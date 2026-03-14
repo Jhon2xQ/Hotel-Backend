@@ -1,0 +1,9 @@
+# deps
+node_modules/
+
+/generated
+/generated/prisma
+
+prisma/migrations
+
+.env
