@@ -6,6 +6,10 @@ const app = new Hono();
 
 app.use("/api/*", corsConfig);
 
+app.get("/health", (c) => {
+  return c.json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
 app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
 
 export default app;
