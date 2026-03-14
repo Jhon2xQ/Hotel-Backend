@@ -24,8 +24,8 @@ RUN addgroup -g 1001 -S bunuser && \
 # Copiar dependencias de producción
 COPY --from=deps --chown=bunuser:bunuser /app/node_modules ./node_modules
 
-# Copiar Prisma client generado (sobreescribe el de node_modules)
-COPY --from=build --chown=bunuser:bunuser /app/node_modules/.prisma ./node_modules/.prisma
+# Copiar Prisma client generado (nueva ubicación en Prisma 7)
+COPY --from=build --chown=bunuser:bunuser /app/generated ./generated
 
 # Copiar código fuente y migraciones
 COPY --chown=bunuser:bunuser . .
@@ -37,16 +37,12 @@ RUN chmod +x entrypoint.sh
 # Cambiar a usuario no-root
 USER bunuser
 
-# Exponer puerto
 EXPOSE 3000
 
-# Variables de entorno por defecto
 ENV NODE_ENV=production
 ENV PORT=3000
 
-# Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=15s --retries=3 \
-  CMD bun run -e "fetch('http://localhost:3000').then(r => r.ok ? process.exit(0) : process.exit(1))"
+  CMD bun run -e "fetch('http://localhost:3000/health').then(r => r.ok ? process.exit(0) : process.exit(1))"
 
-# Comando de inicio
 CMD ["./entrypoint.sh"]
