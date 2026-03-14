@@ -6,7 +6,7 @@ const app = new Hono();
 
 app.use("/api/*", corsConfig);
 
-app.get("/health", (c) => {
+app.get("/api/health", (c) => {
   return c.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
