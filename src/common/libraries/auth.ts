@@ -7,7 +7,7 @@ export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
-  trustedOrigins: async () => [TRUSTED_ORIGINS],
+  trustedOrigins: async () => (TRUSTED_ORIGINS === "*" ? ["*"] : TRUSTED_ORIGINS.split(",")),
   emailAndPassword: {
     enabled: true,
   },
