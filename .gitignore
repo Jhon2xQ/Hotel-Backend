@@ -5,3 +5,9 @@ node_modules/
 /generated/prisma
 
 .env
+
+# AGENTS
+.agents
+.kiro
+skills-lock.json
+AGENTS.md
