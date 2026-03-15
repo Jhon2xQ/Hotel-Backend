@@ -15,8 +15,14 @@ export const auth = betterAuth({
     cookiePrefix: "better-auth",
     defaultCookieAttributes: {
       sameSite: "none",
-      secure: true,
+      secure: process.env.NODE_ENV === "production",
       partitioned: true,
+    },
+  },
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 60 * 60 * 24, // 1 día
     },
   },
   emailAndPassword: {
