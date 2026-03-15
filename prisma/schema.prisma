@@ -12,6 +12,11 @@ datasource db {
   provider = "postgresql"
 }
 
+
+//======================================================================================
+//====================================BETTER-AUTH=======================================
+//======================================================================================
+
 model User {
   id            String    @id
   name          String
@@ -74,4 +79,23 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+//======================================================================================
+//========================================HOTEL=========================================
+//======================================================================================
+
+model Habitacion {
+  id         String   @id @default(uuid()) @db.Uuid
+  numero     String   @unique
+  piso       Int      @db.SmallInt
+  tipo       String
+  precio     Decimal? @db.Decimal(9, 2)
+  estado     String   @default("Disponible")
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  updated_at DateTime @updatedAt @db.Timestamp(6)
+
+  @@index([tipo])
+  @@index([estado])
+  @@map("habitaciones")
 }
