@@ -16,3 +16,16 @@ export function validSchema(schema: ZodSchema) {
     }
   };
 }
+
+export function validParams(schema: ZodSchema) {
+  return async (c: AppContext, next: Next) => {
+    try {
+      const params = c.req.param();
+      schema.parse(params);
+      await next();
+    } catch (error: any) {
+      const errors = error.errors?.map((e: any) => `${e.path.join(".")}: ${e.message}`).join(", ");
+      return c.json(ApiResponse.error(errors || "Parámetros inválidos"), 400);
+    }
+  };
+}
