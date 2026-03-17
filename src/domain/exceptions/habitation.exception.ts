@@ -8,8 +8,4 @@ export class HabitationException extends DomainException {
   static duplicateNumero(numero: string): HabitationException {
     return new HabitationException(`Ya existe una habitación con el número "${numero}"`, 409);
   }
-
-  static invalidUUID(id: string): HabitationException {
-    return new HabitationException(`El id "${id}" no es un UUID válido`, 400);
-  }
 }

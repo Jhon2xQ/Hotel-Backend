@@ -43,4 +43,17 @@ export class Habitation {
       new Date(),
     );
   }
+
+  toOutput() {
+    return {
+      id: this.id,
+      numero: this.numero,
+      piso: this.piso,
+      tipo: this.tipo,
+      precio: this.precio,
+      estado: this.estado,
+      created_at: this.createdAt.toISOString(),
+      updated_at: this.updatedAt.toISOString(),
+    };
+  }
 }
