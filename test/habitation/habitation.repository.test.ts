@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { HabitationRepository } from "../../../src/infrastructure/repositories/habitation.repository";
-import { createMockPrismaClient } from "../../helpers/mock-prisma";
-import { HabitationType, HabitationStatus } from "../../../src/domain/entities/habitation.entity";
+import { HabitationRepository } from "../../src/infrastructure/repositories/habitation.repository";
+import { createMockPrismaClient } from "../helpers/mock-prisma";
+import { HabitationType } from "../../src/domain/entities/habitation.entity";
 
 describe("HabitationRepository", () => {
   let repository: HabitationRepository;

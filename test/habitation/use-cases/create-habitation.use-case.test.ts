@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { CreateHabitationUseCase } from "../../../src/application/use-cases/create-habitation.use-case";
+import { CreateHabitationUseCase } from "../../../src/application/use-cases/habitation/create-habitation.use-case";
 import { IHabitationRepository } from "../../../src/domain/interfaces/habitation.repository.interface";
 import { HabitationException } from "../../../src/domain/exceptions/habitation.exception";
 import { Habitation, HabitationType, HabitationStatus } from "../../../src/domain/entities/habitation.entity";
@@ -15,7 +15,6 @@ describe("CreateHabitationUseCase", () => {
       findAll: vi.fn(),
       findById: vi.fn(),
       update: vi.fn(),
-      updateStatus: vi.fn(),
       delete: vi.fn(),
     };
     useCase = new CreateHabitationUseCase(mockRepository);

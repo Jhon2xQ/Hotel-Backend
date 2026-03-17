@@ -1,13 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { HabitationController } from "../../../src/presentation/controllers/habitation.controller";
-import { CreateHabitationUseCase } from "../../../src/application/use-cases/create-habitation.use-case";
-import { ListHabitationsUseCase } from "../../../src/application/use-cases/list-habitations.use-case";
-import { FindHabitationByIdUseCase } from "../../../src/application/use-cases/find-habitation-by-id.use-case";
-import { UpdateHabitationUseCase } from "../../../src/application/use-cases/update-habitation.use-case";
-import { UpdateHabitationStatusUseCase } from "../../../src/application/use-cases/update-habitation-status.use-case";
-import { DeleteHabitationUseCase } from "../../../src/application/use-cases/delete-habitation.use-case";
-import { createMockContext } from "../../helpers/mock-context";
-import { HabitationType } from "../../../src/domain/entities/habitation.entity";
+import { HabitationController } from "../../src/presentation/controllers/habitation.controller";
+import { createMockContext } from "../helpers/mock-context";
+import { HabitationType } from "../../src/domain/entities/habitation.entity";
 
 describe("HabitationController", () => {
   let controller: HabitationController;
@@ -19,7 +13,6 @@ describe("HabitationController", () => {
       list: { execute: vi.fn() },
       findById: { execute: vi.fn() },
       update: { execute: vi.fn() },
-      updateStatus: { execute: vi.fn() },
       delete: { execute: vi.fn() },
     };
 
@@ -28,7 +21,6 @@ describe("HabitationController", () => {
       mockUseCases.list,
       mockUseCases.findById,
       mockUseCases.update,
-      mockUseCases.updateStatus,
       mockUseCases.delete,
     );
   });
