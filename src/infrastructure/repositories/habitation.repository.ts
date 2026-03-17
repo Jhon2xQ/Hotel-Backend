@@ -56,39 +56,24 @@ export class HabitationRepository implements IHabitationRepository {
 
   async update(id: string, data: UpdateHabitationData): Promise<Habitation> {
     try {
+      const updateData: any = {};
+
+      if (data.numero !== undefined) updateData.numero = data.numero;
+      if (data.piso !== undefined) updateData.piso = data.piso;
+      if (data.tipo !== undefined) updateData.tipo = data.tipo;
+      if (data.precio !== undefined) updateData.precio = data.precio ?? null;
+      if (data.estado !== undefined) updateData.estado = data.estado;
+
       const result = await this.prisma.habitacion.update({
         where: { id },
-        data: {
-          numero: data.numero,
-          piso: data.piso,
-          tipo: data.tipo,
-          precio: data.precio ?? null,
-          estado: data.estado,
-        },
+        data: updateData,
       });
       return this.toDomain(result);
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === "P2002") {
-          throw HabitationException.duplicateNumero(data.numero);
+          throw HabitationException.duplicateNumero(data.numero!);
         }
-        if (error.code === "P2025") {
-          throw HabitationException.notFoundById(id);
-        }
-      }
-      throw error;
-    }
-  }
-
-  async updateStatus(id: string, status: HabitationStatus): Promise<Habitation> {
-    try {
-      const result = await this.prisma.habitacion.update({
-        where: { id },
-        data: { estado: status },
-      });
-      return this.toDomain(result);
-    } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === "P2025") {
           throw HabitationException.notFoundById(id);
         }
