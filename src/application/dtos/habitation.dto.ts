@@ -8,11 +8,11 @@ export interface CreateHabitationInput {
 }
 
 export interface UpdateHabitationInput {
-  numero: string;
-  piso: number;
-  tipo: HabitationType;
+  numero?: string;
+  piso?: number;
+  tipo?: HabitationType;
   precio?: number;
-  estado: HabitationStatus;
+  estado?: HabitationStatus;
 }
 
 export interface UpdateHabitationStatusInput {
