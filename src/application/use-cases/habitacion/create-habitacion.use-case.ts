@@ -16,13 +16,13 @@ export class CreateHabitacionUseCase {
     // Validate TipoHabitacion exists (Requirement 6.4)
     const tipoHabitacion = await this.tipoHabitacionRepository.findById(input.tipo_id);
     if (!tipoHabitacion) {
-      throw HabitacionException.tipoNotFound(input.tipo_id);
+      throw HabitacionException.tipoNotFound();
     }
 
     // Check nroHabitacion uniqueness (Requirement 6.11)
     const existingHabitacion = await this.repository.findByNumero(input.nro_habitacion);
     if (existingHabitacion) {
-      throw HabitacionException.duplicateNumero(input.nro_habitacion);
+      throw HabitacionException.duplicateNumero();
     }
 
     // Validate all referenced muebles exist (Requirement 6.12)
@@ -30,7 +30,7 @@ export class CreateHabitacionUseCase {
       for (const muebleId of input.muebles) {
         const mueble = await this.furnitureRepository.findById(muebleId);
         if (!mueble) {
-          throw HabitacionException.muebleNotFound(muebleId);
+          throw HabitacionException.muebleNotFound();
         }
       }
     }

@@ -35,7 +35,7 @@ export class FurnitureCatalogRepository implements IFurnitureCatalogRepository {
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === "P2002") {
-          throw FurnitureCatalogException.duplicateCodigo(data.codigo);
+          throw FurnitureCatalogException.duplicateCodigo();
         }
       }
       throw error;
@@ -86,10 +86,10 @@ export class FurnitureCatalogRepository implements IFurnitureCatalogRepository {
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === "P2002") {
-          throw FurnitureCatalogException.duplicateCodigo(data.codigo!);
+          throw FurnitureCatalogException.duplicateCodigo();
         }
         if (error.code === "P2025") {
-          throw FurnitureCatalogException.notFoundById(id);
+          throw FurnitureCatalogException.notFoundById();
         }
       }
       throw error;
@@ -104,7 +104,7 @@ export class FurnitureCatalogRepository implements IFurnitureCatalogRepository {
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === "P2025") {
-          throw FurnitureCatalogException.notFoundById(id);
+          throw FurnitureCatalogException.notFoundById();
         }
       }
       throw error;

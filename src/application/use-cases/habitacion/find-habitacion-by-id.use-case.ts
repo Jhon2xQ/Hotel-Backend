@@ -9,7 +9,7 @@ export class FindHabitacionByIdUseCase {
     const habitacion = await this.repository.findById(id);
 
     if (!habitacion) {
-      throw HabitacionException.notFoundById(id);
+      throw HabitacionException.notFoundById();
     }
 
     return habitacion.toOutput();

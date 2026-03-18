@@ -8,7 +8,7 @@ export class DeleteHabitacionUseCase {
     // Validate Habitacion exists (Requirement 11.5)
     const existing = await this.repository.findById(id);
     if (!existing) {
-      throw HabitacionException.notFoundById(id);
+      throw HabitacionException.notFoundById();
     }
 
     // Check for related Estancia records (Requirement 11.3)

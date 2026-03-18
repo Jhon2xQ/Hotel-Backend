@@ -9,7 +9,7 @@ export class UpdateHabitacionStatusUseCase {
     // Validate Habitacion exists (Requirement 10.1, 10.9)
     const existing = await this.repository.findById(id);
     if (!existing) {
-      throw HabitacionException.notFoundById(id);
+      throw HabitacionException.notFoundById();
     }
 
     // Call repository.updateStatus and return HabitacionOutput (Requirement 10.1, 10.5, 10.6)

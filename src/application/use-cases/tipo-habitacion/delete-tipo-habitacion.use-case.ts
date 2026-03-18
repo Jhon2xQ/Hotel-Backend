@@ -8,7 +8,7 @@ export class DeleteTipoHabitacionUseCase {
     // Validate TipoHabitacion exists
     const existing = await this.repository.findById(id);
     if (!existing) {
-      throw TipoHabitacionException.notFoundById(id);
+      throw TipoHabitacionException.notFoundById();
     }
 
     // Check for related records (Habitacion, Tarifa, Reserva)

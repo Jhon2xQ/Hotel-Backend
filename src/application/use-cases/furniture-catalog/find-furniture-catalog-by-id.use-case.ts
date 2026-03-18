@@ -8,7 +8,7 @@ export class FindFurnitureCatalogByIdUseCase {
   async execute(id: string): Promise<FurnitureCatalogOutput> {
     const furniture = await this.repository.findById(id);
     if (!furniture) {
-      throw FurnitureCatalogException.notFoundById(id);
+      throw FurnitureCatalogException.notFoundById();
     }
     return furniture.toOutput();
   }

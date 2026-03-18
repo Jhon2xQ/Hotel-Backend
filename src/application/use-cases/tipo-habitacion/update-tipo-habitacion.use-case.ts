@@ -9,7 +9,7 @@ export class UpdateTipoHabitacionUseCase {
     // Validate TipoHabitacion exists
     const existing = await this.repository.findById(id);
     if (!existing) {
-      throw TipoHabitacionException.notFoundById(id);
+      throw TipoHabitacionException.notFoundById();
     }
 
     // Call repository.update and return TipoHabitacionOutput

@@ -45,7 +45,7 @@ export class HabitacionRepository implements IHabitacionRepository {
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === "P2002") {
-          throw HabitacionException.duplicateNumero(data.nroHabitacion);
+          throw HabitacionException.duplicateNumero();
         }
       }
       throw error;
@@ -123,10 +123,10 @@ export class HabitacionRepository implements IHabitacionRepository {
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === "P2025") {
-          throw HabitacionException.notFoundById(id);
+          throw HabitacionException.notFoundById();
         }
         if (error.code === "P2002") {
-          throw HabitacionException.duplicateNumero(data.nroHabitacion!);
+          throw HabitacionException.duplicateNumero();
         }
       }
       throw error;
@@ -157,7 +157,7 @@ export class HabitacionRepository implements IHabitacionRepository {
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === "P2025") {
-          throw HabitacionException.notFoundById(id);
+          throw HabitacionException.notFoundById();
         }
       }
       throw error;
@@ -172,7 +172,7 @@ export class HabitacionRepository implements IHabitacionRepository {
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === "P2025") {
-          throw HabitacionException.notFoundById(id);
+          throw HabitacionException.notFoundById();
         }
       }
       throw error;

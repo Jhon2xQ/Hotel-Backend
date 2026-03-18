@@ -7,7 +7,7 @@ export class DeleteFurnitureCatalogUseCase {
   async execute(id: string): Promise<void> {
     const existing = await this.repository.findById(id);
     if (!existing) {
-      throw FurnitureCatalogException.notFoundById(id);
+      throw FurnitureCatalogException.notFoundById();
     }
 
     await this.repository.delete(id);

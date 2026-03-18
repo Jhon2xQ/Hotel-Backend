@@ -1,20 +1,31 @@
 import { IFurnitureCatalogRepository } from "../../../domain/interfaces/furniture-catalog.repository.interface";
+import { IHabitacionRepository } from "../../../domain/interfaces/habitacion.repository.interface";
 import { FurnitureCatalogException } from "../../../domain/exceptions/furniture-catalog.exception";
 import { UpdateFurnitureCatalogInput, FurnitureCatalogOutput } from "../../dtos/furniture-catalog.dto";
 
 export class UpdateFurnitureCatalogUseCase {
-  constructor(private repository: IFurnitureCatalogRepository) {}
+  constructor(
+    private repository: IFurnitureCatalogRepository,
+    private habitacionRepository: IHabitacionRepository,
+  ) {}
 
   async execute(id: string, input: UpdateFurnitureCatalogInput): Promise<FurnitureCatalogOutput> {
     const existing = await this.repository.findById(id);
     if (!existing) {
-      throw FurnitureCatalogException.notFoundById(id);
+      throw FurnitureCatalogException.notFoundById();
     }
 
     if (input.codigo && input.codigo !== existing.codigo) {
       const duplicate = await this.repository.findByCodigo(input.codigo);
       if (duplicate) {
-        throw FurnitureCatalogException.duplicateCodigo(input.codigo);
+        throw FurnitureCatalogException.duplicateCodigo();
+      }
+    }
+
+    if (input.habitacion_id !== undefined && input.habitacion_id !== null) {
+      const habitacion = await this.habitacionRepository.findById(input.habitacion_id);
+      if (!habitacion) {
+        throw FurnitureCatalogException.habitacionNotFound();
       }
     }
 

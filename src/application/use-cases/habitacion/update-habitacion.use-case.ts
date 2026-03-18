@@ -16,14 +16,14 @@ export class UpdateHabitacionUseCase {
     // Validate Habitacion exists (Requirement 9.1, 9.10)
     const existing = await this.repository.findById(id);
     if (!existing) {
-      throw HabitacionException.notFoundById(id);
+      throw HabitacionException.notFoundById();
     }
 
     // If nroHabitacion is being changed, check uniqueness (Requirement 9.4, 9.5)
     if (input.nro_habitacion !== undefined && input.nro_habitacion !== existing.nroHabitacion) {
       const existingWithNumero = await this.repository.findByNumero(input.nro_habitacion);
       if (existingWithNumero) {
-        throw HabitacionException.duplicateNumero(input.nro_habitacion);
+        throw HabitacionException.duplicateNumero();
       }
     }
 
@@ -31,7 +31,7 @@ export class UpdateHabitacionUseCase {
     if (input.tipo_id !== undefined) {
       const tipoHabitacion = await this.tipoHabitacionRepository.findById(input.tipo_id);
       if (!tipoHabitacion) {
-        throw HabitacionException.tipoNotFound(input.tipo_id);
+        throw HabitacionException.tipoNotFound();
       }
     }
 
@@ -40,7 +40,7 @@ export class UpdateHabitacionUseCase {
       for (const muebleId of input.muebles) {
         const mueble = await this.furnitureRepository.findById(muebleId);
         if (!mueble) {
-          throw HabitacionException.muebleNotFound(muebleId);
+          throw HabitacionException.muebleNotFound();
         }
       }
     }

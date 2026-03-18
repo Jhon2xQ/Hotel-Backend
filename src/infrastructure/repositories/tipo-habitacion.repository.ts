@@ -48,7 +48,7 @@ export class TipoHabitacionRepository implements ITipoHabitacionRepository {
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === "P2025") {
-          throw TipoHabitacionException.notFoundById(id);
+          throw TipoHabitacionException.notFoundById();
         }
       }
       throw error;
@@ -63,7 +63,7 @@ export class TipoHabitacionRepository implements ITipoHabitacionRepository {
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === "P2025") {
-          throw TipoHabitacionException.notFoundById(id);
+          throw TipoHabitacionException.notFoundById();
         }
       }
       throw error;
