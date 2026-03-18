@@ -190,11 +190,8 @@ enum EstadoReserva {
 }
 
 enum ConceptoPago {
-  DEPOSITO
-  SALDO
-  ABONO
-  DEVOLUCION
-  RETENIDO
+  RESERVA
+  CONSUMO
 
   @@map("concepto_pago")
 }
@@ -329,7 +326,6 @@ model Agencia {
   updatedAt      DateTime @updatedAt @db.Timestamptz
 
   canal    Canal     @relation(fields: [canalId], references: [id])
-  reservas Reserva[]
 
   @@map("agencias")
 }
@@ -350,25 +346,10 @@ model Huesped {
   createdAt    DateTime       @default(now()) @db.Timestamptz
   updatedAt    DateTime       @updatedAt @db.Timestamptz
 
-  resumen  ResumenEstancias?
   reservas Reserva[]
   estancias Estancia[]
 
   @@map("huespedes")
-}
-
-// Estadísticas de fidelización — se actualiza desde la app al cerrar folio
-model ResumenEstancias {
-  huespedId       String    @id @db.Uuid
-  totalEstancias  Int       @default(0)
-  totalNoches     Int       @default(0)
-  totalGastado    Decimal   @default(0) @db.Decimal(12, 2)
-  ultimaEstancia  DateTime? @db.Date
-  primeraEstancia DateTime? @db.Date
-
-  huesped Huesped @relation(fields: [huespedId], references: [id])
-
-  @@map("resumen_estancias")
 }
 
 // ------------------------------------------------------------
@@ -562,46 +543,33 @@ model Servicio {
 // 14. RESERVAS
 // ------------------------------------------------------------
 
-// ------------------------------------------------------------
-// 14. RESERVAS
-// ------------------------------------------------------------
 model Reserva {
   id           String        @id @default(uuid()) @db.Uuid
   codigo       String        @unique @db.VarChar(20)
   huespedId    String        @db.Uuid
-  agenciaId    String?       @db.Uuid
-  canalId      String        @db.Uuid
-  habitacionId String        @db.Uuid          // ← era tipoHabId
-  planId       String        @db.Uuid
+  canalId      String?        @db.Uuid
+  habitacionId String        @db.Uuid 
+  planId       String?        @db.Uuid
+  pagoId       String?       @unique @db.Uuid
 
   fechaEntrada DateTime      @db.Date
   fechaSalida  DateTime      @db.Date
-  noches       Int?
 
   adultos      Int           @default(1)
   ninos        Int           @default(0)
 
-  precioNoche  Decimal       @db.Decimal(10, 2)
-  montoTotal   Decimal       @db.Decimal(12, 2)
-  moneda       String        @default("USD") @db.Char(3)
-
   estado       EstadoReserva @default(TENTATIVA)
   motivoCancel String?       @db.Text
   canceladoEn  DateTime?     @db.Timestamptz
-  refExterna   String?       @db.VarChar(100)
-  nroVoucher   String?       @db.VarChar(50)
-  solicitudes  String?       @db.Text
-  horaLlegada  DateTime?     @db.Time
   createdAt    DateTime      @default(now()) @db.Timestamptz
   updatedAt    DateTime      @updatedAt @db.Timestamptz
 
   huesped    Huesped    @relation(fields: [huespedId], references: [id])
-  agencia    Agencia?   @relation(fields: [agenciaId], references: [id])
-  canal      Canal      @relation(fields: [canalId], references: [id])
-  habitacion Habitacion @relation(fields: [habitacionId], references: [id])  // ← era tipoHabitacion
-  plan       PlanTarifa @relation(fields: [planId], references: [id])
+  canal      Canal?     @relation(fields: [canalId], references: [id])
+  habitacion Habitacion @relation(fields: [habitacionId], references: [id])
+  plan       PlanTarifa? @relation(fields: [planId], references: [id])
 
-  pagos     Pago[]
+  pago      Pago?       @relation("PagoReserva", fields: [pagoId], references: [id])
   estancias Estancia[]
 
   @@map("reservas")
@@ -613,27 +581,19 @@ model Reserva {
 
 model Pago {
   id            String       @id @default(uuid()) @db.Uuid
-  reservaId     String       @db.Uuid
-  folioId       String?      @db.Uuid
-
   concepto      ConceptoPago
   estado        EstadoPago   @default(CONFIRMADO)
-
-  fechaPago     DateTime     @default(now()) @db.Date
+  fechaPago     DateTime     @default(now()) @db.Timestamptz
   monto         Decimal      @db.Decimal(12, 2)
   moneda        String       @default("USD") @db.Char(3)
   metodo        MetodoPago
-  referencia    String?      @db.VarChar(100)
   recibidoPorId String?      @db.Uuid
   notas         String?      @db.Text
-  pagoOrigenId  String?      @db.Uuid
   createdAt     DateTime     @default(now()) @db.Timestamptz
 
-  reserva      Reserva   @relation(fields: [reservaId], references: [id])
-  folio        Folio?    @relation(fields: [folioId], references: [id])
+  reserva   Reserva? @relation("PagoReserva")
+  folio     Folio?   @relation("PagoFolio")
   recibidoPor  Personal? @relation("PagosRecibidos", fields: [recibidoPorId], references: [id])
-  pagoOrigen   Pago?     @relation("PagoDevolucion", fields: [pagoOrigenId], references: [id])
-  devoluciones Pago[]    @relation("PagoDevolucion")
 
   @@map("pagos")
 }
@@ -680,17 +640,16 @@ model Folio {
   moneda       String      @default("USD") @db.Char(3)
   totalCargos  Decimal     @default(0) @db.Decimal(12, 2)
   totalPagos   Decimal     @default(0) @db.Decimal(12, 2)
-  // saldo = totalCargos - totalPagos (calculado en BD, solo lectura)
-  saldo        Decimal?    @db.Decimal(12, 2)
   cerradoEn    DateTime?   @db.Timestamptz
   notas        String?     @db.Text
+  pagoId       String?     @unique @db.Uuid
   createdAt    DateTime    @default(now()) @db.Timestamptz
   updatedAt    DateTime    @updatedAt @db.Timestamptz
 
-  estancia    Estancia      @relation(fields: [estanciaId], references: [id])
-  cargos      CargoFolio[]
-  pagos       Pago[]
+  cargos       CargoFolio[]
   comprobantes Comprobante[]
+  estancia     Estancia      @relation(fields: [estanciaId], references: [id])
+  pago         Pago?         @relation("PagoFolio", fields: [pagoId], references: [id])
 
   @@map("folios")
 }

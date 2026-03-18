@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "pagos" ALTER COLUMN "fechaPago" SET DATA TYPE TIMESTAMPTZ;

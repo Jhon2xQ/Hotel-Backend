@@ -5,6 +5,7 @@ import { prisma } from "./common/libraries/prisma";
 import { createFurnitureCatalogRoutes } from "./routes/furniture-catalog.routes";
 import { createTipoHabitacionRoutes } from "./routes/tipo-habitacion.routes";
 import { createHabitacionRoutes } from "./routes/habitacion.routes";
+import { createPagoRoutes } from "./routes/pago.routes";
 import { errorHandler } from "./presentation/middlewares/exception.middleware";
 
 const app = new Hono();
@@ -20,6 +21,7 @@ app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
 app.route("/api/catalogo-muebles", createFurnitureCatalogRoutes(prisma));
 app.route("/api/tipos-habitacion", createTipoHabitacionRoutes(prisma));
 app.route("/api/habitaciones", createHabitacionRoutes(prisma));
+app.route("/api/pagos", createPagoRoutes(prisma));
 
 app.onError(errorHandler);
 
