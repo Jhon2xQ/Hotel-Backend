@@ -6,6 +6,7 @@ import { createFurnitureCatalogRoutes } from "./routes/furniture-catalog.routes"
 import { createTipoHabitacionRoutes } from "./routes/tipo-habitacion.routes";
 import { createHabitacionRoutes } from "./routes/habitacion.routes";
 import { createPagoRoutes } from "./routes/pago.routes";
+import { createHuespedRoutes } from "./routes/huesped.routes";
 import { errorHandler } from "./presentation/middlewares/exception.middleware";
 
 const app = new Hono();
@@ -22,6 +23,7 @@ app.route("/api/catalogo-muebles", createFurnitureCatalogRoutes(prisma));
 app.route("/api/tipos-habitacion", createTipoHabitacionRoutes(prisma));
 app.route("/api/habitaciones", createHabitacionRoutes(prisma));
 app.route("/api/pagos", createPagoRoutes(prisma));
+app.route("/api/huespedes", createHuespedRoutes(prisma));
 
 app.onError(errorHandler);
 

@@ -1,0 +1,84 @@
+import { AppContext } from "../../common/types/app.types";
+import { ApiResponse } from "../api.response";
+import { CreateHuespedUseCase } from "../../application/use-cases/huesped/create-huesped.use-case";
+import { ListHuespedUseCase } from "../../application/use-cases/huesped/list-huesped.use-case";
+import { FindHuespedByIdUseCase } from "../../application/use-cases/huesped/find-huesped-by-id.use-case";
+import { UpdateHuespedUseCase } from "../../application/use-cases/huesped/update-huesped.use-case";
+import { DeleteHuespedUseCase } from "../../application/use-cases/huesped/delete-huesped.use-case";
+
+export class HuespedController {
+  constructor(
+    private readonly createUseCase: CreateHuespedUseCase,
+    private readonly listUseCase: ListHuespedUseCase,
+    private readonly findByIdUseCase: FindHuespedByIdUseCase,
+    private readonly updateUseCase: UpdateHuespedUseCase,
+    private readonly deleteUseCase: DeleteHuespedUseCase,
+  ) {}
+
+  async create(c: AppContext) {
+    const validData = c.get("validData") as {
+      nombres: string;
+      apellidos: string;
+      email: string;
+      telefono: string;
+      nacionalidad: string;
+      nivel_vip?: number;
+      notas?: string;
+    };
+
+    const huesped = await this.createUseCase.execute({
+      nombres: validData.nombres,
+      apellidos: validData.apellidos,
+      email: validData.email,
+      telefono: validData.telefono,
+      nacionalidad: validData.nacionalidad,
+      nivelVip: validData.nivel_vip,
+      notas: validData.notas,
+    });
+
+    return c.json(ApiResponse.success("Huésped creado exitosamente", huesped.toOutput()), 201);
+  }
+
+  async list(c: AppContext) {
+    const huespedes = await this.listUseCase.execute();
+    const output = huespedes.map((h) => h.toOutput());
+    return c.json(ApiResponse.success("Huéspedes obtenidos exitosamente", output), 200);
+  }
+
+  async findById(c: AppContext) {
+    const id = c.req.param("id") as string;
+    const huesped = await this.findByIdUseCase.execute(id);
+    return c.json(ApiResponse.success("Huésped encontrado", huesped.toOutput()), 200);
+  }
+
+  async update(c: AppContext) {
+    const id = c.req.param("id") as string;
+    const validData = c.get("validData") as {
+      nombres?: string;
+      apellidos?: string;
+      email?: string;
+      telefono?: string;
+      nacionalidad?: string;
+      nivel_vip?: number;
+      notas?: string;
+    };
+
+    const huesped = await this.updateUseCase.execute(id, {
+      nombres: validData.nombres,
+      apellidos: validData.apellidos,
+      email: validData.email,
+      telefono: validData.telefono,
+      nacionalidad: validData.nacionalidad,
+      nivelVip: validData.nivel_vip,
+      notas: validData.notas,
+    });
+
+    return c.json(ApiResponse.success("Huésped actualizado exitosamente", huesped.toOutput()), 200);
+  }
+
+  async delete(c: AppContext) {
+    const id = c.req.param("id") as string;
+    await this.deleteUseCase.execute(id);
+    return c.json(ApiResponse.success("Huésped eliminado exitosamente"), 200);
+  }
+}
