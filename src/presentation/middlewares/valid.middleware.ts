@@ -1,5 +1,5 @@
 import { Next } from "hono";
-import { ZodSchema } from "zod";
+import { ZodError, ZodSchema } from "zod";
 import { AppContext } from "../../common/types/app.types";
 import { ApiResponse } from "../api.response";
 
@@ -11,8 +11,14 @@ export function validSchema(schema: ZodSchema) {
       c.set("validData", validData);
       await next();
     } catch (error: any) {
-      const errors = error.errors?.map((e: any) => `${e.path.join(".")}: ${e.message}`).join(", ");
-      return c.json(ApiResponse.error(errors || "Datos inválidos"), 400);
+      if (error instanceof ZodError) {
+        const errorDetails = error.issues.map((err) => {
+          const field = err.path.join(".");
+          return field;
+        });
+        return c.json(ApiResponse.error(`Error de validacion en cuerpo: ${errorDetails.join(" | ")}`), 400);
+      }
+      return c.json(ApiResponse.error("Datos inválidos en cuerpo de request"), 400);
     }
   };
 }
@@ -24,8 +30,14 @@ export function validParams(schema: ZodSchema) {
       schema.parse(params);
       await next();
     } catch (error: any) {
-      const errors = error.errors?.map((e: any) => `${e.path.join(".")}: ${e.message}`).join(", ");
-      return c.json(ApiResponse.error(errors || "Parámetros inválidos"), 400);
+      if (error instanceof ZodError) {
+        const errorDetails = error.issues.map((err) => {
+          const field = err.path.join(".");
+          return field;
+        });
+        return c.json(ApiResponse.error(`Error de validacion en parametro: ${errorDetails.join(" | ")}`), 400);
+      }
+      return c.json(ApiResponse.error("Datos inválidos en parametros de request"), 400);
     }
   };
 }
