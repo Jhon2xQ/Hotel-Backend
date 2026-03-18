@@ -2,8 +2,9 @@ import { Hono } from "hono";
 import { corsConfig } from "./common/configs/cors.config";
 import { auth } from "./common/libraries/auth";
 import { prisma } from "./common/libraries/prisma";
-import { createHabitationRoutes } from "./routes/habitation.routes";
 import { createFurnitureCatalogRoutes } from "./routes/furniture-catalog.routes";
+import { createTipoHabitacionRoutes } from "./routes/tipo-habitacion.routes";
+import { createHabitacionRoutes } from "./routes/habitacion.routes";
 import { errorHandler } from "./presentation/middlewares/exception.middleware";
 
 const app = new Hono();
@@ -16,8 +17,9 @@ app.get("/api/health", (c) => {
 
 app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
 
-app.route("/api/habitaciones", createHabitationRoutes(prisma));
 app.route("/api/catalogo-muebles", createFurnitureCatalogRoutes(prisma));
+app.route("/api/tipos-habitacion", createTipoHabitacionRoutes(prisma));
+app.route("/api/habitaciones", createHabitacionRoutes(prisma));
 
 app.onError(errorHandler);
 
