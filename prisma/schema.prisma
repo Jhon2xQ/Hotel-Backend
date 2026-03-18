@@ -29,7 +29,7 @@ model User {
 
   sessions      Session[]
   accounts      Account[]
-  staff         Staff?
+  staff         Personal?
 
   @@unique([email])
   @@map("user")
@@ -89,742 +89,720 @@ model Verification {
 
 // ============================================================
 // ENUMS
+// Valores en español para coincidir con el SQL de la BD.
+// createdAt / updatedAt siempre en inglés (convención Prisma).
 // ============================================================
 
-enum ChannelType {
+enum TipoCanal {
   OTA
-  DIRECT
-  AGENCY
-  CORPORATE
-  TOUR_OP
+  DIRECTO
+  AGENCIA
+  CORPORATIVO
+  OPERADOR
+
+  @@map("tipo_canal")
 }
 
-enum DocType {
+enum TipoDocumento {
   DNI
-  PASSPORT
+  PASAPORTE
   CE
   RUC
+
+  @@map("tipo_documento")
 }
 
-enum Gender {
+enum Genero {
   M
   F
   O
+
+  @@map("genero")
 }
 
-enum RoomStatus {
-  AVAILABLE
-  RESERVED
-  OCCUPIED
-  CLEANING
-  MAINTENANCE
+enum EstadoHabitacion {
+  DISPONIBLE
+  RESERVADA
+  OCUPADA
+  LIMPIEZA
+  MANTENIMIENTO
+
+  @@map("estado_habitacion")
 }
 
-enum HousekeepingStatus {
-  CLEAN
-  DIRTY
-  CLEANING
-  INSPECTING
+enum EstadoLimpieza {
+  LIMPIA
+  SUCIA
+  EN_LIMPIEZA
+  INSPECCION
+
+  @@map("estado_limpieza")
 }
 
-enum FurnitureCondition {
-  GOOD
-  FAIR
-  DAMAGED
-  MISSING
+enum CondicionMueble {
+  BUENO
+  REGULAR
+  DANADO
+  FALTANTE
+
+  @@map("condicion_mueble")
 }
 
-enum FurnitureCategory {
-  BED
-  SEATING
-  STORAGE
-  TECH
-  BATHROOM
-  DECOR
-  OTHER
+enum CategoriaMueble {
+  CAMA
+  ASIENTO
+  ALMACENAJE
+  TECNOLOGIA
+  BANO
+  DECORACION
+  OTRO
+
+  @@map("categoria_mueble")
 }
 
-enum CancelPolicy {
+enum PoliticaCancelacion {
   FLEXIBLE
-  MODERATE
-  STRICT
-  NON_REFUND
+  MODERADA
+  ESTRICTA
+  NO_REEMBOLSABLE
+
+  @@map("politica_cancelacion")
 }
 
-enum SeasonType {
-  LOW
-  MID
-  HIGH
-  SUPER_HIGH
+enum TipoTemporada {
+  BAJA
+  MEDIA
+  ALTA
+  MUY_ALTA
+
+  @@map("tipo_temporada")
 }
 
-enum ReservationStatus {
-  TENTATIVE
-  CONFIRMED
-  CHECKED_IN
-  CHECKED_OUT
-  CANCELLED
-  NO_SHOW
+enum EstadoReserva {
+  TENTATIVA
+  CONFIRMADA
+  EN_CASA
+  COMPLETADA
+  CANCELADA
+  NO_LLEGO
+
+  @@map("estado_reserva")
 }
 
-enum PaymentConcept {
-  DEPOSIT
-  BALANCE
-  EXTRA
-  REFUND
-  FORFEITED
+enum ConceptoPago {
+  DEPOSITO
+  SALDO
+  ABONO
+  DEVOLUCION
+  RETENIDO
+
+  @@map("concepto_pago")
 }
 
-enum PaymentStatus {
-  CONFIRMED
-  APPLIED
-  REFUNDED
-  FORFEITED
-  VOID
+enum EstadoPago {
+  CONFIRMADO
+  APLICADO
+  DEVUELTO
+  RETENIDO
+  ANULADO
+
+  @@map("estado_pago")
 }
 
-enum PaymentMethod {
-  CASH
+enum MetodoPago {
+  EFECTIVO
   VISA
   MASTERCARD
   AMEX
-  TRANSFER
-  AGENCY_CREDIT
+  TRANSFERENCIA
+  CREDITO_AGENCIA
   VOUCHER
+
+  @@map("metodo_pago")
 }
 
-enum StayStatus {
-  IN_HOUSE
-  CHECKED_OUT
-  EARLY_DEPARTURE
+enum EstadoEstadia {
+  EN_CASA
+  COMPLETADA
+  SALIDA_ANTICIPADA
+
+  @@map("estado_estadia")
 }
 
-enum FolioStatus {
-  OPEN
-  CLOSED
-  TRANSFERRED
+enum EstadoFolio {
+  ABIERTO
+  CERRADO
+  TRANSFERIDO
+
+  @@map("estado_folio")
 }
 
-enum ServiceCategory {
-  ROOM
-  FOOD
-  BEVERAGE
+enum CategoriaServicio {
+  HABITACION
+  ALIMENTO
+  BEBIDA
   SPA
   TOUR
-  LAUNDRY
-  TRANSPORT
+  LAVANDERIA
+  TRANSPORTE
   MINIBAR
-  OTHER
+  OTRO
+
+  @@map("categoria_servicio")
 }
 
-enum InvoiceType {
+enum TipoComprobante {
   BOLETA
   FACTURA
-  NOTA_CRED
+  NOTA_CREDITO
+
+  @@map("tipo_comprobante")
 }
 
-enum SunatStatus {
-  PENDING
-  ACCEPTED
-  REJECTED
-  ANNULLED
+enum EstadoSunat {
+  PENDIENTE
+  ACEPTADO
+  RECHAZADO
+  ANULADO
+
+  @@map("estado_sunat")
 }
 
-enum StaffRole {
-  RECEPTIONIST
-  MANAGER
-  HOUSEKEEPER
+enum RolPersonal {
+  RECEPCIONISTA
+  GERENTE
+  CAMARERA
   BELLBOY
-  WAITER
-  ACCOUNTANT
-  SECURITY
-  OTHER
+  MOZO
+  CONTADOR
+  SEGURIDAD
+  OTRO
+
+  @@map("rol_personal")
 }
 
 // ============================================================
+// MODELOS
+// ============================================================
+
+// ------------------------------------------------------------
 // 1. CANALES DE VENTA
 // ------------------------------------------------------------
-// Auditoría: saber cuándo se activó/desactivó un canal
-// ============================================================
 
-model Channel {
-  id            String      @id @default(uuid()) @db.Uuid
-  code          String      @unique @db.VarChar(20)
-  name          String      @db.VarChar(100)
-  type          ChannelType
-  commissionPct Decimal     @default(0) @db.Decimal(5, 2)
-  isActive      Boolean     @default(true)
-  notes         String?     @db.Text
-  createdAt     DateTime    @default(now()) @db.Timestamptz
-  updatedAt     DateTime    @updatedAt @db.Timestamptz
+model Canal {
+  id           String    @id @default(uuid()) @db.Uuid
+  codigo       String    @unique @db.VarChar(20)
+  nombre       String    @db.VarChar(100)
+  tipo         TipoCanal
+  comisionPct  Decimal   @default(0) @db.Decimal(5, 2)
+  activo       Boolean   @default(true)
+  notas        String?   @db.Text
+  createdAt    DateTime  @default(now())  @db.Timestamptz
+  updatedAt    DateTime  @updatedAt @db.Timestamptz
 
-  agencies     Agency[]
-  rates        Rate[]
-  reservations Reservation[]
+  agencias    Agencia[]
+  tarifas     Tarifa[]
+  reservas    Reserva[]
 
-  @@map("channels")
+  @@map("canales")
 }
 
-// ============================================================
-// 2. AGENCIAS
 // ------------------------------------------------------------
-// Auditoría: cambios de crédito, datos de contacto
-// ============================================================
-
-model Agency {
-  id          String   @id @default(uuid()) @db.Uuid
-  channelId   String   @db.Uuid
-  ruc         String?  @db.VarChar(11)
-  name        String   @db.VarChar(150)
-  contactName String?  @db.VarChar(100)
-  email       String?  @db.VarChar(100)
-  phone       String?  @db.VarChar(20)
-  address     String?  @db.Text
-  city        String?  @db.VarChar(80)
-  country     String   @default("Peru") @db.VarChar(60)
-  creditLimit Decimal  @default(0) @db.Decimal(10, 2)
-  paymentDays Int      @default(30)
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now()) @db.Timestamptz
-  updatedAt   DateTime @updatedAt @db.Timestamptz
-
-  channel      Channel       @relation(fields: [channelId], references: [id])
-  reservations Reservation[]
-
-  @@map("agencies")
-}
-
-// ============================================================
-// 3. HUÉSPEDES
+// 2. AGENCIAS Y EMPRESAS
 // ------------------------------------------------------------
-// Auditoría: cambios de datos personales, nivel VIP
-// createdAt ya existía. Se agrega updatedAt.
-// ============================================================
 
-model Guest {
-  id          String    @id @default(uuid()) @db.Uuid
-  firstName   String    @db.VarChar(80)
-  lastName    String    @db.VarChar(80)
-  email       String?   @unique @db.VarChar(120)
-  phone       String?   @db.VarChar(20)
-  nationality String?   @db.VarChar(60)
-  docType     DocType?
-  docNumber   String?   @db.VarChar(30)
-  birthDate   DateTime? @db.Date
-  gender      Gender?
-  language    String    @default("es") @db.VarChar(10)
-  vipLevel    Int       @default(0)
-  notes       String?   @db.Text
-  createdAt   DateTime  @default(now()) @db.Timestamptz
-  updatedAt   DateTime  @updatedAt @db.Timestamptz
-
-  staysSummary GuestStaysSummary?
-  reservations Reservation[]
-  stays        Stay[]
-
-  @@unique([docType, docNumber])
-  @@map("guests")
-}
-
-// ============================================================
-// GuestStaysSummary
-// ------------------------------------------------------------
-// Sin auditoría propia: es una tabla derivada que se
-// actualiza por trigger/job. Su "updatedAt" es lastStayDate.
-// ============================================================
-
-model GuestStaysSummary {
-  guestId       String    @id @db.Uuid
-  totalStays    Int       @default(0)
-  totalNights   Int       @default(0)
-  totalSpent    Decimal   @default(0) @db.Decimal(12, 2)
-  lastStayDate  DateTime? @db.Date
-  firstStayDate DateTime? @db.Date
-
-  guest Guest @relation(fields: [guestId], references: [id])
-
-  @@map("guest_stays_summary")
-}
-
-// ============================================================
-// 4. TIPOS DE HABITACIÓN
-// ------------------------------------------------------------
-// Auditoría: cambios de descripción, precio base, amenities
-// ============================================================
-
-model RoomType {
+model Agencia {
   id             String   @id @default(uuid()) @db.Uuid
-  code           String   @unique @db.VarChar(20)
-  name           String   @db.VarChar(100)
-  description    String?  @db.Text
-  baseAreaM2     Decimal? @db.Decimal(6, 1)
-  bedType        String?  @db.VarChar(50)
-  viewType       String?  @db.VarChar(50)
-  floorRange     String?  @db.VarChar(20)
-  hasBathtub     Boolean  @default(false)
-  hasJacuzzi     Boolean  @default(false)
-  hasLivingRoom  Boolean  @default(false)
-  hasKitchenette Boolean  @default(false)
-  imageUrl       String?  @db.VarChar(255)
+  canalId        String   @db.Uuid
+  ruc            String?  @db.VarChar(11)
+  nombre         String   @db.VarChar(150)
+  contacto       String?  @db.VarChar(100)
+  email          String?  @db.VarChar(100)
+  telefono       String?  @db.VarChar(20)
+  direccion      String?  @db.Text
+  ciudad         String?  @db.VarChar(80)
+  pais           String   @default("Peru") @db.VarChar(60)
+  limiteCredito  Decimal  @default(0) @db.Decimal(10, 2)
+  diasPago       Int      @default(30)
+  activo         Boolean  @default(true)
   createdAt      DateTime @default(now()) @db.Timestamptz
   updatedAt      DateTime @updatedAt @db.Timestamptz
 
-  rooms         Room[]
-  rates         Rate[]
-  typeFurniture RoomTypeFurniture[]
-  reservations  Reservation[]
+  canal    Canal     @relation(fields: [canalId], references: [id])
+  reservas Reserva[]
 
-  @@map("room_types")
+  @@map("agencias")
 }
 
-// ============================================================
+// ------------------------------------------------------------
+// 3. HUÉSPEDES
+// ------------------------------------------------------------
+
+model Huesped {
+  id           String         @id @default(uuid()) @db.Uuid
+  nombres      String         @db.VarChar(80)
+  apellidos    String         @db.VarChar(80)
+  email        String?        @unique @db.VarChar(120)
+  telefono     String?        @db.VarChar(20)
+  nacionalidad String?        @db.VarChar(60)
+  tipoDoc      TipoDocumento?
+  nroDoc       String?        @db.VarChar(30)
+  fechaNac     DateTime?      @db.Date
+  genero       Genero?
+  idioma       String         @default("es") @db.VarChar(10)
+  nivelVip     Int            @default(0)
+  notas        String?        @db.Text
+  createdAt    DateTime       @default(now()) @db.Timestamptz
+  updatedAt    DateTime       @updatedAt @db.Timestamptz
+
+  resumen  ResumenEstancias?
+  reservas Reserva[]
+  estancias Estancia[]
+
+  @@unique([tipoDoc, nroDoc])
+  @@map("huespedes")
+}
+
+// Estadísticas de fidelización — se actualiza desde la app al cerrar folio
+model ResumenEstancias {
+  huespedId       String    @id @db.Uuid
+  totalEstancias  Int       @default(0)
+  totalNoches     Int       @default(0)
+  totalGastado    Decimal   @default(0) @db.Decimal(12, 2)
+  ultimaEstancia  DateTime? @db.Date
+  primeraEstancia DateTime? @db.Date
+
+  huesped Huesped @relation(fields: [huespedId], references: [id])
+
+  @@map("resumen_estancias")
+}
+
+// ------------------------------------------------------------
+// 4. TIPOS DE HABITACIÓN
+// ------------------------------------------------------------
+
+model TipoHabitacion {
+  id            String   @id @default(uuid()) @db.Uuid
+  codigo        String   @unique @db.VarChar(20)
+  nombre        String   @db.VarChar(100)
+  descripcion   String?  @db.Text
+  areaM2        Decimal? @db.Decimal(6, 1)
+  tipoCama      String?  @db.VarChar(50)
+  vista         String?  @db.VarChar(50)
+  pisos         String?  @db.VarChar(20)
+  tieneTina     Boolean  @default(false)
+  tieneJacuzzi  Boolean  @default(false)
+  tieneSala     Boolean  @default(false)
+  tieneCocina   Boolean  @default(false)
+  urlImagen     String?  @db.VarChar(255)
+  createdAt     DateTime @default(now()) @db.Timestamptz
+  updatedAt     DateTime @updatedAt @db.Timestamptz
+
+  habitaciones    Habitacion[]
+  tarifas         Tarifa[]
+  mueblesTipo     MueblesPorTipo[]
+  reservas        Reserva[]
+
+  @@map("tipos_habitacion")
+}
+
+// ------------------------------------------------------------
 // 5. CATÁLOGO DE MUEBLES
 // ------------------------------------------------------------
-// Auditoría: renombrado de muebles, cambio de categoría
-// ============================================================
 
-model FurnitureCatalog {
-  id          String            @id @default(uuid()) @db.Uuid
-  code        String            @unique @db.VarChar(30)
-  name        String            @db.VarChar(100)
-  category    FurnitureCategory
-  description String?           @db.Text
-  createdAt   DateTime          @default(now()) @db.Timestamptz
-  updatedAt   DateTime          @updatedAt @db.Timestamptz
+model CatalogoMueble {
+  id          String          @id @default(uuid()) @db.Uuid
+  codigo      String          @unique @db.VarChar(30)
+  nombre      String          @db.VarChar(100)
+  categoria   CategoriaMueble
+  descripcion String?         @db.Text
+  createdAt   DateTime        @default(now()) @db.Timestamptz
+  updatedAt   DateTime        @updatedAt @db.Timestamptz
 
-  roomTypeFurniture RoomTypeFurniture[]
-  roomFurniture     RoomFurniture[]
+  mueblesTipo      MueblesPorTipo[]
+  mueblesHabitacion MuebleHabitacion[]
 
-  @@map("furniture_catalog")
+  @@map("catalogo_muebles")
 }
 
-// ============================================================
+// ------------------------------------------------------------
 // 6. INVENTARIO ESTÁNDAR POR TIPO (plantilla)
 // ------------------------------------------------------------
-// Auditoría: cambios en la cantidad estándar o mandatoriedad
-// ============================================================
 
-model RoomTypeFurniture {
-  id          String   @id @default(uuid()) @db.Uuid
-  roomTypeId  String   @db.Uuid
-  furnitureId String   @db.Uuid
-  quantity    Int      @default(1)
-  isMandatory Boolean  @default(true)
-  notes       String?  @db.Text
-  createdAt   DateTime @default(now()) @db.Timestamptz
-  updatedAt   DateTime @updatedAt @db.Timestamptz
+model MueblesPorTipo {
+  id               String   @id @default(uuid()) @db.Uuid
+  tipoHabitacionId String   @db.Uuid
+  muebleId         String   @db.Uuid
+  cantidad         Int      @default(1)
+  obligatorio      Boolean  @default(true)
+  notas            String?  @db.Text
+  createdAt        DateTime @default(now()) @db.Timestamptz
+  updatedAt        DateTime @updatedAt @db.Timestamptz
 
-  roomType  RoomType         @relation(fields: [roomTypeId], references: [id])
-  furniture FurnitureCatalog @relation(fields: [furnitureId], references: [id])
+  tipoHabitacion TipoHabitacion @relation(fields: [tipoHabitacionId], references: [id])
+  mueble         CatalogoMueble @relation(fields: [muebleId], references: [id])
 
-  @@unique([roomTypeId, furnitureId])
-  @@map("room_type_furniture")
+  @@unique([tipoHabitacionId, muebleId])
+  @@map("muebles_por_tipo")
 }
 
-// ============================================================
+// ------------------------------------------------------------
 // 7. HABITACIONES
 // ------------------------------------------------------------
-// Auditoría: cambios de estado, asignación a mantenimiento
-// lastCleanedAt: Timestamptz — hora exacta en Lima
-// ============================================================
 
-model Room {
-  id                 String             @id @default(uuid()) @db.Uuid
-  roomNumber         String             @unique @db.VarChar(10)
-  roomTypeId         String             @db.Uuid
-  floor              Int
-  status             RoomStatus         @default(AVAILABLE)
-  housekeepingStatus HousekeepingStatus @default(CLEAN)
-  isAccessible       Boolean            @default(false)
-  notes              String?            @db.Text
-  lastCleanedAt      DateTime?          @db.Timestamptz
-  createdAt          DateTime           @default(now()) @db.Timestamptz
-  updatedAt          DateTime           @updatedAt @db.Timestamptz
+model Habitacion {
+  id             String           @id @default(uuid()) @db.Uuid
+  nroHabitacion  String           @unique @db.VarChar(10)
+  tipoId         String           @db.Uuid
+  piso           Int
+  estado         EstadoHabitacion @default(DISPONIBLE)
+  limpieza       EstadoLimpieza   @default(LIMPIA)
+  accesible      Boolean          @default(false)
+  notas          String?          @db.Text
+  ultimaLimpieza DateTime?        @db.Timestamptz
+  createdAt      DateTime         @default(now()) @db.Timestamptz
+  updatedAt      DateTime         @updatedAt @db.Timestamptz
 
-  roomType  RoomType        @relation(fields: [roomTypeId], references: [id])
-  furniture RoomFurniture[]
-  stays     Stay[]
+  tipo      TipoHabitacion     @relation(fields: [tipoId], references: [id])
+  muebles   MuebleHabitacion[]
+  estancias Estancia[]
 
-  @@map("rooms")
+  @@map("habitaciones")
 }
 
-// ============================================================
+// ------------------------------------------------------------
 // 8. INVENTARIO REAL POR HABITACIÓN
 // ------------------------------------------------------------
-// Auditoría: cambios de condición, reportes de daño
-// acquiredDate / lastCheckedAt: Date pura, sin hora
-// ============================================================
 
-model RoomFurniture {
-  id            String             @id @default(uuid()) @db.Uuid
-  roomId        String             @db.Uuid
-  furnitureId   String             @db.Uuid
-  serialNumber  String?            @db.VarChar(60)
-  condition     FurnitureCondition @default(GOOD)
-  acquiredDate  DateTime?          @db.Date
-  lastCheckedAt DateTime?          @db.Date
-  notes         String?            @db.Text
-  createdAt     DateTime           @default(now()) @db.Timestamptz
-  updatedAt     DateTime           @updatedAt @db.Timestamptz
+model MuebleHabitacion {
+  id             String          @id @default(uuid()) @db.Uuid
+  habitacionId   String          @db.Uuid
+  muebleId       String          @db.Uuid
+  nroSerie       String?         @db.VarChar(60)
+  condicion      CondicionMueble @default(BUENO)
+  fechaAdq       DateTime?       @db.Date
+  ultimaRevision DateTime?       @db.Date
+  notas          String?         @db.Text
+  createdAt      DateTime        @default(now()) @db.Timestamptz
+  updatedAt      DateTime        @updatedAt @db.Timestamptz
 
-  room      Room             @relation(fields: [roomId], references: [id])
-  furniture FurnitureCatalog @relation(fields: [furnitureId], references: [id])
+  habitacion Habitacion     @relation(fields: [habitacionId], references: [id])
+  mueble     CatalogoMueble @relation(fields: [muebleId], references: [id])
 
-  @@map("room_furniture")
+  @@map("muebles_habitacion")
 }
 
-// ============================================================
+// ------------------------------------------------------------
 // 9. PLANES TARIFARIOS
 // ------------------------------------------------------------
-// Auditoría: cambios de política de cancelación, inclusiones
-// ============================================================
 
-model RatePlan {
-  id                String       @id @default(uuid()) @db.Uuid
-  code              String       @unique @db.VarChar(20)
-  name              String       @db.VarChar(100)
-  includesBreakfast Boolean      @default(false)
-  includesLunch     Boolean      @default(false)
-  includesDinner    Boolean      @default(false)
-  cancelPolicy      CancelPolicy @default(FLEXIBLE)
-  cancelHours       Int          @default(24)
-  minNights         Int          @default(1)
-  isActive          Boolean      @default(true)
-  description       String?      @db.Text
-  createdAt         DateTime     @default(now()) @db.Timestamptz
-  updatedAt         DateTime     @updatedAt @db.Timestamptz
+model PlanTarifa {
+  id               String              @id @default(uuid()) @db.Uuid
+  codigo           String              @unique @db.VarChar(20)
+  nombre           String              @db.VarChar(100)
+  incluyeDesayuno  Boolean             @default(false)
+  incluyeAlmuerzo  Boolean             @default(false)
+  incluyeCena      Boolean             @default(false)
+  politicaCancel   PoliticaCancelacion @default(FLEXIBLE)
+  horasCancel      Int                 @default(24)
+  nochesMinimas    Int                 @default(1)
+  activo           Boolean             @default(true)
+  descripcion      String?             @db.Text
+  createdAt        DateTime            @default(now()) @db.Timestamptz
+  updatedAt        DateTime            @updatedAt @db.Timestamptz
 
-  rates        Rate[]
-  reservations Reservation[]
+  tarifas  Tarifa[]
+  reservas Reserva[]
 
-  @@map("rate_plans")
+  @@map("planes_tarifa")
 }
 
-// ============================================================
+// ------------------------------------------------------------
 // 10. TEMPORADAS
 // ------------------------------------------------------------
-// Auditoría: ajustes de fechas o multiplicadores de precio
-// dateFrom / dateTo: Date pura (sin hora, sin zona)
-// ============================================================
 
-model Season {
-  id         String     @id @default(uuid()) @db.Uuid
-  name       String     @db.VarChar(80)
-  seasonType SeasonType
-  dateFrom   DateTime   @db.Date
-  dateTo     DateTime   @db.Date
-  multiplier Decimal    @default(1.00) @db.Decimal(4, 2)
-  notes      String?    @db.Text
-  createdAt  DateTime   @default(now()) @db.Timestamptz
-  updatedAt  DateTime   @updatedAt @db.Timestamptz
+model Temporada {
+  id            String        @id @default(uuid()) @db.Uuid
+  nombre        String        @db.VarChar(80)
+  tipo          TipoTemporada
+  fechaInicio   DateTime      @db.Date
+  fechaFin      DateTime      @db.Date
+  multiplicador Decimal       @default(1.00) @db.Decimal(4, 2)
+  notas         String?       @db.Text
+  createdAt     DateTime      @default(now()) @db.Timestamptz
+  updatedAt     DateTime      @updatedAt @db.Timestamptz
 
-  rates Rate[]
+  tarifas Tarifa[]
 
-  @@map("seasons")
+  @@map("temporadas")
 }
 
-// ============================================================
+// ------------------------------------------------------------
 // 11. TARIFAS
 // ------------------------------------------------------------
-// Auditoría: cambios de precio, vigencia
-// validFrom / validTo: Date pura
-// ============================================================
 
-model Rate {
-  id              String    @id @default(uuid()) @db.Uuid
-  roomTypeId      String    @db.Uuid
-  ratePlanId      String    @db.Uuid
-  seasonId        String?   @db.Uuid
-  channelId       String?   @db.Uuid
-  pricePerNight   Decimal   @db.Decimal(10, 2)
-  priceExtraAdult Decimal   @default(0) @db.Decimal(8, 2)
-  priceExtraChild Decimal   @default(0) @db.Decimal(8, 2)
-  currency        String    @default("USD") @db.Char(3)
-  validFrom       DateTime? @db.Date
-  validTo         DateTime? @db.Date
-  createdAt       DateTime  @default(now()) @db.Timestamptz
-  updatedAt       DateTime  @updatedAt @db.Timestamptz
+model Tarifa {
+  id               String    @id @default(uuid()) @db.Uuid
+  tipoHabitacionId String    @db.Uuid
+  planId           String    @db.Uuid
+  temporadaId      String?   @db.Uuid
+  canalId          String?   @db.Uuid
+  precioNoche      Decimal   @db.Decimal(10, 2)
+  precioAdultoExtra Decimal  @default(0) @db.Decimal(8, 2)
+  precioNinoExtra  Decimal   @default(0) @db.Decimal(8, 2)
+  moneda           String    @default("USD") @db.Char(3)
+  vigenciaDesde    DateTime? @db.Date
+  vigenciaHasta    DateTime? @db.Date
+  createdAt        DateTime  @default(now()) @db.Timestamptz
+  updatedAt        DateTime  @updatedAt @db.Timestamptz
 
-  roomType RoomType  @relation(fields: [roomTypeId], references: [id])
-  ratePlan RatePlan  @relation(fields: [ratePlanId], references: [id])
-  season   Season?   @relation(fields: [seasonId], references: [id])
-  channel  Channel?  @relation(fields: [channelId], references: [id])
+  tipoHabitacion TipoHabitacion @relation(fields: [tipoHabitacionId], references: [id])
+  plan           PlanTarifa     @relation(fields: [planId], references: [id])
+  temporada      Temporada?     @relation(fields: [temporadaId], references: [id])
+  canal          Canal?         @relation(fields: [canalId], references: [id])
 
-  @@unique([roomTypeId, ratePlanId, seasonId, channelId])
-  @@map("rates")
+  @@unique([tipoHabitacionId, planId, temporadaId, canalId])
+  @@map("tarifas")
 }
 
-// ============================================================
-// 12. RESERVAS
 // ------------------------------------------------------------
-// Auditoría: crítico — todo cambio de estado queda registrado
-// checkInDate / checkOutDate: Date pura (sin hora)
-// arrivalTime: Time (hora estimada, sin fecha ni zona)
-// cancelledAt: Timestamptz — momento exacto en Lima
-// createdAt / updatedAt ya existían
-// ============================================================
-
-model Reservation {
-  id              String            @id @default(uuid()) @db.Uuid
-  reservationCode String            @unique @db.VarChar(20)
-  guestId         String            @db.Uuid
-  agencyId        String?           @db.Uuid
-  channelId       String            @db.Uuid
-  roomTypeId      String            @db.Uuid
-  ratePlanId      String            @db.Uuid
-
-  checkInDate     DateTime          @db.Date
-  checkOutDate    DateTime          @db.Date
-  nights          Int?
-
-  adults          Int               @default(1)
-  children        Int               @default(0)
-
-  ratePerNight    Decimal           @db.Decimal(10, 2)
-  totalAmount     Decimal           @db.Decimal(12, 2)
-  currency        String            @default("USD") @db.Char(3)
-
-  status          ReservationStatus @default(TENTATIVE)
-  cancelReason    String?           @db.Text
-  cancelledAt     DateTime?         @db.Timestamptz
-  externalRef     String?           @db.VarChar(100)
-  voucherNumber   String?           @db.VarChar(50)
-  specialRequests String?           @db.Text
-  arrivalTime     DateTime?         @db.Time
-  createdAt       DateTime          @default(now()) @db.Timestamptz
-  updatedAt       DateTime          @updatedAt @db.Timestamptz
-
-  guest    Guest     @relation(fields: [guestId], references: [id])
-  agency   Agency?   @relation(fields: [agencyId], references: [id])
-  channel  Channel   @relation(fields: [channelId], references: [id])
-  roomType RoomType  @relation(fields: [roomTypeId], references: [id])
-  ratePlan RatePlan  @relation(fields: [ratePlanId], references: [id])
-
-  payments Payment[]
-  stays    Stay[]
-
-  @@map("reservations")
-}
-
-// ============================================================
-// 13. PAGOS
+// 12. PERSONAL
 // ------------------------------------------------------------
-// Auditoría: crítico — pagos nunca se borran, solo se anulan
-// paymentDate: Date pura (fecha del pago, no hora)
-// createdAt: Timestamptz — momento exacto del registro en Lima
-// Sin updatedAt: un pago no se edita, solo se anula (void)
-//   Para cambios de status usar un campo status + createdAt
-//   es suficiente trazabilidad.
-// ============================================================
 
-model Payment {
-  id              String         @id @default(uuid()) @db.Uuid
-  reservationId   String         @db.Uuid
-  folioId         String?        @db.Uuid
-
-  concept         PaymentConcept
-  status          PaymentStatus  @default(CONFIRMED)
-
-  paymentDate     DateTime       @default(now()) @db.Date
-  amount          Decimal        @db.Decimal(12, 2)
-  currency        String         @default("USD") @db.Char(3)
-  method          PaymentMethod
-  reference       String?        @db.VarChar(100)
-  receivedById    String?        @db.Uuid
-  notes           String?        @db.Text
-  parentPaymentId String?        @db.Uuid
-  createdAt       DateTime       @default(now()) @db.Timestamptz
-
-  reservation   Reservation @relation(fields: [reservationId], references: [id])
-  folio         Folio?      @relation(fields: [folioId], references: [id])
-  receivedBy    Staff?      @relation(fields: [receivedById], references: [id])
-  parentPayment Payment?    @relation("PaymentRefund", fields: [parentPaymentId], references: [id])
-  childPayments Payment[]   @relation("PaymentRefund")
-
-  @@map("payments")
-}
-
-// ============================================================
-// 14. ESTADÍAS
-// ------------------------------------------------------------
-// Auditoría: crítico — check-in y check-out con hora exacta
-// checkInAt / checkOutAt: Timestamptz — hora Lima exacta
-// createdAt: momento del registro del check-in
-// Sin updatedAt: la estadía no se edita, se cierra (checkOutAt)
-// ============================================================
-
-model Stay {
-  id            String     @id @default(uuid()) @db.Uuid
-  reservationId String     @db.Uuid
-  roomId        String     @db.Uuid
-  guestId       String     @db.Uuid
-
-  checkInAt     DateTime   @default(now()) @db.Timestamptz
-  checkOutAt    DateTime?  @db.Timestamptz
-  status        StayStatus @default(IN_HOUSE)
-
-  checkinById  String?  @db.Uuid
-  checkoutById String?  @db.Uuid
-  notes        String?  @db.Text
-  createdAt    DateTime @default(now()) @db.Timestamptz
-
-  reservation Reservation @relation(fields: [reservationId], references: [id])
-  room        Room        @relation(fields: [roomId], references: [id])
-  guest       Guest       @relation(fields: [guestId], references: [id])
-  checkinBy   Staff?      @relation("CheckinBy",  fields: [checkinById],  references: [id])
-  checkoutBy  Staff?      @relation("CheckoutBy", fields: [checkoutById], references: [id])
-
-  folio Folio?
-
-  @@map("stays")
-}
-
-// ============================================================
-// 15. FOLIOS
-// ------------------------------------------------------------
-// Auditoría: cambios de totales, cierre del folio
-// closedAt: Timestamptz — momento exacto del cierre en Lima
-// ============================================================
-
-model Folio {
+model Personal {
   id            String      @id @default(uuid()) @db.Uuid
-  stayId        String      @unique @db.Uuid
-  folioNumber   String      @unique @db.VarChar(20)
-  status        FolioStatus @default(OPEN)
-  currency      String      @default("USD") @db.Char(3)
-  totalCharges  Decimal     @default(0) @db.Decimal(12, 2)
-  totalPayments Decimal     @default(0) @db.Decimal(12, 2)
-  balance       Decimal?    @db.Decimal(12, 2)
-  closedAt      DateTime?   @db.Timestamptz
-  notes         String?     @db.Text
+  userId        String?     @unique // FK a better-auth User
+  codigo        String      @unique @db.VarChar(20)
+  nombres       String      @db.VarChar(80)
+  apellidos     String      @db.VarChar(80)
+  rol           RolPersonal
+  email         String?     @db.VarChar(100)
+  telefono      String?     @db.VarChar(20)
+  fechaIngreso  DateTime?   @db.Date
+  activo        Boolean     @default(true)
   createdAt     DateTime    @default(now()) @db.Timestamptz
   updatedAt     DateTime    @updatedAt @db.Timestamptz
 
-  stay     Stay          @relation(fields: [stayId], references: [id])
-  charges  FolioCharge[]
-  payments Payment[]
-  invoices Invoice[]
+  user             User?         @relation(fields: [userId], references: [id])
+
+  pagosRecibidos   Pago[]          @relation("PagosRecibidos")
+  cargosRegistrados CargoFolio[]   @relation("CargosRegistrados")
+  checkinsRealizados Estancia[]    @relation("CheckinPor")
+  checkoutsRealizados Estancia[]   @relation("CheckoutPor")
+
+  @@map("personal")
+}
+
+// ------------------------------------------------------------
+// 13. SERVICIOS / CATÁLOGO COBRABLE
+// ------------------------------------------------------------
+
+model Servicio {
+  id             String            @id @default(uuid()) @db.Uuid
+  codigo         String            @unique @db.VarChar(30)
+  nombre         String            @db.VarChar(150)
+  categoria      CategoriaServicio
+  precioUnitario Decimal           @db.Decimal(10, 2)
+  moneda         String            @default("USD") @db.Char(3)
+  igvPct         Decimal           @default(18.00) @db.Decimal(5, 2)
+  activo         Boolean           @default(true)
+  descripcion    String?           @db.Text
+  createdAt      DateTime          @default(now()) @db.Timestamptz
+  updatedAt      DateTime          @updatedAt @db.Timestamptz
+
+  cargos CargoFolio[]
+
+  @@map("servicios")
+}
+
+// ------------------------------------------------------------
+// 14. RESERVAS
+// ------------------------------------------------------------
+
+model Reserva {
+  id            String        @id @default(uuid()) @db.Uuid
+  codigo        String        @unique @db.VarChar(20)
+  huespedId     String        @db.Uuid
+  agenciaId     String?       @db.Uuid
+  canalId       String        @db.Uuid
+  tipoHabId     String        @db.Uuid
+  planId        String        @db.Uuid
+
+  fechaEntrada  DateTime      @db.Date
+  fechaSalida   DateTime      @db.Date
+  noches        Int?          // calculado en BD, solo lectura
+
+  adultos       Int           @default(1)
+  ninos         Int           @default(0)
+
+  precioNoche   Decimal       @db.Decimal(10, 2)
+  montoTotal    Decimal       @db.Decimal(12, 2)
+  moneda        String        @default("USD") @db.Char(3)
+
+  estado        EstadoReserva @default(TENTATIVA)
+  motivoCancel  String?       @db.Text
+  canceladoEn   DateTime?     @db.Timestamptz
+  refExterna    String?       @db.VarChar(100)
+  nroVoucher    String?       @db.VarChar(50)
+  solicitudes   String?       @db.Text
+  horaLlegada   DateTime?     @db.Time
+  createdAt     DateTime      @default(now()) @db.Timestamptz
+  updatedAt     DateTime      @updatedAt @db.Timestamptz
+
+  huesped       Huesped        @relation(fields: [huespedId], references: [id])
+  agencia       Agencia?       @relation(fields: [agenciaId], references: [id])
+  canal         Canal          @relation(fields: [canalId], references: [id])
+  tipoHabitacion TipoHabitacion @relation(fields: [tipoHabId], references: [id])
+  plan          PlanTarifa     @relation(fields: [planId], references: [id])
+
+  pagos     Pago[]
+  estancias Estancia[]
+
+  @@map("reservas")
+}
+
+// ------------------------------------------------------------
+// 15. PAGOS
+// ------------------------------------------------------------
+
+model Pago {
+  id            String       @id @default(uuid()) @db.Uuid
+  reservaId     String       @db.Uuid
+  folioId       String?      @db.Uuid
+
+  concepto      ConceptoPago
+  estado        EstadoPago   @default(CONFIRMADO)
+
+  fechaPago     DateTime     @default(now()) @db.Date
+  monto         Decimal      @db.Decimal(12, 2)
+  moneda        String       @default("USD") @db.Char(3)
+  metodo        MetodoPago
+  referencia    String?      @db.VarChar(100)
+  recibidoPorId String?      @db.Uuid
+  notas         String?      @db.Text
+  pagoOrigenId  String?      @db.Uuid
+  createdAt     DateTime     @default(now()) @db.Timestamptz
+
+  reserva      Reserva   @relation(fields: [reservaId], references: [id])
+  folio        Folio?    @relation(fields: [folioId], references: [id])
+  recibidoPor  Personal? @relation("PagosRecibidos", fields: [recibidoPorId], references: [id])
+  pagoOrigen   Pago?     @relation("PagoDevolucion", fields: [pagoOrigenId], references: [id])
+  devoluciones Pago[]    @relation("PagoDevolucion")
+
+  @@map("pagos")
+}
+
+// ------------------------------------------------------------
+// 16. ESTANCIAS
+// ------------------------------------------------------------
+
+model Estancia {
+  id           String        @id @default(uuid()) @db.Uuid
+  reservaId    String        @db.Uuid
+  habitacionId String        @db.Uuid
+  huespedId    String        @db.Uuid
+
+  horaEntrada  DateTime      @default(now()) @db.Timestamptz
+  horaSalida   DateTime?     @db.Timestamptz
+
+  estado       EstadoEstadia @default(EN_CASA)
+  checkinPorId  String?      @db.Uuid
+  checkoutPorId String?      @db.Uuid
+  notas        String?       @db.Text
+  createdAt    DateTime      @default(now()) @db.Timestamptz
+
+  reserva    Reserva    @relation(fields: [reservaId], references: [id])
+  habitacion Habitacion @relation(fields: [habitacionId], references: [id])
+  huesped    Huesped    @relation(fields: [huespedId], references: [id])
+  checkinPor  Personal? @relation("CheckinPor",  fields: [checkinPorId],  references: [id])
+  checkoutPor Personal? @relation("CheckoutPor", fields: [checkoutPorId], references: [id])
+
+  folio Folio?
+
+  @@map("estancias")
+}
+
+// ------------------------------------------------------------
+// 17. FOLIOS
+// ------------------------------------------------------------
+
+model Folio {
+  id           String      @id @default(uuid()) @db.Uuid
+  estanciaId   String      @unique @db.Uuid
+  nroFolio     String      @unique @db.VarChar(20)
+  estado       EstadoFolio @default(ABIERTO)
+  moneda       String      @default("USD") @db.Char(3)
+  totalCargos  Decimal     @default(0) @db.Decimal(12, 2)
+  totalPagos   Decimal     @default(0) @db.Decimal(12, 2)
+  // saldo = totalCargos - totalPagos (calculado en BD, solo lectura)
+  saldo        Decimal?    @db.Decimal(12, 2)
+  cerradoEn    DateTime?   @db.Timestamptz
+  notas        String?     @db.Text
+  createdAt    DateTime    @default(now()) @db.Timestamptz
+  updatedAt    DateTime    @updatedAt @db.Timestamptz
+
+  estancia    Estancia      @relation(fields: [estanciaId], references: [id])
+  cargos      CargoFolio[]
+  pagos       Pago[]
+  comprobantes Comprobante[]
 
   @@map("folios")
 }
 
-// ============================================================
-// 16. SERVICIOS
 // ------------------------------------------------------------
-// Auditoría: cambios de precio, activación/desactivación
-// ============================================================
+// 18. CARGOS AL FOLIO
+// ------------------------------------------------------------
 
-model Service {
-  id          String          @id @default(uuid()) @db.Uuid
-  code        String          @unique @db.VarChar(30)
-  name        String          @db.VarChar(150)
-  category    ServiceCategory
-  unitPrice   Decimal         @db.Decimal(10, 2)
-  currency    String          @default("USD") @db.Char(3)
-  taxPct      Decimal         @default(18.00) @db.Decimal(5, 2)
-  isActive    Boolean         @default(true)
-  description String?         @db.Text
-  createdAt   DateTime        @default(now()) @db.Timestamptz
-  updatedAt   DateTime        @updatedAt @db.Timestamptz
+model CargoFolio {
+  id            String   @id @default(uuid()) @db.Uuid
+  folioId       String   @db.Uuid
+  servicioId    String   @db.Uuid
 
-  charges FolioCharge[]
+  fechaCargo    DateTime @default(now()) @db.Date
+  cantidad      Decimal  @default(1) @db.Decimal(8, 2)
+  precioUnit    Decimal  @db.Decimal(10, 2)
+  // subtotal, montoIgv, total: calculados en BD, solo lectura
+  subtotal      Decimal? @db.Decimal(12, 2)
+  igvPct        Decimal  @default(18.00) @db.Decimal(5, 2)
+  montoIgv      Decimal? @db.Decimal(12, 2)
+  total         Decimal? @db.Decimal(12, 2)
+  descripcion   String?  @db.Text
+  registradoPorId String? @db.Uuid
+  anulado       Boolean  @default(false)
+  motivoAnul    String?  @db.Text
+  createdAt     DateTime @default(now()) @db.Timestamptz
 
-  @@map("services")
+  folio         Folio     @relation(fields: [folioId], references: [id])
+  servicio      Servicio  @relation(fields: [servicioId], references: [id])
+  registradoPor Personal? @relation("CargosRegistrados", fields: [registradoPorId], references: [id])
+
+  @@map("cargos_folio")
 }
 
-// ============================================================
-// 17. CARGOS AL FOLIO
 // ------------------------------------------------------------
-// Auditoría: cuándo se registró cada cargo, quién lo anuló
-// chargeDate: Date pura (fecha del consumo)
-// createdAt: Timestamptz — momento exacto del registro en Lima
-// Sin updatedAt: un cargo no se edita, solo se anula (void=true)
-// ============================================================
-
-model FolioCharge {
-  id          String   @id @default(uuid()) @db.Uuid
-  folioId     String   @db.Uuid
-  serviceId   String   @db.Uuid
-  chargeDate  DateTime @default(now()) @db.Date
-  quantity    Decimal  @default(1) @db.Decimal(8, 2)
-  unitPrice   Decimal  @db.Decimal(10, 2)
-  subtotal    Decimal? @db.Decimal(12, 2)
-  taxPct      Decimal  @default(18.00) @db.Decimal(5, 2)
-  taxAmount   Decimal? @db.Decimal(10, 2)
-  total       Decimal? @db.Decimal(12, 2)
-  description String?  @db.Text
-  postedById  String?  @db.Uuid
-  void        Boolean  @default(false)
-  voidReason  String?  @db.Text
-  createdAt   DateTime @default(now()) @db.Timestamptz
-
-  folio    Folio   @relation(fields: [folioId], references: [id])
-  service  Service @relation(fields: [serviceId], references: [id])
-  postedBy Staff?  @relation("ChargesPosted", fields: [postedById], references: [id])
-
-  @@map("folio_charges")
-}
-
-// ============================================================
-// 18. FACTURAS SUNAT
+// 19. COMPROBANTES SUNAT
 // ------------------------------------------------------------
-// Auditoría: emisión y respuesta de SUNAT
-// issueDate: Date pura (fecha tributaria)
-// createdAt: Timestamptz — momento exacto de generación
-// Sin updatedAt: una factura no se edita, se anula con NOTA_CRED
-// ============================================================
 
-model Invoice {
-  id              String      @id @default(uuid()) @db.Uuid
-  folioId         String      @db.Uuid
-  invoiceType     InvoiceType
-  series          String      @db.VarChar(5)
-  number          Int
-  issueDate       DateTime    @default(now()) @db.Date
-  receptorType    String?     @db.VarChar(10)
-  receptorDoc     String?     @db.VarChar(11)
-  receptorName    String?     @db.VarChar(200)
-  receptorAddress String?     @db.Text
-  subtotal        Decimal     @db.Decimal(12, 2)
-  igv             Decimal     @db.Decimal(10, 2)
-  total           Decimal     @db.Decimal(12, 2)
-  sunatStatus     SunatStatus @default(PENDING)
-  sunatCode       String?     @db.VarChar(50)
-  createdAt       DateTime    @default(now()) @db.Timestamptz
+model Comprobante {
+  id               String          @id @default(uuid()) @db.Uuid
+  folioId          String          @db.Uuid
+  tipo             TipoComprobante
+  serie            String          @db.VarChar(5)
+  numero           Int
+  fechaEmision     DateTime        @default(now()) @db.Date
+  tipoDocReceptor  String?         @db.VarChar(10)
+  nroDocReceptor   String?         @db.VarChar(11)
+  nombreReceptor   String?         @db.VarChar(200)
+  dirReceptor      String?         @db.Text
+  subtotal         Decimal         @db.Decimal(12, 2)
+  igv              Decimal         @db.Decimal(10, 2)
+  total            Decimal         @db.Decimal(12, 2)
+  estadoSunat      EstadoSunat     @default(PENDIENTE)
+  codigoSunat      String?         @db.VarChar(50)
+  createdAt        DateTime        @default(now()) @db.Timestamptz
 
   folio Folio @relation(fields: [folioId], references: [id])
 
-  @@unique([series, number])
-  @@map("invoices")
-}
-
-// ============================================================
-// 19. PERSONAL
-// ------------------------------------------------------------
-// Auditoría: cambios de rol, activación/desactivación
-// hireDate: Date pura (fecha de contrato)
-// ============================================================
-
-model Staff {
-  id           String    @id @default(uuid()) @db.Uuid
-  userId       String?   @unique
-  employeeCode String    @unique @db.VarChar(20)
-  firstName    String    @db.VarChar(80)
-  lastName     String    @db.VarChar(80)
-  role         StaffRole
-  email        String?   @db.VarChar(100)
-  phone        String?   @db.VarChar(20)
-  hireDate     DateTime? @db.Date
-  isActive     Boolean   @default(true)
-  createdAt    DateTime  @default(now()) @db.Timestamptz
-  updatedAt    DateTime  @updatedAt @db.Timestamptz
-
-  user             User?         @relation(fields: [userId], references: [id])
-
-  paymentsReceived Payment[]
-  chargesPosted    FolioCharge[] @relation("ChargesPosted")
-  checkinsHandled  Stay[]        @relation("CheckinBy")
-  checkoutsHandled Stay[]        @relation("CheckoutBy")
-
-  @@map("staff")
+  @@unique([serie, numero])
+  @@map("comprobantes")
 }
