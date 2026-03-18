@@ -27,5 +27,6 @@ export const errorHandler: ErrorHandler = (err: Error, c: Context) => {
     return c.json(ApiResponse.error("Error de validación en la base de datos"), 500);
   }
 
+  console.error(`[Unhandled Error] ${err.name}: ${err.message}`);
   return c.json(ApiResponse.error("Error interno del servidor"), 500);
 };
