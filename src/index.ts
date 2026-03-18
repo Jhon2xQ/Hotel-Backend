@@ -8,7 +8,6 @@ import { errorHandler } from "./presentation/middlewares/exception.middleware";
 
 const app = new Hono();
 
-app.use("*", errorHandler);
 app.use("/api/*", corsConfig);
 
 app.get("/api/health", (c) => {
@@ -19,5 +18,7 @@ app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
 
 app.route("/api/habitaciones", createHabitationRoutes(prisma));
 app.route("/api/catalogo-muebles", createFurnitureCatalogRoutes(prisma));
+
+app.onError(errorHandler);
 
 export default app;

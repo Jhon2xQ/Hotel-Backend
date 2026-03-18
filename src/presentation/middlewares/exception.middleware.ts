@@ -1,26 +1,31 @@
-import { Context, Next } from "hono";
+import { Context, ErrorHandler } from "hono";
 import { DomainException } from "../../domain/exceptions/domain.exception";
 import { Prisma } from "../../../generated/prisma/client";
 import { ApiResponse } from "../api.response";
 
-export async function errorHandler(c: Context, next: Next) {
-  try {
-    await next();
-  } catch (error) {
-    console.error("Error:", error);
-
-    if (error instanceof DomainException) {
-      return c.json(ApiResponse.error(error.message), error.statusCode as any);
-    }
-
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      return c.json(ApiResponse.error("Error en la base de datos"), 500);
-    }
-
-    if (error instanceof Prisma.PrismaClientValidationError) {
-      return c.json(ApiResponse.error("Error de validación en la base de datos"), 500);
-    }
-
-    return c.json(ApiResponse.error("Error interno del servidor"), 500);
+export const errorHandler: ErrorHandler = (err: Error, c: Context) => {
+  if (err instanceof DomainException) {
+    console.error(`[${err.name}] ${err.statusCode}: ${err.message}`);
+    return c.json(ApiResponse.error(err.message), err.statusCode as any);
   }
-}
+
+  if (err instanceof Prisma.PrismaClientKnownRequestError) {
+    const shortMessage = err.message
+      .split("\n")
+      .map((l) => l.trim())
+      .filter(Boolean)[0];
+    console.error(`[PrismaError] ${err.name}: ${shortMessage}`);
+    return c.json(ApiResponse.error("Error en la base de datos"), 500);
+  }
+
+  if (err instanceof Prisma.PrismaClientValidationError) {
+    const shortMessage = err.message
+      .split("\n")
+      .map((l) => l.trim())
+      .filter(Boolean)[0];
+    console.error(`[PrismaError] ${err.name}: ${shortMessage}`);
+    return c.json(ApiResponse.error("Error de validación en la base de datos"), 500);
+  }
+
+  return c.json(ApiResponse.error("Error interno del servidor"), 500);
+};
