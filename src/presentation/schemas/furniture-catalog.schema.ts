@@ -10,18 +10,30 @@ export const FurnitureCategorySchema = z.enum([
   "OTRO",
 ]);
 
+export const FurnitureConditionSchema = z.enum(["BUENO", "REGULAR", "DANADO", "FALTANTE"]);
+
 export const CreateFurnitureCatalogSchema = z.object({
   codigo: z.string().min(1, "El código es requerido").max(30, "El código no puede exceder 30 caracteres"),
   nombre: z.string().min(1, "El nombre es requerido").max(100, "El nombre no puede exceder 100 caracteres"),
   categoria: FurnitureCategorySchema,
-  descripcion: z.string().max(500, "La descripción no puede exceder 500 caracteres").optional(),
+  imagen_url: z.string().url("Debe ser una URL válida").optional(),
+  tipo: z.string().max(60, "El tipo no puede exceder 60 caracteres").optional(),
+  condicion: FurnitureConditionSchema.optional(),
+  fecha_adquisicion: z.string().date("Debe ser una fecha válida (YYYY-MM-DD)").optional(),
+  ultima_revision: z.string().date("Debe ser una fecha válida (YYYY-MM-DD)").optional(),
+  descripcion: z.string().optional(),
 });
 
 export const UpdateFurnitureCatalogSchema = z.object({
   codigo: z.string().min(1, "El código es requerido").max(30, "El código no puede exceder 30 caracteres").optional(),
   nombre: z.string().min(1, "El nombre es requerido").max(100, "El nombre no puede exceder 100 caracteres").optional(),
   categoria: FurnitureCategorySchema.optional(),
-  descripcion: z.string().max(500, "La descripción no puede exceder 500 caracteres").optional(),
+  imagen_url: z.string().url("Debe ser una URL válida").optional(),
+  tipo: z.string().max(60, "El tipo no puede exceder 60 caracteres").optional(),
+  condicion: FurnitureConditionSchema.optional(),
+  fecha_adquisicion: z.string().date("Debe ser una fecha válida (YYYY-MM-DD)").optional(),
+  ultima_revision: z.string().date("Debe ser una fecha válida (YYYY-MM-DD)").optional(),
+  descripcion: z.string().optional(),
 });
 
 export const UUIDParamSchema = z.object({

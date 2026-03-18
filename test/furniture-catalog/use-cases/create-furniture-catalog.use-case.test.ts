@@ -2,7 +2,11 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { CreateFurnitureCatalogUseCase } from "../../../src/application/use-cases/furniture-catalog/create-furniture-catalog.use-case";
 import { IFurnitureCatalogRepository } from "../../../src/domain/interfaces/furniture-catalog.repository.interface";
 import { FurnitureCatalogException } from "../../../src/domain/exceptions/furniture-catalog.exception";
-import { FurnitureCatalog, FurnitureCategory } from "../../../src/domain/entities/furniture-catalog.entity";
+import {
+  FurnitureCatalog,
+  FurnitureCategory,
+  FurnitureCondition,
+} from "../../../src/domain/entities/furniture-catalog.entity";
 
 describe("CreateFurnitureCatalogUseCase", () => {
   let useCase: CreateFurnitureCatalogUseCase;
@@ -33,6 +37,11 @@ describe("CreateFurnitureCatalogUseCase", () => {
       "CAMA-KING-01",
       "Cama King Size",
       FurnitureCategory.Cama,
+      null,
+      null,
+      FurnitureCondition.Bueno,
+      null,
+      null,
       "Cama king size con colchón ortopédico",
       new Date(),
       new Date(),
@@ -46,7 +55,17 @@ describe("CreateFurnitureCatalogUseCase", () => {
     expect(result.codigo).toBe("CAMA-KING-01");
     expect(result.nombre).toBe("Cama King Size");
     expect(mockRepository.findByCodigo).toHaveBeenCalledWith("CAMA-KING-01");
-    expect(mockRepository.create).toHaveBeenCalledWith(input);
+    expect(mockRepository.create).toHaveBeenCalledWith({
+      codigo: input.codigo,
+      nombre: input.nombre,
+      categoria: input.categoria,
+      imagenUrl: null,
+      tipo: null,
+      condicion: undefined,
+      fechaAdq: null,
+      ultimaRevision: null,
+      descripcion: input.descripcion,
+    });
   });
 
   it("should throw exception when codigo already exists", async () => {
@@ -61,6 +80,11 @@ describe("CreateFurnitureCatalogUseCase", () => {
       "CAMA-KING-01",
       "Cama Existente",
       FurnitureCategory.Cama,
+      null,
+      null,
+      FurnitureCondition.Bueno,
+      null,
+      null,
       null,
       new Date(),
       new Date(),

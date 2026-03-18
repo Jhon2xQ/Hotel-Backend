@@ -2,7 +2,11 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { DeleteFurnitureCatalogUseCase } from "../../../src/application/use-cases/furniture-catalog/delete-furniture-catalog.use-case";
 import { IFurnitureCatalogRepository } from "../../../src/domain/interfaces/furniture-catalog.repository.interface";
 import { FurnitureCatalogException } from "../../../src/domain/exceptions/furniture-catalog.exception";
-import { FurnitureCatalog, FurnitureCategory } from "../../../src/domain/entities/furniture-catalog.entity";
+import {
+  FurnitureCatalog,
+  FurnitureCategory,
+  FurnitureCondition,
+} from "../../../src/domain/entities/furniture-catalog.entity";
 
 describe("DeleteFurnitureCatalogUseCase", () => {
   let useCase: DeleteFurnitureCatalogUseCase;
@@ -26,6 +30,11 @@ describe("DeleteFurnitureCatalogUseCase", () => {
       "CAMA-KING-01",
       "Cama King Size",
       FurnitureCategory.Cama,
+      null,
+      null,
+      FurnitureCondition.Bueno,
+      null,
+      null,
       null,
       new Date(),
       new Date(),

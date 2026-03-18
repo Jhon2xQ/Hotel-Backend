@@ -18,7 +18,22 @@ export class UpdateFurnitureCatalogUseCase {
       }
     }
 
-    const updated = await this.repository.update(id, input);
+    const updateData: any = {};
+    if (input.codigo !== undefined) updateData.codigo = input.codigo;
+    if (input.nombre !== undefined) updateData.nombre = input.nombre;
+    if (input.categoria !== undefined) updateData.categoria = input.categoria;
+    if (input.imagen_url !== undefined) updateData.imagenUrl = input.imagen_url ?? null;
+    if (input.tipo !== undefined) updateData.tipo = input.tipo ?? null;
+    if (input.condicion !== undefined) updateData.condicion = input.condicion;
+    if (input.fecha_adquisicion !== undefined) {
+      updateData.fechaAdq = input.fecha_adquisicion ? new Date(input.fecha_adquisicion) : null;
+    }
+    if (input.ultima_revision !== undefined) {
+      updateData.ultimaRevision = input.ultima_revision ? new Date(input.ultima_revision) : null;
+    }
+    if (input.descripcion !== undefined) updateData.descripcion = input.descripcion ?? null;
+
+    const updated = await this.repository.update(id, updateData);
     return updated.toOutput();
   }
 }

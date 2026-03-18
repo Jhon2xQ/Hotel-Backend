@@ -378,118 +378,69 @@ model ResumenEstancias {
 }
 
 // ------------------------------------------------------------
-// 4. TIPOS DE HABITACIÓN
-// ------------------------------------------------------------
-
-model TipoHabitacion {
-  id            String   @id @default(uuid()) @db.Uuid
-  codigo        String   @unique @db.VarChar(20)
-  nombre        String   @db.VarChar(100)
-  descripcion   String?  @db.Text
-  areaM2        Decimal? @db.Decimal(6, 1)
-  tipoCama      String?  @db.VarChar(50)
-  vista         String?  @db.VarChar(50)
-  pisos         String?  @db.VarChar(20)
-  tieneTina     Boolean  @default(false)
-  tieneJacuzzi  Boolean  @default(false)
-  tieneSala     Boolean  @default(false)
-  tieneCocina   Boolean  @default(false)
-  urlImagen     String?  @db.VarChar(255)
-  createdAt     DateTime @default(now()) @db.Timestamptz
-  updatedAt     DateTime @updatedAt @db.Timestamptz
-
-  habitaciones    Habitacion[]
-  tarifas         Tarifa[]
-  mueblesTipo     MueblesPorTipo[]
-  reservas        Reserva[]
-
-  @@map("tipos_habitacion")
-}
-
-// ------------------------------------------------------------
 // 5. CATÁLOGO DE MUEBLES
 // ------------------------------------------------------------
-
 model CatalogoMueble {
-  id          String          @id @default(uuid()) @db.Uuid
-  codigo      String          @unique @db.VarChar(30)
-  nombre      String          @db.VarChar(100)
-  categoria   CategoriaMueble
-  descripcion String?         @db.Text
-  createdAt   DateTime        @default(now()) @db.Timestamptz
-  updatedAt   DateTime        @updatedAt @db.Timestamptz
+  id             String          @id @default(uuid()) @db.Uuid
+  codigo         String          @unique @db.VarChar(30)
+  nombre         String          @db.VarChar(100)
+  categoria      CategoriaMueble
+  imagenUrl      String?         @db.Text
+  tipo           String?         @db.VarChar(60)
+  condicion      CondicionMueble @default(BUENO)
+  fechaAdq       DateTime?       @db.Date
+  ultimaRevision DateTime?       @db.Date
+  descripcion    String?         @db.Text
+  createdAt      DateTime        @default(now()) @db.Timestamptz
+  updatedAt      DateTime        @updatedAt @db.Timestamptz
 
-  mueblesTipo      MueblesPorTipo[]
-  mueblesHabitacion MuebleHabitacion[]
+  tiposHabitacion TipoHabitacion[] @relation("MueblesPorTipo")
+  habitaciones    Habitacion[]     @relation("MueblesHabitacion")
 
   @@map("catalogo_muebles")
 }
 
 // ------------------------------------------------------------
-// 6. INVENTARIO ESTÁNDAR POR TIPO (plantilla)
+// 4. TIPOS DE HABITACIÓN
 // ------------------------------------------------------------
+model TipoHabitacion {
+  id            String   @id @default(uuid()) @db.Uuid
+  nombre        String   @db.VarChar(100)
+  descripcion   String?  @db.Text
+  tieneDucha    Boolean  @default(false)
+  tieneBanio    Boolean  @default(false)
+  createdAt     DateTime @default(now()) @db.Timestamptz
+  updatedAt     DateTime @updatedAt @db.Timestamptz
 
-model MueblesPorTipo {
-  id               String   @id @default(uuid()) @db.Uuid
-  tipoHabitacionId String   @db.Uuid
-  muebleId         String   @db.Uuid
-  cantidad         Int      @default(1)
-  obligatorio      Boolean  @default(true)
-  notas            String?  @db.Text
-  createdAt        DateTime @default(now()) @db.Timestamptz
-  updatedAt        DateTime @updatedAt @db.Timestamptz
+  habitaciones Habitacion[]
+  tarifas      Tarifa[]
+  reservas     Reserva[]
+  muebles      CatalogoMueble[] @relation("MueblesPorTipo")
 
-  tipoHabitacion TipoHabitacion @relation(fields: [tipoHabitacionId], references: [id])
-  mueble         CatalogoMueble @relation(fields: [muebleId], references: [id])
-
-  @@unique([tipoHabitacionId, muebleId])
-  @@map("muebles_por_tipo")
+  @@map("tipos_habitacion")
 }
 
 // ------------------------------------------------------------
 // 7. HABITACIONES
 // ------------------------------------------------------------
-
 model Habitacion {
   id             String           @id @default(uuid()) @db.Uuid
   nroHabitacion  String           @unique @db.VarChar(10)
   tipoId         String           @db.Uuid
   piso           Int
+  urlImagen      String?          @db.VarChar(255)
   estado         EstadoHabitacion @default(DISPONIBLE)
   limpieza       EstadoLimpieza   @default(LIMPIA)
-  accesible      Boolean          @default(false)
   notas          String?          @db.Text
   ultimaLimpieza DateTime?        @db.Timestamptz
   createdAt      DateTime         @default(now()) @db.Timestamptz
   updatedAt      DateTime         @updatedAt @db.Timestamptz
 
-  tipo      TipoHabitacion     @relation(fields: [tipoId], references: [id])
-  muebles   MuebleHabitacion[]
+  tipo      TipoHabitacion   @relation(fields: [tipoId], references: [id])
+  muebles   CatalogoMueble[] @relation("MueblesHabitacion")
   estancias Estancia[]
 
   @@map("habitaciones")
-}
-
-// ------------------------------------------------------------
-// 8. INVENTARIO REAL POR HABITACIÓN
-// ------------------------------------------------------------
-
-model MuebleHabitacion {
-  id             String          @id @default(uuid()) @db.Uuid
-  habitacionId   String          @db.Uuid
-  muebleId       String          @db.Uuid
-  nroSerie       String?         @db.VarChar(60)
-  condicion      CondicionMueble @default(BUENO)
-  fechaAdq       DateTime?       @db.Date
-  ultimaRevision DateTime?       @db.Date
-  notas          String?         @db.Text
-  createdAt      DateTime        @default(now()) @db.Timestamptz
-  updatedAt      DateTime        @updatedAt @db.Timestamptz
-
-  habitacion Habitacion     @relation(fields: [habitacionId], references: [id])
-  mueble     CatalogoMueble @relation(fields: [muebleId], references: [id])
-
-  @@map("muebles_habitacion")
 }
 
 // ------------------------------------------------------------

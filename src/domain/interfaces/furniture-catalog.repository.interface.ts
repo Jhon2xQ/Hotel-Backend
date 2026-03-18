@@ -1,9 +1,19 @@
-import { FurnitureCatalog, FurnitureCategory, CreateFurnitureCatalogData } from "../entities/furniture-catalog.entity";
+import {
+  FurnitureCatalog,
+  FurnitureCategory,
+  FurnitureCondition,
+  CreateFurnitureCatalogData,
+} from "../entities/furniture-catalog.entity";
 
 export interface UpdateFurnitureCatalogData {
   codigo?: string;
   nombre?: string;
   categoria?: FurnitureCategory;
+  imagenUrl?: string | null;
+  tipo?: string | null;
+  condicion?: FurnitureCondition;
+  fechaAdq?: Date | null;
+  ultimaRevision?: Date | null;
   descripcion?: string | null;
 }
 

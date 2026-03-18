@@ -2,7 +2,11 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { UpdateFurnitureCatalogUseCase } from "../../../src/application/use-cases/furniture-catalog/update-furniture-catalog.use-case";
 import { IFurnitureCatalogRepository } from "../../../src/domain/interfaces/furniture-catalog.repository.interface";
 import { FurnitureCatalogException } from "../../../src/domain/exceptions/furniture-catalog.exception";
-import { FurnitureCatalog, FurnitureCategory } from "../../../src/domain/entities/furniture-catalog.entity";
+import {
+  FurnitureCatalog,
+  FurnitureCategory,
+  FurnitureCondition,
+} from "../../../src/domain/entities/furniture-catalog.entity";
 
 describe("UpdateFurnitureCatalogUseCase", () => {
   let useCase: UpdateFurnitureCatalogUseCase;
@@ -26,6 +30,11 @@ describe("UpdateFurnitureCatalogUseCase", () => {
       "CAMA-KING-01",
       "Cama King Size",
       FurnitureCategory.Cama,
+      null,
+      null,
+      FurnitureCondition.Bueno,
+      null,
+      null,
       "Descripción original",
       new Date(),
       new Date(),
@@ -36,6 +45,11 @@ describe("UpdateFurnitureCatalogUseCase", () => {
       "CAMA-KING-01",
       "Cama King Size Premium",
       FurnitureCategory.Cama,
+      null,
+      null,
+      FurnitureCondition.Bueno,
+      null,
+      null,
       "Descripción actualizada",
       new Date(),
       new Date(),
@@ -69,6 +83,11 @@ describe("UpdateFurnitureCatalogUseCase", () => {
       "Cama King Size",
       FurnitureCategory.Cama,
       null,
+      null,
+      FurnitureCondition.Bueno,
+      null,
+      null,
+      null,
       new Date(),
       new Date(),
     );
@@ -78,6 +97,11 @@ describe("UpdateFurnitureCatalogUseCase", () => {
       "CAMA-QUEEN-01",
       "Cama Queen",
       FurnitureCategory.Cama,
+      null,
+      null,
+      FurnitureCondition.Bueno,
+      null,
+      null,
       null,
       new Date(),
       new Date(),

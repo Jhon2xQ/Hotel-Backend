@@ -34,6 +34,11 @@ Obtiene la lista completa de muebles del catálogo.
       "codigo": "CAMA-KING-01",
       "nombre": "Cama King Size",
       "categoria": "CAMA",
+      "imagen_url": "https://example.com/images/cama-king.jpg",
+      "tipo": "King Size",
+      "condicion": "BUENO",
+      "fecha_adquisicion": "2025-01-15",
+      "ultima_revision": "2026-03-01",
       "descripcion": "Cama king size con colchón ortopédico",
       "created_at": "2026-03-17T10:00:00.000Z",
       "updated_at": "2026-03-17T10:00:00.000Z"
@@ -68,6 +73,11 @@ Obtiene los detalles de un mueble específico.
     "codigo": "CAMA-KING-01",
     "nombre": "Cama King Size",
     "categoria": "CAMA",
+    "imagen_url": "https://example.com/images/cama-king.jpg",
+    "tipo": "King Size",
+    "condicion": "BUENO",
+    "fecha_adquisicion": "2025-01-15",
+    "ultima_revision": "2026-03-01",
     "descripcion": "Cama king size con colchón ortopédico",
     "created_at": "2026-03-17T10:00:00.000Z",
     "updated_at": "2026-03-17T10:00:00.000Z"
@@ -97,6 +107,11 @@ Crea un nuevo mueble en el catálogo.
   "codigo": "CAMA-KING-01",
   "nombre": "Cama King Size",
   "categoria": "CAMA",
+  "imagen_url": "https://example.com/images/cama-king.jpg",
+  "tipo": "King Size",
+  "condicion": "BUENO",
+  "fecha_adquisicion": "2025-01-15",
+  "ultima_revision": "2026-03-01",
   "descripcion": "Cama king size con colchón ortopédico"
 }
 ```
@@ -107,7 +122,13 @@ Crea un nuevo mueble en el catálogo.
 - `nombre` (string, requerido): Nombre del mueble (máx. 100 caracteres)
 - `categoria` (enum, requerido): Categoría del mueble
   - Valores: `CAMA`, `ASIENTO`, `ALMACENAJE`, `TECNOLOGIA`, `BANO`, `DECORACION`, `OTRO`
-- `descripcion` (string, opcional): Descripción del mueble (máx. 500 caracteres)
+- `imagen_url` (string, opcional): URL de la imagen del mueble (debe ser una URL válida)
+- `tipo` (string, opcional): Tipo específico del mueble (máx. 60 caracteres)
+- `condicion` (enum, opcional): Estado físico del mueble (default: `BUENO`)
+  - Valores: `BUENO`, `REGULAR`, `DANADO`, `FALTANTE`
+- `fecha_adquisicion` (string, opcional): Fecha de adquisición en formato YYYY-MM-DD
+- `ultima_revision` (string, opcional): Fecha de última revisión en formato YYYY-MM-DD
+- `descripcion` (string, opcional): Descripción del mueble
 
 **Respuesta exitosa (201):**
 
@@ -120,6 +141,11 @@ Crea un nuevo mueble en el catálogo.
     "codigo": "CAMA-KING-01",
     "nombre": "Cama King Size",
     "categoria": "CAMA",
+    "imagen_url": "https://example.com/images/cama-king.jpg",
+    "tipo": "King Size",
+    "condicion": "BUENO",
+    "fecha_adquisicion": "2025-01-15",
+    "ultima_revision": "2026-03-01",
     "descripcion": "Cama king size con colchón ortopédico",
     "created_at": "2026-03-17T10:00:00.000Z",
     "updated_at": "2026-03-17T10:00:00.000Z"
@@ -154,6 +180,11 @@ Actualiza los datos de un mueble existente.
   "codigo": "CAMA-KING-02",
   "nombre": "Cama King Size Premium",
   "categoria": "CAMA",
+  "imagen_url": "https://example.com/images/cama-king-premium.jpg",
+  "tipo": "King Size Premium",
+  "condicion": "BUENO",
+  "fecha_adquisicion": "2025-02-20",
+  "ultima_revision": "2026-03-10",
   "descripcion": "Cama king size premium con colchón memory foam"
 }
 ```
@@ -171,6 +202,11 @@ Actualiza los datos de un mueble existente.
     "codigo": "CAMA-KING-02",
     "nombre": "Cama King Size Premium",
     "categoria": "CAMA",
+    "imagen_url": "https://example.com/images/cama-king-premium.jpg",
+    "tipo": "King Size Premium",
+    "condicion": "BUENO",
+    "fecha_adquisicion": "2025-02-20",
+    "ultima_revision": "2026-03-10",
     "descripcion": "Cama king size premium con colchón memory foam",
     "created_at": "2026-03-17T10:00:00.000Z",
     "updated_at": "2026-03-17T12:00:00.000Z"
@@ -231,6 +267,17 @@ Elimina un mueble del catálogo.
 
 ---
 
+## Condiciones de Muebles
+
+| Condición | Descripción                                      |
+| --------- | ------------------------------------------------ |
+| BUENO     | Mueble en buen estado, funcional y presentable   |
+| REGULAR   | Mueble con desgaste visible pero funcional       |
+| DANADO    | Mueble con daños que requieren reparación        |
+| FALTANTE  | Mueble registrado pero no disponible físicamente |
+
+---
+
 ## Códigos de Error
 
 | Código | Descripción                           |
@@ -247,6 +294,9 @@ Elimina un mueble del catálogo.
 ## Notas
 
 - El campo `codigo` debe ser único en todo el catálogo
-- Los muebles no se pueden eliminar si están asignados a habitaciones (tabla `muebles_habitacion`)
+- Los muebles no se pueden eliminar si están asignados a habitaciones o tipos de habitación
 - La categoría determina cómo se agrupa el mueble en reportes e inventarios
-- La descripción es opcional pero recomendada para facilitar la identificación
+- La condición por defecto es `BUENO` al crear un mueble
+- Las fechas deben estar en formato ISO (YYYY-MM-DD)
+- La `imagen_url` debe ser una URL válida si se proporciona
+- El campo `tipo` permite especificar variantes dentro de una categoría (ej: "King Size", "Queen Size" para camas)

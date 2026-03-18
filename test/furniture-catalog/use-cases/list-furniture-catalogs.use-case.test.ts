@@ -1,7 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { ListFurnitureCatalogsUseCase } from "../../../src/application/use-cases/furniture-catalog/list-furniture-catalogs.use-case";
 import { IFurnitureCatalogRepository } from "../../../src/domain/interfaces/furniture-catalog.repository.interface";
-import { FurnitureCatalog, FurnitureCategory } from "../../../src/domain/entities/furniture-catalog.entity";
+import {
+  FurnitureCatalog,
+  FurnitureCategory,
+  FurnitureCondition,
+} from "../../../src/domain/entities/furniture-catalog.entity";
 
 describe("ListFurnitureCatalogsUseCase", () => {
   let useCase: ListFurnitureCatalogsUseCase;
@@ -26,6 +30,11 @@ describe("ListFurnitureCatalogsUseCase", () => {
         "CAMA-KING-01",
         "Cama King Size",
         FurnitureCategory.Cama,
+        null,
+        null,
+        FurnitureCondition.Bueno,
+        null,
+        null,
         "Descripción 1",
         new Date(),
         new Date(),
@@ -35,6 +44,11 @@ describe("ListFurnitureCatalogsUseCase", () => {
         "TV-55-01",
         "TV 55 pulgadas",
         FurnitureCategory.Tecnologia,
+        null,
+        null,
+        FurnitureCondition.Bueno,
+        null,
+        null,
         "Descripción 2",
         new Date(),
         new Date(),
