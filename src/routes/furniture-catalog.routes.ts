@@ -38,7 +38,7 @@ export function createFurnitureCatalogRoutes(prismaClient: PrismaClient): AppHon
 
   const router = new Hono<{ Variables: AppVariables }>();
 
-  //router.use("*", authMiddleware);
+  router.use("*", authMiddleware);
 
   router.get("/", controller.list.bind(controller));
   router.get("/:id", validParams(UUIDParamSchema), controller.findById.bind(controller));
