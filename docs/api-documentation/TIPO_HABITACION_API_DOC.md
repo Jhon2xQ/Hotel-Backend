@@ -33,22 +33,6 @@ Obtiene la lista completa de tipos de habitación.
       "id": "123e4567-e89b-12d3-a456-426614174000",
       "nombre": "Suite Deluxe",
       "descripcion": "Suite de lujo con vista panorámica al mar",
-      "tiene_ducha": true,
-      "tiene_banio": true,
-      "muebles": [
-        {
-          "id": "550e8400-e29b-41d4-a716-446655440001",
-          "codigo": "CAMA-KING-01",
-          "nombre": "Cama King Size",
-          "categoria": "CAMA"
-        },
-        {
-          "id": "550e8400-e29b-41d4-a716-446655440002",
-          "codigo": "TV-55-01",
-          "nombre": "TV 55 pulgadas",
-          "categoria": "TECNOLOGIA"
-        }
-      ],
       "created_at": "2026-03-17T10:00:00.000Z",
       "updated_at": "2026-03-17T10:00:00.000Z"
     },
@@ -56,16 +40,6 @@ Obtiene la lista completa de tipos de habitación.
       "id": "123e4567-e89b-12d3-a456-426614174001",
       "nombre": "Habitación Estándar",
       "descripcion": "Habitación cómoda con todas las comodidades básicas",
-      "tiene_ducha": true,
-      "tiene_banio": false,
-      "muebles": [
-        {
-          "id": "550e8400-e29b-41d4-a716-446655440003",
-          "codigo": "CAMA-DOBLE-01",
-          "nombre": "Cama Doble",
-          "categoria": "CAMA"
-        }
-      ],
       "created_at": "2026-03-17T09:00:00.000Z",
       "updated_at": "2026-03-17T09:00:00.000Z"
     }
@@ -77,7 +51,6 @@ Obtiene la lista completa de tipos de habitación.
 **Notas:**
 
 - Los tipos de habitación se devuelven ordenados por fecha de creación (más recientes primero)
-- Cada tipo incluye la lista de muebles asociados
 
 ---
 
@@ -103,22 +76,6 @@ Obtiene los detalles de un tipo de habitación específico.
     "id": "123e4567-e89b-12d3-a456-426614174000",
     "nombre": "Suite Deluxe",
     "descripcion": "Suite de lujo con vista panorámica al mar",
-    "tiene_ducha": true,
-    "tiene_banio": true,
-    "muebles": [
-      {
-        "id": "550e8400-e29b-41d4-a716-446655440001",
-        "codigo": "CAMA-KING-01",
-        "nombre": "Cama King Size",
-        "categoria": "CAMA"
-      },
-      {
-        "id": "550e8400-e29b-41d4-a716-446655440002",
-        "codigo": "TV-55-01",
-        "nombre": "TV 55 pulgadas",
-        "categoria": "TECNOLOGIA"
-      }
-    ],
     "created_at": "2026-03-17T10:00:00.000Z",
     "updated_at": "2026-03-17T10:00:00.000Z"
   },
@@ -154,10 +111,7 @@ Crea un nuevo tipo de habitación en el sistema.
 ```json
 {
   "nombre": "Suite Deluxe",
-  "descripcion": "Suite de lujo con vista panorámica al mar",
-  "tiene_ducha": true,
-  "tiene_banio": true,
-  "muebles": ["550e8400-e29b-41d4-a716-446655440001", "550e8400-e29b-41d4-a716-446655440002"]
+  "descripcion": "Suite de lujo con vista panorámica al mar"
 }
 ```
 
@@ -165,9 +119,6 @@ Crea un nuevo tipo de habitación en el sistema.
 
 - `nombre` (string, requerido): Nombre del tipo de habitación (máx. 100 caracteres)
 - `descripcion` (string, opcional): Descripción detallada del tipo de habitación
-- `tiene_ducha` (boolean, requerido): Indica si el tipo de habitación incluye ducha
-- `tiene_banio` (boolean, requerido): Indica si el tipo de habitación incluye baño completo
-- `muebles` (array de UUIDs, opcional): Lista de IDs de muebles del catálogo asociados a este tipo
 
 **Respuesta exitosa (201):**
 
@@ -179,22 +130,6 @@ Crea un nuevo tipo de habitación en el sistema.
     "id": "123e4567-e89b-12d3-a456-426614174000",
     "nombre": "Suite Deluxe",
     "descripcion": "Suite de lujo con vista panorámica al mar",
-    "tiene_ducha": true,
-    "tiene_banio": true,
-    "muebles": [
-      {
-        "id": "550e8400-e29b-41d4-a716-446655440001",
-        "codigo": "CAMA-KING-01",
-        "nombre": "Cama King Size",
-        "categoria": "CAMA"
-      },
-      {
-        "id": "550e8400-e29b-41d4-a716-446655440002",
-        "codigo": "TV-55-01",
-        "nombre": "TV 55 pulgadas",
-        "categoria": "TECNOLOGIA"
-      }
-    ],
     "created_at": "2026-03-17T10:00:00.000Z",
     "updated_at": "2026-03-17T10:00:00.000Z"
   },
@@ -256,14 +191,7 @@ Actualiza los datos de un tipo de habitación existente.
 ```json
 {
   "nombre": "Suite Deluxe Premium",
-  "descripcion": "Suite de lujo premium con vista panorámica al mar y jacuzzi",
-  "tiene_ducha": true,
-  "tiene_banio": true,
-  "muebles": [
-    "550e8400-e29b-41d4-a716-446655440001",
-    "550e8400-e29b-41d4-a716-446655440002",
-    "550e8400-e29b-41d4-a716-446655440005"
-  ]
+  "descripcion": "Suite de lujo premium con vista panorámica al mar y jacuzzi"
 }
 ```
 
@@ -279,28 +207,6 @@ Actualiza los datos de un tipo de habitación existente.
     "id": "123e4567-e89b-12d3-a456-426614174000",
     "nombre": "Suite Deluxe Premium",
     "descripcion": "Suite de lujo premium con vista panorámica al mar y jacuzzi",
-    "tiene_ducha": true,
-    "tiene_banio": true,
-    "muebles": [
-      {
-        "id": "550e8400-e29b-41d4-a716-446655440001",
-        "codigo": "CAMA-KING-01",
-        "nombre": "Cama King Size",
-        "categoria": "CAMA"
-      },
-      {
-        "id": "550e8400-e29b-41d4-a716-446655440002",
-        "codigo": "TV-55-01",
-        "nombre": "TV 55 pulgadas",
-        "categoria": "TECNOLOGIA"
-      },
-      {
-        "id": "550e8400-e29b-41d4-a716-446655440005",
-        "codigo": "JACUZZI-01",
-        "nombre": "Jacuzzi",
-        "categoria": "BANO"
-      }
-    ],
     "created_at": "2026-03-17T10:00:00.000Z",
     "updated_at": "2026-03-17T12:00:00.000Z"
   },
@@ -327,7 +233,6 @@ Actualiza los datos de un tipo de habitación existente.
 **Notas:**
 
 - Solo se actualizan los campos proporcionados en el body
-- Si se proporciona el array `muebles`, se reemplaza completamente la lista de muebles asociados
 - El campo `updated_at` se actualiza automáticamente
 
 ---
@@ -418,37 +323,13 @@ Elimina un tipo de habitación del sistema.
 - **Longitud máxima**: Sin límite
 - **Ejemplo**: "Suite de lujo con vista panorámica al mar y todas las comodidades"
 
-### Campo `tiene_ducha`
-
-- **Requerido**: Sí
-- **Tipo**: Boolean
-- **Valores**: `true` o `false`
-- **Descripción**: Indica si el tipo de habitación incluye ducha
-
-### Campo `tiene_banio`
-
-- **Requerido**: Sí
-- **Tipo**: Boolean
-- **Valores**: `true` o `false`
-- **Descripción**: Indica si el tipo de habitación incluye baño completo
-
-### Campo `muebles`
-
-- **Requerido**: No
-- **Tipo**: Array de UUIDs
-- **Validación**: Cada UUID debe corresponder a un mueble existente en el catálogo
-- **Ejemplo**: `["550e8400-e29b-41d4-a716-446655440001", "550e8400-e29b-41d4-a716-446655440002"]`
-
 ---
 
 ## Notas
 
 - Los tipos de habitación definen las plantillas o categorías de habitaciones disponibles en el hotel
-- Cada tipo puede tener asociados muebles del catálogo que representan el mobiliario estándar
 - Los tipos de habitación se utilizan como referencia para crear habitaciones físicas
-- La lista de muebles asociados se reemplaza completamente al actualizar (no se hace merge)
 - Los campos `created_at` y `updated_at` se gestionan automáticamente por el sistema
-- El campo `tiene_ducha` y `tiene_banio` permiten diferenciar tipos de habitación según sus instalaciones sanitarias
 - No se puede eliminar un tipo de habitación si tiene:
   - Habitaciones asociadas
   - Tarifas asociadas
@@ -466,13 +347,11 @@ curl -X POST https://api.hotel.com/api/tipos-habitacion \
   -H "Authorization: Bearer <token>" \
   -d '{
     "nombre": "Habitación Estándar",
-    "descripcion": "Habitación cómoda con todas las comodidades básicas",
-    "tiene_ducha": true,
-    "tiene_banio": false
+    "descripcion": "Habitación cómoda con todas las comodidades básicas"
   }'
 ```
 
-### Crear un tipo de habitación con muebles
+### Crear un tipo de habitación de lujo
 
 ```bash
 curl -X POST https://api.hotel.com/api/tipos-habitacion \
@@ -480,13 +359,7 @@ curl -X POST https://api.hotel.com/api/tipos-habitacion \
   -H "Authorization: Bearer <token>" \
   -d '{
     "nombre": "Suite Deluxe",
-    "descripcion": "Suite de lujo con vista panorámica",
-    "tiene_ducha": true,
-    "tiene_banio": true,
-    "muebles": [
-      "550e8400-e29b-41d4-a716-446655440001",
-      "550e8400-e29b-41d4-a716-446655440002"
-    ]
+    "descripcion": "Suite de lujo con vista panorámica"
   }'
 ```
 

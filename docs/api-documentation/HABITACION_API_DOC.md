@@ -60,6 +60,8 @@ Obtiene la lista completa de habitaciones del hotel.
         "descripcion": "Suite de lujo con vista panorámica al mar"
       },
       "piso": 1,
+      "tiene_ducha": true,
+      "tiene_banio": true,
       "url_imagen": "https://example.com/rooms/101.jpg",
       "estado": "DISPONIBLE",
       "limpieza": "LIMPIA",
@@ -92,6 +94,8 @@ Obtiene la lista completa de habitaciones del hotel.
         "descripcion": "Habitación cómoda con todas las comodidades básicas"
       },
       "piso": 1,
+      "tiene_ducha": true,
+      "tiene_banio": false,
       "url_imagen": null,
       "estado": "OCUPADA",
       "limpieza": "SUCIA",
@@ -149,6 +153,8 @@ Obtiene los detalles de una habitación específica.
       "descripcion": "Suite de lujo con vista panorámica al mar"
     },
     "piso": 1,
+    "tiene_ducha": true,
+    "tiene_banio": true,
     "url_imagen": "https://example.com/rooms/101.jpg",
     "estado": "DISPONIBLE",
     "limpieza": "LIMPIA",
@@ -205,6 +211,8 @@ Crea una nueva habitación física en el sistema.
   "nro_habitacion": "301",
   "tipo_id": "123e4567-e89b-12d3-a456-426614174000",
   "piso": 3,
+  "tiene_ducha": true,
+  "tiene_banio": true,
   "url_imagen": "https://example.com/rooms/301.jpg",
   "estado": "DISPONIBLE",
   "limpieza": "LIMPIA",
@@ -218,6 +226,8 @@ Crea una nueva habitación física en el sistema.
 - `nro_habitacion` (string, requerido): Número único de habitación (máx. 10 caracteres)
 - `tipo_id` (UUID, requerido): ID del tipo de habitación
 - `piso` (number, requerido): Número de piso (entero positivo)
+- `tiene_ducha` (boolean, opcional): Indica si la habitación tiene ducha (default: `false`)
+- `tiene_banio` (boolean, opcional): Indica si la habitación tiene baño completo (default: `false`)
 - `url_imagen` (string, opcional): URL de imagen de la habitación (máx. 255 caracteres)
 - `estado` (EstadoHabitacion, opcional): Estado operacional (default: `DISPONIBLE`)
 - `limpieza` (EstadoLimpieza, opcional): Estado de limpieza (default: `LIMPIA`)
@@ -240,6 +250,8 @@ Crea una nueva habitación física en el sistema.
       "descripcion": "Suite de lujo con vista panorámica al mar"
     },
     "piso": 3,
+    "tiene_ducha": true,
+    "tiene_banio": true,
     "url_imagen": "https://example.com/rooms/301.jpg",
     "estado": "DISPONIBLE",
     "limpieza": "LIMPIA",
@@ -333,6 +345,8 @@ Actualiza los datos completos de una habitación existente.
   "nro_habitacion": "301-A",
   "tipo_id": "123e4567-e89b-12d3-a456-426614174000",
   "piso": 3,
+  "tiene_ducha": true,
+  "tiene_banio": false,
   "url_imagen": "https://example.com/rooms/301-a.jpg",
   "estado": "MANTENIMIENTO",
   "limpieza": "EN_LIMPIEZA",
@@ -363,6 +377,8 @@ Actualiza los datos completos de una habitación existente.
       "descripcion": "Suite de lujo con vista panorámica al mar"
     },
     "piso": 3,
+    "tiene_ducha": true,
+    "tiene_banio": false,
     "url_imagen": "https://example.com/rooms/301-a.jpg",
     "estado": "MANTENIMIENTO",
     "limpieza": "EN_LIMPIEZA",
@@ -474,6 +490,8 @@ Actualiza únicamente los estados operacional y de limpieza de una habitación. 
       "descripcion": "Suite de lujo con vista panorámica al mar"
     },
     "piso": 3,
+    "tiene_ducha": true,
+    "tiene_banio": true,
     "url_imagen": "https://example.com/rooms/301.jpg",
     "estado": "OCUPADA",
     "limpieza": "LIMPIA",
@@ -632,6 +650,20 @@ Elimina una habitación del sistema.
 - **Validación**: Debe ser un número positivo
 - **Ejemplo**: 1, 2, 3, 10
 
+### Campo `tiene_ducha`
+
+- **Requerido**: No (default: `false`)
+- **Tipo**: Boolean
+- **Valores**: `true` o `false`
+- **Descripción**: Indica si la habitación tiene ducha
+
+### Campo `tiene_banio`
+
+- **Requerido**: No (default: `false`)
+- **Tipo**: Boolean
+- **Valores**: `true` o `false`
+- **Descripción**: Indica si la habitación tiene baño completo
+
 ### Campo `url_imagen`
 
 - **Requerido**: No
@@ -671,6 +703,7 @@ Elimina una habitación del sistema.
 
 - Las habitaciones representan las unidades físicas del hotel con número y ubicación específicos
 - Cada habitación está asociada a un tipo de habitación que define sus características
+- Los campos `tiene_ducha` y `tiene_banio` permiten especificar las instalaciones sanitarias de cada habitación individual
 - El sistema mantiene dos estados independientes:
   - **Estado operacional** (`estado`): Disponibilidad para reservas y ocupación
   - **Estado de limpieza** (`limpieza`): Estado del servicio de housekeeping
@@ -696,7 +729,9 @@ curl -X POST https://api.hotel.com/api/habitaciones \
   -d '{
     "nro_habitacion": "101",
     "tipo_id": "123e4567-e89b-12d3-a456-426614174000",
-    "piso": 1
+    "piso": 1,
+    "tiene_ducha": true,
+    "tiene_banio": false
   }'
 ```
 
@@ -710,6 +745,8 @@ curl -X POST https://api.hotel.com/api/habitaciones \
     "nro_habitacion": "301",
     "tipo_id": "123e4567-e89b-12d3-a456-426614174000",
     "piso": 3,
+    "tiene_ducha": true,
+    "tiene_banio": true,
     "url_imagen": "https://example.com/rooms/301.jpg",
     "estado": "DISPONIBLE",
     "limpieza": "LIMPIA",
@@ -764,6 +801,8 @@ curl -X PUT https://api.hotel.com/api/habitaciones/789e4567-e89b-12d3-a456-42661
   -d '{
     "nro_habitacion": "301-A",
     "piso": 3,
+    "tiene_ducha": true,
+    "tiene_banio": false,
     "estado": "MANTENIMIENTO",
     "notas": "Reparación de aire acondicionado"
   }'

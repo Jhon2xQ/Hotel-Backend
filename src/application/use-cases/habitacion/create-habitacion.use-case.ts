@@ -56,6 +56,8 @@ export class CreateHabitacionUseCase {
       nroHabitacion: input.nro_habitacion,
       tipoId: input.tipo_id,
       piso: input.piso,
+      tieneDucha: input.tiene_ducha ?? false,
+      tieneBanio: input.tiene_banio ?? false,
       urlImagen: input.url_imagen ?? null,
       estado: input.estado ?? EstadoHabitacion.DISPONIBLE,
       limpieza: input.limpieza ?? EstadoLimpieza.LIMPIA,

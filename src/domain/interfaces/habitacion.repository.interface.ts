@@ -5,6 +5,8 @@ export interface UpdateHabitacionData {
   nroHabitacion?: string;
   tipoId?: string;
   piso?: number;
+  tieneDucha?: boolean;
+  tieneBanio?: boolean;
   urlImagen?: string | null;
   estado?: EstadoHabitacion;
   limpieza?: EstadoLimpieza;

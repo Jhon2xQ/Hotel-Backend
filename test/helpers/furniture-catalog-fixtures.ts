@@ -1,21 +1,23 @@
-import { FurnitureCategory } from "../../src/domain/entities/furniture-catalog.entity";
+import {
+  FurnitureCatalog,
+  FurnitureCategory,
+  FurnitureCondition,
+} from "../../src/domain/entities/furniture-catalog.entity";
 
-export const mockFurnitureCatalog = {
-  id: "test-furniture-id-123",
-  codigo: "CAMA-KING-01",
-  nombre: "Cama King Size",
-  categoria: FurnitureCategory.Cama,
-  descripcion: "Cama king size con colchón ortopédico",
-  createdAt: new Date("2026-01-01"),
-  updatedAt: new Date("2026-01-01"),
-};
-
-export const mockFurnitureCatalogDb = {
-  id: "test-furniture-id-123",
-  codigo: "CAMA-KING-01",
-  nombre: "Cama King Size",
-  categoria: "CAMA",
-  descripcion: "Cama king size con colchón ortopédico",
-  createdAt: new Date("2026-01-01"),
-  updatedAt: new Date("2026-01-01"),
-};
+export function createMockFurnitureCatalog(overrides?: Partial<FurnitureCatalog>): FurnitureCatalog {
+  return new FurnitureCatalog(
+    overrides?.id ?? "test-id",
+    overrides?.codigo ?? "CAMA-001",
+    overrides?.nombre ?? "Cama King Size",
+    overrides?.categoria ?? FurnitureCategory.Cama,
+    overrides?.imagenUrl ?? "https://example.com/cama.jpg",
+    overrides?.tipo ?? "King Size",
+    overrides?.condicion ?? FurnitureCondition.Bueno,
+    overrides?.fechaAdq ?? new Date("2025-01-15"),
+    overrides?.ultimaRevision ?? new Date("2026-03-01"),
+    overrides?.descripcion ?? "Cama king size con colchón ortopédico",
+    overrides?.habitacionId ?? null,
+    overrides?.createdAt ?? new Date(),
+    overrides?.updatedAt ?? new Date(),
+  );
+}

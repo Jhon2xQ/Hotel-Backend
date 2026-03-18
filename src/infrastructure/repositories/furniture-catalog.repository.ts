@@ -28,6 +28,7 @@ export class FurnitureCatalogRepository implements IFurnitureCatalogRepository {
           fechaAdq: data.fechaAdq ?? null,
           ultimaRevision: data.ultimaRevision ?? null,
           descripcion: data.descripcion ?? null,
+          habitacionId: data.habitacionId ?? null,
         },
       });
       return this.toDomain(result);
@@ -75,6 +76,7 @@ export class FurnitureCatalogRepository implements IFurnitureCatalogRepository {
       if (data.fechaAdq !== undefined) updateData.fechaAdq = data.fechaAdq ?? null;
       if (data.ultimaRevision !== undefined) updateData.ultimaRevision = data.ultimaRevision ?? null;
       if (data.descripcion !== undefined) updateData.descripcion = data.descripcion ?? null;
+      if (data.habitacionId !== undefined) updateData.habitacionId = data.habitacionId ?? null;
 
       const result = await this.prisma.catalogoMueble.update({
         where: { id },
@@ -121,6 +123,7 @@ export class FurnitureCatalogRepository implements IFurnitureCatalogRepository {
       data.fechaAdq,
       data.ultimaRevision,
       data.descripcion,
+      data.habitacionId,
       data.createdAt,
       data.updatedAt,
     );

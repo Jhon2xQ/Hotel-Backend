@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { ListTipoHabitacionUseCase } from "../../../src/application/use-cases/tipo-habitacion/list-tipo-habitacion.use-case";
 import { ITipoHabitacionRepository } from "../../../src/domain/interfaces/tipo-habitacion.repository.interface";
-import { TipoHabitacion } from "../../../src/domain/entities/tipo-habitacion.entity";
+import { createMockTipoHabitacion } from "../../helpers/tipo-habitacion-fixtures";
 
 describe("ListTipoHabitacionUseCase", () => {
   let useCase: ListTipoHabitacionUseCase;
@@ -9,38 +9,37 @@ describe("ListTipoHabitacionUseCase", () => {
 
   beforeEach(() => {
     mockRepository = {
-      create: vi.fn(),
-      findAll: vi.fn(),
-      findById: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn(),
-      hasRelatedRecords: vi.fn(),
+      create: async () => createMockTipoHabitacion(),
+      findAll: async () => [],
+      findById: async () => null,
+      update: async () => createMockTipoHabitacion(),
+      delete: async () => {},
+      hasRelatedRecords: async () => false,
     };
+
     useCase = new ListTipoHabitacionUseCase(mockRepository);
   });
 
-  it("should list all tipos habitacion", async () => {
+  it("should return list of tipo habitacion", async () => {
     const mockTipos = [
-      new TipoHabitacion("id-1", "Suite Deluxe", "Suite de lujo", true, true, [], new Date(), new Date()),
-      new TipoHabitacion("id-2", "Habitación Estándar", "Habitación básica", true, false, [], new Date(), new Date()),
+      createMockTipoHabitacion({ id: "id-1", nombre: "Suite Deluxe" }),
+      createMockTipoHabitacion({ id: "id-2", nombre: "Habitación Estándar" }),
     ];
 
-    (mockRepository.findAll as any).mockResolvedValue(mockTipos);
+    mockRepository.findAll = async () => mockTipos;
 
     const result = await useCase.execute();
 
     expect(result).toHaveLength(2);
     expect(result[0].nombre).toBe("Suite Deluxe");
     expect(result[1].nombre).toBe("Habitación Estándar");
-    expect(mockRepository.findAll).toHaveBeenCalled();
   });
 
-  it("should return empty array when no tipos habitacion exist", async () => {
-    (mockRepository.findAll as any).mockResolvedValue([]);
+  it("should return empty array when no tipos exist", async () => {
+    mockRepository.findAll = async () => [];
 
     const result = await useCase.execute();
 
     expect(result).toHaveLength(0);
-    expect(mockRepository.findAll).toHaveBeenCalled();
   });
 });

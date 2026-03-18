@@ -15,6 +15,7 @@ export interface UpdateFurnitureCatalogData {
   fechaAdq?: Date | null;
   ultimaRevision?: Date | null;
   descripcion?: string | null;
+  habitacionId?: string | null;
 }
 
 export interface IFurnitureCatalogRepository {

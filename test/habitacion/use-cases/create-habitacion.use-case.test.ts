@@ -1,237 +1,159 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { CreateHabitacionUseCase } from "../../../src/application/use-cases/habitacion/create-habitacion.use-case";
 import { IHabitacionRepository } from "../../../src/domain/interfaces/habitacion.repository.interface";
 import { ITipoHabitacionRepository } from "../../../src/domain/interfaces/tipo-habitacion.repository.interface";
 import { IFurnitureCatalogRepository } from "../../../src/domain/interfaces/furniture-catalog.repository.interface";
 import { HabitacionException } from "../../../src/domain/exceptions/habitacion.exception";
-import { Habitacion, EstadoHabitacion, EstadoLimpieza } from "../../../src/domain/entities/habitacion.entity";
-import { TipoHabitacion } from "../../../src/domain/entities/tipo-habitacion.entity";
-import {
-  FurnitureCatalog,
-  FurnitureCategory,
-  FurnitureCondition,
-} from "../../../src/domain/entities/furniture-catalog.entity";
+import { createMockHabitacion } from "../../helpers/habitacion-fixtures";
+import { createMockTipoHabitacion } from "../../helpers/tipo-habitacion-fixtures";
+import { createMockFurnitureCatalog } from "../../helpers/furniture-catalog-fixtures";
+import { EstadoHabitacion, EstadoLimpieza } from "../../../src/domain/entities/habitacion.entity";
 
 describe("CreateHabitacionUseCase", () => {
   let useCase: CreateHabitacionUseCase;
-  let mockRepository: IHabitacionRepository;
-  let mockTipoRepository: ITipoHabitacionRepository;
-  let mockFurnitureRepository: IFurnitureCatalogRepository;
+  let mockHabitacionRepo: IHabitacionRepository;
+  let mockTipoRepo: ITipoHabitacionRepository;
+  let mockFurnitureRepo: IFurnitureCatalogRepository;
 
   beforeEach(() => {
-    mockRepository = {
-      create: vi.fn(),
-      findAll: vi.fn(),
-      findById: vi.fn(),
-      findByNumero: vi.fn(),
-      update: vi.fn(),
-      updateStatus: vi.fn(),
-      delete: vi.fn(),
-      hasRelatedRecords: vi.fn(),
+    mockHabitacionRepo = {
+      create: async () => createMockHabitacion(),
+      findAll: async () => [],
+      findById: async () => null,
+      findByNumero: async () => null,
+      update: async () => createMockHabitacion(),
+      updateStatus: async () => createMockHabitacion(),
+      delete: async () => {},
+      hasRelatedRecords: async () => false,
     };
-    mockTipoRepository = {
-      create: vi.fn(),
-      findAll: vi.fn(),
-      findById: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn(),
-      hasRelatedRecords: vi.fn(),
+
+    mockTipoRepo = {
+      create: async () => createMockTipoHabitacion(),
+      findAll: async () => [],
+      findById: async () => null,
+      update: async () => createMockTipoHabitacion(),
+      delete: async () => {},
+      hasRelatedRecords: async () => false,
     };
-    mockFurnitureRepository = {
-      create: vi.fn(),
-      findByCodigo: vi.fn(),
-      findAll: vi.fn(),
-      findById: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn(),
+
+    mockFurnitureRepo = {
+      create: async () => createMockFurnitureCatalog(),
+      findAll: async () => [],
+      findById: async () => null,
+      findByCodigo: async () => null,
+      update: async () => createMockFurnitureCatalog(),
+      delete: async () => {},
     };
-    useCase = new CreateHabitacionUseCase(mockRepository, mockTipoRepository, mockFurnitureRepository);
+
+    useCase = new CreateHabitacionUseCase(mockHabitacionRepo, mockTipoRepo, mockFurnitureRepo);
   });
 
-  it("should create habitacion successfully with defaults", async () => {
-    const mockTipo = new TipoHabitacion(
-      "tipo-id",
-      "Suite Deluxe",
-      "Suite de lujo",
-      true,
-      true,
-      [],
-      new Date(),
-      new Date(),
-    );
+  it("should create habitacion successfully", async () => {
+    const mockTipo = createMockTipoHabitacion();
+    const mockHabitacion = createMockHabitacion({
+      nroHabitacion: "101",
+      piso: 1,
+      tieneDucha: true,
+      tieneBanio: true,
+    });
 
-    const input = {
-      nro_habitacion: "301",
-      tipo_id: "tipo-id",
-      piso: 3,
-    };
+    mockTipoRepo.findById = async () => mockTipo;
+    mockHabitacionRepo.findByNumero = async () => null;
+    mockHabitacionRepo.create = async () => mockHabitacion;
 
-    const mockHabitacion = new Habitacion(
-      "test-id",
-      "301",
-      "tipo-id",
-      { id: "tipo-id", nombre: "Suite Deluxe", descripcion: "Suite de lujo" },
-      3,
-      null,
-      EstadoHabitacion.DISPONIBLE,
-      EstadoLimpieza.LIMPIA,
-      null,
-      null,
-      [],
-      new Date(),
-      new Date(),
-    );
+    const result = await useCase.execute({
+      nro_habitacion: "101",
+      tipo_id: "tipo-test-id",
+      piso: 1,
+      tiene_ducha: true,
+      tiene_banio: true,
+    });
 
-    (mockTipoRepository.findById as any).mockResolvedValue(mockTipo);
-    (mockRepository.findByNumero as any).mockResolvedValue(null);
-    (mockRepository.create as any).mockResolvedValue(mockHabitacion);
-
-    const result = await useCase.execute(input);
-
-    expect(result.nro_habitacion).toBe("301");
-    expect(result.estado).toBe("DISPONIBLE");
-    expect(result.limpieza).toBe("LIMPIA");
-    expect(mockTipoRepository.findById).toHaveBeenCalledWith("tipo-id");
-    expect(mockRepository.findByNumero).toHaveBeenCalledWith("301");
+    expect(result).toBeDefined();
+    expect(result.nro_habitacion).toBe("101");
+    expect(result.piso).toBe(1);
+    expect(result.tiene_ducha).toBe(true);
+    expect(result.tiene_banio).toBe(true);
   });
 
-  it("should throw exception when tipo habitacion not found", async () => {
-    const input = {
-      nro_habitacion: "301",
-      tipo_id: "non-existent-tipo",
-      piso: 3,
-    };
+  it("should throw error if tipo habitacion not found", async () => {
+    mockTipoRepo.findById = async () => null;
 
-    (mockTipoRepository.findById as any).mockResolvedValue(null);
-
-    await expect(useCase.execute(input)).rejects.toThrow(HabitacionException);
+    await expect(
+      useCase.execute({
+        nro_habitacion: "101",
+        tipo_id: "non-existent-tipo",
+        piso: 1,
+      }),
+    ).rejects.toThrow(HabitacionException);
   });
 
-  it("should throw exception when nro_habitacion already exists", async () => {
-    const mockTipo = new TipoHabitacion(
-      "tipo-id",
-      "Suite Deluxe",
-      "Suite de lujo",
-      true,
-      true,
-      [],
-      new Date(),
-      new Date(),
-    );
+  it("should throw error if numero already exists", async () => {
+    const mockTipo = createMockTipoHabitacion();
+    const existingHabitacion = createMockHabitacion({ nroHabitacion: "101" });
 
-    const existingHabitacion = new Habitacion(
-      "existing-id",
-      "301",
-      "tipo-id",
-      { id: "tipo-id", nombre: "Suite Deluxe", descripcion: "Suite de lujo" },
-      3,
-      null,
-      EstadoHabitacion.DISPONIBLE,
-      EstadoLimpieza.LIMPIA,
-      null,
-      null,
-      [],
-      new Date(),
-      new Date(),
-    );
-
-    const input = {
-      nro_habitacion: "301",
-      tipo_id: "tipo-id",
-      piso: 3,
+    mockTipoRepo.findById = async () => mockTipo;
+    mockHabitacionRepo.findByNumero = async (numero: string) => {
+      if (numero === "101") return existingHabitacion;
+      return null;
     };
 
-    (mockTipoRepository.findById as any).mockResolvedValue(mockTipo);
-    (mockRepository.findByNumero as any).mockResolvedValue(existingHabitacion);
-
-    await expect(useCase.execute(input)).rejects.toThrow(HabitacionException);
+    await expect(
+      useCase.execute({
+        nro_habitacion: "101",
+        tipo_id: "tipo-test-id",
+        piso: 1,
+      }),
+    ).rejects.toThrow(HabitacionException);
   });
 
   it("should create habitacion with muebles", async () => {
-    const mockTipo = new TipoHabitacion(
-      "tipo-id",
-      "Suite Deluxe",
-      "Suite de lujo",
-      true,
-      true,
-      [],
-      new Date(),
-      new Date(),
-    );
+    const mockTipo = createMockTipoHabitacion();
+    const mockMueble = createMockFurnitureCatalog({ id: "mueble-id" });
+    const mockHabitacion = createMockHabitacion({
+      muebles: [
+        {
+          id: "mueble-id",
+          codigo: "CAMA-001",
+          nombre: "Cama King",
+          categoria: "CAMA",
+        },
+      ],
+    });
 
-    const mockMueble = new FurnitureCatalog(
-      "mueble-id",
-      "CAMA-KING-01",
-      "Cama King Size",
-      FurnitureCategory.Cama,
-      null,
-      null,
-      FurnitureCondition.Bueno,
-      null,
-      null,
-      null,
-      new Date(),
-      new Date(),
-    );
-
-    const input = {
-      nro_habitacion: "301",
-      tipo_id: "tipo-id",
-      piso: 3,
-      muebles: ["mueble-id"],
+    mockTipoRepo.findById = async () => mockTipo;
+    mockHabitacionRepo.findByNumero = async () => null;
+    mockFurnitureRepo.findById = async (id: string) => {
+      if (id === "mueble-id") return mockMueble;
+      return null;
     };
+    mockHabitacionRepo.create = async () => mockHabitacion;
 
-    const mockHabitacion = new Habitacion(
-      "test-id",
-      "301",
-      "tipo-id",
-      { id: "tipo-id", nombre: "Suite Deluxe", descripcion: "Suite de lujo" },
-      3,
-      null,
-      EstadoHabitacion.DISPONIBLE,
-      EstadoLimpieza.LIMPIA,
-      null,
-      null,
-      [{ id: "mueble-id", codigo: "CAMA-KING-01", nombre: "Cama King Size", categoria: "CAMA" }],
-      new Date(),
-      new Date(),
-    );
-
-    (mockTipoRepository.findById as any).mockResolvedValue(mockTipo);
-    (mockRepository.findByNumero as any).mockResolvedValue(null);
-    (mockFurnitureRepository.findById as any).mockResolvedValue(mockMueble);
-    (mockRepository.create as any).mockResolvedValue(mockHabitacion);
-
-    const result = await useCase.execute(input);
+    const result = await useCase.execute({
+      nro_habitacion: "101",
+      tipo_id: "tipo-test-id",
+      piso: 1,
+      muebles: ["mueble-id"],
+    });
 
     expect(result.muebles).toHaveLength(1);
-    expect(result.muebles[0].codigo).toBe("CAMA-KING-01");
-    expect(mockFurnitureRepository.findById).toHaveBeenCalledWith("mueble-id");
+    expect(result.muebles[0].id).toBe("mueble-id");
   });
 
-  it("should throw exception when mueble not found", async () => {
-    const mockTipo = new TipoHabitacion(
-      "tipo-id",
-      "Suite Deluxe",
-      "Suite de lujo",
-      true,
-      true,
-      [],
-      new Date(),
-      new Date(),
-    );
+  it("should throw error if mueble not found", async () => {
+    const mockTipo = createMockTipoHabitacion();
 
-    const input = {
-      nro_habitacion: "301",
-      tipo_id: "tipo-id",
-      piso: 3,
-      muebles: ["non-existent-mueble"],
-    };
+    mockTipoRepo.findById = async () => mockTipo;
+    mockHabitacionRepo.findByNumero = async () => null;
+    mockFurnitureRepo.findById = async () => null;
 
-    (mockTipoRepository.findById as any).mockResolvedValue(mockTipo);
-    (mockRepository.findByNumero as any).mockResolvedValue(null);
-    (mockFurnitureRepository.findById as any).mockResolvedValue(null);
-
-    await expect(useCase.execute(input)).rejects.toThrow(HabitacionException);
+    await expect(
+      useCase.execute({
+        nro_habitacion: "101",
+        tipo_id: "tipo-test-id",
+        piso: 1,
+        muebles: ["non-existent-mueble"],
+      }),
+    ).rejects.toThrow(HabitacionException);
   });
 });

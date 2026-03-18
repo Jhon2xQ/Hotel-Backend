@@ -71,6 +71,8 @@ export class UpdateHabitacionUseCase {
       nroHabitacion: input.nro_habitacion,
       tipoId: input.tipo_id,
       piso: input.piso,
+      tieneDucha: input.tiene_ducha,
+      tieneBanio: input.tiene_banio,
       urlImagen: input.url_imagen,
       estado: input.estado,
       limpieza: input.limpieza,

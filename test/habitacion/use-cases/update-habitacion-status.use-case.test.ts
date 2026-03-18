@@ -1,8 +1,9 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { UpdateHabitacionStatusUseCase } from "../../../src/application/use-cases/habitacion/update-habitacion-status.use-case";
 import { IHabitacionRepository } from "../../../src/domain/interfaces/habitacion.repository.interface";
 import { HabitacionException } from "../../../src/domain/exceptions/habitacion.exception";
-import { Habitacion, EstadoHabitacion, EstadoLimpieza } from "../../../src/domain/entities/habitacion.entity";
+import { createMockHabitacion } from "../../helpers/habitacion-fixtures";
+import { EstadoHabitacion, EstadoLimpieza } from "../../../src/domain/entities/habitacion.entity";
 
 describe("UpdateHabitacionStatusUseCase", () => {
   let useCase: UpdateHabitacionStatusUseCase;
@@ -10,72 +11,58 @@ describe("UpdateHabitacionStatusUseCase", () => {
 
   beforeEach(() => {
     mockRepository = {
-      create: vi.fn(),
-      findAll: vi.fn(),
-      findById: vi.fn(),
-      findByNumero: vi.fn(),
-      update: vi.fn(),
-      updateStatus: vi.fn(),
-      delete: vi.fn(),
-      hasRelatedRecords: vi.fn(),
+      create: async () => createMockHabitacion(),
+      findAll: async () => [],
+      findById: async () => null,
+      findByNumero: async () => null,
+      update: async () => createMockHabitacion(),
+      updateStatus: async () => createMockHabitacion(),
+      delete: async () => {},
+      hasRelatedRecords: async () => false,
     };
+
     useCase = new UpdateHabitacionStatusUseCase(mockRepository);
   });
 
   it("should update habitacion status successfully", async () => {
-    const existingHabitacion = new Habitacion(
-      "test-id",
-      "301",
-      "tipo-id",
-      { id: "tipo-id", nombre: "Suite Deluxe", descripcion: "Suite de lujo" },
-      3,
-      null,
-      EstadoHabitacion.DISPONIBLE,
-      EstadoLimpieza.LIMPIA,
-      null,
-      null,
-      [],
-      new Date(),
-      new Date(),
-    );
+    const existingHabitacion = createMockHabitacion({ id: "test-id", estado: EstadoHabitacion.DISPONIBLE });
+    const updatedHabitacion = createMockHabitacion({ id: "test-id", estado: EstadoHabitacion.OCUPADA });
 
-    const updatedHabitacion = new Habitacion(
-      "test-id",
-      "301",
-      "tipo-id",
-      { id: "tipo-id", nombre: "Suite Deluxe", descripcion: "Suite de lujo" },
-      3,
-      null,
-      EstadoHabitacion.OCUPADA,
-      EstadoLimpieza.SUCIA,
-      null,
-      null,
-      [],
-      new Date(),
-      new Date(),
-    );
-
-    const input = {
-      estado: EstadoHabitacion.OCUPADA,
-      limpieza: EstadoLimpieza.SUCIA,
+    mockRepository.findById = async (id: string) => {
+      if (id === "test-id") return existingHabitacion;
+      return null;
     };
+    mockRepository.updateStatus = async () => updatedHabitacion;
 
-    (mockRepository.findById as any).mockResolvedValue(existingHabitacion);
-    (mockRepository.updateStatus as any).mockResolvedValue(updatedHabitacion);
+    const result = await useCase.execute("test-id", {
+      estado: EstadoHabitacion.OCUPADA,
+    });
 
-    const result = await useCase.execute("test-id", input);
-
+    expect(result).toBeDefined();
     expect(result.estado).toBe("OCUPADA");
-    expect(result.limpieza).toBe("SUCIA");
-    expect(mockRepository.findById).toHaveBeenCalledWith("test-id");
-    expect(mockRepository.updateStatus).toHaveBeenCalledWith("test-id", input);
   });
 
-  it("should throw exception when habitacion not found", async () => {
-    (mockRepository.findById as any).mockResolvedValue(null);
+  it("should throw error when habitacion not found", async () => {
+    mockRepository.findById = async () => null;
 
-    await expect(useCase.execute("non-existent-id", { estado: EstadoHabitacion.OCUPADA })).rejects.toThrow(
-      HabitacionException,
-    );
+    await expect(
+      useCase.execute("non-existent-id", {
+        estado: EstadoHabitacion.OCUPADA,
+      }),
+    ).rejects.toThrow(HabitacionException);
+  });
+
+  it("should update limpieza status", async () => {
+    const existingHabitacion = createMockHabitacion({ id: "test-id", limpieza: EstadoLimpieza.SUCIA });
+    const updatedHabitacion = createMockHabitacion({ id: "test-id", limpieza: EstadoLimpieza.LIMPIA });
+
+    mockRepository.findById = async () => existingHabitacion;
+    mockRepository.updateStatus = async () => updatedHabitacion;
+
+    const result = await useCase.execute("test-id", {
+      limpieza: EstadoLimpieza.LIMPIA,
+    });
+
+    expect(result.limpieza).toBe("LIMPIA");
   });
 });

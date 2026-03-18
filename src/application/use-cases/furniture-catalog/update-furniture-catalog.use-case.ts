@@ -32,6 +32,7 @@ export class UpdateFurnitureCatalogUseCase {
       updateData.ultimaRevision = input.ultima_revision ? new Date(input.ultima_revision) : null;
     }
     if (input.descripcion !== undefined) updateData.descripcion = input.descripcion ?? null;
+    if (input.habitacion_id !== undefined) updateData.habitacionId = input.habitacion_id ?? null;
 
     const updated = await this.repository.update(id, updateData);
     return updated.toOutput();

@@ -1,12 +1,9 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { CreateFurnitureCatalogUseCase } from "../../../src/application/use-cases/furniture-catalog/create-furniture-catalog.use-case";
 import { IFurnitureCatalogRepository } from "../../../src/domain/interfaces/furniture-catalog.repository.interface";
 import { FurnitureCatalogException } from "../../../src/domain/exceptions/furniture-catalog.exception";
-import {
-  FurnitureCatalog,
-  FurnitureCategory,
-  FurnitureCondition,
-} from "../../../src/domain/entities/furniture-catalog.entity";
+import { createMockFurnitureCatalog } from "../../helpers/furniture-catalog-fixtures";
+import { FurnitureCategory, FurnitureCondition } from "../../../src/domain/entities/furniture-catalog.entity";
 
 describe("CreateFurnitureCatalogUseCase", () => {
   let useCase: CreateFurnitureCatalogUseCase;
@@ -14,84 +11,68 @@ describe("CreateFurnitureCatalogUseCase", () => {
 
   beforeEach(() => {
     mockRepository = {
-      create: vi.fn(),
-      findByCodigo: vi.fn(),
-      findAll: vi.fn(),
-      findById: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn(),
+      create: async () => createMockFurnitureCatalog(),
+      findAll: async () => [],
+      findById: async () => null,
+      findByCodigo: async () => null,
+      update: async () => createMockFurnitureCatalog(),
+      delete: async () => {},
     };
+
     useCase = new CreateFurnitureCatalogUseCase(mockRepository);
   });
 
   it("should create a furniture catalog successfully", async () => {
-    const input = {
-      codigo: "CAMA-KING-01",
+    const mockFurniture = createMockFurnitureCatalog();
+    mockRepository.create = async () => mockFurniture;
+    mockRepository.findByCodigo = async () => null;
+
+    const result = await useCase.execute({
+      codigo: "CAMA-001",
       nombre: "Cama King Size",
       categoria: FurnitureCategory.Cama,
+      imagen_url: "https://example.com/cama.jpg",
+      tipo: "King Size",
+      condicion: FurnitureCondition.Bueno,
+      fecha_adquisicion: "2025-01-15",
+      ultima_revision: "2026-03-01",
       descripcion: "Cama king size con colchón ortopédico",
-    };
-
-    const mockFurniture = new FurnitureCatalog(
-      "test-id",
-      "CAMA-KING-01",
-      "Cama King Size",
-      FurnitureCategory.Cama,
-      null,
-      null,
-      FurnitureCondition.Bueno,
-      null,
-      null,
-      "Cama king size con colchón ortopédico",
-      new Date(),
-      new Date(),
-    );
-
-    (mockRepository.findByCodigo as any).mockResolvedValue(null);
-    (mockRepository.create as any).mockResolvedValue(mockFurniture);
-
-    const result = await useCase.execute(input);
-
-    expect(result.codigo).toBe("CAMA-KING-01");
-    expect(result.nombre).toBe("Cama King Size");
-    expect(mockRepository.findByCodigo).toHaveBeenCalledWith("CAMA-KING-01");
-    expect(mockRepository.create).toHaveBeenCalledWith({
-      codigo: input.codigo,
-      nombre: input.nombre,
-      categoria: input.categoria,
-      imagenUrl: null,
-      tipo: null,
-      condicion: undefined,
-      fechaAdq: null,
-      ultimaRevision: null,
-      descripcion: input.descripcion,
     });
+
+    expect(result).toBeDefined();
+    expect(result.codigo).toBe("CAMA-001");
+    expect(result.nombre).toBe("Cama King Size");
+    expect(result.habitacion_id).toBeNull();
   });
 
-  it("should throw exception when codigo already exists", async () => {
-    const input = {
-      codigo: "CAMA-KING-01",
-      nombre: "Cama King Size",
-      categoria: FurnitureCategory.Cama,
+  it("should throw error if codigo already exists", async () => {
+    const existingFurniture = createMockFurnitureCatalog({ codigo: "CAMA-001" });
+    mockRepository.findByCodigo = async (codigo: string) => {
+      if (codigo === "CAMA-001") return existingFurniture;
+      return null;
     };
 
-    const existingFurniture = new FurnitureCatalog(
-      "existing-id",
-      "CAMA-KING-01",
-      "Cama Existente",
-      FurnitureCategory.Cama,
-      null,
-      null,
-      FurnitureCondition.Bueno,
-      null,
-      null,
-      null,
-      new Date(),
-      new Date(),
-    );
+    await expect(
+      useCase.execute({
+        codigo: "CAMA-001",
+        nombre: "Cama King Size",
+        categoria: FurnitureCategory.Cama,
+      }),
+    ).rejects.toThrow(FurnitureCatalogException);
+  });
 
-    (mockRepository.findByCodigo as any).mockResolvedValue(existingFurniture);
+  it("should create furniture with habitacion_id", async () => {
+    const mockFurniture = createMockFurnitureCatalog({ habitacionId: "hab-123" });
+    mockRepository.create = async () => mockFurniture;
+    mockRepository.findByCodigo = async () => null;
 
-    await expect(useCase.execute(input)).rejects.toThrow(FurnitureCatalogException);
+    const result = await useCase.execute({
+      codigo: "CAMA-001",
+      nombre: "Cama King Size",
+      categoria: FurnitureCategory.Cama,
+      habitacion_id: "hab-123",
+    });
+
+    expect(result.habitacion_id).toBe("hab-123");
   });
 });

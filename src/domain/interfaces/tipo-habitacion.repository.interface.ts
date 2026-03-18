@@ -3,9 +3,6 @@ import { TipoHabitacion, CreateTipoHabitacionData, CatalogoMueble } from "../ent
 export interface UpdateTipoHabitacionData {
   nombre?: string;
   descripcion?: string | null;
-  tieneDucha?: boolean;
-  tieneBanio?: boolean;
-  muebles?: CatalogoMueble[];
 }
 
 export interface ITipoHabitacionRepository {

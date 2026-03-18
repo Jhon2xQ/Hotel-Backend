@@ -25,6 +25,8 @@ export interface CreateHabitacionData {
   nroHabitacion: string;
   tipoId: string;
   piso: number;
+  tieneDucha?: boolean;
+  tieneBanio?: boolean;
   urlImagen?: string | null;
   estado?: EstadoHabitacion;
   limpieza?: EstadoLimpieza;
@@ -39,6 +41,8 @@ export class Habitacion {
     public readonly tipoId: string,
     public readonly tipo: TipoHabitacionBasic | null,
     public readonly piso: number,
+    public readonly tieneDucha: boolean,
+    public readonly tieneBanio: boolean,
     public readonly urlImagen: string | null,
     public readonly estado: EstadoHabitacion,
     public readonly limpieza: EstadoLimpieza,
@@ -56,6 +60,8 @@ export class Habitacion {
       data.tipoId,
       null, // tipo is loaded from database, not provided during creation
       data.piso,
+      data.tieneDucha ?? false,
+      data.tieneBanio ?? false,
       data.urlImagen ?? null,
       data.estado ?? EstadoHabitacion.DISPONIBLE,
       data.limpieza ?? EstadoLimpieza.LIMPIA,
@@ -80,6 +86,8 @@ export class Habitacion {
           }
         : null,
       piso: this.piso,
+      tiene_ducha: this.tieneDucha,
+      tiene_banio: this.tieneBanio,
       url_imagen: this.urlImagen,
       estado: this.estado,
       limpieza: this.limpieza,

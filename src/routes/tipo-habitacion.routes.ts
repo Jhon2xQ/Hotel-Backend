@@ -2,7 +2,6 @@ import { Hono } from "hono";
 import { AppHono, AppVariables } from "../common/types/app.types";
 import { PrismaClient } from "../../generated/prisma/client";
 import { TipoHabitacionRepository } from "../infrastructure/repositories/tipo-habitacion.repository";
-import { FurnitureCatalogRepository } from "../infrastructure/repositories/furniture-catalog.repository";
 import { CreateTipoHabitacionUseCase } from "../application/use-cases/tipo-habitacion/create-tipo-habitacion.use-case";
 import { ListTipoHabitacionUseCase } from "../application/use-cases/tipo-habitacion/list-tipo-habitacion.use-case";
 import { FindTipoHabitacionByIdUseCase } from "../application/use-cases/tipo-habitacion/find-tipo-habitacion-by-id.use-case";
@@ -20,12 +19,11 @@ import {
 
 export function createTipoHabitacionRoutes(prismaClient: PrismaClient): AppHono {
   const repository = new TipoHabitacionRepository(prismaClient);
-  const furnitureRepository = new FurnitureCatalogRepository(prismaClient);
 
-  const createUseCase = new CreateTipoHabitacionUseCase(repository, furnitureRepository);
+  const createUseCase = new CreateTipoHabitacionUseCase(repository);
   const listUseCase = new ListTipoHabitacionUseCase(repository);
   const findByIdUseCase = new FindTipoHabitacionByIdUseCase(repository);
-  const updateUseCase = new UpdateTipoHabitacionUseCase(repository, furnitureRepository);
+  const updateUseCase = new UpdateTipoHabitacionUseCase(repository);
   const deleteUseCase = new DeleteTipoHabitacionUseCase(repository);
 
   const controller = new TipoHabitacionController(

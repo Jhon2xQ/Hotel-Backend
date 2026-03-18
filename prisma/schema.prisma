@@ -342,14 +342,9 @@ model Huesped {
   id           String         @id @default(uuid()) @db.Uuid
   nombres      String         @db.VarChar(80)
   apellidos    String         @db.VarChar(80)
-  email        String?        @unique @db.VarChar(120)
-  telefono     String?        @db.VarChar(20)
-  nacionalidad String?        @db.VarChar(60)
-  tipoDoc      TipoDocumento?
-  nroDoc       String?        @db.VarChar(30)
-  fechaNac     DateTime?      @db.Date
-  genero       Genero?
-  idioma       String         @default("es") @db.VarChar(10)
+  email        String         @unique @db.VarChar(120)
+  telefono     String         @db.VarChar(20)
+  nacionalidad String         @db.VarChar(60)
   nivelVip     Int            @default(0)
   notas        String?        @db.Text
   createdAt    DateTime       @default(now()) @db.Timestamptz
@@ -359,7 +354,6 @@ model Huesped {
   reservas Reserva[]
   estancias Estancia[]
 
-  @@unique([tipoDoc, nroDoc])
   @@map("huespedes")
 }
 
@@ -378,7 +372,7 @@ model ResumenEstancias {
 }
 
 // ------------------------------------------------------------
-// 5. CATÁLOGO DE MUEBLES
+// 4. CATÁLOGO DE MUEBLES
 // ------------------------------------------------------------
 model CatalogoMueble {
   id             String          @id @default(uuid()) @db.Uuid
@@ -391,43 +385,40 @@ model CatalogoMueble {
   fechaAdq       DateTime?       @db.Date
   ultimaRevision DateTime?       @db.Date
   descripcion    String?         @db.Text
+  habitacionId   String?         @db.Uuid
   createdAt      DateTime        @default(now()) @db.Timestamptz
   updatedAt      DateTime        @updatedAt @db.Timestamptz
 
-  tiposHabitacion TipoHabitacion[] @relation("MueblesPorTipo")
-  habitaciones    Habitacion[]     @relation("MueblesHabitacion")
+  habitacion Habitacion? @relation(fields: [habitacionId], references: [id])
 
   @@map("catalogo_muebles")
 }
 
 // ------------------------------------------------------------
-// 4. TIPOS DE HABITACIÓN
+// 5. TIPOS DE HABITACIÓN
 // ------------------------------------------------------------
 model TipoHabitacion {
-  id            String   @id @default(uuid()) @db.Uuid
-  nombre        String   @db.VarChar(100)
-  descripcion   String?  @db.Text
-  tieneDucha    Boolean  @default(false)
-  tieneBanio    Boolean  @default(false)
-  createdAt     DateTime @default(now()) @db.Timestamptz
-  updatedAt     DateTime @updatedAt @db.Timestamptz
+  id          String   @id @default(uuid()) @db.Uuid
+  nombre      String   @db.VarChar(100)
+  descripcion String?  @db.Text
+  createdAt   DateTime @default(now()) @db.Timestamptz
+  updatedAt   DateTime @updatedAt @db.Timestamptz
 
   habitaciones Habitacion[]
-  tarifas      Tarifa[]
-  reservas     Reserva[]
-  muebles      CatalogoMueble[] @relation("MueblesPorTipo")
 
   @@map("tipos_habitacion")
 }
 
 // ------------------------------------------------------------
-// 7. HABITACIONES
+// 6. HABITACIONES
 // ------------------------------------------------------------
 model Habitacion {
   id             String           @id @default(uuid()) @db.Uuid
   nroHabitacion  String           @unique @db.VarChar(10)
   tipoId         String           @db.Uuid
   piso           Int
+  tieneDucha     Boolean          @default(false)
+  tieneBanio     Boolean          @default(false)
   urlImagen      String?          @db.VarChar(255)
   estado         EstadoHabitacion @default(DISPONIBLE)
   limpieza       EstadoLimpieza   @default(LIMPIA)
@@ -436,9 +427,11 @@ model Habitacion {
   createdAt      DateTime         @default(now()) @db.Timestamptz
   updatedAt      DateTime         @updatedAt @db.Timestamptz
 
-  tipo      TipoHabitacion   @relation(fields: [tipoId], references: [id])
-  muebles   CatalogoMueble[] @relation("MueblesHabitacion")
+  tipo      TipoHabitacion  @relation(fields: [tipoId], references: [id])
+  muebles   CatalogoMueble[]
   estancias Estancia[]
+  tarifas   Tarifa[]
+  reservas  Reserva[]
 
   @@map("habitaciones")
 }
@@ -491,28 +484,27 @@ model Temporada {
 // ------------------------------------------------------------
 // 11. TARIFAS
 // ------------------------------------------------------------
-
 model Tarifa {
-  id               String    @id @default(uuid()) @db.Uuid
-  tipoHabitacionId String    @db.Uuid
-  planId           String    @db.Uuid
-  temporadaId      String?   @db.Uuid
-  canalId          String?   @db.Uuid
-  precioNoche      Decimal   @db.Decimal(10, 2)
-  precioAdultoExtra Decimal  @default(0) @db.Decimal(8, 2)
-  precioNinoExtra  Decimal   @default(0) @db.Decimal(8, 2)
-  moneda           String    @default("USD") @db.Char(3)
-  vigenciaDesde    DateTime? @db.Date
-  vigenciaHasta    DateTime? @db.Date
-  createdAt        DateTime  @default(now()) @db.Timestamptz
-  updatedAt        DateTime  @updatedAt @db.Timestamptz
+  id            String    @id @default(uuid()) @db.Uuid
+  habitacionId  String    @db.Uuid          // ← era tipoHabitacionId
+  planId        String    @db.Uuid
+  temporadaId   String?   @db.Uuid
+  canalId       String?   @db.Uuid
+  precioNoche   Decimal   @db.Decimal(10, 2)
+  precioAdultoExtra Decimal @default(0) @db.Decimal(8, 2)
+  precioNinoExtra Decimal  @default(0) @db.Decimal(8, 2)
+  moneda        String    @default("USD") @db.Char(3)
+  vigenciaDesde DateTime? @db.Date
+  vigenciaHasta DateTime? @db.Date
+  createdAt     DateTime  @default(now()) @db.Timestamptz
+  updatedAt     DateTime  @updatedAt @db.Timestamptz
 
-  tipoHabitacion TipoHabitacion @relation(fields: [tipoHabitacionId], references: [id])
-  plan           PlanTarifa     @relation(fields: [planId], references: [id])
-  temporada      Temporada?     @relation(fields: [temporadaId], references: [id])
-  canal          Canal?         @relation(fields: [canalId], references: [id])
+  habitacion Habitacion @relation(fields: [habitacionId], references: [id])
+  plan       PlanTarifa  @relation(fields: [planId], references: [id])
+  temporada  Temporada?  @relation(fields: [temporadaId], references: [id])
+  canal      Canal?      @relation(fields: [canalId], references: [id])
 
-  @@unique([tipoHabitacionId, planId, temporadaId, canalId])
+  @@unique([habitacionId, planId, temporadaId, canalId])
   @@map("tarifas")
 }
 
@@ -570,41 +562,44 @@ model Servicio {
 // 14. RESERVAS
 // ------------------------------------------------------------
 
+// ------------------------------------------------------------
+// 14. RESERVAS
+// ------------------------------------------------------------
 model Reserva {
-  id            String        @id @default(uuid()) @db.Uuid
-  codigo        String        @unique @db.VarChar(20)
-  huespedId     String        @db.Uuid
-  agenciaId     String?       @db.Uuid
-  canalId       String        @db.Uuid
-  tipoHabId     String        @db.Uuid
-  planId        String        @db.Uuid
+  id           String        @id @default(uuid()) @db.Uuid
+  codigo       String        @unique @db.VarChar(20)
+  huespedId    String        @db.Uuid
+  agenciaId    String?       @db.Uuid
+  canalId      String        @db.Uuid
+  habitacionId String        @db.Uuid          // ← era tipoHabId
+  planId       String        @db.Uuid
 
-  fechaEntrada  DateTime      @db.Date
-  fechaSalida   DateTime      @db.Date
-  noches        Int?          // calculado en BD, solo lectura
+  fechaEntrada DateTime      @db.Date
+  fechaSalida  DateTime      @db.Date
+  noches       Int?
 
-  adultos       Int           @default(1)
-  ninos         Int           @default(0)
+  adultos      Int           @default(1)
+  ninos        Int           @default(0)
 
-  precioNoche   Decimal       @db.Decimal(10, 2)
-  montoTotal    Decimal       @db.Decimal(12, 2)
-  moneda        String        @default("USD") @db.Char(3)
+  precioNoche  Decimal       @db.Decimal(10, 2)
+  montoTotal   Decimal       @db.Decimal(12, 2)
+  moneda       String        @default("USD") @db.Char(3)
 
-  estado        EstadoReserva @default(TENTATIVA)
-  motivoCancel  String?       @db.Text
-  canceladoEn   DateTime?     @db.Timestamptz
-  refExterna    String?       @db.VarChar(100)
-  nroVoucher    String?       @db.VarChar(50)
-  solicitudes   String?       @db.Text
-  horaLlegada   DateTime?     @db.Time
-  createdAt     DateTime      @default(now()) @db.Timestamptz
-  updatedAt     DateTime      @updatedAt @db.Timestamptz
+  estado       EstadoReserva @default(TENTATIVA)
+  motivoCancel String?       @db.Text
+  canceladoEn  DateTime?     @db.Timestamptz
+  refExterna   String?       @db.VarChar(100)
+  nroVoucher   String?       @db.VarChar(50)
+  solicitudes  String?       @db.Text
+  horaLlegada  DateTime?     @db.Time
+  createdAt    DateTime      @default(now()) @db.Timestamptz
+  updatedAt    DateTime      @updatedAt @db.Timestamptz
 
-  huesped       Huesped        @relation(fields: [huespedId], references: [id])
-  agencia       Agencia?       @relation(fields: [agenciaId], references: [id])
-  canal         Canal          @relation(fields: [canalId], references: [id])
-  tipoHabitacion TipoHabitacion @relation(fields: [tipoHabId], references: [id])
-  plan          PlanTarifa     @relation(fields: [planId], references: [id])
+  huesped    Huesped    @relation(fields: [huespedId], references: [id])
+  agencia    Agencia?   @relation(fields: [agenciaId], references: [id])
+  canal      Canal      @relation(fields: [canalId], references: [id])
+  habitacion Habitacion @relation(fields: [habitacionId], references: [id])  // ← era tipoHabitacion
+  plan       PlanTarifa @relation(fields: [planId], references: [id])
 
   pagos     Pago[]
   estancias Estancia[]

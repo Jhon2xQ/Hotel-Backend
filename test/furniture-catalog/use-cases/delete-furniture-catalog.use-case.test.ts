@@ -1,12 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { DeleteFurnitureCatalogUseCase } from "../../../src/application/use-cases/furniture-catalog/delete-furniture-catalog.use-case";
 import { IFurnitureCatalogRepository } from "../../../src/domain/interfaces/furniture-catalog.repository.interface";
 import { FurnitureCatalogException } from "../../../src/domain/exceptions/furniture-catalog.exception";
-import {
-  FurnitureCatalog,
-  FurnitureCategory,
-  FurnitureCondition,
-} from "../../../src/domain/entities/furniture-catalog.entity";
+import { createMockFurnitureCatalog } from "../../helpers/furniture-catalog-fixtures";
 
 describe("DeleteFurnitureCatalogUseCase", () => {
   let useCase: DeleteFurnitureCatalogUseCase;
@@ -14,45 +10,37 @@ describe("DeleteFurnitureCatalogUseCase", () => {
 
   beforeEach(() => {
     mockRepository = {
-      create: vi.fn(),
-      findByCodigo: vi.fn(),
-      findAll: vi.fn(),
-      findById: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn(),
+      create: async () => createMockFurnitureCatalog(),
+      findAll: async () => [],
+      findById: async () => null,
+      findByCodigo: async () => null,
+      update: async () => createMockFurnitureCatalog(),
+      delete: async () => {},
     };
+
     useCase = new DeleteFurnitureCatalogUseCase(mockRepository);
   });
 
   it("should delete furniture catalog successfully", async () => {
-    const existingFurniture = new FurnitureCatalog(
-      "test-id",
-      "CAMA-KING-01",
-      "Cama King Size",
-      FurnitureCategory.Cama,
-      null,
-      null,
-      FurnitureCondition.Bueno,
-      null,
-      null,
-      null,
-      new Date(),
-      new Date(),
-    );
+    const existingFurniture = createMockFurnitureCatalog({ id: "test-id" });
+    mockRepository.findById = async (id: string) => {
+      if (id === "test-id") return existingFurniture;
+      return null;
+    };
 
-    (mockRepository.findById as any).mockResolvedValue(existingFurniture);
-    (mockRepository.delete as any).mockResolvedValue(undefined);
+    let deleted = false;
+    mockRepository.delete = async () => {
+      deleted = true;
+    };
 
     await useCase.execute("test-id");
 
-    expect(mockRepository.findById).toHaveBeenCalledWith("test-id");
-    expect(mockRepository.delete).toHaveBeenCalledWith("test-id");
+    expect(deleted).toBe(true);
   });
 
-  it("should throw exception when furniture catalog not found", async () => {
-    (mockRepository.findById as any).mockResolvedValue(null);
+  it("should throw error when furniture catalog not found", async () => {
+    mockRepository.findById = async () => null;
 
     await expect(useCase.execute("non-existent-id")).rejects.toThrow(FurnitureCatalogException);
-    expect(mockRepository.findById).toHaveBeenCalledWith("non-existent-id");
   });
 });

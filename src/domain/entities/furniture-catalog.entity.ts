@@ -25,6 +25,7 @@ export interface CreateFurnitureCatalogData {
   fechaAdq?: Date | null;
   ultimaRevision?: Date | null;
   descripcion?: string | null;
+  habitacionId?: string | null;
 }
 
 export class FurnitureCatalog {
@@ -39,6 +40,7 @@ export class FurnitureCatalog {
     public readonly fechaAdq: Date | null,
     public readonly ultimaRevision: Date | null,
     public readonly descripcion: string | null,
+    public readonly habitacionId: string | null,
     public readonly createdAt: Date,
     public readonly updatedAt: Date,
   ) {}
@@ -55,6 +57,7 @@ export class FurnitureCatalog {
       data.fechaAdq ?? null,
       data.ultimaRevision ?? null,
       data.descripcion ?? null,
+      data.habitacionId ?? null,
       new Date(),
       new Date(),
     );
@@ -72,6 +75,7 @@ export class FurnitureCatalog {
       fecha_adquisicion: this.fechaAdq?.toISOString().split("T")[0] ?? null,
       ultima_revision: this.ultimaRevision?.toISOString().split("T")[0] ?? null,
       descripcion: this.descripcion,
+      habitacion_id: this.habitacionId,
       created_at: this.createdAt.toISOString(),
       updated_at: this.updatedAt.toISOString(),
     };

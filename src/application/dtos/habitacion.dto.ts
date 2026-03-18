@@ -4,6 +4,8 @@ export interface CreateHabitacionInput {
   nro_habitacion: string;
   tipo_id: string;
   piso: number;
+  tiene_ducha?: boolean;
+  tiene_banio?: boolean;
   url_imagen?: string;
   estado?: EstadoHabitacion;
   limpieza?: EstadoLimpieza;
@@ -15,6 +17,8 @@ export interface UpdateHabitacionInput {
   nro_habitacion?: string;
   tipo_id?: string;
   piso?: number;
+  tiene_ducha?: boolean;
+  tiene_banio?: boolean;
   url_imagen?: string;
   estado?: EstadoHabitacion;
   limpieza?: EstadoLimpieza;
@@ -37,6 +41,8 @@ export interface HabitacionOutput {
     descripcion: string | null;
   } | null;
   piso: number;
+  tiene_ducha: boolean;
+  tiene_banio: boolean;
   url_imagen: string | null;
   estado: string;
   limpieza: string;

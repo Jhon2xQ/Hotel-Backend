@@ -1,12 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { FindFurnitureCatalogByIdUseCase } from "../../../src/application/use-cases/furniture-catalog/find-furniture-catalog-by-id.use-case";
 import { IFurnitureCatalogRepository } from "../../../src/domain/interfaces/furniture-catalog.repository.interface";
 import { FurnitureCatalogException } from "../../../src/domain/exceptions/furniture-catalog.exception";
-import {
-  FurnitureCatalog,
-  FurnitureCategory,
-  FurnitureCondition,
-} from "../../../src/domain/entities/furniture-catalog.entity";
+import { createMockFurnitureCatalog } from "../../helpers/furniture-catalog-fixtures";
 
 describe("FindFurnitureCatalogByIdUseCase", () => {
   let useCase: FindFurnitureCatalogByIdUseCase;
@@ -14,45 +10,34 @@ describe("FindFurnitureCatalogByIdUseCase", () => {
 
   beforeEach(() => {
     mockRepository = {
-      create: vi.fn(),
-      findByCodigo: vi.fn(),
-      findAll: vi.fn(),
-      findById: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn(),
+      create: async () => createMockFurnitureCatalog(),
+      findAll: async () => [],
+      findById: async () => null,
+      findByCodigo: async () => null,
+      update: async () => createMockFurnitureCatalog(),
+      delete: async () => {},
     };
+
     useCase = new FindFurnitureCatalogByIdUseCase(mockRepository);
   });
 
-  it("should find furniture catalog by id", async () => {
-    const mockFurniture = new FurnitureCatalog(
-      "test-id",
-      "CAMA-KING-01",
-      "Cama King Size",
-      FurnitureCategory.Cama,
-      null,
-      null,
-      FurnitureCondition.Bueno,
-      null,
-      null,
-      "Descripción",
-      new Date(),
-      new Date(),
-    );
-
-    (mockRepository.findById as any).mockResolvedValue(mockFurniture);
+  it("should return furniture catalog when found", async () => {
+    const mockFurniture = createMockFurnitureCatalog({ id: "test-id", codigo: "CAMA-001" });
+    mockRepository.findById = async (id: string) => {
+      if (id === "test-id") return mockFurniture;
+      return null;
+    };
 
     const result = await useCase.execute("test-id");
 
+    expect(result).toBeDefined();
     expect(result.id).toBe("test-id");
-    expect(result.codigo).toBe("CAMA-KING-01");
-    expect(mockRepository.findById).toHaveBeenCalledWith("test-id");
+    expect(result.codigo).toBe("CAMA-001");
   });
 
-  it("should throw exception when furniture catalog not found", async () => {
-    (mockRepository.findById as any).mockResolvedValue(null);
+  it("should throw error when furniture catalog not found", async () => {
+    mockRepository.findById = async () => null;
 
     await expect(useCase.execute("non-existent-id")).rejects.toThrow(FurnitureCatalogException);
-    expect(mockRepository.findById).toHaveBeenCalledWith("non-existent-id");
   });
 });

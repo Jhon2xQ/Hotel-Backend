@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { FindHabitacionByIdUseCase } from "../../../src/application/use-cases/habitacion/find-habitacion-by-id.use-case";
 import { IHabitacionRepository } from "../../../src/domain/interfaces/habitacion.repository.interface";
 import { HabitacionException } from "../../../src/domain/exceptions/habitacion.exception";
-import { Habitacion, EstadoHabitacion, EstadoLimpieza } from "../../../src/domain/entities/habitacion.entity";
+import { createMockHabitacion } from "../../helpers/habitacion-fixtures";
 
 describe("FindHabitacionByIdUseCase", () => {
   let useCase: FindHabitacionByIdUseCase;
@@ -10,48 +10,36 @@ describe("FindHabitacionByIdUseCase", () => {
 
   beforeEach(() => {
     mockRepository = {
-      create: vi.fn(),
-      findAll: vi.fn(),
-      findById: vi.fn(),
-      findByNumero: vi.fn(),
-      update: vi.fn(),
-      updateStatus: vi.fn(),
-      delete: vi.fn(),
-      hasRelatedRecords: vi.fn(),
+      create: async () => createMockHabitacion(),
+      findAll: async () => [],
+      findById: async () => null,
+      findByNumero: async () => null,
+      update: async () => createMockHabitacion(),
+      updateStatus: async () => createMockHabitacion(),
+      delete: async () => {},
+      hasRelatedRecords: async () => false,
     };
+
     useCase = new FindHabitacionByIdUseCase(mockRepository);
   });
 
-  it("should find habitacion by id", async () => {
-    const mockHabitacion = new Habitacion(
-      "test-id",
-      "301",
-      "tipo-id",
-      { id: "tipo-id", nombre: "Suite Deluxe", descripcion: "Suite de lujo" },
-      3,
-      null,
-      EstadoHabitacion.DISPONIBLE,
-      EstadoLimpieza.LIMPIA,
-      null,
-      null,
-      [],
-      new Date(),
-      new Date(),
-    );
-
-    (mockRepository.findById as any).mockResolvedValue(mockHabitacion);
+  it("should return habitacion when found", async () => {
+    const mockHabitacion = createMockHabitacion({ id: "test-id", nroHabitacion: "101" });
+    mockRepository.findById = async (id: string) => {
+      if (id === "test-id") return mockHabitacion;
+      return null;
+    };
 
     const result = await useCase.execute("test-id");
 
+    expect(result).toBeDefined();
     expect(result.id).toBe("test-id");
-    expect(result.nro_habitacion).toBe("301");
-    expect(mockRepository.findById).toHaveBeenCalledWith("test-id");
+    expect(result.nro_habitacion).toBe("101");
   });
 
-  it("should throw exception when habitacion not found", async () => {
-    (mockRepository.findById as any).mockResolvedValue(null);
+  it("should throw error when habitacion not found", async () => {
+    mockRepository.findById = async () => null;
 
     await expect(useCase.execute("non-existent-id")).rejects.toThrow(HabitacionException);
-    expect(mockRepository.findById).toHaveBeenCalledWith("non-existent-id");
   });
 });

@@ -40,6 +40,7 @@ Obtiene la lista completa de muebles del catálogo.
       "fecha_adquisicion": "2025-01-15",
       "ultima_revision": "2026-03-01",
       "descripcion": "Cama king size con colchón ortopédico",
+      "habitacion_id": "660e8400-e29b-41d4-a716-446655440001",
       "created_at": "2026-03-17T10:00:00.000Z",
       "updated_at": "2026-03-17T10:00:00.000Z"
     }
@@ -79,6 +80,7 @@ Obtiene los detalles de un mueble específico.
     "fecha_adquisicion": "2025-01-15",
     "ultima_revision": "2026-03-01",
     "descripcion": "Cama king size con colchón ortopédico",
+    "habitacion_id": "660e8400-e29b-41d4-a716-446655440001",
     "created_at": "2026-03-17T10:00:00.000Z",
     "updated_at": "2026-03-17T10:00:00.000Z"
   },
@@ -98,7 +100,7 @@ Crea un nuevo mueble en el catálogo.
 
 **Endpoint:** `POST /api/catalogo-muebles`
 
-**Permisos:** ADMIN
+**Permisos:** Usuario autenticado
 
 **Body (JSON):**
 
@@ -112,7 +114,8 @@ Crea un nuevo mueble en el catálogo.
   "condicion": "BUENO",
   "fecha_adquisicion": "2025-01-15",
   "ultima_revision": "2026-03-01",
-  "descripcion": "Cama king size con colchón ortopédico"
+  "descripcion": "Cama king size con colchón ortopédico",
+  "habitacion_id": "660e8400-e29b-41d4-a716-446655440001"
 }
 ```
 
@@ -129,6 +132,7 @@ Crea un nuevo mueble en el catálogo.
 - `fecha_adquisicion` (string, opcional): Fecha de adquisición en formato YYYY-MM-DD
 - `ultima_revision` (string, opcional): Fecha de última revisión en formato YYYY-MM-DD
 - `descripcion` (string, opcional): Descripción del mueble
+- `habitacion_id` (UUID, opcional): ID de la habitación a la que está asignado el mueble
 
 **Respuesta exitosa (201):**
 
@@ -147,6 +151,7 @@ Crea un nuevo mueble en el catálogo.
     "fecha_adquisicion": "2025-01-15",
     "ultima_revision": "2026-03-01",
     "descripcion": "Cama king size con colchón ortopédico",
+    "habitacion_id": "660e8400-e29b-41d4-a716-446655440001",
     "created_at": "2026-03-17T10:00:00.000Z",
     "updated_at": "2026-03-17T10:00:00.000Z"
   },
@@ -167,7 +172,7 @@ Actualiza los datos de un mueble existente.
 
 **Endpoint:** `PUT /api/catalogo-muebles/:id`
 
-**Permisos:** ADMIN
+**Permisos:** Usuario autenticado
 
 **Parámetros de ruta:**
 
@@ -185,7 +190,8 @@ Actualiza los datos de un mueble existente.
   "condicion": "BUENO",
   "fecha_adquisicion": "2025-02-20",
   "ultima_revision": "2026-03-10",
-  "descripcion": "Cama king size premium con colchón memory foam"
+  "descripcion": "Cama king size premium con colchón memory foam",
+  "habitacion_id": "660e8400-e29b-41d4-a716-446655440002"
 }
 ```
 
@@ -208,6 +214,7 @@ Actualiza los datos de un mueble existente.
     "fecha_adquisicion": "2025-02-20",
     "ultima_revision": "2026-03-10",
     "descripcion": "Cama king size premium con colchón memory foam",
+    "habitacion_id": "660e8400-e29b-41d4-a716-446655440002",
     "created_at": "2026-03-17T10:00:00.000Z",
     "updated_at": "2026-03-17T12:00:00.000Z"
   },
@@ -229,7 +236,7 @@ Elimina un mueble del catálogo.
 
 **Endpoint:** `DELETE /api/catalogo-muebles/:id`
 
-**Permisos:** ADMIN
+**Permisos:** Usuario autenticado
 
 **Parámetros de ruta:**
 
@@ -249,7 +256,6 @@ Elimina un mueble del catálogo.
 **Errores:**
 
 - `404`: Mueble no encontrado
-- `409`: No se puede eliminar porque está en uso (relaciones con habitaciones)
 
 ---
 
@@ -280,23 +286,24 @@ Elimina un mueble del catálogo.
 
 ## Códigos de Error
 
-| Código | Descripción                           |
-| ------ | ------------------------------------- |
-| 400    | Datos de entrada inválidos            |
-| 401    | No autenticado                        |
-| 403    | No autorizado (requiere rol ADMIN)    |
-| 404    | Mueble no encontrado                  |
-| 409    | Conflicto (código duplicado o en uso) |
-| 500    | Error interno del servidor            |
+| Código | Descripción                        |
+| ------ | ---------------------------------- |
+| 400    | Datos de entrada inválidos         |
+| 401    | No autenticado                     |
+| 403    | No autorizado (requiere rol ADMIN) |
+| 404    | Mueble no encontrado               |
+| 409    | Conflicto (código duplicado)       |
+| 500    | Error interno del servidor         |
 
 ---
 
 ## Notas
 
 - El campo `codigo` debe ser único en todo el catálogo
-- Los muebles no se pueden eliminar si están asignados a habitaciones o tipos de habitación
 - La categoría determina cómo se agrupa el mueble en reportes e inventarios
 - La condición por defecto es `BUENO` al crear un mueble
 - Las fechas deben estar en formato ISO (YYYY-MM-DD)
 - La `imagen_url` debe ser una URL válida si se proporciona
 - El campo `tipo` permite especificar variantes dentro de una categoría (ej: "King Size", "Queen Size" para camas)
+- El campo `habitacion_id` permite asignar un mueble a una habitación específica (opcional)
+- Un mueble puede estar sin asignar (habitacion_id = null) o asignado a una habitación

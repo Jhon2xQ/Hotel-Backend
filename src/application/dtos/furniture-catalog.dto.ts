@@ -10,6 +10,7 @@ export interface CreateFurnitureCatalogInput {
   fecha_adquisicion?: string;
   ultima_revision?: string;
   descripcion?: string;
+  habitacion_id?: string;
 }
 
 export interface UpdateFurnitureCatalogInput {
@@ -22,6 +23,7 @@ export interface UpdateFurnitureCatalogInput {
   fecha_adquisicion?: string;
   ultima_revision?: string;
   descripcion?: string;
+  habitacion_id?: string;
 }
 
 export interface FurnitureCatalogOutput {
@@ -35,6 +37,7 @@ export interface FurnitureCatalogOutput {
   fecha_adquisicion: string | null;
   ultima_revision: string | null;
   descripcion: string | null;
+  habitacion_id: string | null;
   created_at: string;
   updated_at: string;
 }

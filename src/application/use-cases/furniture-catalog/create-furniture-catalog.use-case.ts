@@ -21,6 +21,7 @@ export class CreateFurnitureCatalogUseCase {
       fechaAdq: input.fecha_adquisicion ? new Date(input.fecha_adquisicion) : null,
       ultimaRevision: input.ultima_revision ? new Date(input.ultima_revision) : null,
       descripcion: input.descripcion ?? null,
+      habitacionId: input.habitacion_id ?? null,
     });
     return furniture.toOutput();
   }

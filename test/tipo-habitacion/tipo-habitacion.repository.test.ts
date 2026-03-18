@@ -18,8 +18,6 @@ describe("TipoHabitacionRepository", () => {
       delete: vi.fn(),
     };
     mockPrisma.habitacion = { count: vi.fn() };
-    mockPrisma.tarifa = { count: vi.fn() };
-    mockPrisma.reserva = { count: vi.fn() };
     repository = new TipoHabitacionRepository(mockPrisma);
   });
 
@@ -56,7 +54,6 @@ describe("TipoHabitacionRepository", () => {
       const result = await repository.create(input);
 
       expect(result.nombre).toBe("Suite Deluxe");
-      expect(result.tieneDucha).toBe(true);
       expect(mockPrisma.tipoHabitacion.create).toHaveBeenCalled();
     });
   });
@@ -93,7 +90,6 @@ describe("TipoHabitacionRepository", () => {
       expect(result).toHaveLength(2);
       expect(result[0].nombre).toBe("Suite Deluxe");
       expect(mockPrisma.tipoHabitacion.findMany).toHaveBeenCalledWith({
-        include: { muebles: true },
         orderBy: { createdAt: "desc" },
       });
     });
@@ -120,7 +116,6 @@ describe("TipoHabitacionRepository", () => {
       expect(result?.id).toBe("test-id");
       expect(mockPrisma.tipoHabitacion.findUnique).toHaveBeenCalledWith({
         where: { id: "test-id" },
-        include: { muebles: true },
       });
     });
 
@@ -197,28 +192,6 @@ describe("TipoHabitacionRepository", () => {
   describe("hasRelatedRecords", () => {
     it("should return true when has related habitaciones", async () => {
       mockPrisma.habitacion.count.mockResolvedValue(1);
-      mockPrisma.tarifa.count.mockResolvedValue(0);
-      mockPrisma.reserva.count.mockResolvedValue(0);
-
-      const result = await repository.hasRelatedRecords("test-id");
-
-      expect(result).toBe(true);
-    });
-
-    it("should return true when has related tarifas", async () => {
-      mockPrisma.habitacion.count.mockResolvedValue(0);
-      mockPrisma.tarifa.count.mockResolvedValue(1);
-      mockPrisma.reserva.count.mockResolvedValue(0);
-
-      const result = await repository.hasRelatedRecords("test-id");
-
-      expect(result).toBe(true);
-    });
-
-    it("should return true when has related reservas", async () => {
-      mockPrisma.habitacion.count.mockResolvedValue(0);
-      mockPrisma.tarifa.count.mockResolvedValue(0);
-      mockPrisma.reserva.count.mockResolvedValue(1);
 
       const result = await repository.hasRelatedRecords("test-id");
 
@@ -227,8 +200,6 @@ describe("TipoHabitacionRepository", () => {
 
     it("should return false when has no related records", async () => {
       mockPrisma.habitacion.count.mockResolvedValue(0);
-      mockPrisma.tarifa.count.mockResolvedValue(0);
-      mockPrisma.reserva.count.mockResolvedValue(0);
 
       const result = await repository.hasRelatedRecords("test-id");
 

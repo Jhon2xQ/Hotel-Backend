@@ -22,6 +22,7 @@ export const CreateFurnitureCatalogSchema = z.object({
   fecha_adquisicion: z.string().date("Debe ser una fecha válida (YYYY-MM-DD)").optional(),
   ultima_revision: z.string().date("Debe ser una fecha válida (YYYY-MM-DD)").optional(),
   descripcion: z.string().optional(),
+  habitacion_id: z.uuid("La habitación debe ser un UUID válido").optional(),
 });
 
 export const UpdateFurnitureCatalogSchema = z.object({
@@ -34,6 +35,7 @@ export const UpdateFurnitureCatalogSchema = z.object({
   fecha_adquisicion: z.string().date("Debe ser una fecha válida (YYYY-MM-DD)").optional(),
   ultima_revision: z.string().date("Debe ser una fecha válida (YYYY-MM-DD)").optional(),
   descripcion: z.string().optional(),
+  habitacion_id: z.uuid("La habitación debe ser un UUID válido").optional(),
 });
 
 export const UUIDParamSchema = z.object({

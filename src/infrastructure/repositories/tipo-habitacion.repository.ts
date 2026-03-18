@@ -14,16 +14,6 @@ export class TipoHabitacionRepository implements ITipoHabitacionRepository {
       data: {
         nombre: data.nombre,
         descripcion: data.descripcion ?? null,
-        tieneDucha: data.tieneDucha,
-        tieneBanio: data.tieneBanio,
-        muebles: data.muebles?.length
-          ? {
-              connect: data.muebles.map((m) => ({ id: m.id })),
-            }
-          : undefined,
-      },
-      include: {
-        muebles: true,
       },
     });
     return this.toDomain(result);
@@ -31,9 +21,6 @@ export class TipoHabitacionRepository implements ITipoHabitacionRepository {
 
   async findAll(): Promise<TipoHabitacion[]> {
     const results = await this.prisma.tipoHabitacion.findMany({
-      include: {
-        muebles: true,
-      },
       orderBy: { createdAt: "desc" },
     });
     return results.map((r) => this.toDomain(r));
@@ -42,9 +29,6 @@ export class TipoHabitacionRepository implements ITipoHabitacionRepository {
   async findById(id: string): Promise<TipoHabitacion | null> {
     const result = await this.prisma.tipoHabitacion.findUnique({
       where: { id },
-      include: {
-        muebles: true,
-      },
     });
     return result ? this.toDomain(result) : null;
   }
@@ -55,22 +39,10 @@ export class TipoHabitacionRepository implements ITipoHabitacionRepository {
 
       if (data.nombre !== undefined) updateData.nombre = data.nombre;
       if (data.descripcion !== undefined) updateData.descripcion = data.descripcion ?? null;
-      if (data.tieneDucha !== undefined) updateData.tieneDucha = data.tieneDucha;
-      if (data.tieneBanio !== undefined) updateData.tieneBanio = data.tieneBanio;
-
-      // Handle muebles replacement using set operation
-      if (data.muebles !== undefined) {
-        updateData.muebles = {
-          set: data.muebles.map((m) => ({ id: m.id })),
-        };
-      }
 
       const result = await this.prisma.tipoHabitacion.update({
         where: { id },
         data: updateData,
-        include: {
-          muebles: true,
-        },
       });
       return this.toDomain(result);
     } catch (error) {
@@ -99,34 +71,13 @@ export class TipoHabitacionRepository implements ITipoHabitacionRepository {
   }
 
   async hasRelatedRecords(id: string): Promise<boolean> {
-    const [habitacionCount, tarifaCount, reservaCount] = await Promise.all([
-      this.prisma.habitacion.count({ where: { tipoId: id } }),
-      this.prisma.tarifa.count({ where: { tipoHabitacionId: id } }),
-      this.prisma.reserva.count({ where: { tipoHabId: id } }),
-    ]);
+    // Check if there are habitaciones using this tipo
+    const habitacionCount = await this.prisma.habitacion.count({ where: { tipoId: id } });
 
-    return habitacionCount > 0 || tarifaCount > 0 || reservaCount > 0;
+    return habitacionCount > 0;
   }
 
   private toDomain(data: any): TipoHabitacion {
-    const muebles: CatalogoMueble[] = data.muebles
-      ? data.muebles.map((m: any) => ({
-          id: m.id,
-          codigo: m.codigo,
-          nombre: m.nombre,
-          categoria: m.categoria,
-        }))
-      : [];
-
-    return new TipoHabitacion(
-      data.id,
-      data.nombre,
-      data.descripcion,
-      data.tieneDucha,
-      data.tieneBanio,
-      muebles,
-      data.createdAt,
-      data.updatedAt,
-    );
+    return new TipoHabitacion(data.id, data.nombre, data.descripcion, data.createdAt, data.updatedAt);
   }
 }
