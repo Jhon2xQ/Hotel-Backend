@@ -5,7 +5,6 @@ export enum ConceptoPago {
 
 export enum EstadoPago {
   CONFIRMADO = "CONFIRMADO",
-  APLICADO = "APLICADO",
   DEVUELTO = "DEVUELTO",
   RETENIDO = "RETENIDO",
   ANULADO = "ANULADO",
@@ -17,8 +16,6 @@ export enum MetodoPago {
   MASTERCARD = "MASTERCARD",
   AMEX = "AMEX",
   TRANSFERENCIA = "TRANSFERENCIA",
-  CREDITO_AGENCIA = "CREDITO_AGENCIA",
-  VOUCHER = "VOUCHER",
 }
 
 export interface PersonalBasic {
@@ -36,7 +33,7 @@ export interface CreatePagoData {
   moneda?: string;
   metodo: MetodoPago;
   recibidoPorId?: string | null;
-  notas?: string | null;
+  observacion?: string | null;
 }
 
 export class Pago {
@@ -50,7 +47,7 @@ export class Pago {
     public readonly metodo: MetodoPago,
     public readonly recibidoPorId: string | null,
     public readonly recibidoPor: PersonalBasic | null,
-    public readonly notas: string | null,
+    public readonly observacion: string | null,
     public readonly createdAt: Date,
   ) {}
 
@@ -61,11 +58,11 @@ export class Pago {
       data.estado ?? EstadoPago.CONFIRMADO,
       data.fechaPago ?? new Date(),
       data.monto,
-      data.moneda ?? "USD",
+      data.moneda ?? "SOL",
       data.metodo,
       data.recibidoPorId ?? null,
       null,
-      data.notas ?? null,
+      data.observacion ?? null,
       new Date(),
     );
   }
@@ -88,7 +85,7 @@ export class Pago {
             apellidos: this.recibidoPor.apellidos,
           }
         : null,
-      notas: this.notas,
+      observacion: this.observacion,
       created_at: this.createdAt.toISOString(),
     };
   }

@@ -14,11 +14,11 @@ export function createMockPago(overrides?: Partial<Pago>): Pago {
     overrides?.estado ?? EstadoPago.CONFIRMADO,
     overrides?.fechaPago ?? new Date("2026-03-18T14:30:00.000Z"),
     overrides?.monto ?? 150.0,
-    overrides?.moneda ?? "USD",
+    overrides?.moneda ?? "SOL",
     overrides?.metodo ?? MetodoPago.EFECTIVO,
     overrides?.recibidoPorId ?? "personal-123",
     overrides?.recibidoPor ?? mockPersonal,
-    overrides?.notas ?? "Pago de prueba",
+    overrides?.observacion ?? "Pago de prueba",
     overrides?.createdAt ?? new Date(),
   );
 }

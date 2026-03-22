@@ -38,7 +38,7 @@ export class UpdatePagoUseCase {
       moneda: input.moneda,
       metodo: input.metodo as MetodoPago | undefined,
       recibidoPorId: input.recibido_por_id,
-      notas: input.notas,
+      observacion: input.observacion,
     });
 
     return pago.toOutput();

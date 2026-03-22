@@ -32,7 +32,7 @@ export class CreatePagoUseCase {
       moneda: input.moneda,
       metodo: input.metodo as MetodoPago,
       recibidoPorId: input.recibido_por_id,
-      notas: input.notas,
+      observacion: input.observacion,
     });
 
     return pago.toOutput();

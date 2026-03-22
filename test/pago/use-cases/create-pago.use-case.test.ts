@@ -116,7 +116,7 @@ describe("CreatePagoUseCase", () => {
       monto: 300.0,
       moneda: "PEN",
       metodo: MetodoPago.TRANSFERENCIA,
-      notas: "Pago por servicios adicionales",
+      observacion: "Pago por servicios adicionales",
     });
     mockRepository.create = async () => mockPago;
     mockPersonalRepository.findById = async () => mockPersonal;
@@ -127,10 +127,10 @@ describe("CreatePagoUseCase", () => {
       moneda: "PEN",
       metodo: MetodoPago.TRANSFERENCIA,
       recibido_por_id: "personal-123",
-      notas: "Pago por servicios adicionales",
+      observacion: "Pago por servicios adicionales",
     });
 
     expect(result.moneda).toBe("PEN");
-    expect(result.notas).toBe("Pago por servicios adicionales");
+    expect(result.observacion).toBe("Pago por servicios adicionales");
   });
 });
