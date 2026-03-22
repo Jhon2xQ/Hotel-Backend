@@ -61,7 +61,7 @@ describe("PagoRepository", () => {
         monto: 200.0,
         moneda: "PEN",
         metodo: MetodoPago.VISA,
-        recibidoPorId: "personal-123",
+        recibidoPorId: "user-123",
         observacion: "Pago por servicios",
       };
 
@@ -73,12 +73,11 @@ describe("PagoRepository", () => {
         monto: new Prisma.Decimal(200.0),
         moneda: "PEN",
         metodo: "VISA",
-        recibidoPorId: "personal-123",
+        recibidoPorId: "user-123",
         recibidoPor: {
-          id: "personal-123",
-          codigo: "P001",
-          nombres: "Juan",
-          apellidos: "Pérez",
+          id: "user-123",
+          name: "Juan Pérez",
+          email: "juan.perez@hotel.com",
         },
         observacion: "Pago por servicios",
         createdAt: new Date(),
@@ -91,7 +90,7 @@ describe("PagoRepository", () => {
       expect(result.concepto).toBe(ConceptoPago.CONSUMO);
       expect(result.estado).toBe(EstadoPago.CONFIRMADO);
       expect(result.moneda).toBe("PEN");
-      expect(result.recibidoPorId).toBe("personal-123");
+      expect(result.recibidoPorId).toBe("user-123");
     });
   });
 
@@ -193,12 +192,11 @@ describe("PagoRepository", () => {
         monto: new Prisma.Decimal(150.0),
         moneda: "SOL",
         metodo: "EFECTIVO",
-        recibidoPorId: "personal-123",
+        recibidoPorId: "user-123",
         recibidoPor: {
-          id: "personal-123",
-          codigo: "P001",
-          nombres: "Juan",
-          apellidos: "Pérez",
+          id: "user-123",
+          name: "Juan Pérez",
+          email: "juan.perez@hotel.com",
         },
         observacion: null,
         createdAt: new Date(),
@@ -209,7 +207,7 @@ describe("PagoRepository", () => {
       const result = await repository.findById("test-pago-id");
 
       expect(result?.recibidoPor).toBeDefined();
-      expect(result?.recibidoPor?.codigo).toBe("P001");
+      expect(result?.recibidoPor?.name).toBe("Juan Pérez");
     });
   });
 

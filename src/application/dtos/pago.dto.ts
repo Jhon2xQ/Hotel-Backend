@@ -18,7 +18,6 @@ export interface UpdatePagoInput {
   monto?: number;
   moneda?: string;
   metodo?: MetodoPago;
-  recibido_por_id?: string;
   observacion?: string;
 }
 
@@ -33,9 +32,8 @@ export interface PagoOutput {
   recibido_por_id: string | null;
   recibido_por: {
     id: string;
-    codigo: string;
-    nombres: string;
-    apellidos: string;
+    name: string;
+    email: string;
   } | null;
   observacion: string | null;
   created_at: string;

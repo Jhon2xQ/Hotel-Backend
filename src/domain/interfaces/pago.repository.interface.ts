@@ -7,7 +7,6 @@ export interface UpdatePagoData {
   monto?: number;
   moneda?: string;
   metodo?: MetodoPago;
-  recibidoPorId?: string | null;
   observacion?: string | null;
 }
 

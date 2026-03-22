@@ -1,11 +1,10 @@
-import { Pago, ConceptoPago, EstadoPago, MetodoPago, PersonalBasic } from "../../src/domain/entities/pago.entity";
+import { Pago, ConceptoPago, EstadoPago, MetodoPago, UserBasic } from "../../src/domain/entities/pago.entity";
 
 export function createMockPago(overrides?: Partial<Pago>): Pago {
-  const mockPersonal: PersonalBasic = {
-    id: "personal-123",
-    codigo: "P001",
-    nombres: "Juan",
-    apellidos: "Pérez",
+  const mockUser: UserBasic = {
+    id: "user-123",
+    name: "Juan Pérez",
+    email: "juan.perez@hotel.com",
   };
 
   return new Pago(
@@ -16,18 +15,17 @@ export function createMockPago(overrides?: Partial<Pago>): Pago {
     overrides?.monto ?? 150.0,
     overrides?.moneda ?? "SOL",
     overrides?.metodo ?? MetodoPago.EFECTIVO,
-    overrides?.recibidoPorId ?? "personal-123",
-    overrides?.recibidoPor ?? mockPersonal,
+    overrides?.recibidoPorId ?? "user-123",
+    overrides?.recibidoPor ?? mockUser,
     overrides?.observacion ?? "Pago de prueba",
     overrides?.createdAt ?? new Date(),
   );
 }
 
-export function createMockPersonal(overrides?: Partial<PersonalBasic>): PersonalBasic {
+export function createMockUser(overrides?: Partial<UserBasic>): UserBasic {
   return {
-    id: overrides?.id ?? "personal-123",
-    codigo: overrides?.codigo ?? "P001",
-    nombres: overrides?.nombres ?? "Juan",
-    apellidos: overrides?.apellidos ?? "Pérez",
+    id: overrides?.id ?? "user-123",
+    name: overrides?.name ?? "Juan Pérez",
+    email: overrides?.email ?? "juan.perez@hotel.com",
   };
 }

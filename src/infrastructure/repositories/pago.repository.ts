@@ -5,7 +5,7 @@ import {
   ConceptoPago,
   EstadoPago,
   MetodoPago,
-  PersonalBasic,
+  UserBasic,
 } from "../../domain/entities/pago.entity";
 import { IPagoRepository, UpdatePagoData } from "../../domain/interfaces/pago.repository.interface";
 import { PagoException } from "../../domain/exceptions/pago.exception";
@@ -62,7 +62,6 @@ export class PagoRepository implements IPagoRepository {
       if (data.monto !== undefined) updateData.monto = new Prisma.Decimal(data.monto);
       if (data.moneda !== undefined) updateData.moneda = data.moneda;
       if (data.metodo !== undefined) updateData.metodo = data.metodo;
-      if (data.recibidoPorId !== undefined) updateData.recibidoPorId = data.recibidoPorId;
       if (data.observacion !== undefined) updateData.observacion = data.observacion ?? null;
 
       const result = await this.prisma.pago.update({
@@ -99,12 +98,11 @@ export class PagoRepository implements IPagoRepository {
   }
 
   private toDomain(data: any): Pago {
-    const recibidoPor: PersonalBasic | null = data.recibidoPor
+    const recibidoPor: UserBasic | null = data.recibidoPor
       ? {
           id: data.recibidoPor.id,
-          codigo: data.recibidoPor.codigo,
-          nombres: data.recibidoPor.nombres,
-          apellidos: data.recibidoPor.apellidos,
+          name: data.recibidoPor.name,
+          email: data.recibidoPor.email,
         }
       : null;
 
