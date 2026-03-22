@@ -1,5 +1,6 @@
 import { PrismaClient } from "../../../generated/prisma/client";
 import { CategoriaMueble, CreateCategoriaMuebleData } from "../../domain/entities/categoria-mueble.entity";
+import { CategoriaMuebleException } from "../../domain/exceptions/categoria-mueble.exception";
 import { ICategoriaMuebleRepository, UpdateCategoriaMuebleData } from "../../domain/interfaces/categoria-mueble.repository.interface";
 
 export class CategoriaMuebleRepository implements ICategoriaMuebleRepository {
@@ -48,7 +49,7 @@ export class CategoriaMuebleRepository implements ICategoriaMuebleRepository {
             where: { id },
         });
         if (!result) {
-            return null;
+            throw CategoriaMuebleException.notFoundById(id);
         }
         return new CategoriaMueble(
             result.id,
@@ -61,6 +62,24 @@ export class CategoriaMuebleRepository implements ICategoriaMuebleRepository {
     }
 
     async update(id: string, data: UpdateCategoriaMuebleData): Promise<CategoriaMueble> {
+        
+        const existing = await this.prisma.categoriaMueble.findUnique({
+            where: { id },
+        });
+
+        if (!existing) {
+            throw CategoriaMuebleException.notFoundById(id);
+        }
+
+        if (data.nombre !== undefined) {
+            const duplicate = await this.prisma.categoriaMueble.findUnique({
+                where: { nombre: data.nombre },
+            });
+            if (duplicate && duplicate.id !== id) {
+                throw CategoriaMuebleException.duplicateNombre(data.nombre);
+            }
+        }
+
         const result = await this.prisma.categoriaMueble.update({
             where: { id },
             data: {
@@ -83,6 +102,24 @@ export class CategoriaMuebleRepository implements ICategoriaMuebleRepository {
         await this.prisma.categoriaMueble.delete({
             where: { id },
         });
+    }
+
+    async findByName(nombre: string): Promise<CategoriaMueble | null> {
+        const result = await this.prisma.categoriaMueble.findUnique({
+            where: { nombre }
+        }); 
+        return result ? this.toDomain(result) : null;
+    }
+
+    private toDomain(result: any): CategoriaMueble {
+        return new CategoriaMueble(
+            result.id,
+            result.nombre,
+            result.descripcion,
+            result.activo,
+            result.createdAt,
+            result.updatedAt,
+        );
     }
             
 }

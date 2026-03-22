@@ -16,4 +16,5 @@ export interface ICategoriaMuebleRepository {
     findById(id: string): Promise<CategoriaMueble | null>;
     update(id: string, data: UpdateCategoriaMuebleData): Promise<CategoriaMueble>;
     delete(id: string): Promise<void>;
+    findByName(nombre: string): Promise<CategoriaMueble | null>;
 }

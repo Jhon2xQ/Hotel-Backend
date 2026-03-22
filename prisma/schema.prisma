@@ -706,7 +706,7 @@ model Comprobante {
 
 model CategoriaMueble {
   id            String    @id @default(uuid()) @db.Uuid
-  nombre        String    @db.VarChar(50)
+  nombre        String    @unique @db.VarChar(50)
   descripcion   String?   @db.Text
   activo        Boolean   @default(true)
   createdAt     DateTime  @default(now()) @db.Timestamptz
