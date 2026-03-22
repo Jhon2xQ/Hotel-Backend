@@ -34,7 +34,7 @@ Crea un nuevo registro de pago.
   "monto": 150.0,
   "moneda": "SOL",
   "metodo": "EFECTIVO",
-  "recibido_por_id": "uuid-del-usuario",
+  "recibido_por_id": "id-del-usuario",
   "observacion": "Pago por reserva de habitación"
 }
 ```
@@ -47,7 +47,7 @@ Crea un nuevo registro de pago.
 - `monto` (requerido): Monto del pago, debe ser mayor a cero
 - `moneda` (opcional): Código de moneda de 3 caracteres. Default: `SOL`
 - `metodo` (requerido): Método de pago. Valores: `EFECTIVO`, `VISA`, `MASTERCARD`, `AMEX`, `TRANSFERENCIA`
-- `recibido_por_id` (opcional): UUID del usuario que recibió el pago
+- `recibido_por_id` (opcional): ID del usuario de Better Auth que recibió el pago
 - `observacion` (opcional): Observaciones adicionales
 
 **Response:** `201 Created`
@@ -64,9 +64,9 @@ Crea un nuevo registro de pago.
     "monto": "150.00",
     "moneda": "SOL",
     "metodo": "EFECTIVO",
-    "recibido_por_id": "uuid-del-usuario",
+    "recibido_por_id": "id-del-usuario",
     "recibido_por": {
-      "id": "uuid-del-usuario",
+      "id": "id-del-usuario",
       "name": "Juan Pérez",
       "email": "juan.perez@hotel.com"
     },
@@ -109,9 +109,9 @@ Obtiene todos los pagos registrados, ordenados por fecha de creación descendent
       "monto": "150.00",
       "moneda": "SOL",
       "metodo": "EFECTIVO",
-      "recibido_por_id": "uuid-del-usuario",
+      "recibido_por_id": "id-del-usuario",
       "recibido_por": {
-        "id": "uuid-del-usuario",
+        "id": "id-del-usuario",
         "name": "Juan Pérez",
         "email": "juan.perez@hotel.com"
       },
@@ -151,9 +151,9 @@ Obtiene los detalles de un pago específico.
     "monto": "150.00",
     "moneda": "SOL",
     "metodo": "EFECTIVO",
-    "recibido_por_id": "uuid-del-usuario",
+    "recibido_por_id": "id-del-usuario",
     "recibido_por": {
-      "id": "uuid-del-usuario",
+      "id": "id-del-usuario",
       "name": "Juan Pérez",
       "email": "juan.perez@hotel.com"
     },
@@ -218,9 +218,9 @@ Actualiza los datos de un pago existente.
     "monto": "150.00",
     "moneda": "SOL",
     "metodo": "EFECTIVO",
-    "recibido_por_id": "uuid-del-usuario",
+    "recibido_por_id": "id-del-usuario",
     "recibido_por": {
-      "id": "uuid-del-usuario",
+      "id": "id-del-usuario",
       "name": "Juan Pérez",
       "email": "juan.perez@hotel.com"
     },
