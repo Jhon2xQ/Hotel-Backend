@@ -59,7 +59,7 @@ describe("ListPagoUseCase", () => {
     expect(result[0]).toHaveProperty("metodo");
     expect(result[0]).toHaveProperty("recibido_por_id");
     expect(result[0]).toHaveProperty("recibido_por");
-    expect(result[0]).toHaveProperty("notas");
+    expect(result[0]).toHaveProperty("observacion");
     expect(result[0]).toHaveProperty("created_at");
   });
 });

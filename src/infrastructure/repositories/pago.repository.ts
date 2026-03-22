@@ -20,10 +20,10 @@ export class PagoRepository implements IPagoRepository {
         estado: data.estado ?? EstadoPago.CONFIRMADO,
         fechaPago: data.fechaPago ?? new Date(),
         monto: new Prisma.Decimal(data.monto),
-        moneda: data.moneda ?? "USD",
+        moneda: data.moneda ?? "SOL",
         metodo: data.metodo,
         recibidoPorId: data.recibidoPorId ?? null,
-        notas: data.notas ?? null,
+        observacion: data.observacion ?? null,
       },
       include: {
         recibidoPor: true,
@@ -63,7 +63,7 @@ export class PagoRepository implements IPagoRepository {
       if (data.moneda !== undefined) updateData.moneda = data.moneda;
       if (data.metodo !== undefined) updateData.metodo = data.metodo;
       if (data.recibidoPorId !== undefined) updateData.recibidoPorId = data.recibidoPorId;
-      if (data.notas !== undefined) updateData.notas = data.notas ?? null;
+      if (data.observacion !== undefined) updateData.observacion = data.observacion ?? null;
 
       const result = await this.prisma.pago.update({
         where: { id },
@@ -118,7 +118,7 @@ export class PagoRepository implements IPagoRepository {
       data.metodo as MetodoPago,
       data.recibidoPorId,
       recibidoPor,
-      data.notas,
+      data.observacion,
       data.createdAt,
     );
   }

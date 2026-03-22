@@ -2,17 +2,9 @@ import { z } from "zod";
 
 export const ConceptoPagoSchema = z.enum(["RESERVA", "CONSUMO"]);
 
-export const EstadoPagoSchema = z.enum(["CONFIRMADO", "APLICADO", "DEVUELTO", "RETENIDO", "ANULADO"]);
+export const EstadoPagoSchema = z.enum(["CONFIRMADO", "DEVUELTO", "RETENIDO", "ANULADO"]);
 
-export const MetodoPagoSchema = z.enum([
-  "EFECTIVO",
-  "VISA",
-  "MASTERCARD",
-  "AMEX",
-  "TRANSFERENCIA",
-  "CREDITO_AGENCIA",
-  "VOUCHER",
-]);
+export const MetodoPagoSchema = z.enum(["EFECTIVO", "VISA", "MASTERCARD", "AMEX", "TRANSFERENCIA"]);
 
 export const CreatePagoSchema = z.object({
   concepto: ConceptoPagoSchema,
@@ -22,7 +14,7 @@ export const CreatePagoSchema = z.object({
   moneda: z.string().length(3, "La moneda debe ser un código de 3 caracteres").optional(),
   metodo: MetodoPagoSchema,
   recibido_por_id: z.uuid("El ID del personal debe ser un UUID válido").optional(),
-  notas: z.string().optional(),
+  observacion: z.string().optional(),
 });
 
 export const UpdatePagoSchema = z.object({
@@ -33,5 +25,5 @@ export const UpdatePagoSchema = z.object({
   moneda: z.string().length(3, "La moneda debe ser un código de 3 caracteres").optional(),
   metodo: MetodoPagoSchema.optional(),
   recibido_por_id: z.uuid("El ID del personal debe ser un UUID válido").optional(),
-  notas: z.string().optional(),
+  observacion: z.string().optional(),
 });
