@@ -2,7 +2,6 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { HuespedRepository } from "../../src/infrastructure/repositories/huesped.repository";
 import { createMockPrismaClient } from "../helpers/mock-prisma";
 import { HuespedException } from "../../src/domain/exceptions/huesped.exception";
-import { Prisma } from "../../generated/prisma/client";
 
 describe("HuespedRepository", () => {
   let repository: HuespedRepository;
@@ -32,13 +31,14 @@ describe("HuespedRepository", () => {
 
       const mockResult = {
         id: "test-huesped-id",
+        tipoDoc: null,
+        nroDoc: null,
         nombres: "Juan Carlos",
         apellidos: "Pérez García",
         email: "juan.perez@example.com",
         telefono: "+51987654321",
         nacionalidad: "Perú",
-        nivelVip: 0,
-        notas: null,
+        observacion: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -73,24 +73,26 @@ describe("HuespedRepository", () => {
 
     it("should create huesped with all fields", async () => {
       const input = {
+        tipo_doc: "DNI" as const,
+        nro_doc: "12345678",
         nombres: "María Elena",
         apellidos: "Rodríguez López",
         email: "maria.rodriguez@example.com",
         telefono: "+51912345678",
         nacionalidad: "Argentina",
-        nivelVip: 2,
-        notas: "Cliente VIP",
+        observacion: "Cliente VIP",
       };
 
       const mockResult = {
         id: "test-huesped-id",
+        tipoDoc: "DNI",
+        nroDoc: "12345678",
         nombres: "María Elena",
         apellidos: "Rodríguez López",
         email: "maria.rodriguez@example.com",
         telefono: "+51912345678",
         nacionalidad: "Argentina",
-        nivelVip: 2,
-        notas: "Cliente VIP",
+        observacion: "Cliente VIP",
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -100,8 +102,9 @@ describe("HuespedRepository", () => {
 
       const result = await repository.create(input);
 
-      expect(result.nivelVip).toBe(2);
-      expect(result.notas).toBe("Cliente VIP");
+      expect(result.tipo_doc).toBe("DNI");
+      expect(result.nro_doc).toBe("12345678");
+      expect(result.observacion).toBe("Cliente VIP");
     });
   });
 
@@ -110,25 +113,27 @@ describe("HuespedRepository", () => {
       const mockResults = [
         {
           id: "huesped-1",
+          tipoDoc: null,
+          nroDoc: null,
           nombres: "Juan",
           apellidos: "Pérez",
           email: "juan@example.com",
           telefono: "+51987654321",
           nacionalidad: "Perú",
-          nivelVip: 0,
-          notas: null,
+          observacion: null,
           createdAt: new Date("2026-03-18T14:30:00.000Z"),
           updatedAt: new Date("2026-03-18T14:30:00.000Z"),
         },
         {
           id: "huesped-2",
+          tipoDoc: null,
+          nroDoc: null,
           nombres: "María",
           apellidos: "García",
           email: "maria@example.com",
           telefono: "+51912345678",
           nacionalidad: "Argentina",
-          nivelVip: 1,
-          notas: null,
+          observacion: null,
           createdAt: new Date("2026-03-17T10:00:00.000Z"),
           updatedAt: new Date("2026-03-17T10:00:00.000Z"),
         },
@@ -159,13 +164,14 @@ describe("HuespedRepository", () => {
     it("should find huesped by id", async () => {
       const mockResult = {
         id: "test-huesped-id",
+        tipoDoc: null,
+        nroDoc: null,
         nombres: "Juan Carlos",
         apellidos: "Pérez García",
         email: "juan.perez@example.com",
         telefono: "+51987654321",
         nacionalidad: "Perú",
-        nivelVip: 0,
-        notas: null,
+        observacion: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -194,18 +200,19 @@ describe("HuespedRepository", () => {
     it("should update huesped", async () => {
       const updateData = {
         telefono: "+51999999999",
-        nivelVip: 1,
+        observacion: "Actualizado",
       };
 
       const existingHuesped = {
         id: "test-huesped-id",
+        tipoDoc: null,
+        nroDoc: null,
         nombres: "Juan Carlos",
         apellidos: "Pérez García",
         email: "juan.perez@example.com",
         telefono: "+51987654321",
         nacionalidad: "Perú",
-        nivelVip: 0,
-        notas: null,
+        observacion: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -213,7 +220,7 @@ describe("HuespedRepository", () => {
       const mockResult = {
         ...existingHuesped,
         telefono: "+51999999999",
-        nivelVip: 1,
+        observacion: "Actualizado",
         updatedAt: new Date(),
       };
 
@@ -223,7 +230,7 @@ describe("HuespedRepository", () => {
       const result = await repository.update("test-huesped-id", updateData);
 
       expect(result.telefono).toBe("+51999999999");
-      expect(result.nivelVip).toBe(1);
+      expect(result.observacion).toBe("Actualizado");
       expect(mockPrisma.huesped.update).toHaveBeenCalled();
     });
 
@@ -256,13 +263,14 @@ describe("HuespedRepository", () => {
     it("should allow updating to same email", async () => {
       const existingHuesped = {
         id: "test-huesped-id",
+        tipoDoc: null,
+        nroDoc: null,
         nombres: "Juan Carlos",
         apellidos: "Pérez García",
         email: "juan.perez@example.com",
         telefono: "+51987654321",
         nacionalidad: "Perú",
-        nivelVip: 0,
-        notas: null,
+        observacion: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
