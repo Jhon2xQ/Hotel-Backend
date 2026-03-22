@@ -148,18 +148,6 @@ enum CondicionMueble {
   @@map("condicion_mueble")
 }
 
-enum CategoriaMueble {
-  CAMA
-  ASIENTO
-  ALMACENAJE
-  TECNOLOGIA
-  BANO
-  DECORACION
-  OTRO
-
-  @@map("categoria_mueble")
-}
-
 enum PoliticaCancelacion {
   FLEXIBLE
   MODERADA
@@ -359,7 +347,7 @@ model CatalogoMueble {
   id             String          @id @default(uuid()) @db.Uuid
   codigo         String          @unique @db.VarChar(30)
   nombre         String          @db.VarChar(100)
-  categoria      CategoriaMueble
+  categoria      String          @db.VarChar(50) 
   imagenUrl      String?         @db.Text
   tipo           String?         @db.VarChar(60)
   condicion      CondicionMueble @default(BUENO)
@@ -710,4 +698,19 @@ model Comprobante {
 
   @@unique([serie, numero])
   @@map("comprobantes")
+}
+
+// ------------------------------------------------------------
+// 19. CATEGORIA MUEBLE
+// ------------------------------------------------------------
+
+model CategoriaMueble {
+  id            String    @id @default(uuid()) @db.Uuid
+  nombre        String    @unique @db.VarChar(50)
+  descripcion   String?   @db.Text
+  activo        Boolean   @default(true)
+  createdAt     DateTime  @default(now()) @db.Timestamptz
+  updatedAt     DateTime  @updatedAt @db.Timestamptz
+
+  @@map("categoria_mueble")
 }

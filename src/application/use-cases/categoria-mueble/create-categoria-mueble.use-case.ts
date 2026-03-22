@@ -1,0 +1,18 @@
+import { CategoriaMueble, CreateCategoriaMuebleData } from "../../../domain/entities/categoria-mueble.entity";
+import { CategoriaMuebleException } from "../../../domain/exceptions/categoria-mueble.exception";
+import { ICategoriaMuebleRepository } from "../../../domain/interfaces/categoria-mueble.repository.interface";
+
+export class CreateCategoriaMuebleUseCase {
+    constructor(
+        private readonly categoriaMuebleRepository: ICategoriaMuebleRepository,
+    ) {}
+
+    async execute(data: CreateCategoriaMuebleData): Promise<CategoriaMueble> {
+        
+        const existingCM = await this.categoriaMuebleRepository.findByName(data.nombre);
+        if (existingCM) {
+            throw CategoriaMuebleException.duplicateNombre(data.nombre);
+        }
+        return await this.categoriaMuebleRepository.create(data);
+    }
+}
