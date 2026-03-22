@@ -1,18 +1,9 @@
-import type { CatalogoMueble } from "./tipo-habitacion.entity";
-
 export enum EstadoHabitacion {
   DISPONIBLE = "DISPONIBLE",
   RESERVADA = "RESERVADA",
   OCUPADA = "OCUPADA",
   LIMPIEZA = "LIMPIEZA",
   MANTENIMIENTO = "MANTENIMIENTO",
-}
-
-export enum EstadoLimpieza {
-  LIMPIA = "LIMPIA",
-  SUCIA = "SUCIA",
-  EN_LIMPIEZA = "EN_LIMPIEZA",
-  INSPECCION = "INSPECCION",
 }
 
 export interface TipoHabitacionBasic {
@@ -23,32 +14,29 @@ export interface TipoHabitacionBasic {
 
 export interface CreateHabitacionData {
   nroHabitacion: string;
-  tipoId: string;
+  tipoHabitacionId: string;
   piso: number;
   tieneDucha?: boolean;
   tieneBanio?: boolean;
-  urlImagen?: string | null;
+  urlImagen?: string[] | null;
   estado?: EstadoHabitacion;
-  limpieza?: EstadoLimpieza;
   notas?: string | null;
-  muebles?: CatalogoMueble[];
+  ultiLimpieza?: Date | null;
 }
 
 export class Habitacion {
   constructor(
     public readonly id: string,
     public readonly nroHabitacion: string,
-    public readonly tipoId: string,
+    public readonly tipoHabitacionId: string,
     public readonly tipo: TipoHabitacionBasic | null,
     public readonly piso: number,
     public readonly tieneDucha: boolean,
     public readonly tieneBanio: boolean,
-    public readonly urlImagen: string | null,
+    public readonly urlImagen: string[] | null,
     public readonly estado: EstadoHabitacion,
-    public readonly limpieza: EstadoLimpieza,
     public readonly notas: string | null,
-    public readonly ultimaLimpieza: Date | null,
-    public readonly muebles: CatalogoMueble[],
+    public readonly ultiLimpieza: Date | null,
     public readonly createdAt: Date,
     public readonly updatedAt: Date,
   ) {}
@@ -57,17 +45,15 @@ export class Habitacion {
     return new Habitacion(
       crypto.randomUUID(),
       data.nroHabitacion,
-      data.tipoId,
+      data.tipoHabitacionId,
       null, // tipo is loaded from database, not provided during creation
       data.piso,
       data.tieneDucha ?? false,
       data.tieneBanio ?? false,
       data.urlImagen ?? null,
       data.estado ?? EstadoHabitacion.DISPONIBLE,
-      data.limpieza ?? EstadoLimpieza.LIMPIA,
       data.notas ?? null,
-      null, // ultimaLimpieza is null on creation
-      data.muebles ?? [],
+      data.ultiLimpieza ?? null, 
       new Date(),
       new Date(),
     );
@@ -77,7 +63,7 @@ export class Habitacion {
     return {
       id: this.id,
       nro_habitacion: this.nroHabitacion,
-      tipo_id: this.tipoId,
+      tipo_habitacion_id: this.tipoHabitacionId,
       tipo: this.tipo
         ? {
             id: this.tipo.id,
@@ -90,15 +76,8 @@ export class Habitacion {
       tiene_banio: this.tieneBanio,
       url_imagen: this.urlImagen,
       estado: this.estado,
-      limpieza: this.limpieza,
       notas: this.notas,
-      ultima_limpieza: this.ultimaLimpieza?.toISOString() ?? null,
-      muebles: this.muebles.map((mueble) => ({
-        id: mueble.id,
-        codigo: mueble.codigo,
-        nombre: mueble.nombre,
-        categoria: mueble.categoria,
-      })),
+      ulti_limpieza: this.ultiLimpieza?.toISOString() ?? null,
       created_at: this.createdAt.toISOString(),
       updated_at: this.updatedAt.toISOString(),
     };

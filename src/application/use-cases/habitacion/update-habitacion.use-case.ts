@@ -28,40 +28,10 @@ export class UpdateHabitacionUseCase {
     }
 
     // If tipoId is being changed, validate TipoHabitacion exists (Requirement 9.4)
-    if (input.tipo_id !== undefined) {
-      const tipoHabitacion = await this.tipoHabitacionRepository.findById(input.tipo_id);
+    if (input.tipo_habitacion_id !== undefined) {
+      const tipoHabitacion = await this.tipoHabitacionRepository.findById(input.tipo_habitacion_id);
       if (!tipoHabitacion) {
         throw HabitacionException.tipoNotFound();
-      }
-    }
-
-    // Validate all referenced muebles exist (if provided) (Requirement 9.4)
-    if (input.muebles !== undefined && input.muebles.length > 0) {
-      for (const muebleId of input.muebles) {
-        const mueble = await this.furnitureRepository.findById(muebleId);
-        if (!mueble) {
-          throw HabitacionException.muebleNotFound();
-        }
-      }
-    }
-
-    // Fetch full mueble data for the entity (if muebles are being updated)
-    let muebles: CatalogoMueble[] | undefined;
-    if (input.muebles !== undefined) {
-      if (input.muebles.length > 0) {
-        muebles = await Promise.all(
-          input.muebles.map(async (id) => {
-            const mueble = await this.furnitureRepository.findById(id);
-            return {
-              id: mueble!.id,
-              codigo: mueble!.codigo,
-              nombre: mueble!.nombre,
-              categoria: mueble!.categoria,
-            };
-          }),
-        );
-      } else {
-        muebles = [];
       }
     }
 
@@ -69,15 +39,14 @@ export class UpdateHabitacionUseCase {
     // If estado changes to LIMPIEZA, set ultimaLimpieza to current timestamp (Requirement 9.8)
     const updated = await this.repository.update(id, {
       nroHabitacion: input.nro_habitacion,
-      tipoId: input.tipo_id,
+      tipoHabitacionId: input.tipo_habitacion_id,
       piso: input.piso,
       tieneDucha: input.tiene_ducha,
       tieneBanio: input.tiene_banio,
       urlImagen: input.url_imagen,
       estado: input.estado,
-      limpieza: input.limpieza,
       notas: input.notas,
-      muebles,
+      ultiLimpieza: input.ulti_limpieza ? new Date(input.ulti_limpieza) : null,
     });
 
     return updated.toOutput();

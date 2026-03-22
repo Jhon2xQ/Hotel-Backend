@@ -26,7 +26,7 @@ export function createHabitacionRoutes(prismaClient: PrismaClient): AppHono {
   const tipoHabitacionRepository = new TipoHabitacionRepository(prismaClient);
   const furnitureRepository = new FurnitureCatalogRepository(prismaClient);
 
-  const createUseCase = new CreateHabitacionUseCase(repository, tipoHabitacionRepository, furnitureRepository);
+  const createUseCase = new CreateHabitacionUseCase(repository, tipoHabitacionRepository);
   const listUseCase = new ListHabitacionUseCase(repository);
   const findByIdUseCase = new FindHabitacionByIdUseCase(repository);
   const updateUseCase = new UpdateHabitacionUseCase(repository, tipoHabitacionRepository, furnitureRepository);

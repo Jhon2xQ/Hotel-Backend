@@ -358,8 +358,6 @@ model CatalogoMueble {
   createdAt      DateTime        @default(now()) @db.Timestamptz
   updatedAt      DateTime        @updatedAt @db.Timestamptz
 
-  habitacion Habitacion? @relation(fields: [habitacionId], references: [id])
-
   @@map("catalogo_muebles")
 }
 
@@ -382,25 +380,20 @@ model TipoHabitacion {
 // 6. HABITACIONES
 // ------------------------------------------------------------
 model Habitacion {
-  id             String           @id @default(uuid()) @db.Uuid
-  nroHabitacion  String           @unique @db.VarChar(10)
-  tipoId         String           @db.Uuid
-  piso           Int
-  tieneDucha     Boolean          @default(false)
-  tieneBanio     Boolean          @default(false)
-  urlImagen      String?          @db.VarChar(255)
-  estado         EstadoHabitacion @default(DISPONIBLE)
-  limpieza       EstadoLimpieza   @default(LIMPIA)
-  notas          String?          @db.Text
-  ultimaLimpieza DateTime?        @db.Timestamptz
-  createdAt      DateTime         @default(now()) @db.Timestamptz
-  updatedAt      DateTime         @updatedAt @db.Timestamptz
+  id                String           @id @default(uuid()) @db.Uuid
+  nroHabitacion     String           @unique @db.VarChar(10)
+  tipoHabitacionId  String           @db.Uuid
+  piso              Int
+  tieneDucha        Boolean          @default(false)
+  tieneBanio        Boolean          @default(false)
+  urlImagen         String[]         @db.VarChar(255)
+  estado            EstadoHabitacion @default(DISPONIBLE)
+  notas             String?          @db.Text
+  ultimaLimpieza    DateTime?        @db.Timestamptz
+  createdAt         DateTime         @default(now()) @db.Timestamptz
+  updatedAt         DateTime         @updatedAt @db.Timestamptz
 
-  tipo      TipoHabitacion  @relation(fields: [tipoId], references: [id])
-  muebles   CatalogoMueble[]
-  estancias Estancia[]
-  tarifas   Tarifa[]
-  reservas  Reserva[]
+  tipo             TipoHabitacion    @relation(fields: [tipoHabitacionId], references: [id])
 
   @@map("habitaciones")
 }
@@ -468,7 +461,6 @@ model Tarifa {
   createdAt     DateTime  @default(now()) @db.Timestamptz
   updatedAt     DateTime  @updatedAt @db.Timestamptz
 
-  habitacion Habitacion @relation(fields: [habitacionId], references: [id])
   plan       PlanTarifa  @relation(fields: [planId], references: [id])
   temporada  Temporada?  @relation(fields: [temporadaId], references: [id])
   canal      Canal?      @relation(fields: [canalId], references: [id])
@@ -554,7 +546,6 @@ model Reserva {
 
   huesped    Huesped    @relation(fields: [huespedId], references: [id])
   canal      Canal?     @relation(fields: [canalId], references: [id])
-  habitacion Habitacion @relation(fields: [habitacionId], references: [id])
   plan       PlanTarifa? @relation(fields: [planId], references: [id])
 
   pago      Pago?       @relation("PagoReserva", fields: [pagoId], references: [id])
@@ -606,7 +597,6 @@ model Estancia {
   createdAt    DateTime      @default(now()) @db.Timestamptz
 
   reserva    Reserva    @relation(fields: [reservaId], references: [id])
-  habitacion Habitacion @relation(fields: [habitacionId], references: [id])
   huesped    Huesped    @relation(fields: [huespedId], references: [id])
   checkinPor  Personal? @relation("CheckinPor",  fields: [checkinPorId],  references: [id])
   checkoutPor Personal? @relation("CheckoutPor", fields: [checkoutPorId], references: [id])
