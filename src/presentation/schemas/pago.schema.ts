@@ -13,7 +13,7 @@ export const CreatePagoSchema = z.object({
   monto: z.number().positive("El monto debe ser mayor a cero"),
   moneda: z.string().length(3, "La moneda debe ser un código de 3 caracteres").optional(),
   metodo: MetodoPagoSchema,
-  recibido_por_id: z.uuid("El ID del personal debe ser un UUID válido").optional(),
+  recibido_por_id: z.string().optional(),
   observacion: z.string().optional(),
 });
 

@@ -3,6 +3,7 @@
 
   - The values [APLICADO] on the enum `estado_pago` will be removed. If these variants are still used in the database, this will fail.
   - The values [CREDITO_AGENCIA,VOUCHER] on the enum `metodo_pago` will be removed. If these variants are still used in the database, this will fail.
+  - You are about to drop the column `nivelVip` on the `huespedes` table. All the data in the column will be lost.
   - You are about to drop the column `notas` on the `huespedes` table. All the data in the column will be lost.
   - You are about to drop the column `notas` on the `pagos` table. All the data in the column will be lost.
   - Added the required column `updatedAt` to the `pagos` table without a default value. This is not possible if the table is not empty.
@@ -35,7 +36,8 @@ COMMIT;
 ALTER TABLE "pagos" DROP CONSTRAINT "pagos_recibidoPorId_fkey";
 
 -- AlterTable
-ALTER TABLE "huespedes" DROP COLUMN "notas",
+ALTER TABLE "huespedes" DROP COLUMN "nivelVip",
+DROP COLUMN "notas",
 ADD COLUMN     "nroDoc" VARCHAR(20),
 ADD COLUMN     "observacion" TEXT,
 ADD COLUMN     "tipoDoc" "tipo_doc_identidad";
@@ -44,7 +46,8 @@ ADD COLUMN     "tipoDoc" "tipo_doc_identidad";
 ALTER TABLE "pagos" DROP COLUMN "notas",
 ADD COLUMN     "observacion" TEXT,
 ADD COLUMN     "updatedAt" TIMESTAMPTZ NOT NULL,
-ALTER COLUMN "moneda" SET DEFAULT 'SOL';
+ALTER COLUMN "moneda" SET DEFAULT 'SOL',
+ALTER COLUMN "recibidoPorId" SET DATA TYPE TEXT;
 
 -- DropEnum
 DROP TYPE "tipo_documento";
