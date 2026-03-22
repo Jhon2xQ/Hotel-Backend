@@ -30,6 +30,7 @@ model User {
   sessions      Session[]
   accounts      Account[]
   staff         Personal?
+  pagosRecibidos Pago[]   @relation("PagosRecibidos")
 
   @@unique([email])
   @@map("user")
@@ -494,7 +495,6 @@ model Personal {
 
   user             User?         @relation(fields: [userId], references: [id])
 
-  pagosRecibidos   Pago[]          @relation("PagosRecibidos")
   cargosRegistrados CargoFolio[]   @relation("CargosRegistrados")
   checkinsRealizados Estancia[]    @relation("CheckinPor")
   checkoutsRealizados Estancia[]   @relation("CheckoutPor")
@@ -579,7 +579,7 @@ model Pago {
 
   reserva   Reserva? @relation("PagoReserva")
   folio     Folio?   @relation("PagoFolio")
-  recibidoPor  Personal? @relation("PagosRecibidos", fields: [recibidoPorId], references: [id])
+  recibidoPor  User? @relation("PagosRecibidos", fields: [recibidoPorId], references: [id])
 
   @@map("pagos")
 }

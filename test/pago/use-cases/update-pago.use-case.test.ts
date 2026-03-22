@@ -1,15 +1,13 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { UpdatePagoUseCase } from "../../../src/application/use-cases/pago/update-pago.use-case";
 import { IPagoRepository } from "../../../src/domain/interfaces/pago.repository.interface";
-import { IPersonalRepository } from "../../../src/domain/interfaces/personal.repository.interface";
 import { PagoException } from "../../../src/domain/exceptions/pago.exception";
-import { createMockPago, createMockPersonal } from "../../helpers/pago-fixtures";
+import { createMockPago } from "../../helpers/pago-fixtures";
 import { EstadoPago, MetodoPago } from "../../../src/domain/entities/pago.entity";
 
 describe("UpdatePagoUseCase", () => {
   let useCase: UpdatePagoUseCase;
   let mockRepository: IPagoRepository;
-  let mockPersonalRepository: IPersonalRepository;
 
   beforeEach(() => {
     mockRepository = {
@@ -20,11 +18,7 @@ describe("UpdatePagoUseCase", () => {
       delete: async () => {},
     };
 
-    mockPersonalRepository = {
-      findById: async () => null,
-    };
-
-    useCase = new UpdatePagoUseCase(mockRepository, mockPersonalRepository);
+    useCase = new UpdatePagoUseCase(mockRepository);
   });
 
   it("should update pago successfully", async () => {
@@ -67,36 +61,6 @@ describe("UpdatePagoUseCase", () => {
     await expect(
       useCase.execute("pago-123", {
         monto: -100,
-      }),
-    ).rejects.toThrow(PagoException);
-  });
-
-  it("should update pago with new personal", async () => {
-    const existingPago = createMockPago();
-    const mockPersonal = createMockPersonal({ id: "personal-456" });
-    const updatedPago = createMockPago({ recibidoPorId: "personal-456" });
-    mockRepository.findById = async () => existingPago;
-    mockRepository.update = async () => updatedPago;
-    mockPersonalRepository.findById = async (id: string) => {
-      if (id === "personal-456") return mockPersonal;
-      return null;
-    };
-
-    const result = await useCase.execute("pago-123", {
-      recibido_por_id: "personal-456",
-    });
-
-    expect(result.recibido_por_id).toBe("personal-456");
-  });
-
-  it("should throw error if personal does not exist", async () => {
-    const existingPago = createMockPago();
-    mockRepository.findById = async () => existingPago;
-    mockPersonalRepository.findById = async () => null;
-
-    await expect(
-      useCase.execute("pago-123", {
-        recibido_por_id: "non-existent-personal",
       }),
     ).rejects.toThrow(PagoException);
   });

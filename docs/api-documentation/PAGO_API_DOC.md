@@ -34,7 +34,7 @@ Crea un nuevo registro de pago.
   "monto": 150.0,
   "moneda": "SOL",
   "metodo": "EFECTIVO",
-  "recibido_por_id": "uuid-del-personal",
+  "recibido_por_id": "uuid-del-usuario",
   "observacion": "Pago por reserva de habitación"
 }
 ```
@@ -47,7 +47,7 @@ Crea un nuevo registro de pago.
 - `monto` (requerido): Monto del pago, debe ser mayor a cero
 - `moneda` (opcional): Código de moneda de 3 caracteres. Default: `SOL`
 - `metodo` (requerido): Método de pago. Valores: `EFECTIVO`, `VISA`, `MASTERCARD`, `AMEX`, `TRANSFERENCIA`
-- `recibido_por_id` (opcional): UUID del personal que recibió el pago
+- `recibido_por_id` (opcional): UUID del usuario que recibió el pago
 - `observacion` (opcional): Observaciones adicionales
 
 **Response:** `201 Created`
@@ -64,12 +64,11 @@ Crea un nuevo registro de pago.
     "monto": "150.00",
     "moneda": "SOL",
     "metodo": "EFECTIVO",
-    "recibido_por_id": "uuid-del-personal",
+    "recibido_por_id": "uuid-del-usuario",
     "recibido_por": {
-      "id": "uuid-del-personal",
-      "codigo": "P001",
-      "nombres": "Juan",
-      "apellidos": "Pérez"
+      "id": "uuid-del-usuario",
+      "name": "Juan Pérez",
+      "email": "juan.perez@hotel.com"
     },
     "observacion": "Pago por reserva de habitación",
     "created_at": "2026-03-18T10:30:00.000Z"
@@ -81,7 +80,7 @@ Crea un nuevo registro de pago.
 **Errores:**
 
 - `400`: Monto inválido (debe ser mayor a cero)
-- `404`: Personal no encontrado
+- `404`: Usuario no encontrado
 - `401`: No autenticado
 - `403`: Sin permisos de administrador
 
@@ -110,12 +109,11 @@ Obtiene todos los pagos registrados, ordenados por fecha de creación descendent
       "monto": "150.00",
       "moneda": "SOL",
       "metodo": "EFECTIVO",
-      "recibido_por_id": "uuid-del-personal",
+      "recibido_por_id": "uuid-del-usuario",
       "recibido_por": {
-        "id": "uuid-del-personal",
-        "codigo": "P001",
-        "nombres": "Juan",
-        "apellidos": "Pérez"
+        "id": "uuid-del-usuario",
+        "name": "Juan Pérez",
+        "email": "juan.perez@hotel.com"
       },
       "observacion": "Pago por reserva de habitación",
       "created_at": "2026-03-18T10:30:00.000Z"
@@ -153,12 +151,11 @@ Obtiene los detalles de un pago específico.
     "monto": "150.00",
     "moneda": "SOL",
     "metodo": "EFECTIVO",
-    "recibido_por_id": "uuid-del-personal",
+    "recibido_por_id": "uuid-del-usuario",
     "recibido_por": {
-      "id": "uuid-del-personal",
-      "codigo": "P001",
-      "nombres": "Juan",
-      "apellidos": "Pérez"
+      "id": "uuid-del-usuario",
+      "name": "Juan Pérez",
+      "email": "juan.perez@hotel.com"
     },
     "observacion": "Pago por consumos en el hotel",
     "created_at": "2026-03-18T10:30:00.000Z"
@@ -203,8 +200,9 @@ Actualiza los datos de un pago existente.
 - `monto`: Monto del pago (debe ser mayor a cero)
 - `moneda`: Código de moneda
 - `metodo`: Método de pago
-- `recibido_por_id`: UUID del personal
 - `observacion`: Observaciones
+
+**Nota:** El campo `recibido_por_id` no puede ser modificado después de la creación del pago.
 
 **Response:** `200 OK`
 
@@ -220,12 +218,11 @@ Actualiza los datos de un pago existente.
     "monto": "150.00",
     "moneda": "SOL",
     "metodo": "EFECTIVO",
-    "recibido_por_id": "uuid-del-personal",
+    "recibido_por_id": "uuid-del-usuario",
     "recibido_por": {
-      "id": "uuid-del-personal",
-      "codigo": "P001",
-      "nombres": "Juan",
-      "apellidos": "Pérez"
+      "id": "uuid-del-usuario",
+      "name": "Juan Pérez",
+      "email": "juan.perez@hotel.com"
     },
     "observacion": "Pago devuelto",
     "created_at": "2026-03-18T10:30:00.000Z"
@@ -238,7 +235,6 @@ Actualiza los datos de un pago existente.
 
 - `404`: Pago no encontrado
 - `400`: Monto inválido
-- `404`: Personal no encontrado
 - `401`: No autenticado
 - `403`: Sin permisos de administrador
 
@@ -307,5 +303,5 @@ Elimina un pago del sistema.
 4. El estado por defecto es CONFIRMADO
 5. La fecha de pago por defecto es la fecha y hora actual
 6. Los pagos pueden estar asociados a reservas o folios (relaciones opcionales)
-7. El campo `recibido_por` muestra información del personal que registró el pago
+7. El campo `recibido_por` muestra información del usuario que registró el pago (id, name, email)
 8. El campo `fecha_pago` acepta formatos: ISO 8601 completo o solo fecha (YYYY-MM-DD)

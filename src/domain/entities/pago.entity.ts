@@ -18,11 +18,10 @@ export enum MetodoPago {
   TRANSFERENCIA = "TRANSFERENCIA",
 }
 
-export interface PersonalBasic {
+export interface UserBasic {
   id: string;
-  codigo: string;
-  nombres: string;
-  apellidos: string;
+  name: string;
+  email: string;
 }
 
 export interface CreatePagoData {
@@ -46,7 +45,7 @@ export class Pago {
     public readonly moneda: string,
     public readonly metodo: MetodoPago,
     public readonly recibidoPorId: string | null,
-    public readonly recibidoPor: PersonalBasic | null,
+    public readonly recibidoPor: UserBasic | null,
     public readonly observacion: string | null,
     public readonly createdAt: Date,
   ) {}
@@ -80,9 +79,8 @@ export class Pago {
       recibido_por: this.recibidoPor
         ? {
             id: this.recibidoPor.id,
-            codigo: this.recibidoPor.codigo,
-            nombres: this.recibidoPor.nombres,
-            apellidos: this.recibidoPor.apellidos,
+            name: this.recibidoPor.name,
+            email: this.recibidoPor.email,
           }
         : null,
       observacion: this.observacion,

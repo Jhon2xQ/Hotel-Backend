@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { AppHono, AppVariables } from "../common/types/app.types";
 import { PrismaClient } from "../../generated/prisma/client";
 import { PagoRepository } from "../infrastructure/repositories/pago.repository";
-import { PersonalRepository } from "../infrastructure/repositories/personal.repository";
+import { UserRepository } from "../infrastructure/repositories/user.repository";
 import { CreatePagoUseCase } from "../application/use-cases/pago/create-pago.use-case";
 import { ListPagoUseCase } from "../application/use-cases/pago/list-pago.use-case";
 import { FindPagoByIdUseCase } from "../application/use-cases/pago/find-pago-by-id.use-case";
@@ -17,12 +17,12 @@ import { UUIDParamSchema } from "../presentation/schemas/tipo-habitacion.schema"
 
 export function createPagoRoutes(prismaClient: PrismaClient): AppHono {
   const repository = new PagoRepository(prismaClient);
-  const personalRepository = new PersonalRepository(prismaClient);
+  const userRepository = new UserRepository(prismaClient);
 
-  const createUseCase = new CreatePagoUseCase(repository, personalRepository);
+  const createUseCase = new CreatePagoUseCase(repository, userRepository);
   const listUseCase = new ListPagoUseCase(repository);
   const findByIdUseCase = new FindPagoByIdUseCase(repository);
-  const updateUseCase = new UpdatePagoUseCase(repository, personalRepository);
+  const updateUseCase = new UpdatePagoUseCase(repository);
   const deleteUseCase = new DeletePagoUseCase(repository);
 
   const controller = new PagoController(createUseCase, listUseCase, findByIdUseCase, updateUseCase, deleteUseCase);

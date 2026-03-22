@@ -5,8 +5,8 @@ export class PagoException extends DomainException {
     return new PagoException("Pago no encontrado", 404);
   }
 
-  static personalNotFound(): PagoException {
-    return new PagoException("Personal no encontrado", 404);
+  static userNotFound(): PagoException {
+    return new PagoException("Usuario no encontrado", 404);
   }
 
   static invalidAmount(): PagoException {
