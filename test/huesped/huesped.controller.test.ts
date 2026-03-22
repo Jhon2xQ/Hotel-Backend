@@ -60,33 +60,26 @@ describe("HuespedController", () => {
       );
     });
 
-    it("should create huesped with nivel_vip", async () => {
+    it("should create huesped with tipo_doc", async () => {
       const mockContext = createMockContext();
       const input = {
+        tipo_doc: "PASAPORTE",
+        nro_doc: "AB123456",
         nombres: "María Elena",
         apellidos: "Rodríguez López",
         email: "maria.rodriguez@example.com",
         telefono: "+51912345678",
         nacionalidad: "Argentina",
-        nivel_vip: 2,
       };
 
-      const mockHuesped = createMockHuesped({ nivelVip: 2 });
+      const mockHuesped = createMockHuesped({ tipo_doc: "PASAPORTE", nro_doc: "AB123456" });
 
       mockContext.get = vi.fn().mockReturnValue(input);
       mockCreateUseCase.execute.mockResolvedValue(mockHuesped);
 
       await controller.create(mockContext);
 
-      expect(mockCreateUseCase.execute).toHaveBeenCalledWith({
-        nombres: "María Elena",
-        apellidos: "Rodríguez López",
-        email: "maria.rodriguez@example.com",
-        telefono: "+51912345678",
-        nacionalidad: "Argentina",
-        nivelVip: 2,
-        notas: undefined,
-      });
+      expect(mockCreateUseCase.execute).toHaveBeenCalledWith(input);
     });
   });
 
@@ -155,12 +148,12 @@ describe("HuespedController", () => {
 
       const input = {
         telefono: "+51999999999",
-        nivel_vip: 1,
+        observacion: "Actualizado",
       };
 
       const mockHuesped = createMockHuesped({
         telefono: "+51999999999",
-        nivelVip: 1,
+        observacion: "Actualizado",
       });
 
       mockContext.get = vi.fn().mockReturnValue(input);
@@ -168,15 +161,7 @@ describe("HuespedController", () => {
 
       await controller.update(mockContext);
 
-      expect(mockUpdateUseCase.execute).toHaveBeenCalledWith("test-huesped-id", {
-        nombres: undefined,
-        apellidos: undefined,
-        email: undefined,
-        telefono: "+51999999999",
-        nacionalidad: undefined,
-        nivelVip: 1,
-        notas: undefined,
-      });
+      expect(mockUpdateUseCase.execute).toHaveBeenCalledWith("test-huesped-id", input);
       expect(mockContext.json).toHaveBeenCalledWith(
         expect.objectContaining({
           success: true,
@@ -192,14 +177,12 @@ describe("HuespedController", () => {
 
       const input = {
         telefono: "+51988888888",
-        nivel_vip: 2,
-        notas: "Cliente VIP actualizado",
+        observacion: "Cliente VIP actualizado",
       };
 
       const mockHuesped = createMockHuesped({
         telefono: "+51988888888",
-        nivelVip: 2,
-        notas: "Cliente VIP actualizado",
+        observacion: "Cliente VIP actualizado",
       });
 
       mockContext.get = vi.fn().mockReturnValue(input);
@@ -207,15 +190,7 @@ describe("HuespedController", () => {
 
       await controller.update(mockContext);
 
-      expect(mockUpdateUseCase.execute).toHaveBeenCalledWith("test-huesped-id", {
-        nombres: undefined,
-        apellidos: undefined,
-        email: undefined,
-        telefono: "+51988888888",
-        nacionalidad: undefined,
-        nivelVip: 2,
-        notas: "Cliente VIP actualizado",
-      });
+      expect(mockUpdateUseCase.execute).toHaveBeenCalledWith("test-huesped-id", input);
     });
   });
 

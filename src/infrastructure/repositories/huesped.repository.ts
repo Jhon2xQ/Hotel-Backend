@@ -17,25 +17,27 @@ export class HuespedRepository implements IHuespedRepository {
 
     const huesped = await this.prisma.huesped.create({
       data: {
+        tipoDoc: data.tipo_doc ?? null,
+        nroDoc: data.nro_doc ?? null,
         nombres: data.nombres,
         apellidos: data.apellidos,
         email: data.email,
         telefono: data.telefono,
         nacionalidad: data.nacionalidad,
-        nivelVip: data.nivelVip ?? 0,
-        notas: data.notas ?? null,
+        observacion: data.observacion ?? null,
       },
     });
 
     return new Huesped(
       huesped.id,
+      huesped.tipoDoc,
+      huesped.nroDoc,
       huesped.nombres,
       huesped.apellidos,
       huesped.email,
       huesped.telefono,
       huesped.nacionalidad,
-      huesped.nivelVip,
-      huesped.notas,
+      huesped.observacion,
       huesped.createdAt,
       huesped.updatedAt,
     );
@@ -50,13 +52,14 @@ export class HuespedRepository implements IHuespedRepository {
       (h) =>
         new Huesped(
           h.id,
+          h.tipoDoc,
+          h.nroDoc,
           h.nombres,
           h.apellidos,
           h.email,
           h.telefono,
           h.nacionalidad,
-          h.nivelVip,
-          h.notas,
+          h.observacion,
           h.createdAt,
           h.updatedAt,
         ),
@@ -74,13 +77,14 @@ export class HuespedRepository implements IHuespedRepository {
 
     return new Huesped(
       huesped.id,
+      huesped.tipoDoc,
+      huesped.nroDoc,
       huesped.nombres,
       huesped.apellidos,
       huesped.email,
       huesped.telefono,
       huesped.nacionalidad,
-      huesped.nivelVip,
-      huesped.notas,
+      huesped.observacion,
       huesped.createdAt,
       huesped.updatedAt,
     );
@@ -108,25 +112,27 @@ export class HuespedRepository implements IHuespedRepository {
     const updated = await this.prisma.huesped.update({
       where: { id },
       data: {
+        tipoDoc: data.tipo_doc,
+        nroDoc: data.nro_doc,
         nombres: data.nombres,
         apellidos: data.apellidos,
         email: data.email,
         telefono: data.telefono,
         nacionalidad: data.nacionalidad,
-        nivelVip: data.nivelVip,
-        notas: data.notas,
+        observacion: data.observacion,
       },
     });
 
     return new Huesped(
       updated.id,
+      updated.tipoDoc,
+      updated.nroDoc,
       updated.nombres,
       updated.apellidos,
       updated.email,
       updated.telefono,
       updated.nacionalidad,
-      updated.nivelVip,
-      updated.notas,
+      updated.observacion,
       updated.createdAt,
       updated.updatedAt,
     );
