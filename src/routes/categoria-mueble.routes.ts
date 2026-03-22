@@ -33,8 +33,8 @@ export function categoriaMuebleRoutes(prismaClient: PrismaClient): AppHono {
 
     router.use("*", authMiddleware);
 
-    router.get("/", controller.list.bind(controller));
-    router.get("/:id", validParams(CategoriaMuebleIdSchema), controller.findById.bind(controller));
+    router.get("/", adminMiddleware, controller.list.bind(controller));
+    router.get("/:id", adminMiddleware, validParams(CategoriaMuebleIdSchema), controller.findById.bind(controller));
     router.post("/", adminMiddleware, validSchema(CreateCategoriaMuebleSchema), controller.create.bind(controller));
     router.put("/:id", adminMiddleware, validParams(CategoriaMuebleIdSchema), validSchema(UpdateCategoriaMuebleSchema), controller.update.bind(controller));
     router.delete("/:id", adminMiddleware, validParams(CategoriaMuebleIdSchema), controller.delete.bind(controller));
