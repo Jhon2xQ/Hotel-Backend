@@ -1,13 +1,14 @@
 import { Huesped, CreateHuespedData } from "../entities/huesped.entity";
 
 export interface UpdateHuespedData {
+  tipo_doc?: "DNI" | "PASAPORTE" | "RUC" | "CE" | null;
+  nro_doc?: string | null;
   nombres?: string;
   apellidos?: string;
   email?: string;
   telefono?: string;
   nacionalidad?: string;
-  nivelVip?: number;
-  notas?: string | null;
+  observacion?: string | null;
 }
 
 export interface IHuespedRepository {

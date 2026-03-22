@@ -7,8 +7,7 @@ export interface UpdatePagoData {
   monto?: number;
   moneda?: string;
   metodo?: MetodoPago;
-  recibidoPorId?: string | null;
-  notas?: string | null;
+  observacion?: string | null;
 }
 
 export interface IPagoRepository {

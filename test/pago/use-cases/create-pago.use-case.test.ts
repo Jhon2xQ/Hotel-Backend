@@ -1,15 +1,15 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { CreatePagoUseCase } from "../../../src/application/use-cases/pago/create-pago.use-case";
 import { IPagoRepository } from "../../../src/domain/interfaces/pago.repository.interface";
-import { IPersonalRepository } from "../../../src/domain/interfaces/personal.repository.interface";
+import { IUserRepository } from "../../../src/domain/interfaces/user.repository.interface";
 import { PagoException } from "../../../src/domain/exceptions/pago.exception";
-import { createMockPago, createMockPersonal } from "../../helpers/pago-fixtures";
+import { createMockPago, createMockUser } from "../../helpers/pago-fixtures";
 import { ConceptoPago, MetodoPago } from "../../../src/domain/entities/pago.entity";
 
 describe("CreatePagoUseCase", () => {
   let useCase: CreatePagoUseCase;
   let mockRepository: IPagoRepository;
-  let mockPersonalRepository: IPersonalRepository;
+  let mockUserRepository: IUserRepository;
 
   beforeEach(() => {
     mockRepository = {
@@ -20,11 +20,11 @@ describe("CreatePagoUseCase", () => {
       delete: async () => {},
     };
 
-    mockPersonalRepository = {
+    mockUserRepository = {
       findById: async () => null,
     };
 
-    useCase = new CreatePagoUseCase(mockRepository, mockPersonalRepository);
+    useCase = new CreatePagoUseCase(mockRepository, mockUserRepository);
   });
 
   it("should create a pago successfully", async () => {
@@ -62,11 +62,11 @@ describe("CreatePagoUseCase", () => {
   });
 
   it("should create pago with recibido_por_id", async () => {
-    const mockPersonal = createMockPersonal({ id: "personal-123" });
-    const mockPago = createMockPago({ recibidoPorId: "personal-123" });
+    const mockUser = createMockUser({ id: "user-123" });
+    const mockPago = createMockPago({ recibidoPorId: "user-123" });
     mockRepository.create = async () => mockPago;
-    mockPersonalRepository.findById = async (id: string) => {
-      if (id === "personal-123") return mockPersonal;
+    mockUserRepository.findById = async (id: string) => {
+      if (id === "user-123") return mockUser;
       return null;
     };
 
@@ -74,22 +74,22 @@ describe("CreatePagoUseCase", () => {
       concepto: ConceptoPago.RESERVA,
       monto: 150.0,
       metodo: MetodoPago.EFECTIVO,
-      recibido_por_id: "personal-123",
+      recibido_por_id: "user-123",
     });
 
-    expect(result.recibido_por_id).toBe("personal-123");
+    expect(result.recibido_por_id).toBe("user-123");
     expect(result.recibido_por).toBeDefined();
   });
 
-  it("should throw error if personal does not exist", async () => {
-    mockPersonalRepository.findById = async () => null;
+  it("should throw error if user does not exist", async () => {
+    mockUserRepository.findById = async () => null;
 
     await expect(
       useCase.execute({
         concepto: ConceptoPago.RESERVA,
         monto: 150.0,
         metodo: MetodoPago.EFECTIVO,
-        recibido_por_id: "non-existent-personal",
+        recibido_por_id: "non-existent-user",
       }),
     ).rejects.toThrow(PagoException);
   });
@@ -110,27 +110,27 @@ describe("CreatePagoUseCase", () => {
   });
 
   it("should create pago with all optional fields", async () => {
-    const mockPersonal = createMockPersonal();
+    const mockUser = createMockUser();
     const mockPago = createMockPago({
       concepto: ConceptoPago.CONSUMO,
       monto: 300.0,
       moneda: "PEN",
       metodo: MetodoPago.TRANSFERENCIA,
-      notas: "Pago por servicios adicionales",
+      observacion: "Pago por servicios adicionales",
     });
     mockRepository.create = async () => mockPago;
-    mockPersonalRepository.findById = async () => mockPersonal;
+    mockUserRepository.findById = async () => mockUser;
 
     const result = await useCase.execute({
       concepto: ConceptoPago.CONSUMO,
       monto: 300.0,
       moneda: "PEN",
       metodo: MetodoPago.TRANSFERENCIA,
-      recibido_por_id: "personal-123",
-      notas: "Pago por servicios adicionales",
+      recibido_por_id: "user-123",
+      observacion: "Pago por servicios adicionales",
     });
 
     expect(result.moneda).toBe("PEN");
-    expect(result.notas).toBe("Pago por servicios adicionales");
+    expect(result.observacion).toBe("Pago por servicios adicionales");
   });
 });

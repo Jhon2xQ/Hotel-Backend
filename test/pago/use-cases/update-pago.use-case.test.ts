@@ -1,15 +1,13 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { UpdatePagoUseCase } from "../../../src/application/use-cases/pago/update-pago.use-case";
 import { IPagoRepository } from "../../../src/domain/interfaces/pago.repository.interface";
-import { IPersonalRepository } from "../../../src/domain/interfaces/personal.repository.interface";
 import { PagoException } from "../../../src/domain/exceptions/pago.exception";
-import { createMockPago, createMockPersonal } from "../../helpers/pago-fixtures";
+import { createMockPago } from "../../helpers/pago-fixtures";
 import { EstadoPago, MetodoPago } from "../../../src/domain/entities/pago.entity";
 
 describe("UpdatePagoUseCase", () => {
   let useCase: UpdatePagoUseCase;
   let mockRepository: IPagoRepository;
-  let mockPersonalRepository: IPersonalRepository;
 
   beforeEach(() => {
     mockRepository = {
@@ -20,16 +18,12 @@ describe("UpdatePagoUseCase", () => {
       delete: async () => {},
     };
 
-    mockPersonalRepository = {
-      findById: async () => null,
-    };
-
-    useCase = new UpdatePagoUseCase(mockRepository, mockPersonalRepository);
+    useCase = new UpdatePagoUseCase(mockRepository);
   });
 
   it("should update pago successfully", async () => {
     const existingPago = createMockPago({ id: "pago-123" });
-    const updatedPago = createMockPago({ id: "pago-123", estado: EstadoPago.APLICADO });
+    const updatedPago = createMockPago({ id: "pago-123", estado: EstadoPago.DEVUELTO });
     mockRepository.findById = async (id: string) => {
       if (id === "pago-123") return existingPago;
       return null;
@@ -37,11 +31,11 @@ describe("UpdatePagoUseCase", () => {
     mockRepository.update = async () => updatedPago;
 
     const result = await useCase.execute("pago-123", {
-      estado: EstadoPago.APLICADO,
+      estado: EstadoPago.DEVUELTO,
     });
 
     expect(result).toBeDefined();
-    expect(result.estado).toBe("APLICADO");
+    expect(result.estado).toBe("DEVUELTO");
   });
 
   it("should throw error if pago not found", async () => {
@@ -49,7 +43,7 @@ describe("UpdatePagoUseCase", () => {
 
     await expect(
       useCase.execute("non-existent-id", {
-        estado: EstadoPago.APLICADO,
+        estado: EstadoPago.DEVUELTO,
       }),
     ).rejects.toThrow(PagoException);
   });
@@ -71,54 +65,24 @@ describe("UpdatePagoUseCase", () => {
     ).rejects.toThrow(PagoException);
   });
 
-  it("should update pago with new personal", async () => {
-    const existingPago = createMockPago();
-    const mockPersonal = createMockPersonal({ id: "personal-456" });
-    const updatedPago = createMockPago({ recibidoPorId: "personal-456" });
-    mockRepository.findById = async () => existingPago;
-    mockRepository.update = async () => updatedPago;
-    mockPersonalRepository.findById = async (id: string) => {
-      if (id === "personal-456") return mockPersonal;
-      return null;
-    };
-
-    const result = await useCase.execute("pago-123", {
-      recibido_por_id: "personal-456",
-    });
-
-    expect(result.recibido_por_id).toBe("personal-456");
-  });
-
-  it("should throw error if personal does not exist", async () => {
-    const existingPago = createMockPago();
-    mockRepository.findById = async () => existingPago;
-    mockPersonalRepository.findById = async () => null;
-
-    await expect(
-      useCase.execute("pago-123", {
-        recibido_por_id: "non-existent-personal",
-      }),
-    ).rejects.toThrow(PagoException);
-  });
-
   it("should update multiple fields at once", async () => {
     const existingPago = createMockPago();
     const updatedPago = createMockPago({
-      estado: EstadoPago.APLICADO,
+      estado: EstadoPago.DEVUELTO,
       metodo: MetodoPago.VISA,
-      notas: "Pago actualizado",
+      observacion: "Pago actualizado",
     });
     mockRepository.findById = async () => existingPago;
     mockRepository.update = async () => updatedPago;
 
     const result = await useCase.execute("pago-123", {
-      estado: EstadoPago.APLICADO,
+      estado: EstadoPago.DEVUELTO,
       metodo: MetodoPago.VISA,
-      notas: "Pago actualizado",
+      observacion: "Pago actualizado",
     });
 
-    expect(result.estado).toBe("APLICADO");
+    expect(result.estado).toBe("DEVUELTO");
     expect(result.metodo).toBe("VISA");
-    expect(result.notas).toBe("Pago actualizado");
+    expect(result.observacion).toBe("Pago actualizado");
   });
 });

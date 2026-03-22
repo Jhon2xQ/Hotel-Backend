@@ -32,23 +32,23 @@ Crea un nuevo registro de pago.
   "estado": "CONFIRMADO",
   "fecha_pago": "2026-03-18T14:30:00.000Z",
   "monto": 150.0,
-  "moneda": "USD",
+  "moneda": "SOL",
   "metodo": "EFECTIVO",
-  "recibido_por_id": "uuid-del-personal",
-  "notas": "Pago por reserva de habitación"
+  "recibido_por_id": "id-del-usuario",
+  "observacion": "Pago por reserva de habitación"
 }
 ```
 
 **Campos:**
 
 - `concepto` (requerido): Tipo de pago. Valores: `RESERVA`, `CONSUMO`
-- `estado` (opcional): Estado del pago. Valores: `CONFIRMADO`, `APLICADO`, `DEVUELTO`, `RETENIDO`, `ANULADO`. Default: `CONFIRMADO`
+- `estado` (opcional): Estado del pago. Valores: `CONFIRMADO`, `DEVUELTO`, `RETENIDO`, `ANULADO`. Default: `CONFIRMADO`
 - `fecha_pago` (opcional): Fecha y hora del pago en formato ISO 8601 (YYYY-MM-DDTHH:mm:ss.sssZ) o YYYY-MM-DD. Default: fecha y hora actual
 - `monto` (requerido): Monto del pago, debe ser mayor a cero
-- `moneda` (opcional): Código de moneda de 3 caracteres. Default: `USD`
-- `metodo` (requerido): Método de pago. Valores: `EFECTIVO`, `VISA`, `MASTERCARD`, `AMEX`, `TRANSFERENCIA`, `CREDITO_AGENCIA`, `VOUCHER`
-- `recibido_por_id` (opcional): UUID del personal que recibió el pago
-- `notas` (opcional): Observaciones adicionales
+- `moneda` (opcional): Código de moneda de 3 caracteres. Default: `SOL`
+- `metodo` (requerido): Método de pago. Valores: `EFECTIVO`, `VISA`, `MASTERCARD`, `AMEX`, `TRANSFERENCIA`
+- `recibido_por_id` (opcional): ID del usuario de Better Auth que recibió el pago
+- `observacion` (opcional): Observaciones adicionales
 
 **Response:** `201 Created`
 
@@ -62,16 +62,15 @@ Crea un nuevo registro de pago.
     "estado": "CONFIRMADO",
     "fecha_pago": "2026-03-18T14:30:00.000Z",
     "monto": "150.00",
-    "moneda": "USD",
+    "moneda": "SOL",
     "metodo": "EFECTIVO",
-    "recibido_por_id": "uuid-del-personal",
+    "recibido_por_id": "id-del-usuario",
     "recibido_por": {
-      "id": "uuid-del-personal",
-      "codigo": "P001",
-      "nombres": "Juan",
-      "apellidos": "Pérez"
+      "id": "id-del-usuario",
+      "name": "Juan Pérez",
+      "email": "juan.perez@hotel.com"
     },
-    "notas": "Pago por reserva de habitación",
+    "observacion": "Pago por reserva de habitación",
     "created_at": "2026-03-18T10:30:00.000Z"
   },
   "timestamp": 1710758400000
@@ -81,7 +80,7 @@ Crea un nuevo registro de pago.
 **Errores:**
 
 - `400`: Monto inválido (debe ser mayor a cero)
-- `404`: Personal no encontrado
+- `404`: Usuario no encontrado
 - `401`: No autenticado
 - `403`: Sin permisos de administrador
 
@@ -108,16 +107,15 @@ Obtiene todos los pagos registrados, ordenados por fecha de creación descendent
       "estado": "CONFIRMADO",
       "fecha_pago": "2026-03-18T14:30:00.000Z",
       "monto": "150.00",
-      "moneda": "USD",
+      "moneda": "SOL",
       "metodo": "EFECTIVO",
-      "recibido_por_id": "uuid-del-personal",
+      "recibido_por_id": "id-del-usuario",
       "recibido_por": {
-        "id": "uuid-del-personal",
-        "codigo": "P001",
-        "nombres": "Juan",
-        "apellidos": "Pérez"
+        "id": "id-del-usuario",
+        "name": "Juan Pérez",
+        "email": "juan.perez@hotel.com"
       },
-      "notas": "Pago por reserva de habitación",
+      "observacion": "Pago por reserva de habitación",
       "created_at": "2026-03-18T10:30:00.000Z"
     }
   ],
@@ -151,16 +149,15 @@ Obtiene los detalles de un pago específico.
     "estado": "CONFIRMADO",
     "fecha_pago": "2026-03-18T14:30:00.000Z",
     "monto": "150.00",
-    "moneda": "USD",
+    "moneda": "SOL",
     "metodo": "EFECTIVO",
-    "recibido_por_id": "uuid-del-personal",
+    "recibido_por_id": "id-del-usuario",
     "recibido_por": {
-      "id": "uuid-del-personal",
-      "codigo": "P001",
-      "nombres": "Juan",
-      "apellidos": "Pérez"
+      "id": "id-del-usuario",
+      "name": "Juan Pérez",
+      "email": "juan.perez@hotel.com"
     },
-    "notas": "Pago por consumos en el hotel",
+    "observacion": "Pago por consumos en el hotel",
     "created_at": "2026-03-18T10:30:00.000Z"
   },
   "timestamp": 1710758400000
@@ -190,8 +187,8 @@ Actualiza los datos de un pago existente.
 
 ```json
 {
-  "estado": "APLICADO",
-  "notas": "Pago aplicado al folio"
+  "estado": "DEVUELTO",
+  "observacion": "Pago devuelto"
 }
 ```
 
@@ -203,8 +200,9 @@ Actualiza los datos de un pago existente.
 - `monto`: Monto del pago (debe ser mayor a cero)
 - `moneda`: Código de moneda
 - `metodo`: Método de pago
-- `recibido_por_id`: UUID del personal
-- `notas`: Observaciones
+- `observacion`: Observaciones
+
+**Nota:** El campo `recibido_por_id` no puede ser modificado después de la creación del pago.
 
 **Response:** `200 OK`
 
@@ -215,19 +213,18 @@ Actualiza los datos de un pago existente.
   "data": {
     "id": "uuid-del-pago",
     "concepto": "RESERVA",
-    "estado": "APLICADO",
+    "estado": "DEVUELTO",
     "fecha_pago": "2026-03-18T14:30:00.000Z",
     "monto": "150.00",
-    "moneda": "USD",
+    "moneda": "SOL",
     "metodo": "EFECTIVO",
-    "recibido_por_id": "uuid-del-personal",
+    "recibido_por_id": "id-del-usuario",
     "recibido_por": {
-      "id": "uuid-del-personal",
-      "codigo": "P001",
-      "nombres": "Juan",
-      "apellidos": "Pérez"
+      "id": "id-del-usuario",
+      "name": "Juan Pérez",
+      "email": "juan.perez@hotel.com"
     },
-    "notas": "Pago aplicado al folio",
+    "observacion": "Pago devuelto",
     "created_at": "2026-03-18T10:30:00.000Z"
   },
   "timestamp": 1710758400000
@@ -238,7 +235,6 @@ Actualiza los datos de un pago existente.
 
 - `404`: Pago no encontrado
 - `400`: Monto inválido
-- `404`: Personal no encontrado
 - `401`: No autenticado
 - `403`: Sin permisos de administrador
 
@@ -284,8 +280,7 @@ Elimina un pago del sistema.
 
 ### EstadoPago
 
-- `CONFIRMADO`: Pago confirmado pero no aplicado
-- `APLICADO`: Pago aplicado a un folio o reserva
+- `CONFIRMADO`: Pago confirmado
 - `DEVUELTO`: Pago devuelto al cliente
 - `RETENIDO`: Pago retenido temporalmente
 - `ANULADO`: Pago anulado
@@ -297,8 +292,6 @@ Elimina un pago del sistema.
 - `MASTERCARD`: Tarjeta Mastercard
 - `AMEX`: American Express
 - `TRANSFERENCIA`: Transferencia bancaria
-- `CREDITO_AGENCIA`: Crédito de agencia
-- `VOUCHER`: Voucher o cupón
 
 ---
 
@@ -306,9 +299,9 @@ Elimina un pago del sistema.
 
 1. Todos los montos se almacenan con precisión decimal (12,2)
 2. Las fechas de pago se almacenan en formato TIMESTAMPTZ (fecha y hora con zona horaria)
-3. La moneda por defecto es USD
+3. La moneda por defecto es SOL
 4. El estado por defecto es CONFIRMADO
 5. La fecha de pago por defecto es la fecha y hora actual
 6. Los pagos pueden estar asociados a reservas o folios (relaciones opcionales)
-7. El campo `recibido_por` muestra información del personal que registró el pago
+7. El campo `recibido_por` muestra información del usuario que registró el pago (id, name, email)
 8. El campo `fecha_pago` acepta formatos: ISO 8601 completo o solo fecha (YYYY-MM-DD)

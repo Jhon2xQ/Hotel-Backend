@@ -35,11 +35,11 @@ describe("PagoRepository", () => {
         estado: "CONFIRMADO",
         fechaPago: new Date("2026-03-18T14:30:00.000Z"),
         monto: new Prisma.Decimal(150.0),
-        moneda: "USD",
+        moneda: "SOL",
         metodo: "EFECTIVO",
         recibidoPorId: null,
         recibidoPor: null,
-        notas: null,
+        observacion: null,
         createdAt: new Date(),
       };
 
@@ -56,31 +56,30 @@ describe("PagoRepository", () => {
     it("should create pago with all fields", async () => {
       const input = {
         concepto: ConceptoPago.CONSUMO,
-        estado: EstadoPago.APLICADO,
+        estado: EstadoPago.CONFIRMADO,
         fechaPago: new Date("2026-03-20T10:00:00.000Z"),
         monto: 200.0,
         moneda: "PEN",
         metodo: MetodoPago.VISA,
-        recibidoPorId: "personal-123",
-        notas: "Pago por servicios",
+        recibidoPorId: "user-123",
+        observacion: "Pago por servicios",
       };
 
       const mockResult = {
         id: "test-pago-id",
         concepto: "CONSUMO",
-        estado: "APLICADO",
+        estado: "CONFIRMADO",
         fechaPago: new Date("2026-03-20T10:00:00.000Z"),
         monto: new Prisma.Decimal(200.0),
         moneda: "PEN",
         metodo: "VISA",
-        recibidoPorId: "personal-123",
+        recibidoPorId: "user-123",
         recibidoPor: {
-          id: "personal-123",
-          codigo: "P001",
-          nombres: "Juan",
-          apellidos: "Pérez",
+          id: "user-123",
+          name: "Juan Pérez",
+          email: "juan.perez@hotel.com",
         },
-        notas: "Pago por servicios",
+        observacion: "Pago por servicios",
         createdAt: new Date(),
       };
 
@@ -89,9 +88,9 @@ describe("PagoRepository", () => {
       const result = await repository.create(input);
 
       expect(result.concepto).toBe(ConceptoPago.CONSUMO);
-      expect(result.estado).toBe(EstadoPago.APLICADO);
+      expect(result.estado).toBe(EstadoPago.CONFIRMADO);
       expect(result.moneda).toBe("PEN");
-      expect(result.recibidoPorId).toBe("personal-123");
+      expect(result.recibidoPorId).toBe("user-123");
     });
   });
 
@@ -104,11 +103,11 @@ describe("PagoRepository", () => {
           estado: "CONFIRMADO",
           fechaPago: new Date("2026-03-18T14:30:00.000Z"),
           monto: new Prisma.Decimal(150.0),
-          moneda: "USD",
+          moneda: "SOL",
           metodo: "EFECTIVO",
           recibidoPorId: null,
           recibidoPor: null,
-          notas: null,
+          observacion: null,
           createdAt: new Date("2026-03-18T14:30:00.000Z"),
         },
         {
@@ -117,11 +116,11 @@ describe("PagoRepository", () => {
           estado: "CONFIRMADO",
           fechaPago: new Date("2026-03-17T10:00:00.000Z"),
           monto: new Prisma.Decimal(200.0),
-          moneda: "USD",
+          moneda: "SOL",
           metodo: "VISA",
           recibidoPorId: null,
           recibidoPor: null,
-          notas: null,
+          observacion: null,
           createdAt: new Date("2026-03-17T10:00:00.000Z"),
         },
       ];
@@ -156,11 +155,11 @@ describe("PagoRepository", () => {
         estado: "CONFIRMADO",
         fechaPago: new Date("2026-03-18T14:30:00.000Z"),
         monto: new Prisma.Decimal(150.0),
-        moneda: "USD",
+        moneda: "SOL",
         metodo: "EFECTIVO",
         recibidoPorId: null,
         recibidoPor: null,
-        notas: null,
+        observacion: null,
         createdAt: new Date(),
       };
 
@@ -191,16 +190,15 @@ describe("PagoRepository", () => {
         estado: "CONFIRMADO",
         fechaPago: new Date("2026-03-18T14:30:00.000Z"),
         monto: new Prisma.Decimal(150.0),
-        moneda: "USD",
+        moneda: "SOL",
         metodo: "EFECTIVO",
-        recibidoPorId: "personal-123",
+        recibidoPorId: "user-123",
         recibidoPor: {
-          id: "personal-123",
-          codigo: "P001",
-          nombres: "Juan",
-          apellidos: "Pérez",
+          id: "user-123",
+          name: "Juan Pérez",
+          email: "juan.perez@hotel.com",
         },
-        notas: null,
+        observacion: null,
         createdAt: new Date(),
       };
 
@@ -209,28 +207,28 @@ describe("PagoRepository", () => {
       const result = await repository.findById("test-pago-id");
 
       expect(result?.recibidoPor).toBeDefined();
-      expect(result?.recibidoPor?.codigo).toBe("P001");
+      expect(result?.recibidoPor?.name).toBe("Juan Pérez");
     });
   });
 
   describe("update", () => {
     it("should update pago", async () => {
       const updateData = {
-        estado: EstadoPago.APLICADO,
-        notas: "Pago aplicado al folio",
+        estado: EstadoPago.DEVUELTO,
+        observacion: "Pago devuelto",
       };
 
       const mockResult = {
         id: "test-pago-id",
         concepto: "RESERVA",
-        estado: "APLICADO",
+        estado: "DEVUELTO",
         fechaPago: new Date("2026-03-18T14:30:00.000Z"),
         monto: new Prisma.Decimal(150.0),
-        moneda: "USD",
+        moneda: "SOL",
         metodo: "EFECTIVO",
         recibidoPorId: null,
         recibidoPor: null,
-        notas: "Pago aplicado al folio",
+        observacion: "Pago devuelto",
         createdAt: new Date(),
       };
 
@@ -238,8 +236,8 @@ describe("PagoRepository", () => {
 
       const result = await repository.update("test-pago-id", updateData);
 
-      expect(result.estado).toBe(EstadoPago.APLICADO);
-      expect(result.notas).toBe("Pago aplicado al folio");
+      expect(result.estado).toBe(EstadoPago.DEVUELTO);
+      expect(result.observacion).toBe("Pago devuelto");
       expect(mockPrisma.pago.update).toHaveBeenCalled();
     });
 
@@ -251,7 +249,7 @@ describe("PagoRepository", () => {
 
       mockPrisma.pago.update.mockRejectedValue(error);
 
-      await expect(repository.update("non-existent-id", { notas: "Test" })).rejects.toThrow(PagoException);
+      await expect(repository.update("non-existent-id", { observacion: "Test" })).rejects.toThrow(PagoException);
     });
 
     it("should update monto correctly", async () => {
@@ -265,11 +263,11 @@ describe("PagoRepository", () => {
         estado: "CONFIRMADO",
         fechaPago: new Date("2026-03-18T14:30:00.000Z"),
         monto: new Prisma.Decimal(250.0),
-        moneda: "USD",
+        moneda: "SOL",
         metodo: "EFECTIVO",
         recibidoPorId: null,
         recibidoPor: null,
-        notas: null,
+        observacion: null,
         createdAt: new Date(),
       };
 

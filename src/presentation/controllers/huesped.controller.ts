@@ -5,6 +5,7 @@ import { ListHuespedUseCase } from "../../application/use-cases/huesped/list-hue
 import { FindHuespedByIdUseCase } from "../../application/use-cases/huesped/find-huesped-by-id.use-case";
 import { UpdateHuespedUseCase } from "../../application/use-cases/huesped/update-huesped.use-case";
 import { DeleteHuespedUseCase } from "../../application/use-cases/huesped/delete-huesped.use-case";
+import type { CreateHuespedDto, UpdateHuespedDto } from "../../application/dtos/huesped.dto";
 
 export class HuespedController {
   constructor(
@@ -16,26 +17,8 @@ export class HuespedController {
   ) {}
 
   async create(c: AppContext) {
-    const validData = c.get("validData") as {
-      nombres: string;
-      apellidos: string;
-      email: string;
-      telefono: string;
-      nacionalidad: string;
-      nivel_vip?: number;
-      notas?: string;
-    };
-
-    const huesped = await this.createUseCase.execute({
-      nombres: validData.nombres,
-      apellidos: validData.apellidos,
-      email: validData.email,
-      telefono: validData.telefono,
-      nacionalidad: validData.nacionalidad,
-      nivelVip: validData.nivel_vip,
-      notas: validData.notas,
-    });
-
+    const validData = c.get("validData") as CreateHuespedDto;
+    const huesped = await this.createUseCase.execute(validData);
     return c.json(ApiResponse.success("Huésped creado exitosamente", huesped.toOutput()), 201);
   }
 
@@ -53,26 +36,8 @@ export class HuespedController {
 
   async update(c: AppContext) {
     const id = c.req.param("id") as string;
-    const validData = c.get("validData") as {
-      nombres?: string;
-      apellidos?: string;
-      email?: string;
-      telefono?: string;
-      nacionalidad?: string;
-      nivel_vip?: number;
-      notas?: string;
-    };
-
-    const huesped = await this.updateUseCase.execute(id, {
-      nombres: validData.nombres,
-      apellidos: validData.apellidos,
-      email: validData.email,
-      telefono: validData.telefono,
-      nacionalidad: validData.nacionalidad,
-      nivelVip: validData.nivel_vip,
-      notas: validData.notas,
-    });
-
+    const validData = c.get("validData") as UpdateHuespedDto;
+    const huesped = await this.updateUseCase.execute(id, validData);
     return c.json(ApiResponse.success("Huésped actualizado exitosamente", huesped.toOutput()), 200);
   }
 

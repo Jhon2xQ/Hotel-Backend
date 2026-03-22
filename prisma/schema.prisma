@@ -30,6 +30,7 @@ model User {
   sessions      Session[]
   accounts      Account[]
   staff         Personal?
+  pagosRecibidos Pago[]   @relation("PagosRecibidos")
 
   @@unique([email])
   @@map("user")
@@ -103,13 +104,13 @@ enum TipoCanal {
   @@map("tipo_canal")
 }
 
-enum TipoDocumento {
+enum TipoDocIdentidad {
   DNI
   PASAPORTE
-  CE
   RUC
+  CE
 
-  @@map("tipo_documento")
+  @@map("tipo_doc_identidad")
 }
 
 enum Genero {
@@ -186,7 +187,6 @@ enum ConceptoPago {
 
 enum EstadoPago {
   CONFIRMADO
-  APLICADO
   DEVUELTO
   RETENIDO
   ANULADO
@@ -200,8 +200,6 @@ enum MetodoPago {
   MASTERCARD
   AMEX
   TRANSFERENCIA
-  CREDITO_AGENCIA
-  VOUCHER
 
   @@map("metodo_pago")
 }
@@ -323,16 +321,17 @@ model Agencia {
 // ------------------------------------------------------------
 
 model Huesped {
-  id           String         @id @default(uuid()) @db.Uuid
-  nombres      String         @db.VarChar(80)
-  apellidos    String         @db.VarChar(80)
-  email        String         @unique @db.VarChar(120)
-  telefono     String         @db.VarChar(20)
-  nacionalidad String         @db.VarChar(60)
-  nivelVip     Int            @default(0)
-  notas        String?        @db.Text
-  createdAt    DateTime       @default(now()) @db.Timestamptz
-  updatedAt    DateTime       @updatedAt @db.Timestamptz
+  id           String            @id @default(uuid()) @db.Uuid
+  tipoDoc      TipoDocIdentidad?
+  nroDoc       String?           @db.VarChar(20)
+  nombres      String            @db.VarChar(80)
+  apellidos    String            @db.VarChar(80)
+  email        String            @unique @db.VarChar(120)
+  telefono     String            @db.VarChar(20)
+  nacionalidad String            @db.VarChar(60)
+  observacion  String?           @db.Text
+  createdAt    DateTime          @default(now()) @db.Timestamptz
+  updatedAt    DateTime          @updatedAt @db.Timestamptz
 
   reservas Reserva[]
   estancias Estancia[]
@@ -489,7 +488,6 @@ model Personal {
 
   user             User?         @relation(fields: [userId], references: [id])
 
-  pagosRecibidos   Pago[]          @relation("PagosRecibidos")
   cargosRegistrados CargoFolio[]   @relation("CargosRegistrados")
   checkinsRealizados Estancia[]    @relation("CheckinPor")
   checkoutsRealizados Estancia[]   @relation("CheckoutPor")
@@ -564,15 +562,16 @@ model Pago {
   estado        EstadoPago   @default(CONFIRMADO)
   fechaPago     DateTime     @default(now()) @db.Timestamptz
   monto         Decimal      @db.Decimal(12, 2)
-  moneda        String       @default("USD") @db.Char(3)
+  moneda        String       @default("SOL") @db.Char(3)
   metodo        MetodoPago
-  recibidoPorId String?      @db.Uuid
-  notas         String?      @db.Text
+  recibidoPorId String?      // No es UUID, es el ID de User de Better Auth
+  observacion   String?      @db.Text
   createdAt     DateTime     @default(now()) @db.Timestamptz
+  updatedAt     DateTime     @updatedAt @db.Timestamptz
 
   reserva   Reserva? @relation("PagoReserva")
   folio     Folio?   @relation("PagoFolio")
-  recibidoPor  Personal? @relation("PagosRecibidos", fields: [recibidoPorId], references: [id])
+  recibidoPor  User? @relation("PagosRecibidos", fields: [recibidoPorId], references: [id])
 
   @@map("pagos")
 }

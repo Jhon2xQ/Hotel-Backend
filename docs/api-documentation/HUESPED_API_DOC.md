@@ -33,13 +33,14 @@ Obtiene la lista completa de huéspedes registrados en el sistema.
   "data": [
     {
       "id": "550e8400-e29b-41d4-a716-446655440000",
+      "tipo_doc": "DNI",
+      "nro_doc": "12345678",
       "nombres": "Juan Carlos",
       "apellidos": "Pérez García",
       "email": "juan.perez@example.com",
       "telefono": "+51987654321",
       "nacionalidad": "Perú",
-      "nivel_vip": 1,
-      "notas": "Cliente frecuente, prefiere habitaciones con vista",
+      "observacion": "Cliente frecuente, prefiere habitaciones con vista",
       "created_at": "2026-03-15T10:30:00.000Z",
       "updated_at": "2026-03-15T10:30:00.000Z"
     }
@@ -70,13 +71,14 @@ Obtiene los detalles de un huésped específico.
   "message": "Huésped encontrado",
   "data": {
     "id": "550e8400-e29b-41d4-a716-446655440000",
+    "tipo_doc": "DNI",
+    "nro_doc": "12345678",
     "nombres": "Juan Carlos",
     "apellidos": "Pérez García",
     "email": "juan.perez@example.com",
     "telefono": "+51987654321",
     "nacionalidad": "Perú",
-    "nivel_vip": 1,
-    "notas": "Cliente frecuente, prefiere habitaciones con vista",
+    "observacion": "Cliente frecuente, prefiere habitaciones con vista",
     "created_at": "2026-03-15T10:30:00.000Z",
     "updated_at": "2026-03-15T10:30:00.000Z"
   },
@@ -109,25 +111,27 @@ Registra un nuevo huésped en el sistema.
 
 ```json
 {
+  "tipo_doc": "PASAPORTE",
+  "nro_doc": "AB123456",
   "nombres": "María Elena",
   "apellidos": "Rodríguez López",
   "email": "maria.rodriguez@example.com",
   "telefono": "+51912345678",
   "nacionalidad": "Argentina",
-  "nivel_vip": 0,
-  "notas": "Primera visita al hotel"
+  "observacion": "Primera visita al hotel"
 }
 ```
 
 **Campos:**
 
+- `tipo_doc` (string, opcional): Tipo de documento ("DNI", "PASAPORTE", "RUC", "CE")
+- `nro_doc` (string, opcional): Número de documento (máx. 20 caracteres)
 - `nombres` (string, requerido): Nombres del huésped (máx. 80 caracteres)
 - `apellidos` (string, requerido): Apellidos del huésped (máx. 80 caracteres)
 - `email` (string, requerido): Email del huésped (máx. 120 caracteres, debe ser único)
 - `telefono` (string, requerido): Teléfono del huésped (máx. 20 caracteres)
 - `nacionalidad` (string, requerido): Nacionalidad del huésped (máx. 60 caracteres)
-- `nivel_vip` (number, opcional): Nivel VIP del huésped (0=normal, 1=VIP, 2=VVIP). Por defecto: 0
-- `notas` (string, opcional): Notas adicionales sobre el huésped
+- `observacion` (string, opcional): Observaciones adicionales sobre el huésped
 
 **Respuesta exitosa (201):**
 
@@ -137,13 +141,14 @@ Registra un nuevo huésped en el sistema.
   "message": "Huésped creado exitosamente",
   "data": {
     "id": "660e8400-e29b-41d4-a716-446655440001",
+    "tipo_doc": "PASAPORTE",
+    "nro_doc": "AB123456",
     "nombres": "María Elena",
     "apellidos": "Rodríguez López",
     "email": "maria.rodriguez@example.com",
     "telefono": "+51912345678",
     "nacionalidad": "Argentina",
-    "nivel_vip": 0,
-    "notas": "Primera visita al hotel",
+    "observacion": "Primera visita al hotel",
     "created_at": "2026-03-18T14:20:00.000Z",
     "updated_at": "2026-03-18T14:20:00.000Z"
   },
@@ -157,17 +162,6 @@ Registra un nuevo huésped en el sistema.
 {
   "success": false,
   "message": "Ya existe un huésped con el email \"maria.rodriguez@example.com\"",
-  "data": null,
-  "timestamp": 1710770400000
-}
-```
-
-**Respuesta de error (400):**
-
-```json
-{
-  "success": false,
-  "message": "El nivel VIP debe estar entre 0 y 2, recibido: 5",
   "data": null,
   "timestamp": 1710770400000
 }
@@ -192,20 +186,20 @@ Actualiza los datos de un huésped existente.
 ```json
 {
   "telefono": "+51987654322",
-  "nivel_vip": 2,
-  "notas": "Cliente VIP, cumpleaños en marzo"
+  "observacion": "Cliente VIP, cumpleaños en marzo"
 }
 ```
 
 **Campos (todos opcionales):**
 
+- `tipo_doc` (string): Tipo de documento ("DNI", "PASAPORTE", "RUC", "CE")
+- `nro_doc` (string): Número de documento (máx. 20 caracteres)
 - `nombres` (string): Nombres del huésped (máx. 80 caracteres)
 - `apellidos` (string): Apellidos del huésped (máx. 80 caracteres)
 - `email` (string): Email del huésped (máx. 120 caracteres, debe ser único)
 - `telefono` (string): Teléfono del huésped (máx. 20 caracteres)
 - `nacionalidad` (string): Nacionalidad del huésped (máx. 60 caracteres)
-- `nivel_vip` (number): Nivel VIP del huésped (0-2)
-- `notas` (string): Notas adicionales sobre el huésped
+- `observacion` (string): Observaciones adicionales sobre el huésped
 
 **Respuesta exitosa (200):**
 
@@ -215,13 +209,14 @@ Actualiza los datos de un huésped existente.
   "message": "Huésped actualizado exitosamente",
   "data": {
     "id": "550e8400-e29b-41d4-a716-446655440000",
+    "tipo_doc": "DNI",
+    "nro_doc": "12345678",
     "nombres": "Juan Carlos",
     "apellidos": "Pérez García",
     "email": "juan.perez@example.com",
     "telefono": "+51987654322",
     "nacionalidad": "Perú",
-    "nivel_vip": 2,
-    "notas": "Cliente VIP, cumpleaños en marzo",
+    "observacion": "Cliente VIP, cumpleaños en marzo",
     "created_at": "2026-03-15T10:30:00.000Z",
     "updated_at": "2026-03-18T15:00:00.000Z"
   },
@@ -290,14 +285,6 @@ Elimina un huésped del sistema.
 ---
 
 ## Notas Importantes
-
-### Niveles VIP
-
-El sistema maneja tres niveles de huéspedes:
-
-- **0 (Normal)**: Cliente estándar sin beneficios especiales
-- **1 (VIP)**: Cliente frecuente con beneficios como upgrades de habitación
-- **2 (VVIP)**: Cliente premium con máxima prioridad y amenities especiales
 
 ### Email Único
 

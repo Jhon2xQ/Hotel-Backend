@@ -1,5 +1,5 @@
 import { IPagoRepository } from "../../../domain/interfaces/pago.repository.interface";
-import { IPersonalRepository } from "../../../domain/interfaces/personal.repository.interface";
+import { IUserRepository } from "../../../domain/interfaces/user.repository.interface";
 import { PagoException } from "../../../domain/exceptions/pago.exception";
 import { CreatePagoInput, PagoOutput } from "../../dtos/pago.dto";
 import { ConceptoPago, EstadoPago, MetodoPago } from "../../../domain/entities/pago.entity";
@@ -7,7 +7,7 @@ import { ConceptoPago, EstadoPago, MetodoPago } from "../../../domain/entities/p
 export class CreatePagoUseCase {
   constructor(
     private repository: IPagoRepository,
-    private personalRepository: IPersonalRepository,
+    private userRepository: IUserRepository,
   ) {}
 
   async execute(input: CreatePagoInput): Promise<PagoOutput> {
@@ -16,11 +16,11 @@ export class CreatePagoUseCase {
       throw PagoException.invalidAmount();
     }
 
-    // Validate personal exists if provided
+    // Validate user exists if provided
     if (input.recibido_por_id) {
-      const personal = await this.personalRepository.findById(input.recibido_por_id);
-      if (!personal) {
-        throw PagoException.personalNotFound();
+      const user = await this.userRepository.findById(input.recibido_por_id);
+      if (!user) {
+        throw PagoException.userNotFound();
       }
     }
 
@@ -32,7 +32,7 @@ export class CreatePagoUseCase {
       moneda: input.moneda,
       metodo: input.metodo as MetodoPago,
       recibidoPorId: input.recibido_por_id,
-      notas: input.notas,
+      observacion: input.observacion,
     });
 
     return pago.toOutput();

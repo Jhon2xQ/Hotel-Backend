@@ -47,11 +47,11 @@ describe("PagoController", () => {
         estado: "CONFIRMADO",
         fecha_pago: new Date().toISOString(),
         monto: "150.00",
-        moneda: "USD",
+        moneda: "SOL",
         metodo: "EFECTIVO",
         recibido_por_id: null,
         recibido_por: null,
-        notas: null,
+        observacion: null,
         created_at: new Date().toISOString(),
       };
 
@@ -81,11 +81,11 @@ describe("PagoController", () => {
           estado: "CONFIRMADO",
           fecha_pago: new Date().toISOString(),
           monto: "150.00",
-          moneda: "USD",
+          moneda: "SOL",
           metodo: "EFECTIVO",
           recibido_por_id: null,
           recibido_por: null,
-          notas: null,
+          observacion: null,
           created_at: new Date().toISOString(),
         },
       ];
@@ -116,11 +116,11 @@ describe("PagoController", () => {
         estado: "CONFIRMADO",
         fecha_pago: new Date().toISOString(),
         monto: "150.00",
-        moneda: "USD",
+        moneda: "SOL",
         metodo: "EFECTIVO",
         recibido_por_id: null,
         recibido_por: null,
-        notas: null,
+        observacion: null,
         created_at: new Date().toISOString(),
       };
 
@@ -145,21 +145,21 @@ describe("PagoController", () => {
       mockContext.req.param = vi.fn().mockReturnValue({ id: "test-pago-id" });
 
       const input = {
-        estado: EstadoPago.APLICADO,
-        notas: "Pago aplicado al folio",
+        estado: EstadoPago.DEVUELTO,
+        observacion: "Pago devuelto",
       };
 
       const mockOutput = {
         id: "test-pago-id",
         concepto: "RESERVA",
-        estado: "APLICADO",
+        estado: "DEVUELTO",
         fecha_pago: new Date().toISOString(),
         monto: "150.00",
-        moneda: "USD",
+        moneda: "SOL",
         metodo: "EFECTIVO",
         recibido_por_id: null,
         recibido_por: null,
-        notas: "Pago aplicado al folio",
+        observacion: "Pago devuelto",
         created_at: new Date().toISOString(),
       };
 

@@ -1,14 +1,10 @@
 import { IPagoRepository } from "../../../domain/interfaces/pago.repository.interface";
-import { IPersonalRepository } from "../../../domain/interfaces/personal.repository.interface";
 import { PagoException } from "../../../domain/exceptions/pago.exception";
 import { UpdatePagoInput, PagoOutput } from "../../dtos/pago.dto";
 import { ConceptoPago, EstadoPago, MetodoPago } from "../../../domain/entities/pago.entity";
 
 export class UpdatePagoUseCase {
-  constructor(
-    private repository: IPagoRepository,
-    private personalRepository: IPersonalRepository,
-  ) {}
+  constructor(private repository: IPagoRepository) {}
 
   async execute(id: string, input: UpdatePagoInput): Promise<PagoOutput> {
     // Verify pago exists
@@ -22,14 +18,6 @@ export class UpdatePagoUseCase {
       throw PagoException.invalidAmount();
     }
 
-    // Validate personal exists if provided
-    if (input.recibido_por_id) {
-      const personal = await this.personalRepository.findById(input.recibido_por_id);
-      if (!personal) {
-        throw PagoException.personalNotFound();
-      }
-    }
-
     const pago = await this.repository.update(id, {
       concepto: input.concepto as ConceptoPago | undefined,
       estado: input.estado as EstadoPago | undefined,
@@ -37,8 +25,7 @@ export class UpdatePagoUseCase {
       monto: input.monto,
       moneda: input.moneda,
       metodo: input.metodo as MetodoPago | undefined,
-      recibidoPorId: input.recibido_por_id,
-      notas: input.notas,
+      observacion: input.observacion,
     });
 
     return pago.toOutput();
