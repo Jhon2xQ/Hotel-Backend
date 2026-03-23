@@ -3,7 +3,6 @@ import {
   Habitacion,
   CreateHabitacionData,
   EstadoHabitacion,
-  EstadoLimpieza,
   TipoHabitacionBasic,
 } from "../../domain/entities/habitacion.entity";
 import {
@@ -22,24 +21,15 @@ export class HabitacionRepository implements IHabitacionRepository {
       const result = await this.prisma.habitacion.create({
         data: {
           nroHabitacion: data.nroHabitacion,
-          tipoId: data.tipoId,
+          tipoHabitacionId: data.tipoHabitacionId,
           piso: data.piso,
           tieneDucha: data.tieneDucha ?? false,
           tieneBanio: data.tieneBanio ?? false,
-          urlImagen: data.urlImagen ?? null,
+          urlImagen: data.urlImagen ?? undefined,
           estado: data.estado ?? EstadoHabitacion.DISPONIBLE,
-          limpieza: data.limpieza ?? EstadoLimpieza.LIMPIA,
-          notas: data.notas ?? null,
-          muebles: data.muebles?.length
-            ? {
-                connect: data.muebles.map((m) => ({ id: m.id })),
-              }
-            : undefined,
+          notas: data.notas,
         },
-        include: {
-          tipo: true,
-          muebles: true,
-        },
+        include: {tipo: true},
       });
       return this.toDomain(result);
     } catch (error) {
@@ -56,7 +46,6 @@ export class HabitacionRepository implements IHabitacionRepository {
     const results = await this.prisma.habitacion.findMany({
       include: {
         tipo: true,
-        muebles: true,
       },
       orderBy: { nroHabitacion: "asc" },
     });
@@ -68,7 +57,6 @@ export class HabitacionRepository implements IHabitacionRepository {
       where: { id },
       include: {
         tipo: true,
-        muebles: true,
       },
     });
     return result ? this.toDomain(result) : null;
@@ -79,7 +67,6 @@ export class HabitacionRepository implements IHabitacionRepository {
       where: { nroHabitacion: numero },
       include: {
         tipo: true,
-        muebles: true,
       },
     });
     return result ? this.toDomain(result) : null;
@@ -90,25 +77,17 @@ export class HabitacionRepository implements IHabitacionRepository {
       const updateData: any = {};
 
       if (data.nroHabitacion !== undefined) updateData.nroHabitacion = data.nroHabitacion;
-      if (data.tipoId !== undefined) updateData.tipoId = data.tipoId;
+      if (data.tipoHabitacionId !== undefined) updateData.tipoHabitacionId = data.tipoHabitacionId;
       if (data.piso !== undefined) updateData.piso = data.piso;
       if (data.tieneDucha !== undefined) updateData.tieneDucha = data.tieneDucha;
       if (data.tieneBanio !== undefined) updateData.tieneBanio = data.tieneBanio;
-      if (data.urlImagen !== undefined) updateData.urlImagen = data.urlImagen ?? null;
+      if (data.urlImagen !== undefined) updateData.urlImagen = data.urlImagen;
       if (data.estado !== undefined) updateData.estado = data.estado;
-      if (data.limpieza !== undefined) updateData.limpieza = data.limpieza;
-      if (data.notas !== undefined) updateData.notas = data.notas ?? null;
+      if (data.notas !== undefined) updateData.notas = data.notas;
 
       // Handle ultimaLimpieza logic: set to current timestamp when estado changes to LIMPIEZA
       if (data.estado === EstadoHabitacion.LIMPIEZA) {
         updateData.ultimaLimpieza = new Date();
-      }
-
-      // Handle muebles replacement using set operation
-      if (data.muebles !== undefined) {
-        updateData.muebles = {
-          set: data.muebles.map((m) => ({ id: m.id })),
-        };
       }
 
       const result = await this.prisma.habitacion.update({
@@ -116,7 +95,6 @@ export class HabitacionRepository implements IHabitacionRepository {
         data: updateData,
         include: {
           tipo: true,
-          muebles: true,
         },
       });
       return this.toDomain(result);
@@ -138,19 +116,13 @@ export class HabitacionRepository implements IHabitacionRepository {
       const updateData: any = {};
 
       if (data.estado !== undefined) updateData.estado = data.estado;
-      if (data.limpieza !== undefined) updateData.limpieza = data.limpieza;
 
-      // Handle ultimaLimpieza logic: set to current timestamp when limpieza changes to LIMPIA
-      if (data.limpieza === EstadoLimpieza.LIMPIA) {
-        updateData.ultimaLimpieza = new Date();
-      }
 
       const result = await this.prisma.habitacion.update({
         where: { id },
         data: updateData,
         include: {
           tipo: true,
-          muebles: true,
         },
       });
       return this.toDomain(result);
@@ -193,29 +165,18 @@ export class HabitacionRepository implements IHabitacionRepository {
         }
       : null;
 
-    const muebles: CatalogoMueble[] = data.muebles
-      ? data.muebles.map((m: any) => ({
-          id: m.id,
-          codigo: m.codigo,
-          nombre: m.nombre,
-          categoria: m.categoria,
-        }))
-      : [];
-
     return new Habitacion(
       data.id,
       data.nroHabitacion,
-      data.tipoId,
+      data.tipoHabitacionId,
       tipo,
       data.piso,
       data.tieneDucha,
       data.tieneBanio,
       data.urlImagen,
       data.estado as EstadoHabitacion,
-      data.limpieza as EstadoLimpieza,
       data.notas,
       data.ultimaLimpieza,
-      muebles,
       data.createdAt,
       data.updatedAt,
     );

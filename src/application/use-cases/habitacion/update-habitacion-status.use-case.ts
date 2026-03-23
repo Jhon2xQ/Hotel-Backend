@@ -16,7 +16,7 @@ export class UpdateHabitacionStatusUseCase {
     // If limpieza changes to LIMPIA, set ultimaLimpieza to current timestamp (Requirement 10.6)
     const updated = await this.repository.updateStatus(id, {
       estado: input.estado,
-      limpieza: input.limpieza,
+      ultiLimpieza: input.ulti_limpieza ? new Date(input.ulti_limpieza) : null,
     });
 
     return updated.toOutput();

@@ -1,22 +1,20 @@
-import { Habitacion, CreateHabitacionData, EstadoHabitacion, EstadoLimpieza } from "../entities/habitacion.entity";
-import type { CatalogoMueble } from "../entities/tipo-habitacion.entity";
+import { Habitacion, CreateHabitacionData, EstadoHabitacion } from "../entities/habitacion.entity";
 
 export interface UpdateHabitacionData {
   nroHabitacion?: string;
-  tipoId?: string;
+  tipoHabitacionId?: string;
   piso?: number;
   tieneDucha?: boolean;
   tieneBanio?: boolean;
-  urlImagen?: string | null;
+  urlImagen?: string[] | null;
   estado?: EstadoHabitacion;
-  limpieza?: EstadoLimpieza;
   notas?: string | null;
-  muebles?: CatalogoMueble[];
+  ultiLimpieza?: Date | null;
 }
 
 export interface UpdateHabitacionStatusData {
   estado?: EstadoHabitacion;
-  limpieza?: EstadoLimpieza;
+  ultiLimpieza?: Date | null;
 }
 
 export interface IHabitacionRepository {
