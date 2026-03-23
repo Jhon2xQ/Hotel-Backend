@@ -2,18 +2,14 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { CreateHabitacionUseCase } from "../../../src/application/use-cases/habitacion/create-habitacion.use-case";
 import { IHabitacionRepository } from "../../../src/domain/interfaces/habitacion.repository.interface";
 import { ITipoHabitacionRepository } from "../../../src/domain/interfaces/tipo-habitacion.repository.interface";
-import { IFurnitureCatalogRepository } from "../../../src/domain/interfaces/furniture-catalog.repository.interface";
 import { HabitacionException } from "../../../src/domain/exceptions/habitacion.exception";
 import { createMockHabitacion } from "../../helpers/habitacion-fixtures";
 import { createMockTipoHabitacion } from "../../helpers/tipo-habitacion-fixtures";
-import { createMockFurnitureCatalog } from "../../helpers/furniture-catalog-fixtures";
-import { EstadoHabitacion, EstadoLimpieza } from "../../../src/domain/entities/habitacion.entity";
 
 describe("CreateHabitacionUseCase", () => {
   let useCase: CreateHabitacionUseCase;
   let mockHabitacionRepo: IHabitacionRepository;
   let mockTipoRepo: ITipoHabitacionRepository;
-  let mockFurnitureRepo: IFurnitureCatalogRepository;
 
   beforeEach(() => {
     mockHabitacionRepo = {
@@ -31,21 +27,13 @@ describe("CreateHabitacionUseCase", () => {
       create: async () => createMockTipoHabitacion(),
       findAll: async () => [],
       findById: async () => null,
+      findByName: async () => null,
       update: async () => createMockTipoHabitacion(),
       delete: async () => {},
       hasRelatedRecords: async () => false,
     };
 
-    mockFurnitureRepo = {
-      create: async () => createMockFurnitureCatalog(),
-      findAll: async () => [],
-      findById: async () => null,
-      findByCodigo: async () => null,
-      update: async () => createMockFurnitureCatalog(),
-      delete: async () => {},
-    };
-
-    useCase = new CreateHabitacionUseCase(mockHabitacionRepo, mockTipoRepo, mockFurnitureRepo);
+    useCase = new CreateHabitacionUseCase(mockHabitacionRepo, mockTipoRepo);
   });
 
   it("should create habitacion successfully", async () => {
@@ -63,7 +51,7 @@ describe("CreateHabitacionUseCase", () => {
 
     const result = await useCase.execute({
       nro_habitacion: "101",
-      tipo_id: "tipo-test-id",
+      tipo_habitacion_id: "tipo-test-id",
       piso: 1,
       tiene_ducha: true,
       tiene_banio: true,
@@ -82,7 +70,7 @@ describe("CreateHabitacionUseCase", () => {
     await expect(
       useCase.execute({
         nro_habitacion: "101",
-        tipo_id: "non-existent-tipo",
+        tipo_habitacion_id: "non-existent-tipo",
         piso: 1,
       }),
     ).rejects.toThrow(HabitacionException);
@@ -101,58 +89,8 @@ describe("CreateHabitacionUseCase", () => {
     await expect(
       useCase.execute({
         nro_habitacion: "101",
-        tipo_id: "tipo-test-id",
+        tipo_habitacion_id: "tipo-test-id",
         piso: 1,
-      }),
-    ).rejects.toThrow(HabitacionException);
-  });
-
-  it("should create habitacion with muebles", async () => {
-    const mockTipo = createMockTipoHabitacion();
-    const mockMueble = createMockFurnitureCatalog({ id: "mueble-id" });
-    const mockHabitacion = createMockHabitacion({
-      muebles: [
-        {
-          id: "mueble-id",
-          codigo: "CAMA-001",
-          nombre: "Cama King",
-          categoria: "CAMA",
-        },
-      ],
-    });
-
-    mockTipoRepo.findById = async () => mockTipo;
-    mockHabitacionRepo.findByNumero = async () => null;
-    mockFurnitureRepo.findById = async (id: string) => {
-      if (id === "mueble-id") return mockMueble;
-      return null;
-    };
-    mockHabitacionRepo.create = async () => mockHabitacion;
-
-    const result = await useCase.execute({
-      nro_habitacion: "101",
-      tipo_id: "tipo-test-id",
-      piso: 1,
-      muebles: ["mueble-id"],
-    });
-
-    expect(result.muebles).toHaveLength(1);
-    expect(result.muebles[0].id).toBe("mueble-id");
-  });
-
-  it("should throw error if mueble not found", async () => {
-    const mockTipo = createMockTipoHabitacion();
-
-    mockTipoRepo.findById = async () => mockTipo;
-    mockHabitacionRepo.findByNumero = async () => null;
-    mockFurnitureRepo.findById = async () => null;
-
-    await expect(
-      useCase.execute({
-        nro_habitacion: "101",
-        tipo_id: "tipo-test-id",
-        piso: 1,
-        muebles: ["non-existent-mueble"],
       }),
     ).rejects.toThrow(HabitacionException);
   });

@@ -135,6 +135,17 @@ describe("TipoHabitacionRepository", () => {
         descripcion: "Descripción actualizada",
       };
 
+      const existingResult = {
+        id: "test-id",
+        nombre: "Suite Deluxe",
+        descripcion: "Suite de lujo",
+        tieneDucha: true,
+        tieneBanio: true,
+        muebles: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
       const mockResult = {
         id: "test-id",
         nombre: "Suite Deluxe Premium",
@@ -146,11 +157,13 @@ describe("TipoHabitacionRepository", () => {
         updatedAt: new Date(),
       };
 
+      mockPrisma.tipoHabitacion.findUnique.mockResolvedValue(existingResult);
       mockPrisma.tipoHabitacion.update.mockResolvedValue(mockResult);
 
       const result = await repository.update("test-id", updateData);
 
       expect(result.nombre).toBe("Suite Deluxe Premium");
+      expect(mockPrisma.tipoHabitacion.findUnique).toHaveBeenCalled();
       expect(mockPrisma.tipoHabitacion.update).toHaveBeenCalled();
     });
 
