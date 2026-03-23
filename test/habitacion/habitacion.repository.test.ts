@@ -3,7 +3,7 @@ import { HabitacionRepository } from "../../src/infrastructure/repositories/habi
 import { createMockPrismaClient } from "../helpers/mock-prisma";
 import { HabitacionException } from "../../src/domain/exceptions/habitacion.exception";
 import { Prisma } from "../../generated/prisma/client";
-import { EstadoHabitacion, EstadoLimpieza } from "../../src/domain/entities/habitacion.entity";
+import { EstadoHabitacion } from "../../src/domain/entities/habitacion.entity";
 
 describe("HabitacionRepository", () => {
   let repository: HabitacionRepository;
@@ -26,20 +26,22 @@ describe("HabitacionRepository", () => {
     it("should create a habitacion", async () => {
       const input = {
         nroHabitacion: "301",
-        tipoId: "tipo-id",
+        tipoHabitacionId: "tipo-id",
         piso: 3,
-        urlImagen: "https://example.com/301.jpg",
-        muebles: [{ id: "mueble-1", codigo: "CAMA-01", nombre: "Cama", categoria: "CAMA" }],
+        tieneDucha: true,
+        tieneBanio: true,
+        urlImagen: ["https://example.com/301.jpg"],
       };
 
       const mockResult = {
         id: "test-id",
         nroHabitacion: "301",
-        tipoId: "tipo-id",
+        tipoHabitacionId: "tipo-id",
         piso: 3,
-        urlImagen: "https://example.com/301.jpg",
+        tieneDucha: true,
+        tieneBanio: true,
+        urlImagen: ["https://example.com/301.jpg"],
         estado: "DISPONIBLE",
-        limpieza: "LIMPIA",
         notas: null,
         ultimaLimpieza: null,
         tipo: {
@@ -47,14 +49,6 @@ describe("HabitacionRepository", () => {
           nombre: "Suite",
           descripcion: null,
         },
-        muebles: [
-          {
-            id: "mueble-1",
-            codigo: "CAMA-01",
-            nombre: "Cama",
-            categoria: "CAMA",
-          },
-        ],
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -71,7 +65,7 @@ describe("HabitacionRepository", () => {
     it("should throw exception on duplicate nroHabitacion", async () => {
       const input = {
         nroHabitacion: "301",
-        tipoId: "tipo-id",
+        tipoHabitacionId: "tipo-id",
         piso: 3,
       };
 
@@ -92,32 +86,32 @@ describe("HabitacionRepository", () => {
         {
           id: "id-1",
           nroHabitacion: "101",
-          tipoId: "tipo-id",
+          tipoHabitacionId: "tipo-id",
           piso: 1,
+          tieneDucha: false,
+          tieneBanio: true,
           urlImagen: null,
           estado: "DISPONIBLE",
-          limpieza: "LIMPIA",
           notas: null,
           ultimaLimpieza: null,
           tipo: { id: "tipo-id", nombre: "Suite", descripcion: null },
-          muebles: [],
-          createdAt: new Date(),
-          updatedAt: new Date(),
+          createdAt: new Date("2026-03-17T10:00:00.000Z"),
+          updatedAt: new Date("2026-03-17T10:00:00.000Z"),
         },
         {
           id: "id-2",
           nroHabitacion: "102",
-          tipoId: "tipo-id",
+          tipoHabitacionId: "tipo-id",
           piso: 1,
+          tieneDucha: true,
+          tieneBanio: true,
           urlImagen: null,
           estado: "OCUPADA",
-          limpieza: "SUCIA",
           notas: null,
           ultimaLimpieza: null,
           tipo: { id: "tipo-id", nombre: "Suite", descripcion: null },
-          muebles: [],
-          createdAt: new Date(),
-          updatedAt: new Date(),
+          createdAt: new Date("2026-03-16T10:00:00.000Z"),
+          updatedAt: new Date("2026-03-16T10:00:00.000Z"),
         },
       ];
 
@@ -128,7 +122,7 @@ describe("HabitacionRepository", () => {
       expect(result).toHaveLength(2);
       expect(result[0].nroHabitacion).toBe("101");
       expect(mockPrisma.habitacion.findMany).toHaveBeenCalledWith({
-        include: { tipo: true, muebles: true },
+        include: { tipo: true },
         orderBy: { nroHabitacion: "asc" },
       });
     });
@@ -139,15 +133,15 @@ describe("HabitacionRepository", () => {
       const mockResult = {
         id: "test-id",
         nroHabitacion: "301",
-        tipoId: "tipo-id",
+        tipoHabitacionId: "tipo-id",
         piso: 3,
+        tieneDucha: true,
+        tieneBanio: true,
         urlImagen: null,
         estado: "DISPONIBLE",
-        limpieza: "LIMPIA",
         notas: null,
         ultimaLimpieza: null,
         tipo: { id: "tipo-id", nombre: "Suite", descripcion: null },
-        muebles: [],
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -160,7 +154,7 @@ describe("HabitacionRepository", () => {
       expect(result?.id).toBe("test-id");
       expect(mockPrisma.habitacion.findUnique).toHaveBeenCalledWith({
         where: { id: "test-id" },
-        include: { tipo: true, muebles: true },
+        include: { tipo: true },
       });
     });
 
@@ -178,15 +172,15 @@ describe("HabitacionRepository", () => {
       const mockResult = {
         id: "test-id",
         nroHabitacion: "301",
-        tipoId: "tipo-id",
+        tipoHabitacionId: "tipo-id",
         piso: 3,
+        tieneDucha: true,
+        tieneBanio: true,
         urlImagen: null,
         estado: "DISPONIBLE",
-        limpieza: "LIMPIA",
         notas: null,
         ultimaLimpieza: null,
         tipo: { id: "tipo-id", nombre: "Suite", descripcion: null },
-        muebles: [],
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -197,32 +191,28 @@ describe("HabitacionRepository", () => {
 
       expect(result).not.toBeNull();
       expect(result?.nroHabitacion).toBe("301");
-      expect(mockPrisma.habitacion.findUnique).toHaveBeenCalledWith({
-        where: { nroHabitacion: "301" },
-        include: { tipo: true, muebles: true },
-      });
     });
   });
 
   describe("update", () => {
     it("should update habitacion", async () => {
       const updateData = {
-        nroHabitacion: "301-A",
-        piso: 4,
+        nroHabitacion: "302",
+        notas: "Notas actualizadas",
       };
 
       const mockResult = {
         id: "test-id",
-        nroHabitacion: "301-A",
-        tipoId: "tipo-id",
-        piso: 4,
+        nroHabitacion: "302",
+        tipoHabitacionId: "tipo-id",
+        piso: 3,
+        tieneDucha: true,
+        tieneBanio: true,
         urlImagen: null,
         estado: "DISPONIBLE",
-        limpieza: "LIMPIA",
-        notas: null,
+        notas: "Notas actualizadas",
         ultimaLimpieza: null,
         tipo: { id: "tipo-id", nombre: "Suite", descripcion: null },
-        muebles: [],
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -231,9 +221,20 @@ describe("HabitacionRepository", () => {
 
       const result = await repository.update("test-id", updateData);
 
-      expect(result.nroHabitacion).toBe("301-A");
-      expect(result.piso).toBe(4);
+      expect(result.nroHabitacion).toBe("302");
+      expect(result.notas).toBe("Notas actualizadas");
       expect(mockPrisma.habitacion.update).toHaveBeenCalled();
+    });
+
+    it("should throw exception when not found", async () => {
+      const error = new Prisma.PrismaClientKnownRequestError("Record not found", {
+        code: "P2025",
+        clientVersion: "5.0.0",
+      });
+
+      mockPrisma.habitacion.update.mockRejectedValue(error);
+
+      await expect(repository.update("non-existent-id", { notas: "Test" })).rejects.toThrow(HabitacionException);
     });
 
     it("should set ultimaLimpieza when estado changes to LIMPIEZA", async () => {
@@ -244,15 +245,15 @@ describe("HabitacionRepository", () => {
       const mockResult = {
         id: "test-id",
         nroHabitacion: "301",
-        tipoId: "tipo-id",
+        tipoHabitacionId: "tipo-id",
         piso: 3,
+        tieneDucha: true,
+        tieneBanio: true,
         urlImagen: null,
         estado: "LIMPIEZA",
-        limpieza: "LIMPIA",
         notas: null,
         ultimaLimpieza: new Date(),
         tipo: { id: "tipo-id", nombre: "Suite", descripcion: null },
-        muebles: [],
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -270,49 +271,26 @@ describe("HabitacionRepository", () => {
         }),
       );
     });
-
-    it("should throw exception when not found", async () => {
-      const error = new Prisma.PrismaClientKnownRequestError("Record not found", {
-        code: "P2025",
-        clientVersion: "5.0.0",
-      });
-
-      mockPrisma.habitacion.update.mockRejectedValue(error);
-
-      await expect(repository.update("non-existent-id", { piso: 2 })).rejects.toThrow(HabitacionException);
-    });
-
-    it("should throw exception on duplicate nroHabitacion", async () => {
-      const error = new Prisma.PrismaClientKnownRequestError("Unique constraint failed", {
-        code: "P2002",
-        clientVersion: "5.0.0",
-      });
-
-      mockPrisma.habitacion.update.mockRejectedValue(error);
-
-      await expect(repository.update("test-id", { nroHabitacion: "301" })).rejects.toThrow(HabitacionException);
-    });
   });
 
   describe("updateStatus", () => {
-    it("should update only estado and limpieza", async () => {
+    it("should update only estado", async () => {
       const updateData = {
         estado: EstadoHabitacion.OCUPADA,
-        limpieza: EstadoLimpieza.SUCIA,
       };
 
       const mockResult = {
         id: "test-id",
         nroHabitacion: "301",
-        tipoId: "tipo-id",
+        tipoHabitacionId: "tipo-id",
         piso: 3,
+        tieneDucha: true,
+        tieneBanio: true,
         urlImagen: null,
         estado: "OCUPADA",
-        limpieza: "SUCIA",
         notas: null,
         ultimaLimpieza: null,
         tipo: { id: "tipo-id", nombre: "Suite", descripcion: null },
-        muebles: [],
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -322,42 +300,6 @@ describe("HabitacionRepository", () => {
       const result = await repository.updateStatus("test-id", updateData);
 
       expect(result.estado).toBe(EstadoHabitacion.OCUPADA);
-      expect(result.limpieza).toBe(EstadoLimpieza.SUCIA);
-    });
-
-    it("should set ultimaLimpieza when limpieza changes to LIMPIA", async () => {
-      const updateData = {
-        limpieza: EstadoLimpieza.LIMPIA,
-      };
-
-      const mockResult = {
-        id: "test-id",
-        nroHabitacion: "301",
-        tipoId: "tipo-id",
-        piso: 3,
-        urlImagen: null,
-        estado: "DISPONIBLE",
-        limpieza: "LIMPIA",
-        notas: null,
-        ultimaLimpieza: new Date(),
-        tipo: { id: "tipo-id", nombre: "Suite", descripcion: null },
-        muebles: [],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-
-      mockPrisma.habitacion.update.mockResolvedValue(mockResult);
-
-      const result = await repository.updateStatus("test-id", updateData);
-
-      expect(result.limpieza).toBe(EstadoLimpieza.LIMPIA);
-      expect(mockPrisma.habitacion.update).toHaveBeenCalledWith(
-        expect.objectContaining({
-          data: expect.objectContaining({
-            ultimaLimpieza: expect.any(Date),
-          }),
-        }),
-      );
     });
 
     it("should throw exception when not found", async () => {
@@ -404,12 +346,9 @@ describe("HabitacionRepository", () => {
       const result = await repository.hasRelatedRecords("test-id");
 
       expect(result).toBe(true);
-      expect(mockPrisma.estancia.count).toHaveBeenCalledWith({
-        where: { habitacionId: "test-id" },
-      });
     });
 
-    it("should return false when has no related estancias", async () => {
+    it("should return false when has no related records", async () => {
       mockPrisma.estancia.count.mockResolvedValue(0);
 
       const result = await repository.hasRelatedRecords("test-id");

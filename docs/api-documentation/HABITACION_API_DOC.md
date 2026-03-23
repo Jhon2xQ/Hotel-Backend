@@ -24,15 +24,6 @@ Estados operacionales de una habitación:
 - `LIMPIEZA`: Habitación en proceso de limpieza
 - `MANTENIMIENTO`: Habitación en mantenimiento, no disponible
 
-### EstadoLimpieza
-
-Estados de limpieza de una habitación:
-
-- `LIMPIA`: Habitación limpia y lista para uso
-- `SUCIA`: Habitación requiere limpieza
-- `EN_LIMPIEZA`: Habitación siendo limpiada actualmente
-- `INSPECCION`: Habitación en inspección de calidad
-
 ## Endpoints
 
 ### 1. Listar Habitaciones
@@ -53,7 +44,7 @@ Obtiene la lista completa de habitaciones del hotel.
     {
       "id": "789e4567-e89b-12d3-a456-426614174000",
       "nro_habitacion": "101",
-      "tipo_id": "123e4567-e89b-12d3-a456-426614174000",
+      "tipo_habitacion_id": "123e4567-e89b-12d3-a456-426614174000",
       "tipo": {
         "id": "123e4567-e89b-12d3-a456-426614174000",
         "nombre": "Suite Deluxe",
@@ -62,32 +53,17 @@ Obtiene la lista completa de habitaciones del hotel.
       "piso": 1,
       "tiene_ducha": true,
       "tiene_banio": true,
-      "url_imagen": "https://example.com/rooms/101.jpg",
+      "url_imagen": ["https://example.com/rooms/101-1.jpg", "https://example.com/rooms/101-2.jpg"],
       "estado": "DISPONIBLE",
-      "limpieza": "LIMPIA",
       "notas": null,
-      "ultima_limpieza": "2026-03-17T08:00:00.000Z",
-      "muebles": [
-        {
-          "id": "550e8400-e29b-41d4-a716-446655440001",
-          "codigo": "CAMA-KING-01",
-          "nombre": "Cama King Size",
-          "categoria": "CAMA"
-        },
-        {
-          "id": "550e8400-e29b-41d4-a716-446655440002",
-          "codigo": "TV-55-01",
-          "nombre": "TV 55 pulgadas",
-          "categoria": "TECNOLOGIA"
-        }
-      ],
+      "ulti_limpieza": "2026-03-17T08:00:00.000Z",
       "created_at": "2026-03-15T10:00:00.000Z",
       "updated_at": "2026-03-17T08:00:00.000Z"
     },
     {
       "id": "789e4567-e89b-12d3-a456-426614174001",
       "nro_habitacion": "102",
-      "tipo_id": "123e4567-e89b-12d3-a456-426614174001",
+      "tipo_habitacion_id": "123e4567-e89b-12d3-a456-426614174001",
       "tipo": {
         "id": "123e4567-e89b-12d3-a456-426614174001",
         "nombre": "Habitación Estándar",
@@ -98,17 +74,8 @@ Obtiene la lista completa de habitaciones del hotel.
       "tiene_banio": false,
       "url_imagen": null,
       "estado": "OCUPADA",
-      "limpieza": "SUCIA",
       "notas": "Solicitud de almohadas extra",
-      "ultima_limpieza": "2026-03-16T09:00:00.000Z",
-      "muebles": [
-        {
-          "id": "550e8400-e29b-41d4-a716-446655440003",
-          "codigo": "CAMA-DOBLE-01",
-          "nombre": "Cama Doble",
-          "categoria": "CAMA"
-        }
-      ],
+      "ulti_limpieza": "2026-03-16T09:00:00.000Z",
       "created_at": "2026-03-15T10:05:00.000Z",
       "updated_at": "2026-03-17T14:30:00.000Z"
     }
@@ -120,8 +87,9 @@ Obtiene la lista completa de habitaciones del hotel.
 **Notas:**
 
 - Las habitaciones se devuelven ordenadas por número de habitación (ascendente)
-- Cada habitación incluye el tipo de habitación asociado y la lista de muebles
-- El campo `ultima_limpieza` puede ser `null` si nunca se ha limpiado
+- Cada habitación incluye el tipo de habitación asociado
+- El campo `ulti_limpieza` puede ser `null` si nunca se ha limpiado
+- El campo `url_imagen` es un array de strings que puede contener múltiples URLs de imágenes
 
 ---
 
@@ -146,7 +114,7 @@ Obtiene los detalles de una habitación específica.
   "data": {
     "id": "789e4567-e89b-12d3-a456-426614174000",
     "nro_habitacion": "101",
-    "tipo_id": "123e4567-e89b-12d3-a456-426614174000",
+    "tipo_habitacion_id": "123e4567-e89b-12d3-a456-426614174000",
     "tipo": {
       "id": "123e4567-e89b-12d3-a456-426614174000",
       "nombre": "Suite Deluxe",
@@ -155,25 +123,10 @@ Obtiene los detalles de una habitación específica.
     "piso": 1,
     "tiene_ducha": true,
     "tiene_banio": true,
-    "url_imagen": "https://example.com/rooms/101.jpg",
+    "url_imagen": ["https://example.com/rooms/101-1.jpg", "https://example.com/rooms/101-2.jpg"],
     "estado": "DISPONIBLE",
-    "limpieza": "LIMPIA",
     "notas": null,
-    "ultima_limpieza": "2026-03-17T08:00:00.000Z",
-    "muebles": [
-      {
-        "id": "550e8400-e29b-41d4-a716-446655440001",
-        "codigo": "CAMA-KING-01",
-        "nombre": "Cama King Size",
-        "categoria": "CAMA"
-      },
-      {
-        "id": "550e8400-e29b-41d4-a716-446655440002",
-        "codigo": "TV-55-01",
-        "nombre": "TV 55 pulgadas",
-        "categoria": "TECNOLOGIA"
-      }
-    ],
+    "ulti_limpieza": "2026-03-17T08:00:00.000Z",
     "created_at": "2026-03-15T10:00:00.000Z",
     "updated_at": "2026-03-17T08:00:00.000Z"
   },
@@ -188,7 +141,7 @@ Obtiene los detalles de una habitación específica.
 ```json
 {
   "success": false,
-  "message": "Habitación con id \"789e4567-e89b-12d3-a456-426614174000\" no encontrada",
+  "message": "Habitación no encontrada",
   "data": null,
   "timestamp": 1710684600000
 }
@@ -209,30 +162,26 @@ Crea una nueva habitación física en el sistema.
 ```json
 {
   "nro_habitacion": "301",
-  "tipo_id": "123e4567-e89b-12d3-a456-426614174000",
+  "tipo_habitacion_id": "123e4567-e89b-12d3-a456-426614174000",
   "piso": 3,
   "tiene_ducha": true,
   "tiene_banio": true,
-  "url_imagen": "https://example.com/rooms/301.jpg",
+  "url_imagen": ["https://example.com/rooms/301-1.jpg", "https://example.com/rooms/301-2.jpg"],
   "estado": "DISPONIBLE",
-  "limpieza": "LIMPIA",
-  "notas": "Habitación con vista al mar",
-  "muebles": ["550e8400-e29b-41d4-a716-446655440001", "550e8400-e29b-41d4-a716-446655440002"]
+  "notas": "Habitación con vista al mar"
 }
 ```
 
 **Campos:**
 
 - `nro_habitacion` (string, requerido): Número único de habitación (máx. 10 caracteres)
-- `tipo_id` (UUID, requerido): ID del tipo de habitación
+- `tipo_habitacion_id` (UUID, requerido): ID del tipo de habitación
 - `piso` (number, requerido): Número de piso (entero positivo)
 - `tiene_ducha` (boolean, opcional): Indica si la habitación tiene ducha (default: `false`)
 - `tiene_banio` (boolean, opcional): Indica si la habitación tiene baño completo (default: `false`)
-- `url_imagen` (string, opcional): URL de imagen de la habitación (máx. 255 caracteres)
+- `url_imagen` (array de strings, opcional): URLs de imágenes de la habitación (máx. 255 caracteres cada una)
 - `estado` (EstadoHabitacion, opcional): Estado operacional (default: `DISPONIBLE`)
-- `limpieza` (EstadoLimpieza, opcional): Estado de limpieza (default: `LIMPIA`)
 - `notas` (string, opcional): Notas adicionales para el personal
-- `muebles` (array de UUIDs, opcional): Lista de IDs de muebles del catálogo
 
 **Respuesta exitosa (201):**
 
@@ -243,7 +192,7 @@ Crea una nueva habitación física en el sistema.
   "data": {
     "id": "789e4567-e89b-12d3-a456-426614174000",
     "nro_habitacion": "301",
-    "tipo_id": "123e4567-e89b-12d3-a456-426614174000",
+    "tipo_habitacion_id": "123e4567-e89b-12d3-a456-426614174000",
     "tipo": {
       "id": "123e4567-e89b-12d3-a456-426614174000",
       "nombre": "Suite Deluxe",
@@ -252,25 +201,10 @@ Crea una nueva habitación física en el sistema.
     "piso": 3,
     "tiene_ducha": true,
     "tiene_banio": true,
-    "url_imagen": "https://example.com/rooms/301.jpg",
+    "url_imagen": ["https://example.com/rooms/301-1.jpg", "https://example.com/rooms/301-2.jpg"],
     "estado": "DISPONIBLE",
-    "limpieza": "LIMPIA",
     "notas": "Habitación con vista al mar",
-    "ultima_limpieza": null,
-    "muebles": [
-      {
-        "id": "550e8400-e29b-41d4-a716-446655440001",
-        "codigo": "CAMA-KING-01",
-        "nombre": "Cama King Size",
-        "categoria": "CAMA"
-      },
-      {
-        "id": "550e8400-e29b-41d4-a716-446655440002",
-        "codigo": "TV-55-01",
-        "nombre": "TV 55 pulgadas",
-        "categoria": "TECNOLOGIA"
-      }
-    ],
+    "ulti_limpieza": null,
     "created_at": "2026-03-17T15:00:00.000Z",
     "updated_at": "2026-03-17T15:00:00.000Z"
   },
@@ -313,12 +247,23 @@ Crea una nueva habitación física en el sistema.
 }
 ```
 
+- `404`: Tipo de habitación no encontrado
+
+```json
+{
+  "success": false,
+  "message": "Tipo de habitación no encontrado",
+  "data": null,
+  "timestamp": 1710687600000
+}
+```
+
 - `409`: Número de habitación duplicado
 
 ```json
 {
   "success": false,
-  "message": "Ya existe una habitación con el número \"301\"",
+  "message": "Ya existe una habitación con ese número",
   "data": null,
   "timestamp": 1710687600000
 }
@@ -343,19 +288,13 @@ Actualiza los datos completos de una habitación existente.
 ```json
 {
   "nro_habitacion": "301-A",
-  "tipo_id": "123e4567-e89b-12d3-a456-426614174000",
+  "tipo_habitacion_id": "123e4567-e89b-12d3-a456-426614174000",
   "piso": 3,
   "tiene_ducha": true,
   "tiene_banio": false,
-  "url_imagen": "https://example.com/rooms/301-a.jpg",
+  "url_imagen": ["https://example.com/rooms/301-a-1.jpg"],
   "estado": "MANTENIMIENTO",
-  "limpieza": "EN_LIMPIEZA",
-  "notas": "Reparación de aire acondicionado programada",
-  "muebles": [
-    "550e8400-e29b-41d4-a716-446655440001",
-    "550e8400-e29b-41d4-a716-446655440002",
-    "550e8400-e29b-41d4-a716-446655440005"
-  ]
+  "notas": "Reparación de aire acondicionado programada"
 }
 ```
 
@@ -370,7 +309,7 @@ Actualiza los datos completos de una habitación existente.
   "data": {
     "id": "789e4567-e89b-12d3-a456-426614174000",
     "nro_habitacion": "301-A",
-    "tipo_id": "123e4567-e89b-12d3-a456-426614174000",
+    "tipo_habitacion_id": "123e4567-e89b-12d3-a456-426614174000",
     "tipo": {
       "id": "123e4567-e89b-12d3-a456-426614174000",
       "nombre": "Suite Deluxe",
@@ -379,31 +318,10 @@ Actualiza los datos completos de una habitación existente.
     "piso": 3,
     "tiene_ducha": true,
     "tiene_banio": false,
-    "url_imagen": "https://example.com/rooms/301-a.jpg",
+    "url_imagen": ["https://example.com/rooms/301-a-1.jpg"],
     "estado": "MANTENIMIENTO",
-    "limpieza": "EN_LIMPIEZA",
     "notas": "Reparación de aire acondicionado programada",
-    "ultima_limpieza": "2026-03-17T08:00:00.000Z",
-    "muebles": [
-      {
-        "id": "550e8400-e29b-41d4-a716-446655440001",
-        "codigo": "CAMA-KING-01",
-        "nombre": "Cama King Size",
-        "categoria": "CAMA"
-      },
-      {
-        "id": "550e8400-e29b-41d4-a716-446655440002",
-        "codigo": "TV-55-01",
-        "nombre": "TV 55 pulgadas",
-        "categoria": "TECNOLOGIA"
-      },
-      {
-        "id": "550e8400-e29b-41d4-a716-446655440005",
-        "codigo": "MINIBAR-01",
-        "nombre": "Minibar",
-        "categoria": "AMENIDADES"
-      }
-    ],
+    "ulti_limpieza": "2026-03-17T08:00:00.000Z",
     "created_at": "2026-03-15T10:00:00.000Z",
     "updated_at": "2026-03-17T16:00:00.000Z"
   },
@@ -416,12 +334,12 @@ Actualiza los datos completos de una habitación existente.
 - `400`: Datos de entrada inválidos
 - `401`: No autenticado
 - `403`: No autorizado (requiere rol ADMIN)
-- `404`: Habitación no encontrada
+- `404`: Habitación o tipo de habitación no encontrado
 
 ```json
 {
   "success": false,
-  "message": "Habitación con id \"789e4567-e89b-12d3-a456-426614174000\" no encontrada",
+  "message": "Habitación no encontrada",
   "data": null,
   "timestamp": 1710691200000
 }
@@ -432,7 +350,7 @@ Actualiza los datos completos de una habitación existente.
 ```json
 {
   "success": false,
-  "message": "Ya existe una habitación con el número \"301-A\"",
+  "message": "Ya existe una habitación con ese número",
   "data": null,
   "timestamp": 1710691200000
 }
@@ -441,15 +359,14 @@ Actualiza los datos completos de una habitación existente.
 **Notas:**
 
 - Solo se actualizan los campos proporcionados en el body
-- Si se proporciona el array `muebles`, se reemplaza completamente la lista de muebles asociados
 - El campo `updated_at` se actualiza automáticamente
-- Si el estado cambia a `LIMPIEZA`, el campo `ultima_limpieza` se actualiza automáticamente
+- Si el estado cambia a `LIMPIEZA`, el campo `ulti_limpieza` se actualiza automáticamente con la fecha/hora actual
 
 ---
 
 ### 5. Actualizar Estado de Habitación
 
-Actualiza únicamente los estados operacional y de limpieza de una habitación. Este endpoint está disponible para todos los usuarios autenticados (no requiere rol ADMIN).
+Actualiza únicamente el estado operacional de una habitación. Este endpoint está disponible para todos los usuarios autenticados (no requiere rol ADMIN).
 
 **Endpoint:** `PATCH /api/habitaciones/:id/estado`
 
@@ -464,14 +381,14 @@ Actualiza únicamente los estados operacional y de limpieza de una habitación. 
 ```json
 {
   "estado": "OCUPADA",
-  "limpieza": "LIMPIA"
+  "ulti_limpieza": "2026-03-17T17:00:00.000Z"
 }
 ```
 
 **Campos:**
 
 - `estado` (EstadoHabitacion, opcional): Nuevo estado operacional
-- `limpieza` (EstadoLimpieza, opcional): Nuevo estado de limpieza
+- `ulti_limpieza` (string ISO 8601, opcional): Fecha y hora de última limpieza
 - **Nota:** Debe proporcionar al menos uno de los dos campos
 
 **Respuesta exitosa (200):**
@@ -483,7 +400,7 @@ Actualiza únicamente los estados operacional y de limpieza de una habitación. 
   "data": {
     "id": "789e4567-e89b-12d3-a456-426614174000",
     "nro_habitacion": "301",
-    "tipo_id": "123e4567-e89b-12d3-a456-426614174000",
+    "tipo_habitacion_id": "123e4567-e89b-12d3-a456-426614174000",
     "tipo": {
       "id": "123e4567-e89b-12d3-a456-426614174000",
       "nombre": "Suite Deluxe",
@@ -492,19 +409,10 @@ Actualiza únicamente los estados operacional y de limpieza de una habitación. 
     "piso": 3,
     "tiene_ducha": true,
     "tiene_banio": true,
-    "url_imagen": "https://example.com/rooms/301.jpg",
+    "url_imagen": ["https://example.com/rooms/301.jpg"],
     "estado": "OCUPADA",
-    "limpieza": "LIMPIA",
     "notas": "Habitación con vista al mar",
-    "ultima_limpieza": "2026-03-17T17:00:00.000Z",
-    "muebles": [
-      {
-        "id": "550e8400-e29b-41d4-a716-446655440001",
-        "codigo": "CAMA-KING-01",
-        "nombre": "Cama King Size",
-        "categoria": "CAMA"
-      }
-    ],
+    "ulti_limpieza": "2026-03-17T17:00:00.000Z",
     "created_at": "2026-03-15T10:00:00.000Z",
     "updated_at": "2026-03-17T17:00:00.000Z"
   },
@@ -541,7 +449,7 @@ Actualiza únicamente los estados operacional y de limpieza de una habitación. 
 ```json
 {
   "success": false,
-  "message": "Habitación con id \"789e4567-e89b-12d3-a456-426614174000\" no encontrada",
+  "message": "Habitación no encontrada",
   "data": null,
   "timestamp": 1710694800000
 }
@@ -550,7 +458,6 @@ Actualiza únicamente los estados operacional y de limpieza de una habitación. 
 **Notas:**
 
 - Este endpoint NO requiere rol ADMIN, permitiendo al personal de limpieza y recepción actualizar estados
-- Cuando `limpieza` cambia a `LIMPIA`, el campo `ultima_limpieza` se actualiza automáticamente con la fecha/hora actual
 - Solo actualiza los campos de estado, no modifica otros datos de la habitación
 - El campo `updated_at` se actualiza automáticamente
 
@@ -588,7 +495,7 @@ Elimina una habitación del sistema.
 ```json
 {
   "success": false,
-  "message": "Habitación con id \"789e4567-e89b-12d3-a456-426614174000\" no encontrada",
+  "message": "Habitación no encontrada",
   "data": null,
   "timestamp": 1710694800000
 }
@@ -599,7 +506,7 @@ Elimina una habitación del sistema.
 ```json
 {
   "success": false,
-  "message": "No se puede eliminar la habitación porque tiene registros relacionados (estancias)",
+  "message": "No se puede eliminar la habitación porque tiene registros relacionados",
   "data": null,
   "timestamp": 1710694800000
 }
@@ -619,7 +526,7 @@ Elimina una habitación del sistema.
 | 400    | Datos de entrada inválidos (validación de Zod)              |
 | 401    | No autenticado (sesión inválida o inexistente)              |
 | 403    | No autorizado (requiere rol ADMIN)                          |
-| 404    | Habitación no encontrada                                    |
+| 404    | Habitación o tipo de habitación no encontrado               |
 | 409    | Conflicto (número duplicado o tiene registros relacionados) |
 | 500    | Error interno del servidor                                  |
 
@@ -636,7 +543,7 @@ Elimina una habitación del sistema.
 - **Único**: Sí (no puede haber dos habitaciones con el mismo número)
 - **Ejemplo**: "101", "202", "301-A", "SUITE-01"
 
-### Campo `tipo_id`
+### Campo `tipo_habitacion_id`
 
 - **Requerido**: Sí
 - **Tipo**: UUID
@@ -667,21 +574,15 @@ Elimina una habitación del sistema.
 ### Campo `url_imagen`
 
 - **Requerido**: No
-- **Tipo**: String
-- **Longitud máxima**: 255 caracteres
-- **Ejemplo**: "https://example.com/rooms/301.jpg"
+- **Tipo**: Array de strings
+- **Longitud máxima por URL**: 255 caracteres
+- **Ejemplo**: `["https://example.com/rooms/301-1.jpg", "https://example.com/rooms/301-2.jpg"]`
 
 ### Campo `estado`
 
 - **Requerido**: No (default: `DISPONIBLE`)
 - **Tipo**: Enum EstadoHabitacion
 - **Valores**: `DISPONIBLE`, `RESERVADA`, `OCUPADA`, `LIMPIEZA`, `MANTENIMIENTO`
-
-### Campo `limpieza`
-
-- **Requerido**: No (default: `LIMPIA`)
-- **Tipo**: Enum EstadoLimpieza
-- **Valores**: `LIMPIA`, `SUCIA`, `EN_LIMPIEZA`, `INSPECCION`
 
 ### Campo `notas`
 
@@ -690,12 +591,12 @@ Elimina una habitación del sistema.
 - **Longitud máxima**: Sin límite
 - **Ejemplo**: "Solicitud de almohadas extra", "Aire acondicionado en reparación"
 
-### Campo `muebles`
+### Campo `ulti_limpieza`
 
 - **Requerido**: No
-- **Tipo**: Array de UUIDs
-- **Validación**: Cada UUID debe corresponder a un mueble existente en el catálogo
-- **Ejemplo**: `["550e8400-e29b-41d4-a716-446655440001", "550e8400-e29b-41d4-a716-446655440002"]`
+- **Tipo**: String (formato ISO 8601)
+- **Ejemplo**: "2026-03-17T17:00:00.000Z"
+- **Nota**: Se actualiza automáticamente cuando el estado cambia a `LIMPIEZA`
 
 ---
 
@@ -704,13 +605,8 @@ Elimina una habitación del sistema.
 - Las habitaciones representan las unidades físicas del hotel con número y ubicación específicos
 - Cada habitación está asociada a un tipo de habitación que define sus características
 - Los campos `tiene_ducha` y `tiene_banio` permiten especificar las instalaciones sanitarias de cada habitación individual
-- El sistema mantiene dos estados independientes:
-  - **Estado operacional** (`estado`): Disponibilidad para reservas y ocupación
-  - **Estado de limpieza** (`limpieza`): Estado del servicio de housekeeping
-- El campo `ultima_limpieza` se actualiza automáticamente cuando:
-  - El estado de limpieza cambia a `LIMPIA` (vía PATCH /estado)
-  - El estado operacional cambia a `LIMPIEZA` (vía PUT)
-- La lista de muebles asociados se reemplaza completamente al actualizar (no se hace merge)
+- El campo `ulti_limpieza` se actualiza automáticamente cuando el estado cambia a `LIMPIEZA` (vía PUT)
+- El campo `url_imagen` es un array que permite almacenar múltiples imágenes de la habitación
 - Los campos `created_at` y `updated_at` se gestionan automáticamente por el sistema
 - No se puede eliminar una habitación si tiene estancias asociadas
 - El endpoint PATCH `/habitaciones/:id/estado` está disponible para todos los usuarios autenticados, permitiendo al personal actualizar estados sin necesidad de permisos de administrador
@@ -728,14 +624,14 @@ curl -X POST https://api.hotel.com/api/habitaciones \
   -H "Authorization: Bearer <token>" \
   -d '{
     "nro_habitacion": "101",
-    "tipo_id": "123e4567-e89b-12d3-a456-426614174000",
+    "tipo_habitacion_id": "123e4567-e89b-12d3-a456-426614174000",
     "piso": 1,
     "tiene_ducha": true,
     "tiene_banio": false
   }'
 ```
 
-### Crear una habitación completa con muebles
+### Crear una habitación completa con imágenes
 
 ```bash
 curl -X POST https://api.hotel.com/api/habitaciones \
@@ -743,29 +639,17 @@ curl -X POST https://api.hotel.com/api/habitaciones \
   -H "Authorization: Bearer <token>" \
   -d '{
     "nro_habitacion": "301",
-    "tipo_id": "123e4567-e89b-12d3-a456-426614174000",
+    "tipo_habitacion_id": "123e4567-e89b-12d3-a456-426614174000",
     "piso": 3,
     "tiene_ducha": true,
     "tiene_banio": true,
-    "url_imagen": "https://example.com/rooms/301.jpg",
+    "url_imagen": [
+      "https://example.com/rooms/301-1.jpg",
+      "https://example.com/rooms/301-2.jpg",
+      "https://example.com/rooms/301-3.jpg"
+    ],
     "estado": "DISPONIBLE",
-    "limpieza": "LIMPIA",
-    "notas": "Habitación con vista al mar",
-    "muebles": [
-      "550e8400-e29b-41d4-a716-446655440001",
-      "550e8400-e29b-41d4-a716-446655440002"
-    ]
-  }'
-```
-
-### Actualizar estado de limpieza (personal de limpieza)
-
-```bash
-curl -X PATCH https://api.hotel.com/api/habitaciones/789e4567-e89b-12d3-a456-426614174000/estado \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <token>" \
-  -d '{
-    "limpieza": "LIMPIA"
+    "notas": "Habitación con vista al mar"
   }'
 ```
 
@@ -780,15 +664,14 @@ curl -X PATCH https://api.hotel.com/api/habitaciones/789e4567-e89b-12d3-a456-426
   }'
 ```
 
-### Actualizar ambos estados simultáneamente
+### Actualizar fecha de limpieza
 
 ```bash
 curl -X PATCH https://api.hotel.com/api/habitaciones/789e4567-e89b-12d3-a456-426614174000/estado \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <token>" \
   -d '{
-    "estado": "DISPONIBLE",
-    "limpieza": "LIMPIA"
+    "ulti_limpieza": "2026-03-17T17:00:00.000Z"
   }'
 ```
 

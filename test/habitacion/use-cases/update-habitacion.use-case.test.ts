@@ -29,7 +29,8 @@ describe("UpdateHabitacionUseCase", () => {
     mockTipoRepo = {
       create: async () => createMockTipoHabitacion(),
       findAll: async () => [],
-      findById: async () => null,
+      findById: async () => createMockTipoHabitacion(),
+      findByName: async () => null,
       update: async () => createMockTipoHabitacion(),
       delete: async () => {},
       hasRelatedRecords: async () => false,
@@ -104,7 +105,7 @@ describe("UpdateHabitacionUseCase", () => {
 
     await expect(
       useCase.execute("test-id", {
-        tipo_id: "non-existent-tipo",
+        tipo_habitacion_id: "non-existent-tipo",
       }),
     ).rejects.toThrow(HabitacionException);
   });

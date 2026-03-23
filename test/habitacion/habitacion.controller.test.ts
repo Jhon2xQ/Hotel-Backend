@@ -7,7 +7,7 @@ import { UpdateHabitacionUseCase } from "../../src/application/use-cases/habitac
 import { UpdateHabitacionStatusUseCase } from "../../src/application/use-cases/habitacion/update-habitacion-status.use-case";
 import { DeleteHabitacionUseCase } from "../../src/application/use-cases/habitacion/delete-habitacion.use-case";
 import { createMockContext } from "../helpers/mock-context";
-import { EstadoHabitacion, EstadoLimpieza } from "../../src/domain/entities/habitacion.entity";
+import { EstadoHabitacion } from "../../src/domain/entities/habitacion.entity";
 
 describe("HabitacionController", () => {
   let controller: HabitacionController;
@@ -41,22 +41,22 @@ describe("HabitacionController", () => {
       const mockContext = createMockContext();
       const input = {
         nro_habitacion: "301",
-        tipo_id: "tipo-id",
+        tipo_habitacion_id: "tipo-id",
         piso: 3,
       };
 
       const mockOutput = {
         id: "test-id",
         nro_habitacion: "301",
-        tipo_id: "tipo-id",
+        tipo_habitacion_id: "tipo-id",
         tipo: { id: "tipo-id", nombre: "Suite Deluxe", descripcion: "Suite de lujo" },
         piso: 3,
+        tiene_ducha: false,
+        tiene_banio: false,
         url_imagen: null,
         estado: "DISPONIBLE",
-        limpieza: "LIMPIA",
         notas: null,
-        ultima_limpieza: null,
-        muebles: [],
+        ulti_limpieza: null,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
@@ -84,15 +84,15 @@ describe("HabitacionController", () => {
         {
           id: "id-1",
           nro_habitacion: "301",
-          tipo_id: "tipo-id",
+          tipo_habitacion_id: "tipo-id",
           tipo: { id: "tipo-id", nombre: "Suite Deluxe", descripcion: "Suite de lujo" },
           piso: 3,
+          tiene_ducha: false,
+          tiene_banio: false,
           url_imagen: null,
           estado: "DISPONIBLE",
-          limpieza: "LIMPIA",
           notas: null,
-          ultima_limpieza: null,
-          muebles: [],
+          ulti_limpieza: null,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         },
@@ -162,15 +162,15 @@ describe("HabitacionController", () => {
       const mockOutput = {
         id: "test-id",
         nro_habitacion: "302",
-        tipo_id: "tipo-id",
+        tipo_habitacion_id: "tipo-id",
         tipo: { id: "tipo-id", nombre: "Suite Deluxe", descripcion: "Suite de lujo" },
         piso: 3,
+        tiene_ducha: false,
+        tiene_banio: false,
         url_imagen: null,
         estado: "DISPONIBLE",
-        limpieza: "LIMPIA",
         notas: "Notas actualizadas",
-        ultima_limpieza: null,
-        muebles: [],
+        ulti_limpieza: null,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
@@ -198,21 +198,20 @@ describe("HabitacionController", () => {
 
       const input = {
         estado: EstadoHabitacion.OCUPADA,
-        limpieza: EstadoLimpieza.SUCIA,
       };
 
       const mockOutput = {
         id: "test-id",
         nro_habitacion: "301",
-        tipo_id: "tipo-id",
+        tipo_habitacion_id: "tipo-id",
         tipo: { id: "tipo-id", nombre: "Suite Deluxe", descripcion: "Suite de lujo" },
         piso: 3,
+        tiene_ducha: false,
+        tiene_banio: false,
         url_imagen: null,
         estado: "OCUPADA",
-        limpieza: "SUCIA",
         notas: null,
-        ultima_limpieza: null,
-        muebles: [],
+        ulti_limpieza: null,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
