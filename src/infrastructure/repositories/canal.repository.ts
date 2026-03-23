@@ -87,8 +87,8 @@ export class CanalRepository implements ICanalRepository {
   }
 
   async hasRelatedRecords(id: string): Promise<boolean> {
-    const reservaCount = await this.prisma.reserva.count({ where: { canalId: id } });
-    return reservaCount > 0;
+    const tarifaCount = await this.prisma.tarifa.count({ where: { canalId: id } });
+    return tarifaCount > 0;
   }
 
   async findByName(nombre: string): Promise<Canal | null> {
