@@ -279,7 +279,6 @@ model Canal {
   createdAt DateTime  @default(now()) @db.Timestamptz
   updatedAt DateTime  @updatedAt @db.Timestamptz
 
-  reservas Reserva[]
   tarifas  Tarifa[]
 
   @@map("canales")
@@ -366,6 +365,7 @@ model Habitacion {
 
   muebles          Mueble[]
   tipo             TipoHabitacion    @relation(fields: [tipoHabitacionId], references: [id])
+  reservas         Reserva[]
   
   @@map("habitaciones")
 }
@@ -380,12 +380,13 @@ model Tarifa {
   precioNoche       Decimal  @db.Decimal(10, 2)
   IVA               Decimal? @db.Decimal(4, 2)
   cargoServicios    Decimal? @db.Decimal(4, 2)
-  moneda            String   @default("SOL") @db.Char(3)
+  moneda            String   @default("USD") @db.Char(3)
   createdAt         DateTime @default(now()) @db.Timestamptz
   updatedAt         DateTime @updatedAt @db.Timestamptz
 
   tipoHabitacion TipoHabitacion @relation(fields: [tipoHabitacionId], references: [id])
   canal          Canal          @relation(fields: [canalId], references: [id])
+  reservas       Reserva[]
 
   @@map("tarifas")
 }
@@ -446,30 +447,59 @@ model Servicio {
 model Reserva {
   id           String        @id @default(uuid()) @db.Uuid
   codigo       String        @unique @db.VarChar(20)
+  
+  // Relaciones
   huespedId    String        @db.Uuid
-  canalId      String?        @db.Uuid
   habitacionId String        @db.Uuid 
-  planId       String?        @db.Uuid
+  tarifaId     String        @db.Uuid
   pagoId       String?       @unique @db.Uuid
 
-  fechaEntrada DateTime      @db.Date
-  fechaSalida  DateTime      @db.Date
+  // Fechas
+  fechaEntrada DateTime      @db.Timestamptz
+  fechaSalida  DateTime      @db.Timestamptz
 
-  adultos      Int           @default(1)
-  ninos        Int           @default(0)
+  // Ocupación
+  adultos      Int           @default(1) @db.SmallInt
+  ninos        Int           @default(0) @db.SmallInt
 
+  // Snapshot (desnormalización)
+  nombreHuesped   String     @db.VarChar(100)
+  nroHabitacion   String     @db.VarChar(10)
+  nombreTipoHab   String     @db.VarChar(100)
+  nombreCanal     String     @db.VarChar(50)
+
+  // Precios
+  precioNoche     Decimal    @db.Decimal(10, 2)
+  IVA             Decimal    @default(0) @db.Decimal(4, 2)
+  cargoServicios  Decimal    @default(0) @db.Decimal(4, 2)
+
+  // Totales
+  montoTotal      Decimal    @db.Decimal(10, 2)
+  montoDescuento  Decimal    @default(0) @db.Decimal(10, 2)
+  montoFinal      Decimal?   @db.Decimal(10, 2)
+
+  // Estado
   estado       EstadoReserva @default(TENTATIVA)
   motivoCancel String?       @db.Text
   canceladoEn  DateTime?     @db.Timestamptz
+  
+  // Auditoría
   createdAt    DateTime      @default(now()) @db.Timestamptz
   updatedAt    DateTime      @updatedAt @db.Timestamptz
 
-  huesped    Huesped    @relation(fields: [huespedId], references: [id])
-  canal      Canal?     @relation(fields: [canalId], references: [id])
+  // Relaciones
+  huesped      Huesped       @relation(fields: [huespedId], references: [id])
+  habitacion   Habitacion    @relation(fields: [habitacionId], references: [id])
+  tarifa       Tarifa        @relation(fields: [tarifaId], references: [id])
+  pago         Pago?         @relation("PagoReserva", fields: [pagoId], references: [id])
+  estancias    Estancia[]
 
-  pago      Pago?       @relation("PagoReserva", fields: [pagoId], references: [id])
-  estancias Estancia[]
-
+  @@index([huespedId])
+  @@index([habitacionId])
+  @@index([tarifaId])
+  @@index([fechaEntrada])
+  @@index([fechaSalida])
+  @@index([estado])
   @@map("reservas")
 }
 
