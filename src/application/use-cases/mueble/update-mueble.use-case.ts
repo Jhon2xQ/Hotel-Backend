@@ -1,40 +1,39 @@
-import { IFurnitureCatalogRepository } from "../../../domain/interfaces/furniture-catalog.repository.interface";
+import { IMuebleRepository } from "../../../domain/interfaces/mueble.repository.interface";
 import { IHabitacionRepository } from "../../../domain/interfaces/habitacion.repository.interface";
-import { FurnitureCatalogException } from "../../../domain/exceptions/furniture-catalog.exception";
-import { UpdateFurnitureCatalogInput, FurnitureCatalogOutput } from "../../dtos/furniture-catalog.dto";
+import { MuebleException } from "../../../domain/exceptions/mueble.exception";
+import { UpdateMuebleInput, MuebleOutput } from "../../dtos/mueble.dto";
 
-export class UpdateFurnitureCatalogUseCase {
+export class UpdateMuebleUseCase {
   constructor(
-    private repository: IFurnitureCatalogRepository,
+    private repository: IMuebleRepository,
     private habitacionRepository: IHabitacionRepository,
   ) {}
 
-  async execute(id: string, input: UpdateFurnitureCatalogInput): Promise<FurnitureCatalogOutput> {
+  async execute(id: string, input: UpdateMuebleInput): Promise<MuebleOutput> {
     const existing = await this.repository.findById(id);
     if (!existing) {
-      throw FurnitureCatalogException.notFoundById();
+      throw MuebleException.notFoundById();
     }
 
     if (input.codigo && input.codigo !== existing.codigo) {
       const duplicate = await this.repository.findByCodigo(input.codigo);
       if (duplicate) {
-        throw FurnitureCatalogException.duplicateCodigo();
+        throw MuebleException.duplicateCodigo();
       }
     }
 
     if (input.habitacion_id !== undefined && input.habitacion_id !== null) {
       const habitacion = await this.habitacionRepository.findById(input.habitacion_id);
       if (!habitacion) {
-        throw FurnitureCatalogException.habitacionNotFound();
+        throw MuebleException.habitacionNotFound();
       }
     }
 
     const updateData: any = {};
     if (input.codigo !== undefined) updateData.codigo = input.codigo;
     if (input.nombre !== undefined) updateData.nombre = input.nombre;
-    if (input.categoria !== undefined) updateData.categoria = input.categoria;
+    if (input.categoria_id !== undefined) updateData.categoriaId = input.categoria_id;
     if (input.imagen_url !== undefined) updateData.imagenUrl = input.imagen_url ?? null;
-    if (input.tipo !== undefined) updateData.tipo = input.tipo ?? null;
     if (input.condicion !== undefined) updateData.condicion = input.condicion;
     if (input.fecha_adquisicion !== undefined) {
       updateData.fechaAdq = input.fecha_adquisicion ? new Date(input.fecha_adquisicion) : null;

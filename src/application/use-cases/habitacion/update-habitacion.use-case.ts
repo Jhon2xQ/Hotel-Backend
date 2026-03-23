@@ -1,6 +1,6 @@
 import { IHabitacionRepository } from "../../../domain/interfaces/habitacion.repository.interface";
 import { ITipoHabitacionRepository } from "../../../domain/interfaces/tipo-habitacion.repository.interface";
-import { IFurnitureCatalogRepository } from "../../../domain/interfaces/furniture-catalog.repository.interface";
+import { IMuebleRepository } from "../../../domain/interfaces/mueble.repository.interface";
 import { HabitacionException } from "../../../domain/exceptions/habitacion.exception";
 import { UpdateHabitacionInput, HabitacionOutput } from "../../dtos/habitacion.dto";
 import type { CatalogoMueble } from "../../../domain/entities/tipo-habitacion.entity";
@@ -9,7 +9,7 @@ export class UpdateHabitacionUseCase {
   constructor(
     private repository: IHabitacionRepository,
     private tipoHabitacionRepository: ITipoHabitacionRepository,
-    private furnitureRepository: IFurnitureCatalogRepository,
+    private furnitureRepository: IMuebleRepository,
   ) {}
 
   async execute(id: string, input: UpdateHabitacionInput): Promise<HabitacionOutput> {

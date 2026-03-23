@@ -1,84 +1,83 @@
 import { PrismaClient } from "../../../generated/prisma/client";
 import { Prisma } from "../../../generated/prisma/client";
 import {
-  FurnitureCatalog,
-  FurnitureCategory,
-  FurnitureCondition,
-  CreateFurnitureCatalogData,
-} from "../../domain/entities/furniture-catalog.entity";
+  Mueble,
+  MuebleCondition,
+  CreateMuebleData,
+  CategoriaMuebleBasic,
+  HabitacionBasic,
+} from "../../domain/entities/mueble.entity";
 import {
-  IFurnitureCatalogRepository,
-  UpdateFurnitureCatalogData,
-} from "../../domain/interfaces/furniture-catalog.repository.interface";
-import { FurnitureCatalogException } from "../../domain/exceptions/furniture-catalog.exception";
+  IMuebleRepository,
+  UpdateMuebleData,
+} from "../../domain/interfaces/mueble.repository.interface";
+import { MuebleException } from "../../domain/exceptions/mueble.exception";
 
-export class FurnitureCatalogRepository implements IFurnitureCatalogRepository {
+export class MuebleRepository implements IMuebleRepository {
   constructor(private prisma: PrismaClient) {}
 
-  async create(data: CreateFurnitureCatalogData): Promise<FurnitureCatalog> {
+  async create(data: CreateMuebleData): Promise<Mueble> {
     try {
-      const result = await this.prisma.catalogoMueble.create({
+      const result = await this.prisma.mueble.create({
         data: {
           codigo: data.codigo,
           nombre: data.nombre,
-          categoria: data.categoria,
+          descripcion: data.descripcion ?? null,
+          categoriaId: data.categoriaId,
           imagenUrl: data.imagenUrl ?? null,
-          tipo: data.tipo ?? null,
-          condicion: data.condicion ?? FurnitureCondition.Bueno,
+          condicion: data.condicion ?? MuebleCondition.Bueno,
           fechaAdq: data.fechaAdq ?? null,
           ultimaRevision: data.ultimaRevision ?? null,
-          descripcion: data.descripcion ?? null,
-          habitacionId: data.habitacionId ?? null,
+          habitacionId: data.habitacionId,
         },
       });
       return this.toDomain(result);
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === "P2002") {
-          throw FurnitureCatalogException.duplicateCodigo();
+          throw MuebleException.duplicateCodigo();
         }
       }
       throw error;
     }
   }
 
-  async findAll(): Promise<FurnitureCatalog[]> {
-    const results = await this.prisma.catalogoMueble.findMany({
+  async findAll(): Promise<Mueble[]> {
+    const results = await this.prisma.mueble.findMany({
       orderBy: { nombre: "asc" },
     });
     return results.map((r) => this.toDomain(r));
   }
 
-  async findById(id: string): Promise<FurnitureCatalog | null> {
-    const result = await this.prisma.catalogoMueble.findUnique({
+  async findById(id: string): Promise<Mueble | null> {
+    const result = await this.prisma.mueble.findUnique({
       where: { id },
     });
     return result ? this.toDomain(result) : null;
   }
 
-  async findByCodigo(codigo: string): Promise<FurnitureCatalog | null> {
-    const result = await this.prisma.catalogoMueble.findUnique({
+  async findByCodigo(codigo: string): Promise<Mueble | null> {
+    const result = await this.prisma.mueble.findUnique({
       where: { codigo },
     });
     return result ? this.toDomain(result) : null;
   }
 
-  async update(id: string, data: UpdateFurnitureCatalogData): Promise<FurnitureCatalog> {
+  async update(id: string, data: UpdateMuebleData): Promise<Mueble> {
     try {
       const updateData: any = {};
 
       if (data.codigo !== undefined) updateData.codigo = data.codigo;
       if (data.nombre !== undefined) updateData.nombre = data.nombre;
-      if (data.categoria !== undefined) updateData.categoria = data.categoria;
+      if (data.categoriaId !== undefined) updateData.categoriaId = data.categoriaId;
       if (data.imagenUrl !== undefined) updateData.imagenUrl = data.imagenUrl ?? null;
-      if (data.tipo !== undefined) updateData.tipo = data.tipo ?? null;
       if (data.condicion !== undefined) updateData.condicion = data.condicion;
       if (data.fechaAdq !== undefined) updateData.fechaAdq = data.fechaAdq ?? null;
       if (data.ultimaRevision !== undefined) updateData.ultimaRevision = data.ultimaRevision ?? null;
       if (data.descripcion !== undefined) updateData.descripcion = data.descripcion ?? null;
-      if (data.habitacionId !== undefined) updateData.habitacionId = data.habitacionId ?? null;
+      if (data.habitacionId !== undefined) updateData.habitacionId = data.habitacionId;
 
-      const result = await this.prisma.catalogoMueble.update({
+      const result = await this.prisma.mueble.update({
         where: { id },
         data: updateData,
       });
@@ -86,10 +85,10 @@ export class FurnitureCatalogRepository implements IFurnitureCatalogRepository {
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === "P2002") {
-          throw FurnitureCatalogException.duplicateCodigo();
+          throw MuebleException.duplicateCodigo();
         }
         if (error.code === "P2025") {
-          throw FurnitureCatalogException.notFoundById();
+          throw MuebleException.notFoundById();
         }
       }
       throw error;
@@ -98,32 +97,50 @@ export class FurnitureCatalogRepository implements IFurnitureCatalogRepository {
 
   async delete(id: string): Promise<void> {
     try {
-      await this.prisma.catalogoMueble.delete({
+      await this.prisma.mueble.delete({
         where: { id },
       });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === "P2025") {
-          throw FurnitureCatalogException.notFoundById();
+          throw MuebleException.notFoundById();
         }
       }
       throw error;
     }
   }
 
-  private toDomain(data: any): FurnitureCatalog {
-    return new FurnitureCatalog(
+  private toDomain(data: any): Mueble {
+    const cataegoria: CategoriaMuebleBasic | null = data.categoria
+      ? {
+          id: data.categoria.id,
+          nombre: data.categoria.nombre,
+          descripcion: data.categoria.descripcion,
+          activo: data.categoria.activo,
+        }
+      : null;
+
+    const habitacion: HabitacionBasic | null = data.habitacion
+       ? {
+          id: data.habitacion.id,
+          nroHabitacion: data.habitacion.nro_habitacion,
+          piso: data.habitacion.piso,
+        }
+      : null;
+      
+    return new Mueble(
       data.id,
       data.codigo,
       data.nombre,
-      data.categoria as FurnitureCategory,
+      data.descripcion,
+      data.categoriaId,
+      cataegoria,
       data.imagenUrl,
-      data.tipo,
-      data.condicion as FurnitureCondition,
+      data.condicion as MuebleCondition,
       data.fechaAdq,
       data.ultimaRevision,
-      data.descripcion,
       data.habitacionId,
+      habitacion,
       data.createdAt,
       data.updatedAt,
     );

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const FurnitureCategorySchema = z.enum([
+export const MuebleCategorySchema = z.enum([
   "CAMA",
   "ASIENTO",
   "ALMACENAJE",
@@ -10,28 +10,26 @@ export const FurnitureCategorySchema = z.enum([
   "OTRO",
 ]);
 
-export const FurnitureConditionSchema = z.enum(["BUENO", "REGULAR", "DANADO", "FALTANTE"]);
+export const MuebleConditionSchema = z.enum(["BUENO", "REGULAR", "DANADO", "FALTANTE"]);
 
-export const CreateFurnitureCatalogSchema = z.object({
+export const CreateMuebleSchema = z.object({
   codigo: z.string().min(1, "El código es requerido").max(30, "El código no puede exceder 30 caracteres"),
   nombre: z.string().min(1, "El nombre es requerido").max(100, "El nombre no puede exceder 100 caracteres"),
-  categoria: FurnitureCategorySchema,
+  categoria_id: z.uuid("La categoria debe ser un UUID valido").optional(),
   imagen_url: z.string().url("Debe ser una URL válida").optional(),
-  tipo: z.string().max(60, "El tipo no puede exceder 60 caracteres").optional(),
-  condicion: FurnitureConditionSchema.optional(),
+  condicion: MuebleConditionSchema.optional(),
   fecha_adquisicion: z.string().date("Debe ser una fecha válida (YYYY-MM-DD)").optional(),
   ultima_revision: z.string().date("Debe ser una fecha válida (YYYY-MM-DD)").optional(),
   descripcion: z.string().optional(),
   habitacion_id: z.uuid("La habitación debe ser un UUID válido").optional(),
 });
 
-export const UpdateFurnitureCatalogSchema = z.object({
+export const UpdateMuebleSchema = z.object({
   codigo: z.string().min(1, "El código es requerido").max(30, "El código no puede exceder 30 caracteres").optional(),
   nombre: z.string().min(1, "El nombre es requerido").max(100, "El nombre no puede exceder 100 caracteres").optional(),
-  categoria: FurnitureCategorySchema.optional(),
+  categoria_id: z.uuid("La categoria debe ser un UUID valido").optional(),
   imagen_url: z.string().url("Debe ser una URL válida").optional(),
-  tipo: z.string().max(60, "El tipo no puede exceder 60 caracteres").optional(),
-  condicion: FurnitureConditionSchema.optional(),
+  condicion: MuebleConditionSchema.optional(),
   fecha_adquisicion: z.string().date("Debe ser una fecha válida (YYYY-MM-DD)").optional(),
   ultima_revision: z.string().date("Debe ser una fecha válida (YYYY-MM-DD)").optional(),
   descripcion: z.string().optional(),

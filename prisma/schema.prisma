@@ -309,24 +309,26 @@ model Huesped {
 }
 
 // ------------------------------------------------------------
-// 4. CATÁLOGO DE MUEBLES
+// 4. MUEBLES
 // ------------------------------------------------------------
-model CatalogoMueble {
-  id             String          @id @default(uuid()) @db.Uuid
-  codigo         String          @unique @db.VarChar(30)
-  nombre         String          @db.VarChar(100)
-  categoria      String          @db.VarChar(50) 
-  imagenUrl      String?         @db.Text
-  tipo           String?         @db.VarChar(60)
-  condicion      CondicionMueble @default(BUENO)
-  fechaAdq       DateTime?       @db.Date
-  ultimaRevision DateTime?       @db.Date
-  descripcion    String?         @db.Text
-  habitacionId   String?         @db.Uuid
-  createdAt      DateTime        @default(now()) @db.Timestamptz
-  updatedAt      DateTime        @updatedAt @db.Timestamptz
+model Mueble {
+  id             String           @id @default(uuid()) @db.Uuid
+  codigo         String           @unique @db.VarChar(30)
+  nombre         String           @db.VarChar(100)
+  categoriaId    String           @db.Uuid
+  imagenUrl      String?          @db.Text
+  condicion      CondicionMueble  @default(BUENO)
+  fechaAdq       DateTime?        @db.Date
+  ultimaRevision DateTime?        @db.Date
+  descripcion    String?          @db.Text
+  habitacionId   String           @db.Uuid
+  createdAt      DateTime         @default(now()) @db.Timestamptz
+  updatedAt      DateTime         @updatedAt @db.Timestamptz
 
-  @@map("catalogo_muebles")
+  categoria     CategoriaMueble   @relation(fields: [categoriaId], references: [id])
+  habitacion    Habitacion        @relation(fields: [habitacionId], references: [id])
+  
+  @@map("muebles")
 }
 
 // ------------------------------------------------------------
@@ -362,8 +364,9 @@ model Habitacion {
   createdAt         DateTime         @default(now()) @db.Timestamptz
   updatedAt         DateTime         @updatedAt @db.Timestamptz
 
+  muebles          Mueble[]
   tipo             TipoHabitacion    @relation(fields: [tipoHabitacionId], references: [id])
-
+  
   @@map("habitaciones")
 }
 
@@ -618,6 +621,8 @@ model CategoriaMueble {
   activo        Boolean   @default(true)
   createdAt     DateTime  @default(now()) @db.Timestamptz
   updatedAt     DateTime  @updatedAt @db.Timestamptz
+
+  muebles       Mueble[]
 
   @@map("categoria_mueble")
 }

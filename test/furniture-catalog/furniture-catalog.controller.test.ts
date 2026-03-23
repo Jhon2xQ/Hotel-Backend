@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { FurnitureCatalogController } from "../../src/presentation/controllers/furniture-catalog.controller";
+import { FurnitureCatalogController } from "../../src/presentation/controllers/mueble.controller";
 import { CreateFurnitureCatalogUseCase } from "../../src/application/use-cases/furniture-catalog/create-furniture-catalog.use-case";
 import { ListFurnitureCatalogsUseCase } from "../../src/application/use-cases/furniture-catalog/list-furniture-catalogs.use-case";
 import { FindFurnitureCatalogByIdUseCase } from "../../src/application/use-cases/furniture-catalog/find-furniture-catalog-by-id.use-case";
