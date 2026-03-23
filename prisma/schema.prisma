@@ -366,6 +366,7 @@ model Habitacion {
   muebles          Mueble[]
   tipo             TipoHabitacion    @relation(fields: [tipoHabitacionId], references: [id])
   reservas         Reserva[]
+  estancias        Estancia[]
   
   @@map("habitaciones")
 }
@@ -412,8 +413,6 @@ model Personal {
   user             User?         @relation(fields: [userId], references: [id])
 
   cargosRegistrados CargoFolio[]   @relation("CargosRegistrados")
-  checkinsRealizados Estancia[]    @relation("CheckinPor")
-  checkoutsRealizados Estancia[]   @relation("CheckoutPor")
 
   @@map("personal")
 }
@@ -537,19 +536,17 @@ model Estancia {
   habitacionId String        @db.Uuid
   huespedId    String        @db.Uuid
 
-  horaEntrada  DateTime      @default(now()) @db.Timestamptz
-  horaSalida   DateTime?     @db.Timestamptz
+  fechaEntrada DateTime      @default(now()) @db.Timestamptz
+  fechaSalida  DateTime?     @db.Timestamptz
 
   estado       EstadoEstadia @default(EN_CASA)
-  checkinPorId  String?      @db.Uuid
-  checkoutPorId String?      @db.Uuid
   notas        String?       @db.Text
   createdAt    DateTime      @default(now()) @db.Timestamptz
+  updatedAt    DateTime      @updatedAt @db.Timestamptz
 
   reserva    Reserva    @relation(fields: [reservaId], references: [id])
+  habitacion Habitacion @relation(fields: [habitacionId], references: [id])
   huesped    Huesped    @relation(fields: [huespedId], references: [id])
-  checkinPor  Personal? @relation("CheckinPor",  fields: [checkinPorId],  references: [id])
-  checkoutPor Personal? @relation("CheckoutPor", fields: [checkoutPorId], references: [id])
 
   folio Folio?
 

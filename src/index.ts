@@ -10,6 +10,7 @@ import { createHuespedRoutes } from "./routes/huesped.routes";
 import { createCanalRoutes } from "./routes/canal.routes";
 import { createTarifaRoutes } from "./routes/tarifa.routes";
 import { createReservaRoutes } from "./routes/reserva.routes";
+import { createEstanciaRoutes } from "./routes/estancia.routes";
 import { errorHandler } from "./presentation/middlewares/exception.middleware";
 import { categoriaMuebleRoutes } from "./routes/categoria-mueble.routes";
 
@@ -32,6 +33,7 @@ app.route("/api/categorias-mueble", categoriaMuebleRoutes(prisma));
 app.route("/api/canales", createCanalRoutes(prisma));
 app.route("/api/tarifas", createTarifaRoutes(prisma));
 app.route("/api/reservas", createReservaRoutes(prisma));
+app.route("/api/estancias", createEstanciaRoutes(prisma));
 
 app.onError(errorHandler);
 
