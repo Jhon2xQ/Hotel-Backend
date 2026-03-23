@@ -97,9 +97,7 @@ model Verification {
 enum TipoCanal {
   OTA
   DIRECTO
-  AGENCIA
-  CORPORATIVO
-  OPERADOR
+  AGENTE
 
   @@map("tipo_canal")
 }
@@ -273,47 +271,17 @@ enum RolPersonal {
 // ------------------------------------------------------------
 
 model Canal {
-  id           String    @id @default(uuid()) @db.Uuid
-  codigo       String    @unique @db.VarChar(20)
-  nombre       String    @db.VarChar(100)
-  tipo         TipoCanal
-  comisionPct  Decimal   @default(0) @db.Decimal(5, 2)
-  activo       Boolean   @default(true)
-  notas        String?   @db.Text
-  createdAt    DateTime  @default(now())  @db.Timestamptz
-  updatedAt    DateTime  @updatedAt @db.Timestamptz
+  id        String    @id @default(uuid()) @db.Uuid
+  nombre    String    @unique @db.VarChar
+  tipo      TipoCanal
+  activo    Boolean   @default(true)
+  notas     String?   @db.Text
+  createdAt DateTime  @default(now()) @db.Timestamptz
+  updatedAt DateTime  @updatedAt @db.Timestamptz
 
-  agencias    Agencia[]
-  tarifas     Tarifa[]
-  reservas    Reserva[]
+  reservas Reserva[]
 
   @@map("canales")
-}
-
-// ------------------------------------------------------------
-// 2. AGENCIAS Y EMPRESAS
-// ------------------------------------------------------------
-
-model Agencia {
-  id             String   @id @default(uuid()) @db.Uuid
-  canalId        String   @db.Uuid
-  ruc            String?  @db.VarChar(11)
-  nombre         String   @db.VarChar(150)
-  contacto       String?  @db.VarChar(100)
-  email          String?  @db.VarChar(100)
-  telefono       String?  @db.VarChar(20)
-  direccion      String?  @db.Text
-  ciudad         String?  @db.VarChar(80)
-  pais           String   @default("Peru") @db.VarChar(60)
-  limiteCredito  Decimal  @default(0) @db.Decimal(10, 2)
-  diasPago       Int      @default(30)
-  activo         Boolean  @default(true)
-  createdAt      DateTime @default(now()) @db.Timestamptz
-  updatedAt      DateTime @updatedAt @db.Timestamptz
-
-  canal    Canal     @relation(fields: [canalId], references: [id])
-
-  @@map("agencias")
 }
 
 // ------------------------------------------------------------
@@ -398,77 +366,6 @@ model Habitacion {
 }
 
 // ------------------------------------------------------------
-// 9. PLANES TARIFARIOS
-// ------------------------------------------------------------
-
-model PlanTarifa {
-  id               String              @id @default(uuid()) @db.Uuid
-  codigo           String              @unique @db.VarChar(20)
-  nombre           String              @db.VarChar(100)
-  incluyeDesayuno  Boolean             @default(false)
-  incluyeAlmuerzo  Boolean             @default(false)
-  incluyeCena      Boolean             @default(false)
-  politicaCancel   PoliticaCancelacion @default(FLEXIBLE)
-  horasCancel      Int                 @default(24)
-  nochesMinimas    Int                 @default(1)
-  activo           Boolean             @default(true)
-  descripcion      String?             @db.Text
-  createdAt        DateTime            @default(now()) @db.Timestamptz
-  updatedAt        DateTime            @updatedAt @db.Timestamptz
-
-  tarifas  Tarifa[]
-  reservas Reserva[]
-
-  @@map("planes_tarifa")
-}
-
-// ------------------------------------------------------------
-// 10. TEMPORADAS
-// ------------------------------------------------------------
-
-model Temporada {
-  id            String        @id @default(uuid()) @db.Uuid
-  nombre        String        @db.VarChar(80)
-  tipo          TipoTemporada
-  fechaInicio   DateTime      @db.Date
-  fechaFin      DateTime      @db.Date
-  multiplicador Decimal       @default(1.00) @db.Decimal(4, 2)
-  notas         String?       @db.Text
-  createdAt     DateTime      @default(now()) @db.Timestamptz
-  updatedAt     DateTime      @updatedAt @db.Timestamptz
-
-  tarifas Tarifa[]
-
-  @@map("temporadas")
-}
-
-// ------------------------------------------------------------
-// 11. TARIFAS
-// ------------------------------------------------------------
-model Tarifa {
-  id            String    @id @default(uuid()) @db.Uuid
-  habitacionId  String    @db.Uuid          // ← era tipoHabitacionId
-  planId        String    @db.Uuid
-  temporadaId   String?   @db.Uuid
-  canalId       String?   @db.Uuid
-  precioNoche   Decimal   @db.Decimal(10, 2)
-  precioAdultoExtra Decimal @default(0) @db.Decimal(8, 2)
-  precioNinoExtra Decimal  @default(0) @db.Decimal(8, 2)
-  moneda        String    @default("USD") @db.Char(3)
-  vigenciaDesde DateTime? @db.Date
-  vigenciaHasta DateTime? @db.Date
-  createdAt     DateTime  @default(now()) @db.Timestamptz
-  updatedAt     DateTime  @updatedAt @db.Timestamptz
-
-  plan       PlanTarifa  @relation(fields: [planId], references: [id])
-  temporada  Temporada?  @relation(fields: [temporadaId], references: [id])
-  canal      Canal?      @relation(fields: [canalId], references: [id])
-
-  @@unique([habitacionId, planId, temporadaId, canalId])
-  @@map("tarifas")
-}
-
-// ------------------------------------------------------------
 // 12. PERSONAL
 // ------------------------------------------------------------
 
@@ -544,7 +441,6 @@ model Reserva {
 
   huesped    Huesped    @relation(fields: [huespedId], references: [id])
   canal      Canal?     @relation(fields: [canalId], references: [id])
-  plan       PlanTarifa? @relation(fields: [planId], references: [id])
 
   pago      Pago?       @relation("PagoReserva", fields: [pagoId], references: [id])
   estancias Estancia[]

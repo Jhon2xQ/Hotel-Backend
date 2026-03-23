@@ -7,6 +7,7 @@ import { createTipoHabitacionRoutes } from "./routes/tipo-habitacion.routes";
 import { createHabitacionRoutes } from "./routes/habitacion.routes";
 import { createPagoRoutes } from "./routes/pago.routes";
 import { createHuespedRoutes } from "./routes/huesped.routes";
+import { createCanalRoutes } from "./routes/canal.routes";
 import { errorHandler } from "./presentation/middlewares/exception.middleware";
 import { categoriaMuebleRoutes } from "./routes/categoria-mueble.routes";
 
@@ -26,6 +27,7 @@ app.route("/api/habitaciones", createHabitacionRoutes(prisma));
 app.route("/api/pagos", createPagoRoutes(prisma));
 app.route("/api/huespedes", createHuespedRoutes(prisma));
 app.route("/api/categorias-mueble", categoriaMuebleRoutes(prisma));
+app.route("/api/canales", createCanalRoutes(prisma));
 
 app.onError(errorHandler);
 
