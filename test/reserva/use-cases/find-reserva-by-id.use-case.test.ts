@@ -10,13 +10,13 @@ describe("FindReservaByIdUseCase", () => {
 
   beforeEach(() => {
     mockRepository = {
-      create: async (data) => createMockReserva(),
+      create: async (_data: any) => createMockReserva(),
       findAll: async () => [],
-      findById: async (id) => null,
-      findByCodigo: async (codigo) => null,
-      update: async (id, data) => createMockReserva(),
-      delete: async (id) => {},
-      cancel: async (id, motivo) => createMockReserva(),
+      findById: async (_id: string) => null,
+      findByCodigo: async (_codigo: string) => null,
+      update: async (_id: string, _data: any) => createMockReserva(),
+      delete: async (_id: string) => {},
+      cancel: async (_id: string, _motivo: string) => createMockReserva(),
     } as any;
 
     useCase = new FindReservaByIdUseCase(mockRepository);
