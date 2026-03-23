@@ -365,7 +365,7 @@ model CatalogoMueble {
 // ------------------------------------------------------------
 model TipoHabitacion {
   id          String   @id @default(uuid()) @db.Uuid
-  nombre      String   @db.VarChar(100)
+  nombre      String   @db.VarChar(100) @unique
   descripcion String?  @db.Text
   createdAt   DateTime @default(now()) @db.Timestamptz
   updatedAt   DateTime @updatedAt @db.Timestamptz
