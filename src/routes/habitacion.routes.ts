@@ -3,7 +3,7 @@ import { AppHono, AppVariables } from "../common/types/app.types";
 import { PrismaClient } from "../../generated/prisma/client";
 import { HabitacionRepository } from "../infrastructure/repositories/habitacion.repository";
 import { TipoHabitacionRepository } from "../infrastructure/repositories/tipo-habitacion.repository";
-import { FurnitureCatalogRepository } from "../infrastructure/repositories/furniture-catalog.repository";
+import { MuebleRepository } from "../infrastructure/repositories/mueble.repository";
 import { CreateHabitacionUseCase } from "../application/use-cases/habitacion/create-habitacion.use-case";
 import { ListHabitacionUseCase } from "../application/use-cases/habitacion/list-habitacion.use-case";
 import { FindHabitacionByIdUseCase } from "../application/use-cases/habitacion/find-habitacion-by-id.use-case";
@@ -24,7 +24,7 @@ import { UUIDParamSchema } from "../presentation/schemas/tipo-habitacion.schema"
 export function createHabitacionRoutes(prismaClient: PrismaClient): AppHono {
   const repository = new HabitacionRepository(prismaClient);
   const tipoHabitacionRepository = new TipoHabitacionRepository(prismaClient);
-  const furnitureRepository = new FurnitureCatalogRepository(prismaClient);
+  const furnitureRepository = new MuebleRepository(prismaClient);
 
   const createUseCase = new CreateHabitacionUseCase(repository, tipoHabitacionRepository);
   const listUseCase = new ListHabitacionUseCase(repository);

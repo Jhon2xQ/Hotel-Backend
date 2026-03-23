@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { corsConfig } from "./common/configs/cors.config";
 import { auth } from "./common/libraries/auth";
 import { prisma } from "./common/libraries/prisma";
-import { createFurnitureCatalogRoutes } from "./routes/furniture-catalog.routes";
+import { createMuebleRoutes } from "./routes/mueble.routes";
 import { createTipoHabitacionRoutes } from "./routes/tipo-habitacion.routes";
 import { createHabitacionRoutes } from "./routes/habitacion.routes";
 import { createPagoRoutes } from "./routes/pago.routes";
@@ -20,7 +20,7 @@ app.get("/api/health", (c) => {
 
 app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
 
-app.route("/api/catalogo-muebles", createFurnitureCatalogRoutes(prisma));
+app.route("/api/muebles", createMuebleRoutes(prisma));
 app.route("/api/tipos-habitacion", createTipoHabitacionRoutes(prisma));
 app.route("/api/habitaciones", createHabitacionRoutes(prisma));
 app.route("/api/pagos", createPagoRoutes(prisma));

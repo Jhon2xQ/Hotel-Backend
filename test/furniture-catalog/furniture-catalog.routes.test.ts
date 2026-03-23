@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { createFurnitureCatalogRoutes } from "../../src/routes/furniture-catalog.routes";
+import { createFurnitureCatalogRoutes } from "../../src/routes/mueble.routes";
 import { createMockPrismaClient } from "../helpers/mock-prisma";
 import { FurnitureCategory } from "../../src/domain/entities/furniture-catalog.entity";
 
