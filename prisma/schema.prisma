@@ -280,6 +280,7 @@ model Canal {
   updatedAt DateTime  @updatedAt @db.Timestamptz
 
   reservas Reserva[]
+  tarifas  Tarifa[]
 
   @@map("canales")
 }
@@ -339,6 +340,7 @@ model TipoHabitacion {
   updatedAt   DateTime @updatedAt @db.Timestamptz
 
   habitaciones Habitacion[]
+  tarifas      Tarifa[]
 
   @@map("tipos_habitacion")
 }
@@ -363,6 +365,26 @@ model Habitacion {
   tipo             TipoHabitacion    @relation(fields: [tipoHabitacionId], references: [id])
 
   @@map("habitaciones")
+}
+
+// ------------------------------------------------------------
+// 7. TARIFAS
+// ------------------------------------------------------------
+model Tarifa {
+  id                String   @id @default(uuid()) @db.Uuid
+  tipoHabitacionId  String   @db.Uuid
+  canalId           String   @db.Uuid
+  precioNoche       Decimal  @db.Decimal(10, 2)
+  IVA               Decimal? @db.Decimal(4, 2)
+  cargoServicios    Decimal? @db.Decimal(4, 2)
+  moneda            String   @default("SOL") @db.Char(3)
+  createdAt         DateTime @default(now()) @db.Timestamptz
+  updatedAt         DateTime @updatedAt @db.Timestamptz
+
+  tipoHabitacion TipoHabitacion @relation(fields: [tipoHabitacionId], references: [id])
+  canal          Canal          @relation(fields: [canalId], references: [id])
+
+  @@map("tarifas")
 }
 
 // ------------------------------------------------------------

@@ -1,0 +1,107 @@
+import { describe, it, expect, beforeEach } from "vitest";
+import { CreateTarifaUseCase } from "../../../src/application/use-cases/tarifa/create-tarifa.use-case";
+import { ITarifaRepository } from "../../../src/domain/interfaces/tarifa.repository.interface";
+import { TarifaException } from "../../../src/domain/exceptions/tarifa.exception";
+import { createMockTarifa } from "../../helpers/tarifa-fixtures";
+
+describe("CreateTarifaUseCase", () => {
+  let useCase: CreateTarifaUseCase;
+  let mockRepository: ITarifaRepository;
+
+  beforeEach(() => {
+    mockRepository = {
+      create: async () => createMockTarifa(),
+      findAll: async () => [],
+      findById: async () => null,
+      update: async () => createMockTarifa(),
+      delete: async () => {},
+      hasRelatedRecords: async () => false,
+      findByTipoHabitacionAndCanal: async () => [],
+    };
+
+    useCase = new CreateTarifaUseCase(mockRepository);
+  });
+
+  it("should create tarifa successfully", async () => {
+    const mockTarifa = createMockTarifa({
+      tipoHabitacionId: "tipo-id",
+      canalId: "canal-id",
+      precioNoche: 150.0,
+      IVA: 18.0,
+      cargoServicios: 10.0,
+    });
+
+    mockRepository.create = async () => mockTarifa;
+
+    const result = await useCase.execute({
+      tipo_habitacion_id: "tipo-id",
+      canal_id: "canal-id",
+      precio_noche: 150.0,
+      iva: 18.0,
+      cargo_servicios: 10.0,
+    });
+
+    expect(result).toBeDefined();
+    expect(result.precio_noche).toBe(150.0);
+    expect(result.iva).toBe(18.0);
+    expect(result.cargo_servicios).toBe(10.0);
+  });
+
+  it("should create tarifa without optional fields", async () => {
+    mockRepository.create = async (data) => {
+      return createMockTarifa({
+        tipoHabitacionId: data.tipoHabitacionId,
+        canalId: data.canalId,
+        precioNoche: data.precioNoche,
+        IVA: data.IVA ?? null,
+        cargoServicios: data.cargoServicios ?? null,
+        moneda: data.moneda ?? "USD",
+      });
+    };
+
+    const result = await useCase.execute({
+      tipo_habitacion_id: "tipo-id",
+      canal_id: "canal-id",
+      precio_noche: 100.0,
+    });
+
+    expect(result).toBeDefined();
+    expect(result.precio_noche).toBe(100.0);
+    expect(result.moneda).toBe("USD");
+  });
+
+  it("should throw error when precio_noche is zero or negative", async () => {
+    await expect(
+      useCase.execute({
+        tipo_habitacion_id: "tipo-id",
+        canal_id: "canal-id",
+        precio_noche: 0,
+      }),
+    ).rejects.toThrow(TarifaException);
+
+    await expect(
+      useCase.execute({
+        tipo_habitacion_id: "tipo-id",
+        canal_id: "canal-id",
+        precio_noche: -50,
+      }),
+    ).rejects.toThrow(TarifaException);
+  });
+
+  it("should create tarifa with custom moneda", async () => {
+    const mockTarifa = createMockTarifa({
+      moneda: "EUR",
+    });
+
+    mockRepository.create = async () => mockTarifa;
+
+    const result = await useCase.execute({
+      tipo_habitacion_id: "tipo-id",
+      canal_id: "canal-id",
+      precio_noche: 150.0,
+      moneda: "EUR",
+    });
+
+    expect(result.moneda).toBe("EUR");
+  });
+});
