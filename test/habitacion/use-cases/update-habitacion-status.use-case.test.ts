@@ -3,7 +3,7 @@ import { UpdateHabitacionStatusUseCase } from "../../../src/application/use-case
 import { IHabitacionRepository } from "../../../src/domain/interfaces/habitacion.repository.interface";
 import { HabitacionException } from "../../../src/domain/exceptions/habitacion.exception";
 import { createMockHabitacion } from "../../helpers/habitacion-fixtures";
-import { EstadoHabitacion, EstadoLimpieza } from "../../../src/domain/entities/habitacion.entity";
+import { EstadoHabitacion } from "../../../src/domain/entities/habitacion.entity";
 
 describe("UpdateHabitacionStatusUseCase", () => {
   let useCase: UpdateHabitacionStatusUseCase;
@@ -50,19 +50,5 @@ describe("UpdateHabitacionStatusUseCase", () => {
         estado: EstadoHabitacion.OCUPADA,
       }),
     ).rejects.toThrow(HabitacionException);
-  });
-
-  it("should update limpieza status", async () => {
-    const existingHabitacion = createMockHabitacion({ id: "test-id", limpieza: EstadoLimpieza.SUCIA });
-    const updatedHabitacion = createMockHabitacion({ id: "test-id", limpieza: EstadoLimpieza.LIMPIA });
-
-    mockRepository.findById = async () => existingHabitacion;
-    mockRepository.updateStatus = async () => updatedHabitacion;
-
-    const result = await useCase.execute("test-id", {
-      limpieza: EstadoLimpieza.LIMPIA,
-    });
-
-    expect(result.limpieza).toBe("LIMPIA");
   });
 });

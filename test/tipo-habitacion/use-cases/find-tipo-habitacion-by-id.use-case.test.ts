@@ -13,6 +13,7 @@ describe("FindTipoHabitacionByIdUseCase", () => {
       create: async () => createMockTipoHabitacion(),
       findAll: async () => [],
       findById: async () => null,
+      findByName: async () => null,
       update: async () => createMockTipoHabitacion(),
       delete: async () => {},
       hasRelatedRecords: async () => false,

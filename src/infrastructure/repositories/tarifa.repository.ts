@@ -1,0 +1,187 @@
+import { PrismaClient, Prisma } from "../../../generated/prisma/client";
+import { Tarifa, CreateTarifaData } from "../../domain/entities/tarifa.entity";
+import { ITarifaRepository, UpdateTarifaData } from "../../domain/interfaces/tarifa.repository.interface";
+import { TarifaException } from "../../domain/exceptions/tarifa.exception";
+
+export class TarifaRepository implements ITarifaRepository {
+  constructor(private prisma: PrismaClient) {}
+
+  async create(data: CreateTarifaData): Promise<Tarifa> {
+    if (data.precioNoche <= 0) {
+      throw TarifaException.invalidPrecio();
+    }
+
+    const tipoHabitacion = await this.prisma.tipoHabitacion.findUnique({
+      where: { id: data.tipoHabitacionId },
+    });
+    if (!tipoHabitacion) {
+      throw TarifaException.tipoHabitacionNotFound();
+    }
+
+    const canal = await this.prisma.canal.findUnique({
+      where: { id: data.canalId },
+    });
+    if (!canal) {
+      throw TarifaException.canalNotFound();
+    }
+
+    const result = await this.prisma.tarifa.create({
+      data: {
+        tipoHabitacionId: data.tipoHabitacionId,
+        canalId: data.canalId,
+        precioNoche: data.precioNoche,
+        IVA: data.IVA ?? null,
+        cargoServicios: data.cargoServicios ?? null,
+        moneda: data.moneda ?? "USD",
+      },
+    });
+    return this.toDomain(result);
+  }
+
+  async findAll(): Promise<Tarifa[]> {
+    const results = await this.prisma.tarifa.findMany({
+      include: {
+        tipoHabitacion: true,
+        canal: true,
+      },
+      orderBy: { createdAt: "desc" },
+    });
+    return results.map((r) => this.toDomain(r));
+  }
+
+  async findById(id: string): Promise<Tarifa | null> {
+    const result = await this.prisma.tarifa.findUnique({
+      where: { id },
+      include: {
+        tipoHabitacion: true,
+        canal: true,
+      },
+    });
+    return result ? this.toDomain(result) : null;
+  }
+
+  async update(id: string, data: UpdateTarifaData): Promise<Tarifa> {
+    try {
+      const existing = await this.prisma.tarifa.findUnique({
+        where: { id },
+      });
+      if (!existing) {
+        throw TarifaException.notFoundById();
+      }
+
+      if (data.precioNoche !== undefined && data.precioNoche <= 0) {
+        throw TarifaException.invalidPrecio();
+      }
+
+      if (data.tipoHabitacionId) {
+        const tipoHabitacion = await this.prisma.tipoHabitacion.findUnique({
+          where: { id: data.tipoHabitacionId },
+        });
+        if (!tipoHabitacion) {
+          throw TarifaException.tipoHabitacionNotFound();
+        }
+      }
+
+      if (data.canalId) {
+        const canal = await this.prisma.canal.findUnique({
+          where: { id: data.canalId },
+        });
+        if (!canal) {
+          throw TarifaException.canalNotFound();
+        }
+      }
+
+      const updateData: any = {};
+      if (data.tipoHabitacionId !== undefined) updateData.tipoHabitacionId = data.tipoHabitacionId;
+      if (data.canalId !== undefined) updateData.canalId = data.canalId;
+      if (data.precioNoche !== undefined) updateData.precioNoche = data.precioNoche;
+      if (data.IVA !== undefined) updateData.IVA = data.IVA;
+      if (data.cargoServicios !== undefined) updateData.cargoServicios = data.cargoServicios;
+      if (data.moneda !== undefined) updateData.moneda = data.moneda;
+
+      const result = await this.prisma.tarifa.update({
+        where: { id },
+        data: updateData,
+      });
+      return this.toDomain(result);
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === "P2025") {
+          throw TarifaException.notFoundById();
+        }
+      }
+      throw error;
+    }
+  }
+
+  async delete(id: string): Promise<void> {
+    try {
+      await this.prisma.tarifa.delete({
+        where: { id },
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === "P2025") {
+          throw TarifaException.notFoundById();
+        }
+      }
+      throw error;
+    }
+  }
+
+  async hasRelatedRecords(id: string): Promise<boolean> {
+    // Tarifas no tiene relaciones con otras tablas actualmente
+    return false;
+  }
+
+  async findByTipoHabitacionAndCanal(tipoHabitacionId: string, canalId: string): Promise<Tarifa[]> {
+    const results = await this.prisma.tarifa.findMany({
+      where: {
+        tipoHabitacionId,
+        canalId,
+      },
+      include: {
+        tipoHabitacion: true,
+        canal: true,
+      },
+      orderBy: { createdAt: "desc" },
+    });
+    return results.map((r) => this.toDomain(r));
+  }
+
+  private toDomain(data: any): Tarifa {
+    if (!data.tipoHabitacion || !data.canal) {
+      throw new Error("Tarifa must include tipoHabitacion and canal relations");
+    }
+
+    const tipoHabitacion = new (require("../../domain/entities/tipo-habitacion.entity").TipoHabitacion)(
+      data.tipoHabitacion.id,
+      data.tipoHabitacion.nombre,
+      data.tipoHabitacion.descripcion,
+      data.tipoHabitacion.createdAt,
+      data.tipoHabitacion.updatedAt,
+    );
+
+    const canal = new (require("../../domain/entities/canal.entity").Canal)(
+      data.canal.id,
+      data.canal.nombre,
+      data.canal.tipo,
+      data.canal.activo,
+      data.canal.notas,
+      data.canal.createdAt,
+      data.canal.updatedAt,
+    );
+
+    return new Tarifa(
+      data.id,
+      tipoHabitacion,
+      canal,
+      Number(data.precioNoche),
+      data.IVA ? Number(data.IVA) : null,
+      data.cargoServicios ? Number(data.cargoServicios) : null,
+      data.moneda,
+      data.createdAt,
+      data.updatedAt,
+    );
+  }
+}

@@ -1,10 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { createHabitacionRoutes } from "../../src/routes/habitacion.routes";
 import { createMockPrismaClient } from "../helpers/mock-prisma";
-import { EstadoHabitacion, EstadoLimpieza } from "../../src/domain/entities/habitacion.entity";
+import { EstadoHabitacion } from "../../src/domain/entities/habitacion.entity";
 
 describe("Habitacion Routes Integration", () => {
-  let app: any;
   let mockPrisma: any;
 
   beforeEach(() => {
@@ -15,34 +14,56 @@ describe("Habitacion Routes Integration", () => {
       findMany: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
-    };
-    mockPrisma.estancia = {
       count: vi.fn(),
     };
-    app = createHabitacionRoutes(mockPrisma);
+    mockPrisma.tipoHabitacion = {
+      findUnique: vi.fn(),
+    };
+    mockPrisma.catalogoMueble = {
+      findUnique: vi.fn(),
+    };
   });
 
   it("should have routes defined", () => {
-    expect(app).toBeDefined();
+    const routes = createHabitacionRoutes(mockPrisma);
+    expect(routes).toBeDefined();
   });
 
   it("should create habitacion route handler", async () => {
-    const mockResult = {
+    const mockHabitacion = {
       id: "test-id",
       nroHabitacion: "301",
-      tipoId: "tipo-id",
+      tipoHabitacionId: "tipo-id",
       piso: 3,
+      tieneDucha: false,
+      tieneBanio: false,
       urlImagen: null,
       estado: EstadoHabitacion.DISPONIBLE,
-      limpieza: EstadoLimpieza.LIMPIA,
       notas: null,
       ultimaLimpieza: null,
       createdAt: new Date(),
       updatedAt: new Date(),
+      tipo: {
+        id: "tipo-id",
+        nombre: "Suite Deluxe",
+        descripcion: "Suite de lujo",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
     };
 
-    mockPrisma.habitacion.create.mockResolvedValue(mockResult);
+    mockPrisma.tipoHabitacion.findUnique.mockResolvedValue({
+      id: "tipo-id",
+      nombre: "Suite Deluxe",
+      descripcion: "Suite de lujo",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
 
-    expect(mockPrisma.habitacion).toBeDefined();
+    mockPrisma.habitacion.findUnique.mockResolvedValue(null);
+    mockPrisma.habitacion.create.mockResolvedValue(mockHabitacion);
+
+    const routes = createHabitacionRoutes(mockPrisma);
+    expect(routes).toBeDefined();
   });
 });

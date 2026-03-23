@@ -90,7 +90,7 @@ Obtiene los detalles de un tipo de habitación específico.
 ```json
 {
   "success": false,
-  "message": "Tipo de habitación con id \"123e4567-e89b-12d3-a456-426614174000\" no encontrado",
+  "message": "Tipo de habitación no encontrado",
   "data": null,
   "timestamp": 1710669600000
 }
@@ -117,7 +117,7 @@ Crea un nuevo tipo de habitación en el sistema.
 
 **Campos:**
 
-- `nombre` (string, requerido): Nombre del tipo de habitación (máx. 100 caracteres)
+- `nombre` (string, requerido): Nombre del tipo de habitación (máx. 100 caracteres, único)
 - `descripcion` (string, opcional): Descripción detallada del tipo de habitación
 
 **Respuesta exitosa (201):**
@@ -167,6 +167,17 @@ Crea un nuevo tipo de habitación en el sistema.
 {
   "success": false,
   "message": "Acceso denegado. Se requiere rol de administrador",
+  "data": null,
+  "timestamp": 1710669600000
+}
+```
+
+- `409`: Nombre duplicado
+
+```json
+{
+  "success": false,
+  "message": "Ya existe un tipo de habitación con el nombre 'Suite Deluxe'",
   "data": null,
   "timestamp": 1710669600000
 }
@@ -224,7 +235,18 @@ Actualiza los datos de un tipo de habitación existente.
 ```json
 {
   "success": false,
-  "message": "Tipo de habitación con id \"123e4567-e89b-12d3-a456-426614174000\" no encontrado",
+  "message": "Tipo de habitación no encontrado",
+  "data": null,
+  "timestamp": 1710669600000
+}
+```
+
+- `409`: Nombre duplicado
+
+```json
+{
+  "success": false,
+  "message": "Ya existe un tipo de habitación con el nombre 'Suite Deluxe Premium'",
   "data": null,
   "timestamp": 1710669600000
 }
@@ -234,6 +256,7 @@ Actualiza los datos de un tipo de habitación existente.
 
 - Solo se actualizan los campos proporcionados en el body
 - El campo `updated_at` se actualiza automáticamente
+- Si se intenta cambiar el nombre a uno que ya existe, se retorna error 409
 
 ---
 
@@ -269,7 +292,7 @@ Elimina un tipo de habitación del sistema.
 ```json
 {
   "success": false,
-  "message": "Tipo de habitación con id \"123e4567-e89b-12d3-a456-426614174000\" no encontrado",
+  "message": "Tipo de habitación no encontrado",
   "data": null,
   "timestamp": 1710669600000
 }
@@ -280,7 +303,7 @@ Elimina un tipo de habitación del sistema.
 ```json
 {
   "success": false,
-  "message": "No se puede eliminar el tipo de habitación porque tiene registros relacionados (habitaciones, tarifas o reservas)",
+  "message": "No se puede eliminar el tipo de habitación porque tiene registros relacionados",
   "data": null,
   "timestamp": 1710669600000
 }
@@ -288,21 +311,21 @@ Elimina un tipo de habitación del sistema.
 
 **Notas:**
 
-- No se puede eliminar un tipo de habitación si tiene habitaciones, tarifas o reservas asociadas
+- No se puede eliminar un tipo de habitación si tiene habitaciones asociadas
 - Esta validación protege la integridad referencial de los datos
 
 ---
 
 ## Códigos de Error
 
-| Código | Descripción                                                          |
-| ------ | -------------------------------------------------------------------- |
-| 400    | Datos de entrada inválidos (validación de Zod)                       |
-| 401    | No autenticado (sesión inválida o inexistente)                       |
-| 403    | No autorizado (requiere rol ADMIN)                                   |
-| 404    | Tipo de habitación no encontrado                                     |
-| 409    | Conflicto (no se puede eliminar porque tiene registros relacionados) |
-| 500    | Error interno del servidor                                           |
+| Código | Descripción                                                 |
+| ------ | ----------------------------------------------------------- |
+| 400    | Datos de entrada inválidos (validación de Zod)              |
+| 401    | No autenticado (sesión inválida o inexistente)              |
+| 403    | No autorizado (requiere rol ADMIN)                          |
+| 404    | Tipo de habitación no encontrado                            |
+| 409    | Conflicto (nombre duplicado o tiene registros relacionados) |
+| 500    | Error interno del servidor                                  |
 
 ---
 
@@ -314,6 +337,7 @@ Elimina un tipo de habitación del sistema.
 - **Tipo**: String
 - **Longitud mínima**: 1 carácter
 - **Longitud máxima**: 100 caracteres
+- **Único**: Sí (no puede haber dos tipos con el mismo nombre)
 - **Ejemplo**: "Suite Deluxe", "Habitación Estándar", "Suite Presidencial"
 
 ### Campo `descripcion`
@@ -329,11 +353,10 @@ Elimina un tipo de habitación del sistema.
 
 - Los tipos de habitación definen las plantillas o categorías de habitaciones disponibles en el hotel
 - Los tipos de habitación se utilizan como referencia para crear habitaciones físicas
+- El campo `nombre` debe ser único en todo el sistema
 - Los campos `created_at` y `updated_at` se gestionan automáticamente por el sistema
-- No se puede eliminar un tipo de habitación si tiene:
-  - Habitaciones asociadas
-  - Tarifas asociadas
-  - Reservas asociadas
+- No se puede eliminar un tipo de habitación si tiene habitaciones asociadas
+- Al crear o actualizar, se valida que el nombre no esté duplicado
 
 ---
 
@@ -359,7 +382,18 @@ curl -X POST https://api.hotel.com/api/tipos-habitacion \
   -H "Authorization: Bearer <token>" \
   -d '{
     "nombre": "Suite Deluxe",
-    "descripcion": "Suite de lujo con vista panorámica"
+    "descripcion": "Suite de lujo con vista panorámica al mar, jacuzzi y todas las comodidades premium"
+  }'
+```
+
+### Crear un tipo sin descripción
+
+```bash
+curl -X POST https://api.hotel.com/api/tipos-habitacion \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <token>" \
+  -d '{
+    "nombre": "Habitación Económica"
   }'
 ```
 
@@ -374,10 +408,40 @@ curl -X PUT https://api.hotel.com/api/tipos-habitacion/123e4567-e89b-12d3-a456-4
   }'
 ```
 
+### Actualizar solo la descripción
+
+```bash
+curl -X PUT https://api.hotel.com/api/tipos-habitacion/123e4567-e89b-12d3-a456-426614174000 \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <token>" \
+  -d '{
+    "descripcion": "Suite de lujo premium con vista panorámica al mar, jacuzzi privado y servicio de mayordomo 24/7"
+  }'
+```
+
+### Actualizar nombre y descripción
+
+```bash
+curl -X PUT https://api.hotel.com/api/tipos-habitacion/123e4567-e89b-12d3-a456-426614174000 \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <token>" \
+  -d '{
+    "nombre": "Suite Presidencial",
+    "descripcion": "La suite más lujosa del hotel con todas las comodidades premium"
+  }'
+```
+
 ### Listar todos los tipos
 
 ```bash
 curl -X GET https://api.hotel.com/api/tipos-habitacion \
+  -H "Authorization: Bearer <token>"
+```
+
+### Obtener un tipo específico
+
+```bash
+curl -X GET https://api.hotel.com/api/tipos-habitacion/123e4567-e89b-12d3-a456-426614174000 \
   -H "Authorization: Bearer <token>"
 ```
 
