@@ -15,4 +15,7 @@ export class TipoHabitacionException extends DomainException {
   static muebleNotFound(): TipoHabitacionException {
     return new TipoHabitacionException("Mueble no encontrado", 404);
   }
+  static duplicateNombre(nombre: string): TipoHabitacionException {
+    return new TipoHabitacionException(`Ya existe un tipo de habitación con el nombre '${nombre}'`, 409);
+  }
 }

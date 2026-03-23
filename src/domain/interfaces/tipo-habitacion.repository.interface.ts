@@ -12,4 +12,5 @@ export interface ITipoHabitacionRepository {
   update(id: string, data: UpdateTipoHabitacionData): Promise<TipoHabitacion>;
   delete(id: string): Promise<void>;
   hasRelatedRecords(id: string): Promise<boolean>;
+  findByName(nombre: string): Promise<TipoHabitacion | null>;
 }
