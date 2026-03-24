@@ -6,7 +6,7 @@ import { IFurnitureCatalogRepository } from "../../../src/domain/interfaces/furn
 import { HabitacionException } from "../../../src/domain/exceptions/habitacion.exception";
 import { createMockHabitacion } from "../../helpers/habitacion-fixtures";
 import { createMockTipoHabitacion } from "../../helpers/tipo-habitacion-fixtures";
-import { createMockFurnitureCatalog } from "../../helpers/furniture-catalog-fixtures";
+import { createMockMueble } from "../../helpers/mueble-fixtures";
 
 describe("UpdateHabitacionUseCase", () => {
   let useCase: UpdateHabitacionUseCase;
@@ -37,11 +37,11 @@ describe("UpdateHabitacionUseCase", () => {
     };
 
     mockFurnitureRepo = {
-      create: async () => createMockFurnitureCatalog(),
+      create: async () => createMockMueble(),
       findAll: async () => [],
       findById: async () => null,
       findByCodigo: async () => null,
-      update: async () => createMockFurnitureCatalog(),
+      update: async () => createMockMueble(),
       delete: async () => {},
     };
 
