@@ -26,10 +26,12 @@ export interface IHabitacionRepository {
   updateStatus(id: string, data: UpdateHabitacionStatusData): Promise<Habitacion>;
   delete(id: string): Promise<void>;
   hasRelatedRecords(id: string): Promise<boolean>;
-  findAvailableWithFilters(filters: {
-    tipoNombre?: string;
-    fechaInicio?: Date;
-    fechaFin?: Date;
-    ordenPrecio?: "asc" | "desc";
-  }): Promise<Array<Habitacion & { precioNoche?: number }>>;
+  findAllWithDirectPrice(): Promise<Array<{ habitacion: Habitacion; precioNoche: number | null }>>;
+  findByTipoWithDirectPrice(tipoNombre: string): Promise<Array<{ habitacion: Habitacion; precioNoche: number | null }>>;
+  findAvailableInDateRange(
+    fechaInicio: Date,
+    fechaFin: Date,
+    tipoNombre?: string,
+  ): Promise<Array<{ habitacion: Habitacion; precioNoche: number | null }>>;
+  findByIdWithDirectPrice(id: string): Promise<{ habitacion: Habitacion; precioNoche: number | null } | null>;
 }
