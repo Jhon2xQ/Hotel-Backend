@@ -18,7 +18,10 @@ describe("DeleteHabitacionUseCase", () => {
       updateStatus: async () => createMockHabitacion(),
       delete: async () => {},
       hasRelatedRecords: async () => false,
-      findAvailableWithFilters: async () => [],
+      findAllWithDirectPrice: async () => [],
+      findByTipoWithDirectPrice: async () => [],
+      findAvailableInDateRange: async () => [],
+      findByIdWithDirectPrice: async () => null,
     };
 
     useCase = new DeleteHabitacionUseCase(mockRepository);

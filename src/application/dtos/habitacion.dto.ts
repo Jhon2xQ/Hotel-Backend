@@ -57,6 +57,7 @@ export interface HabitacionOutput {
   updated_at: string;
 }
 
-export interface HabitacionAvailableOutput extends HabitacionOutput {
-  precio_noche?: number;
+export interface HabitacionWithPriceOutput {
+  habitacion: HabitacionOutput;
+  precio_noche: number | null;
 }

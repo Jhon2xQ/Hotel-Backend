@@ -155,58 +155,110 @@ export class HabitacionRepository implements IHabitacionRepository {
     return estanciaCount > 0;
   }
 
-  async findAvailableWithFilters(filters: {
-    tipoNombre?: string;
-    fechaInicio?: Date;
-    fechaFin?: Date;
-    ordenPrecio?: "asc" | "desc";
-  }): Promise<Array<Habitacion & { precioNoche?: number }>> {
+  async findAllWithDirectPrice(): Promise<Array<{ habitacion: Habitacion; precioNoche: number | null }>> {
+    const results = await this.prisma.habitacion.findMany({
+      include: {
+        tipo: {
+          include: {
+            tarifas: {
+              where: {
+                canal: {
+                  tipo: "DIRECTO",
+                },
+              },
+              take: 1,
+            },
+          },
+        },
+      },
+      orderBy: { nroHabitacion: "asc" },
+    });
+
+    return results.map((r) => ({
+      habitacion: this.toDomain(r),
+      precioNoche: r.tipo?.tarifas?.[0]?.precioNoche ? Number(r.tipo.tarifas[0].precioNoche) : null,
+    }));
+  }
+
+  async findByTipoWithDirectPrice(
+    tipoNombre: string,
+  ): Promise<Array<{ habitacion: Habitacion; precioNoche: number | null }>> {
+    const results = await this.prisma.habitacion.findMany({
+      where: {
+        tipo: {
+          nombre: {
+            contains: tipoNombre,
+            mode: "insensitive",
+          },
+        },
+      },
+      include: {
+        tipo: {
+          include: {
+            tarifas: {
+              where: {
+                canal: {
+                  tipo: "DIRECTO",
+                },
+              },
+              take: 1,
+            },
+          },
+        },
+      },
+      orderBy: { nroHabitacion: "asc" },
+    });
+
+    return results.map((r) => ({
+      habitacion: this.toDomain(r),
+      precioNoche: r.tipo?.tarifas?.[0]?.precioNoche ? Number(r.tipo.tarifas[0].precioNoche) : null,
+    }));
+  }
+
+  async findAvailableInDateRange(
+    fechaInicio: Date,
+    fechaFin: Date,
+    tipoNombre?: string,
+  ): Promise<Array<{ habitacion: Habitacion; precioNoche: number | null }>> {
     const whereClause: any = {};
 
-    // Filtro por tipo de habitación
-    if (filters.tipoNombre) {
+    if (tipoNombre) {
       whereClause.tipo = {
         nombre: {
-          contains: filters.tipoNombre,
+          contains: tipoNombre,
           mode: "insensitive",
         },
       };
     }
 
-    // Filtro por disponibilidad en rango de fechas
-    if (filters.fechaInicio && filters.fechaFin) {
-      whereClause.reservas = {
-        none: {
-          AND: [
-            {
-              OR: [{ estado: "CONFIRMADA" }, { estado: "EN_CASA" }],
+    // Excluir habitaciones con reservas que intersecten con el rango
+    whereClause.reservas = {
+      none: {
+        AND: [
+          {
+            estado: {
+              in: ["CONFIRMADA", "EN_CASA", "TENTATIVA", "NO_LLEGO"],
             },
-            {
-              OR: [
-                {
-                  AND: [{ fechaEntrada: { lte: filters.fechaInicio } }, { fechaSalida: { gt: filters.fechaInicio } }],
-                },
-                {
-                  AND: [{ fechaEntrada: { lt: filters.fechaFin } }, { fechaSalida: { gte: filters.fechaFin } }],
-                },
-                {
-                  AND: [{ fechaEntrada: { gte: filters.fechaInicio } }, { fechaSalida: { lte: filters.fechaFin } }],
-                },
-              ],
-            },
-          ],
-        },
-      };
-    }
-
-    const orderBy: any = {};
-    if (filters.ordenPrecio) {
-      orderBy.tipo = {
-        tarifas: {
-          _count: filters.ordenPrecio,
-        },
-      };
-    }
+          },
+          {
+            OR: [
+              // Reserva comienza antes o en fecha_inicio y termina después de fecha_inicio
+              {
+                AND: [{ fechaEntrada: { lte: fechaInicio } }, { fechaSalida: { gt: fechaInicio } }],
+              },
+              // Reserva comienza antes de fecha_fin y termina en o después de fecha_fin
+              {
+                AND: [{ fechaEntrada: { lt: fechaFin } }, { fechaSalida: { gte: fechaFin } }],
+              },
+              // Reserva está completamente dentro del rango
+              {
+                AND: [{ fechaEntrada: { gte: fechaInicio } }, { fechaSalida: { lte: fechaFin } }],
+              },
+            ],
+          },
+        ],
+      },
+    };
 
     const results = await this.prisma.habitacion.findMany({
       where: whereClause,
@@ -214,35 +266,52 @@ export class HabitacionRepository implements IHabitacionRepository {
         tipo: {
           include: {
             tarifas: {
-              orderBy: {
-                precioNoche: filters.ordenPrecio || "asc",
+              where: {
+                canal: {
+                  tipo: "DIRECTO",
+                },
               },
               take: 1,
             },
           },
         },
       },
-      orderBy: orderBy.tipo ? orderBy : { nroHabitacion: "asc" },
+      orderBy: { nroHabitacion: "asc" },
     });
 
-    // Mapear resultados con precio
-    const habitacionesConPrecio = results.map((r) => {
-      const habitacion = this.toDomain(r);
-      const precioNoche = r.tipo?.tarifas?.[0]?.precioNoche ? Number(r.tipo.tarifas[0].precioNoche) : undefined;
+    return results.map((r) => ({
+      habitacion: this.toDomain(r),
+      precioNoche: r.tipo?.tarifas?.[0]?.precioNoche ? Number(r.tipo.tarifas[0].precioNoche) : null,
+    }));
+  }
 
-      return Object.assign(habitacion, { precioNoche });
+  async findByIdWithDirectPrice(id: string): Promise<{ habitacion: Habitacion; precioNoche: number | null } | null> {
+    const result = await this.prisma.habitacion.findUnique({
+      where: { id },
+      include: {
+        tipo: {
+          include: {
+            tarifas: {
+              where: {
+                canal: {
+                  tipo: "DIRECTO",
+                },
+              },
+              take: 1,
+            },
+          },
+        },
+      },
     });
 
-    // Ordenar por precio si se especificó
-    if (filters.ordenPrecio) {
-      habitacionesConPrecio.sort((a, b) => {
-        const precioA = a.precioNoche ?? Number.MAX_VALUE;
-        const precioB = b.precioNoche ?? Number.MAX_VALUE;
-        return filters.ordenPrecio === "asc" ? precioA - precioB : precioB - precioA;
-      });
+    if (!result) {
+      return null;
     }
 
-    return habitacionesConPrecio;
+    return {
+      habitacion: this.toDomain(result),
+      precioNoche: result.tipo?.tarifas?.[0]?.precioNoche ? Number(result.tipo.tarifas[0].precioNoche) : null,
+    };
   }
 
   private toDomain(data: any): Habitacion {
