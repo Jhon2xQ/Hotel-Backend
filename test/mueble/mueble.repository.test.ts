@@ -106,7 +106,9 @@ describe("MuebleRepository", () => {
 
       expect(result).toBeDefined();
       expect(result?.id).toBe("test-id");
-      expect(mockPrisma.mueble.findUnique).toHaveBeenCalledWith({ where: { id: "test-id" } });
+      expect(mockPrisma.mueble.findUnique).toHaveBeenCalledWith({
+        where: { id: "test-id" },
+      });
     });
 
     it("should return null when not found", async () => {

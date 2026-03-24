@@ -67,6 +67,34 @@ describe("CreateMuebleUseCase", () => {
     expect(result.codigo).toBe("CAMA-001");
   });
 
+  it("should create mueble without habitacion_id", async () => {
+    const mockCreatedMueble = createMockMueble({
+      codigo: "CAMA-002",
+      nombre: "Silla de Escritorio",
+    });
+    // Manually override habitacionId to null
+    Object.defineProperty(mockCreatedMueble, "habitacionId", {
+      value: null,
+      writable: false,
+      enumerable: true,
+      configurable: true,
+    });
+
+    mockMuebleRepo.create = async () => mockCreatedMueble;
+
+    const input = {
+      codigo: "CAMA-002",
+      nombre: "Silla de Escritorio",
+      categoria_id: "categoria-id",
+    };
+
+    const result = await useCase.execute(input);
+
+    expect(result).toBeDefined();
+    expect(result.codigo).toBe("CAMA-002");
+    expect(result.habitacion_id).toBeNull();
+  });
+
   it("should throw error when codigo already exists", async () => {
     mockMuebleRepo.findByCodigo = async () => createMockMueble();
 

@@ -33,9 +33,9 @@ Crea un nuevo mueble en el sistema.
 - `codigo` (string, requerido): Código único del mueble (máx. 30 caracteres)
 - `nombre` (string, requerido): Nombre del mueble (máx. 100 caracteres)
 - `descripcion` (string, opcional): Descripción detallada del mueble
-- `categoria_id` (uuid, opcional): ID de la categoría del mueble
+- `categoria_id` (uuid, requerido): ID de la categoría del mueble
 - `imagen_url` (string, opcional): URL de la imagen del mueble
-- `condicion` (enum, opcional): Estado del mueble (BUENO, REGULAR, DANADO, FALTANTE)
+- `condicion` (enum, opcional): Estado del mueble (BUENO, REGULAR, DANADO, FALTANTE). Por defecto: BUENO
 - `fecha_adquisicion` (date, opcional): Fecha de adquisición (formato: YYYY-MM-DD)
 - `ultima_revision` (date, opcional): Fecha de última revisión (formato: YYYY-MM-DD)
 - `habitacion_id` (uuid, opcional): ID de la habitación donde se encuentra
@@ -52,32 +52,17 @@ Crea un nuevo mueble en el sistema.
     "nombre": "Cama King Size",
     "descripcion": "Cama de lujo con colchón ortopédico",
     "categoria_id": "uuid-categoria",
-```
-
-    "categoria": {
-      "id": "uuid-categoria",
-      "nombre": "Cama",
-      "descripcion": "Muebles para dormir",
-      "activo": true
-    },
     "imagen_url": "https://example.com/cama.jpg",
     "condicion": "BUENO",
     "fecha_adquisicion": "2025-01-15",
     "ultima_revision": "2026-03-01",
     "habitacion_id": "uuid-habitacion",
-    "habitacion": {
-      "id": "uuid-habitacion",
-      "nro_habitacion": "101",
-      "piso": 1
-    },
     "created_at": "2026-03-24T08:00:00.000Z",
     "updated_at": "2026-03-24T08:00:00.000Z"
-
-},
-"timestamp": 1711267200000
+  },
+  "timestamp": 1711267200000
 }
-
-````
+```
 
 **Errores:**
 
@@ -110,29 +95,32 @@ Obtiene la lista de todos los muebles registrados.
       "nombre": "Cama King Size",
       "descripcion": "Cama de lujo",
       "categoria_id": "uuid-categoria",
-      "categoria": {
-        "id": "uuid-categoria",
-        "nombre": "Cama",
-        "descripcion": "Muebles para dormir",
-        "activo": true
-      },
       "imagen_url": "https://example.com/cama.jpg",
       "condicion": "BUENO",
       "fecha_adquisicion": "2025-01-15",
       "ultima_revision": "2026-03-01",
       "habitacion_id": "uuid-habitacion",
-      "habitacion": {
-        "id": "uuid-habitacion",
-        "nro_habitacion": "101",
-        "piso": 1
-      },
       "created_at": "2026-03-24T08:00:00.000Z",
       "updated_at": "2026-03-24T08:00:00.000Z"
+    },
+    {
+      "id": "uuid-mueble-2",
+      "codigo": "SILLA-001",
+      "nombre": "Silla de Escritorio",
+      "descripcion": "Silla ergonómica",
+      "categoria_id": "uuid-categoria-2",
+      "imagen_url": "https://example.com/silla.jpg",
+      "condicion": "BUENO",
+      "fecha_adquisicion": "2025-02-10",
+      "ultima_revision": null,
+      "habitacion_id": null,
+      "created_at": "2026-03-24T09:00:00.000Z",
+      "updated_at": "2026-03-24T09:00:00.000Z"
     }
   ],
   "timestamp": 1711267200000
 }
-````
+```
 
 **Errores:**
 
@@ -165,22 +153,11 @@ Obtiene los detalles de un mueble específico.
     "nombre": "Cama King Size",
     "descripcion": "Cama de lujo con colchón ortopédico",
     "categoria_id": "uuid-categoria",
-    "categoria": {
-      "id": "uuid-categoria",
-      "nombre": "Cama",
-      "descripcion": "Muebles para dormir",
-      "activo": true
-    },
     "imagen_url": "https://example.com/cama.jpg",
     "condicion": "BUENO",
     "fecha_adquisicion": "2025-01-15",
     "ultima_revision": "2026-03-01",
     "habitacion_id": "uuid-habitacion",
-    "habitacion": {
-      "id": "uuid-habitacion",
-      "nro_habitacion": "101",
-      "piso": 1
-    },
     "created_at": "2026-03-24T08:00:00.000Z",
     "updated_at": "2026-03-24T08:00:00.000Z"
   },
@@ -237,7 +214,7 @@ Todos los campos son opcionales. Solo se actualizarán los campos proporcionados
 - `condicion` (enum, opcional): Estado del mueble (BUENO, REGULAR, DANADO, FALTANTE)
 - `fecha_adquisicion` (date, opcional): Fecha de adquisición (formato: YYYY-MM-DD)
 - `ultima_revision` (date, opcional): Fecha de última revisión (formato: YYYY-MM-DD)
-- `habitacion_id` (uuid, opcional): ID de la habitación donde se encuentra
+- `habitacion_id` (uuid, opcional): ID de la habitación donde se encuentra (puede ser null para desasignar)
 
 **Response (200 OK):**
 
@@ -251,22 +228,11 @@ Todos los campos son opcionales. Solo se actualizarán los campos proporcionados
     "nombre": "Cama Queen Size",
     "descripcion": "Cama queen actualizada",
     "categoria_id": "uuid-categoria",
-    "categoria": {
-      "id": "uuid-categoria",
-      "nombre": "Cama",
-      "descripcion": "Muebles para dormir",
-      "activo": true
-    },
     "imagen_url": "https://example.com/cama-nueva.jpg",
     "condicion": "REGULAR",
     "fecha_adquisicion": "2025-02-01",
     "ultima_revision": "2026-03-15",
     "habitacion_id": "uuid-habitacion-nueva",
-    "habitacion": {
-      "id": "uuid-habitacion-nueva",
-      "nro_habitacion": "102",
-      "piso": 1
-    },
     "created_at": "2026-03-24T08:00:00.000Z",
     "updated_at": "2026-03-24T09:00:00.000Z"
   },
@@ -331,13 +297,73 @@ enum MuebleCondition {
 
 ---
 
+## Estructura de Datos
+
+### Objeto Mueble
+
+```typescript
+{
+  id: string; // UUID del mueble
+  codigo: string; // Código único (máx. 30 caracteres)
+  nombre: string; // Nombre del mueble (máx. 100 caracteres)
+  descripcion: string | null; // Descripción detallada
+  categoria_id: string; // UUID de la categoría
+  imagen_url: string | null; // URL de la imagen
+  condicion: MuebleCondition; // Estado del mueble
+  fecha_adquisicion: string | null; // Fecha en formato YYYY-MM-DD
+  ultima_revision: string | null; // Fecha en formato YYYY-MM-DD
+  habitacion_id: string | null; // UUID de la habitación (puede ser null)
+  created_at: string; // Timestamp ISO 8601
+  updated_at: string; // Timestamp ISO 8601
+}
+```
+
+---
+
 ## Notas
 
-1. Todos los endpoints requieren autenticación mediante Better Auth
-2. Solo usuarios con rol `ADMIN` pueden acceder a estos endpoints
-3. El código del mueble debe ser único en el sistema
-4. Las fechas deben estar en formato ISO 8601 (YYYY-MM-DD)
-5. Los campos opcionales pueden omitirse en las peticiones
-6. La categoría y habitación deben existir antes de asignarlas a un mueble
-7. Al actualizar, solo se modifican los campos proporcionados en el request
-8. Las respuestas incluyen información relacionada (categoría y habitación) cuando están disponibles
+1. **Autenticación**: Todos los endpoints requieren autenticación mediante Better Auth
+2. **Autorización**: Solo usuarios con rol `ADMIN` pueden acceder a estos endpoints
+3. **Código único**: El código del mueble debe ser único en el sistema
+4. **Formato de fechas**: Las fechas deben estar en formato ISO 8601 (YYYY-MM-DD)
+5. **Campos opcionales**: Los campos opcionales pueden omitirse en las peticiones
+6. **Validación de relaciones**:
+   - La categoría debe existir antes de crear/actualizar un mueble
+   - La habitación debe existir si se proporciona `habitacion_id`
+7. **Actualización parcial**: Al actualizar, solo se modifican los campos proporcionados en el request
+8. **Muebles sin asignar**: Un mueble puede existir sin estar asignado a ninguna habitación (`habitacion_id: null`)
+9. **Respuestas simplificadas**: Las respuestas solo incluyen IDs de relaciones, no objetos anidados
+10. **Condición por defecto**: Si no se especifica, la condición del mueble será `BUENO`
+
+---
+
+## Ejemplos de Uso
+
+### Crear mueble sin habitación asignada
+
+```json
+POST /api/muebles
+{
+  "codigo": "SILLA-001",
+  "nombre": "Silla de Escritorio",
+  "categoria_id": "uuid-categoria"
+}
+```
+
+### Desasignar mueble de una habitación
+
+```json
+PUT /api/muebles/:id
+{
+  "habitacion_id": null
+}
+```
+
+### Actualizar solo la condición
+
+```json
+PUT /api/muebles/:id
+{
+  "condicion": "DANADO"
+}
+```

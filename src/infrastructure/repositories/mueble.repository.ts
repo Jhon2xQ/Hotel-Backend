@@ -1,12 +1,6 @@
 import { PrismaClient } from "../../../generated/prisma/client";
 import { Prisma } from "../../../generated/prisma/client";
-import {
-  Mueble,
-  MuebleCondition,
-  CreateMuebleData,
-  CategoriaMuebleBasic,
-  HabitacionBasic,
-} from "../../domain/entities/mueble.entity";
+import { Mueble, MuebleCondition, CreateMuebleData } from "../../domain/entities/mueble.entity";
 import { IMuebleRepository, UpdateMuebleData } from "../../domain/interfaces/mueble.repository.interface";
 import { MuebleException } from "../../domain/exceptions/mueble.exception";
 
@@ -25,10 +19,9 @@ export class MuebleRepository implements IMuebleRepository {
           condicion: data.condicion ?? MuebleCondition.Bueno,
           fechaAdq: data.fechaAdq ?? null,
           ultimaRevision: data.ultimaRevision ?? null,
-          habitacionId: data.habitacionId,
+          habitacionId: data.habitacionId ?? null,
         },
       });
-      console.log("pase");
       return this.toDomain(result);
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -109,36 +102,17 @@ export class MuebleRepository implements IMuebleRepository {
   }
 
   private toDomain(data: any): Mueble {
-    const cataegoria: CategoriaMuebleBasic | null = data.categoria
-      ? {
-          id: data.categoria.id,
-          nombre: data.categoria.nombre,
-          descripcion: data.categoria.descripcion,
-          activo: data.categoria.activo,
-        }
-      : null;
-
-    const habitacion: HabitacionBasic | null = data.habitacion
-      ? {
-          id: data.habitacion.id,
-          nroHabitacion: data.habitacion.nro_habitacion,
-          piso: data.habitacion.piso,
-        }
-      : null;
-
     return new Mueble(
       data.id,
       data.codigo,
       data.nombre,
       data.descripcion,
       data.categoriaId,
-      cataegoria,
       data.imagenUrl,
       data.condicion as MuebleCondition,
       data.fechaAdq,
       data.ultimaRevision,
       data.habitacionId,
-      habitacion,
       data.createdAt,
       data.updatedAt,
     );

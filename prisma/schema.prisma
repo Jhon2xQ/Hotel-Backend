@@ -320,12 +320,12 @@ model Mueble {
   fechaAdq       DateTime?        @db.Date
   ultimaRevision DateTime?        @db.Date
   descripcion    String?          @db.Text
-  habitacionId   String           @db.Uuid
+  habitacionId   String?          @db.Uuid
   createdAt      DateTime         @default(now()) @db.Timestamptz
   updatedAt      DateTime         @updatedAt @db.Timestamptz
 
   categoria     CategoriaMueble   @relation(fields: [categoriaId], references: [id])
-  habitacion    Habitacion        @relation(fields: [habitacionId], references: [id])
+  habitacion    Habitacion?       @relation(fields: [habitacionId], references: [id])
   
   @@map("muebles")
 }
