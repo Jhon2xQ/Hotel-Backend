@@ -12,11 +12,7 @@ import { MuebleController } from "../presentation/controllers/mueble.controller"
 import { authMiddleware } from "../presentation/middlewares/auth.middleware";
 import { adminMiddleware } from "../presentation/middlewares/admin.middleware";
 import { validSchema, validParams } from "../presentation/middlewares/valid.middleware";
-import {
-  CreateMuebleSchema,
-  UpdateMuebleSchema,
-  UUIDParamSchema,
-} from "../presentation/schemas/mueble.schema";
+import { CreateMuebleSchema, UpdateMuebleSchema, UUIDParamSchema } from "../presentation/schemas/mueble.schema";
 import { CategoriaMuebleRepository } from "../infrastructure/repositories/categoria-mueble.repository";
 
 export function createMuebleRoutes(prismaClient: PrismaClient): AppHono {
@@ -30,13 +26,7 @@ export function createMuebleRoutes(prismaClient: PrismaClient): AppHono {
   const updateUseCase = new UpdateMuebleUseCase(repository, habitacionRepository);
   const deleteUseCase = new DeleteMuebleUseCase(repository);
 
-  const controller = new MuebleController(
-    createUseCase,
-    listUseCase,
-    findByIdUseCase,
-    updateUseCase,
-    deleteUseCase,
-  );
+  const controller = new MuebleController(createUseCase, listUseCase, findByIdUseCase, updateUseCase, deleteUseCase);
 
   const router = new Hono<{ Variables: AppVariables }>();
 
@@ -47,7 +37,8 @@ export function createMuebleRoutes(prismaClient: PrismaClient): AppHono {
 
   router.post("/", adminMiddleware, validSchema(CreateMuebleSchema), controller.create.bind(controller));
   router.put(
-    "/:id", adminMiddleware,
+    "/:id",
+    adminMiddleware,
     validParams(UUIDParamSchema),
     validSchema(UpdateMuebleSchema),
     controller.update.bind(controller),

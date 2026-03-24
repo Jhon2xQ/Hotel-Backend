@@ -9,7 +9,7 @@ export class CreateMuebleUseCase {
   constructor(
     private repository: IMuebleRepository,
     private habitacionRepository: IHabitacionRepository,
-    private categoriaRepository: CategoriaMuebleRepository
+    private categoriaRepository: CategoriaMuebleRepository,
   ) {}
 
   async execute(input: CreateMuebleInput): Promise<MuebleOutput> {
@@ -17,11 +17,10 @@ export class CreateMuebleUseCase {
     if (existing) {
       throw MuebleException.duplicateCodigo();
     }
-    if (input.categoria_id) {
-      const categoria = await this.categoriaRepository.findById(input.categoria_id);
-      if (!categoria) {
-        throw CategoriaMuebleException.notFoundById(input.categoria_id);
-      }
+
+    const categoria = await this.categoriaRepository.findById(input.categoria_id);
+    if (!categoria) {
+      throw CategoriaMuebleException.notFoundById(input.categoria_id);
     }
 
     if (input.habitacion_id) {
@@ -40,7 +39,7 @@ export class CreateMuebleUseCase {
       condicion: input.condicion,
       fechaAdq: input.fecha_adquisicion ? new Date(input.fecha_adquisicion) : null,
       ultimaRevision: input.ultima_revision ? new Date(input.ultima_revision) : null,
-      habitacionId: input.habitacion_id,
+      habitacionId: input.habitacion_id ?? null,
     });
     return furniture.toOutput();
   }

@@ -9,7 +9,7 @@ export interface CreateMuebleInput {
   condicion?: MuebleCondition;
   fecha_adquisicion?: string;
   ultima_revision?: string;
-  habitacion_id: string;
+  habitacion_id?: string;
 }
 
 export interface UpdateMuebleInput {
@@ -30,22 +30,11 @@ export interface MuebleOutput {
   nombre: string;
   descripcion: string | null;
   categoria_id: string;
-  categoria: {
-    id: string;
-    nombre: string;
-    descripcion: string | null;
-    activo: boolean;
-  } | null;
   imagen_url: string | null;
   condicion: string;
   fecha_adquisicion: string | null;
   ultima_revision: string | null;
   habitacion_id: string | null;
-  habitacion: {
-    id: string;
-    nro_habitacion: string;
-    piso: number;
-  } | null;
   created_at: string;
   updated_at: string;
 }

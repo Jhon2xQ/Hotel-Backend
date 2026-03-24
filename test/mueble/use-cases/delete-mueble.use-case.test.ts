@@ -25,7 +25,9 @@ describe("DeleteMuebleUseCase", () => {
     const existingMueble = createMockMueble({ id: "test-id" });
     mockMuebleRepo.findById = async () => existingMueble;
 
-    await expect(useCase.execute("test-id")).resolves.not.toThrow();
+    await useCase.execute("test-id");
+
+    expect(mockMuebleRepo.delete).toBeDefined();
   });
 
   it("should throw error when mueble not found", async () => {
