@@ -1,4 +1,4 @@
-# Sistema de Gestión Hotelera - Documentación General Version 1.0.0
+# Sistema de Gestión Hotelera para el Hotel KORIKALLPA - Documentación General Version 1.0.0
 
 ## Índice
 
@@ -15,7 +15,7 @@
 
 ## Introducción
 
-El Sistema de Gestión Hotelera es una aplicación web diseñada para administrar las operaciones diarias de un hotel, desde la gestión de reservas hasta el control de inventario de muebles y el registro de pagos. El sistema está orientado a hoteles pequeños y medianos que buscan digitalizar sus procesos operativos.
+El Sistema de Gestión Hotelera es una aplicación web diseñada para administrar las operaciones diarias del hotel, desde la gestión de reservas hasta el control de inventario de muebles y el registro de pagos.
 
 ### Objetivo
 
