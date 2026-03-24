@@ -33,6 +33,7 @@ describe("CreateMuebleUseCase", () => {
       updateStatus: async () => createMockHabitacion(),
       delete: async () => {},
       hasRelatedRecords: async () => false,
+      findAvailableWithFilters: async () => [],
     };
 
     mockCategoriaRepo = {

@@ -6,10 +6,12 @@ import { FindHabitacionByIdUseCase } from "../../application/use-cases/habitacio
 import { UpdateHabitacionUseCase } from "../../application/use-cases/habitacion/update-habitacion.use-case";
 import { UpdateHabitacionStatusUseCase } from "../../application/use-cases/habitacion/update-habitacion-status.use-case";
 import { DeleteHabitacionUseCase } from "../../application/use-cases/habitacion/delete-habitacion.use-case";
+import { SearchAvailableHabitacionesUseCase } from "../../application/use-cases/habitacion/search-available-habitaciones.use-case";
 import {
   CreateHabitacionInput,
   UpdateHabitacionInput,
   UpdateHabitacionStatusInput,
+  SearchAvailableHabitacionesInput,
 } from "../../application/dtos/habitacion.dto";
 
 export class HabitacionController {
@@ -20,6 +22,7 @@ export class HabitacionController {
     private updateUseCase: UpdateHabitacionUseCase,
     private updateStatusUseCase: UpdateHabitacionStatusUseCase,
     private deleteUseCase: DeleteHabitacionUseCase,
+    private searchAvailableUseCase: SearchAvailableHabitacionesUseCase,
   ) {}
 
   async create(c: AppContext) {
@@ -57,5 +60,17 @@ export class HabitacionController {
     const { id } = c.req.param();
     await this.deleteUseCase.execute(id);
     return c.json(ApiResponse.success("Habitación eliminada exitosamente"), 200);
+  }
+
+  async searchAvailable(c: AppContext) {
+    const query = c.req.query();
+    const input: SearchAvailableHabitacionesInput = {
+      tipo: query.tipo,
+      fecha_inicio: query.fecha_inicio,
+      fecha_fin: query.fecha_fin,
+      orden_precio: query.orden_precio as "asc" | "desc" | undefined,
+    };
+    const results = await this.searchAvailableUseCase.execute(input);
+    return c.json(ApiResponse.success("Habitaciones disponibles obtenidas exitosamente", results), 200);
   }
 }
