@@ -10,14 +10,16 @@ import { FindHabitacionByIdUseCase } from "../application/use-cases/habitacion/f
 import { UpdateHabitacionUseCase } from "../application/use-cases/habitacion/update-habitacion.use-case";
 import { UpdateHabitacionStatusUseCase } from "../application/use-cases/habitacion/update-habitacion-status.use-case";
 import { DeleteHabitacionUseCase } from "../application/use-cases/habitacion/delete-habitacion.use-case";
+import { SearchAvailableHabitacionesUseCase } from "../application/use-cases/habitacion/search-available-habitaciones.use-case";
 import { HabitacionController } from "../presentation/controllers/habitacion.controller";
 import { authMiddleware } from "../presentation/middlewares/auth.middleware";
 import { adminMiddleware } from "../presentation/middlewares/admin.middleware";
-import { validSchema, validParams } from "../presentation/middlewares/valid.middleware";
+import { validSchema, validParams, validQuery } from "../presentation/middlewares/valid.middleware";
 import {
   CreateHabitacionSchema,
   UpdateHabitacionSchema,
   UpdateHabitacionStatusSchema,
+  SearchAvailableHabitacionesSchema,
 } from "../presentation/schemas/habitacion.schema";
 import { UUIDParamSchema } from "../presentation/schemas/tipo-habitacion.schema";
 
@@ -32,6 +34,7 @@ export function createHabitacionRoutes(prismaClient: PrismaClient): AppHono {
   const updateUseCase = new UpdateHabitacionUseCase(repository, tipoHabitacionRepository, furnitureRepository);
   const updateStatusUseCase = new UpdateHabitacionStatusUseCase(repository);
   const deleteUseCase = new DeleteHabitacionUseCase(repository);
+  const searchAvailableUseCase = new SearchAvailableHabitacionesUseCase(repository);
 
   const controller = new HabitacionController(
     createUseCase,
@@ -40,6 +43,7 @@ export function createHabitacionRoutes(prismaClient: PrismaClient): AppHono {
     updateUseCase,
     updateStatusUseCase,
     deleteUseCase,
+    searchAvailableUseCase,
   );
 
   const router = new Hono<{ Variables: AppVariables }>();
@@ -48,6 +52,11 @@ export function createHabitacionRoutes(prismaClient: PrismaClient): AppHono {
 
   router.post("/", adminMiddleware, validSchema(CreateHabitacionSchema), controller.create.bind(controller));
   router.get("/", controller.list.bind(controller));
+  router.get(
+    "/disponibles",
+    validQuery(SearchAvailableHabitacionesSchema),
+    controller.searchAvailable.bind(controller),
+  );
   router.get("/:id", validParams(UUIDParamSchema), controller.findById.bind(controller));
   router.put(
     "/:id",
