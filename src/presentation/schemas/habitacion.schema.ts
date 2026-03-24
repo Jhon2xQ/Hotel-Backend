@@ -41,3 +41,22 @@ export const UpdateHabitacionStatusSchema = z
   .refine((data) => data.estado !== undefined || data.ulti_limpieza !== undefined, {
     message: "Debe proporcionar al menos un campo (estado o limpieza)",
   });
+
+export const SearchAvailableHabitacionesSchema = z
+  .object({
+    tipo: z.string().optional(),
+    fecha_inicio: z.string().datetime({ message: "fecha_inicio debe ser una fecha ISO válida" }).optional(),
+    fecha_fin: z.string().datetime({ message: "fecha_fin debe ser una fecha ISO válida" }).optional(),
+    orden_precio: z.enum(["asc", "desc"]).optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.fecha_inicio && data.fecha_fin) {
+        return new Date(data.fecha_inicio) < new Date(data.fecha_fin);
+      }
+      return true;
+    },
+    {
+      message: "fecha_inicio debe ser anterior a fecha_fin",
+    },
+  );

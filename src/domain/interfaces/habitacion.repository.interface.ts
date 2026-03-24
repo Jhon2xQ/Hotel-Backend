@@ -26,4 +26,10 @@ export interface IHabitacionRepository {
   updateStatus(id: string, data: UpdateHabitacionStatusData): Promise<Habitacion>;
   delete(id: string): Promise<void>;
   hasRelatedRecords(id: string): Promise<boolean>;
+  findAvailableWithFilters(filters: {
+    tipoNombre?: string;
+    fechaInicio?: Date;
+    fechaFin?: Date;
+    ordenPrecio?: "asc" | "desc";
+  }): Promise<Array<Habitacion & { precioNoche?: number }>>;
 }

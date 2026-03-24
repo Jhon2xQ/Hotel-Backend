@@ -41,3 +41,23 @@ export function validParams(schema: ZodSchema) {
     }
   };
 }
+
+export function validQuery(schema: ZodSchema) {
+  return async (c: AppContext, next: Next) => {
+    try {
+      const query = c.req.query();
+      const validData = schema.parse(query);
+      c.set("validData", validData);
+      await next();
+    } catch (error: any) {
+      if (error instanceof ZodError) {
+        const errorDetails = error.issues.map((err) => {
+          const field = err.path.join(".");
+          return `${field}: ${err.message}`;
+        });
+        return c.json(ApiResponse.error(`Error de validación en query: ${errorDetails.join(" | ")}`), 400);
+      }
+      return c.json(ApiResponse.error("Datos inválidos en query params"), 400);
+    }
+  };
+}

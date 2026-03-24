@@ -7,10 +7,7 @@ import {
   CategoriaMuebleBasic,
   HabitacionBasic,
 } from "../../domain/entities/mueble.entity";
-import {
-  IMuebleRepository,
-  UpdateMuebleData,
-} from "../../domain/interfaces/mueble.repository.interface";
+import { IMuebleRepository, UpdateMuebleData } from "../../domain/interfaces/mueble.repository.interface";
 import { MuebleException } from "../../domain/exceptions/mueble.exception";
 
 export class MuebleRepository implements IMuebleRepository {
@@ -31,6 +28,7 @@ export class MuebleRepository implements IMuebleRepository {
           habitacionId: data.habitacionId,
         },
       });
+      console.log("pase");
       return this.toDomain(result);
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -121,13 +119,13 @@ export class MuebleRepository implements IMuebleRepository {
       : null;
 
     const habitacion: HabitacionBasic | null = data.habitacion
-       ? {
+      ? {
           id: data.habitacion.id,
           nroHabitacion: data.habitacion.nro_habitacion,
           piso: data.habitacion.piso,
         }
       : null;
-      
+
     return new Mueble(
       data.id,
       data.codigo,

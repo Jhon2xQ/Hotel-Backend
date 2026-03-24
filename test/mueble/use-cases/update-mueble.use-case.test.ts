@@ -31,6 +31,7 @@ describe("UpdateMuebleUseCase", () => {
       updateStatus: async () => createMockHabitacion(),
       delete: async () => {},
       hasRelatedRecords: async () => false,
+      findAvailableWithFilters: async () => [],
     };
 
     useCase = new UpdateMuebleUseCase(mockMuebleRepo, mockHabitacionRepo);

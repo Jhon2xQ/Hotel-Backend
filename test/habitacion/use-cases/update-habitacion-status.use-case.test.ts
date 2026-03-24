@@ -19,6 +19,7 @@ describe("UpdateHabitacionStatusUseCase", () => {
       updateStatus: async () => createMockHabitacion(),
       delete: async () => {},
       hasRelatedRecords: async () => false,
+      findAvailableWithFilters: async () => [],
     };
 
     useCase = new UpdateHabitacionStatusUseCase(mockRepository);

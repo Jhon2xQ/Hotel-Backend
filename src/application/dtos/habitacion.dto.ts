@@ -30,6 +30,13 @@ export interface UpdateHabitacionStatusInput {
   ulti_limpieza?: string;
 }
 
+export interface SearchAvailableHabitacionesInput {
+  tipo?: string;
+  fecha_inicio?: string;
+  fecha_fin?: string;
+  orden_precio?: "asc" | "desc";
+}
+
 export interface HabitacionOutput {
   id: string;
   nro_habitacion: string;
@@ -48,4 +55,8 @@ export interface HabitacionOutput {
   ulti_limpieza: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface HabitacionAvailableOutput extends HabitacionOutput {
+  precio_noche?: number;
 }

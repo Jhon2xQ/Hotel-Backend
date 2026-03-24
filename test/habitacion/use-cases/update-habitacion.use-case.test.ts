@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { UpdateHabitacionUseCase } from "../../../src/application/use-cases/habitacion/update-habitacion.use-case";
 import { IHabitacionRepository } from "../../../src/domain/interfaces/habitacion.repository.interface";
 import { ITipoHabitacionRepository } from "../../../src/domain/interfaces/tipo-habitacion.repository.interface";
-import { IFurnitureCatalogRepository } from "../../../src/domain/interfaces/furniture-catalog.repository.interface";
+import { IMuebleRepository } from "../../../src/domain/interfaces/mueble.repository.interface";
 import { HabitacionException } from "../../../src/domain/exceptions/habitacion.exception";
 import { createMockHabitacion } from "../../helpers/habitacion-fixtures";
 import { createMockTipoHabitacion } from "../../helpers/tipo-habitacion-fixtures";
@@ -12,7 +12,7 @@ describe("UpdateHabitacionUseCase", () => {
   let useCase: UpdateHabitacionUseCase;
   let mockHabitacionRepo: IHabitacionRepository;
   let mockTipoRepo: ITipoHabitacionRepository;
-  let mockFurnitureRepo: IFurnitureCatalogRepository;
+  let mockFurnitureRepo: IMuebleRepository;
 
   beforeEach(() => {
     mockHabitacionRepo = {
@@ -24,6 +24,7 @@ describe("UpdateHabitacionUseCase", () => {
       updateStatus: async () => createMockHabitacion(),
       delete: async () => {},
       hasRelatedRecords: async () => false,
+      findAvailableWithFilters: async () => [],
     };
 
     mockTipoRepo = {

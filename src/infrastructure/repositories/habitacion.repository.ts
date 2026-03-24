@@ -29,7 +29,7 @@ export class HabitacionRepository implements IHabitacionRepository {
           estado: data.estado ?? EstadoHabitacion.DISPONIBLE,
           notas: data.notas,
         },
-        include: {tipo: true},
+        include: { tipo: true },
       });
       return this.toDomain(result);
     } catch (error) {
@@ -117,7 +117,6 @@ export class HabitacionRepository implements IHabitacionRepository {
 
       if (data.estado !== undefined) updateData.estado = data.estado;
 
-
       const result = await this.prisma.habitacion.update({
         where: { id },
         data: updateData,
@@ -154,6 +153,96 @@ export class HabitacionRepository implements IHabitacionRepository {
   async hasRelatedRecords(id: string): Promise<boolean> {
     const estanciaCount = await this.prisma.estancia.count({ where: { habitacionId: id } });
     return estanciaCount > 0;
+  }
+
+  async findAvailableWithFilters(filters: {
+    tipoNombre?: string;
+    fechaInicio?: Date;
+    fechaFin?: Date;
+    ordenPrecio?: "asc" | "desc";
+  }): Promise<Array<Habitacion & { precioNoche?: number }>> {
+    const whereClause: any = {};
+
+    // Filtro por tipo de habitación
+    if (filters.tipoNombre) {
+      whereClause.tipo = {
+        nombre: {
+          contains: filters.tipoNombre,
+          mode: "insensitive",
+        },
+      };
+    }
+
+    // Filtro por disponibilidad en rango de fechas
+    if (filters.fechaInicio && filters.fechaFin) {
+      whereClause.reservas = {
+        none: {
+          AND: [
+            {
+              OR: [{ estado: "CONFIRMADA" }, { estado: "EN_CASA" }],
+            },
+            {
+              OR: [
+                {
+                  AND: [{ fechaEntrada: { lte: filters.fechaInicio } }, { fechaSalida: { gt: filters.fechaInicio } }],
+                },
+                {
+                  AND: [{ fechaEntrada: { lt: filters.fechaFin } }, { fechaSalida: { gte: filters.fechaFin } }],
+                },
+                {
+                  AND: [{ fechaEntrada: { gte: filters.fechaInicio } }, { fechaSalida: { lte: filters.fechaFin } }],
+                },
+              ],
+            },
+          ],
+        },
+      };
+    }
+
+    const orderBy: any = {};
+    if (filters.ordenPrecio) {
+      orderBy.tipo = {
+        tarifas: {
+          _count: filters.ordenPrecio,
+        },
+      };
+    }
+
+    const results = await this.prisma.habitacion.findMany({
+      where: whereClause,
+      include: {
+        tipo: {
+          include: {
+            tarifas: {
+              orderBy: {
+                precioNoche: filters.ordenPrecio || "asc",
+              },
+              take: 1,
+            },
+          },
+        },
+      },
+      orderBy: orderBy.tipo ? orderBy : { nroHabitacion: "asc" },
+    });
+
+    // Mapear resultados con precio
+    const habitacionesConPrecio = results.map((r) => {
+      const habitacion = this.toDomain(r);
+      const precioNoche = r.tipo?.tarifas?.[0]?.precioNoche ? Number(r.tipo.tarifas[0].precioNoche) : undefined;
+
+      return Object.assign(habitacion, { precioNoche });
+    });
+
+    // Ordenar por precio si se especificó
+    if (filters.ordenPrecio) {
+      habitacionesConPrecio.sort((a, b) => {
+        const precioA = a.precioNoche ?? Number.MAX_VALUE;
+        const precioB = b.precioNoche ?? Number.MAX_VALUE;
+        return filters.ordenPrecio === "asc" ? precioA - precioB : precioB - precioA;
+      });
+    }
+
+    return habitacionesConPrecio;
   }
 
   private toDomain(data: any): Habitacion {

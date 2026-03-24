@@ -6,6 +6,7 @@ import { FindHabitacionByIdUseCase } from "../../src/application/use-cases/habit
 import { UpdateHabitacionUseCase } from "../../src/application/use-cases/habitacion/update-habitacion.use-case";
 import { UpdateHabitacionStatusUseCase } from "../../src/application/use-cases/habitacion/update-habitacion-status.use-case";
 import { DeleteHabitacionUseCase } from "../../src/application/use-cases/habitacion/delete-habitacion.use-case";
+import { SearchAvailableHabitacionesUseCase } from "../../src/application/use-cases/habitacion/search-available-habitaciones.use-case";
 import { createMockContext } from "../helpers/mock-context";
 import { EstadoHabitacion } from "../../src/domain/entities/habitacion.entity";
 
@@ -17,6 +18,7 @@ describe("HabitacionController", () => {
   let mockUpdateUseCase: any;
   let mockUpdateStatusUseCase: any;
   let mockDeleteUseCase: any;
+  let mockSearchAvailableUseCase: any;
 
   beforeEach(() => {
     mockCreateUseCase = { execute: vi.fn() };
@@ -25,6 +27,7 @@ describe("HabitacionController", () => {
     mockUpdateUseCase = { execute: vi.fn() };
     mockUpdateStatusUseCase = { execute: vi.fn() };
     mockDeleteUseCase = { execute: vi.fn() };
+    mockSearchAvailableUseCase = { execute: vi.fn() };
 
     controller = new HabitacionController(
       mockCreateUseCase,
@@ -33,6 +36,7 @@ describe("HabitacionController", () => {
       mockUpdateUseCase,
       mockUpdateStatusUseCase,
       mockDeleteUseCase,
+      mockSearchAvailableUseCase,
     );
   });
 
