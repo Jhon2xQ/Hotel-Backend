@@ -15,6 +15,7 @@ export interface IHuespedRepository {
   create(data: CreateHuespedData): Promise<Huesped>;
   findAll(): Promise<Huesped[]>;
   findById(id: string): Promise<Huesped | null>;
+  findByEmail(email: string): Promise<Huesped | null>;
   update(id: string, data: UpdateHuespedData): Promise<Huesped>;
   delete(id: string): Promise<void>;
 }

@@ -12,6 +12,7 @@ describe("UpdateHuespedUseCase", () => {
       create: async () => createMockHuesped(),
       findAll: async () => [],
       findById: async () => null,
+      findByEmail: async () => null,
       update: async () => createMockHuesped(),
       delete: async () => {},
     };
@@ -20,7 +21,8 @@ describe("UpdateHuespedUseCase", () => {
   });
 
   it("should update huesped successfully", async () => {
-    const mockHuesped = createMockHuesped({ telefono: "+51999999999" });
+    const mockHuesped = createMockHuesped({ id: "test-huesped-id", telefono: "+51999999999" });
+    mockRepository.findById = async () => createMockHuesped({ id: "test-huesped-id" });
     mockRepository.update = async () => mockHuesped;
 
     const result = await useCase.execute("test-huesped-id", {
@@ -31,7 +33,8 @@ describe("UpdateHuespedUseCase", () => {
   });
 
   it("should update tipo_doc and nro_doc", async () => {
-    const mockHuesped = createMockHuesped({ tipo_doc: "PASAPORTE", nro_doc: "AB123456" });
+    const mockHuesped = createMockHuesped({ id: "test-huesped-id", tipo_doc: "PASAPORTE", nro_doc: "AB123456" });
+    mockRepository.findById = async () => createMockHuesped({ id: "test-huesped-id" });
     mockRepository.update = async () => mockHuesped;
 
     const result = await useCase.execute("test-huesped-id", {
@@ -45,9 +48,11 @@ describe("UpdateHuespedUseCase", () => {
 
   it("should update multiple fields", async () => {
     const mockHuesped = createMockHuesped({
+      id: "test-huesped-id",
       telefono: "+51988888888",
       observacion: "Cliente VIP actualizado",
     });
+    mockRepository.findById = async () => createMockHuesped({ id: "test-huesped-id" });
     mockRepository.update = async () => mockHuesped;
 
     const result = await useCase.execute("test-huesped-id", {

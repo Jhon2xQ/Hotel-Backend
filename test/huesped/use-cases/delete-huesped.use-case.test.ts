@@ -12,6 +12,7 @@ describe("DeleteHuespedUseCase", () => {
       create: async () => createMockHuesped(),
       findAll: async () => [],
       findById: async () => null,
+      findByEmail: async () => null,
       update: async () => createMockHuesped(),
       delete: vi.fn(),
     };
@@ -20,6 +21,9 @@ describe("DeleteHuespedUseCase", () => {
   });
 
   it("should delete huesped successfully", async () => {
+    const mockHuesped = createMockHuesped({ id: "test-huesped-id" });
+    mockRepository.findById = async () => mockHuesped;
+
     await useCase.execute("test-huesped-id");
 
     expect(mockRepository.delete).toHaveBeenCalledWith("test-huesped-id");

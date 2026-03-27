@@ -12,6 +12,7 @@ describe("ListHuespedUseCase", () => {
       create: async () => createMockHuesped(),
       findAll: async () => [],
       findById: async () => null,
+      findByEmail: async () => null,
       update: async () => createMockHuesped(),
       delete: async () => {},
     };
