@@ -21,7 +21,6 @@ export class ReservaController {
   async create(c: AppContext) {
     const validData = c.get("validData") as any;
     const input: CreateReservaInput = {
-      codigo: validData.codigo,
       huespedId: validData.huespedId,
       habitacionId: validData.habitacionId,
       tarifaId: validData.tarifaId,

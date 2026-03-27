@@ -2,6 +2,7 @@ import { IReservaRepository } from "../../../domain/interfaces/reserva.repositor
 import { Reserva } from "../../../domain/entities/reserva.entity";
 import { CreateReservaInput } from "../../dtos/reserva.dto";
 import { ReservaException } from "../../../domain/exceptions/reserva.exception";
+import { generateCodigoReserva } from "../../../common/utils/codigo-generator";
 
 export class CreateReservaUseCase {
   constructor(private reservaRepository: IReservaRepository) {}
@@ -18,14 +19,28 @@ export class CreateReservaUseCase {
       throw ReservaException.invalidNinos();
     }
 
-    // Verificar código único
-    const existingCodigo = await this.reservaRepository.findByCodigo(input.codigo);
-    if (existingCodigo) {
-      throw ReservaException.duplicateCodigo(input.codigo);
+    // Generar código único automáticamente
+    let codigo: string;
+    let attempts = 0;
+    const maxAttempts = 10;
+
+    while (attempts < maxAttempts) {
+      codigo = generateCodigoReserva();
+      const existingCodigo = await this.reservaRepository.findByCodigo(codigo);
+
+      if (!existingCodigo) {
+        break;
+      }
+
+      attempts++;
+    }
+
+    if (attempts === maxAttempts) {
+      throw ReservaException.codigoGenerationFailed();
     }
 
     return await this.reservaRepository.create({
-      codigo: input.codigo,
+      codigo: codigo!,
       huespedId: input.huespedId,
       habitacionId: input.habitacionId,
       tarifaId: input.tarifaId,

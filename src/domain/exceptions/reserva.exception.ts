@@ -57,4 +57,8 @@ export class ReservaException extends DomainException {
   static cancelRequiresMotivo(): ReservaException {
     return new ReservaException("Debe proporcionar un motivo de cancelación", 400);
   }
+
+  static codigoGenerationFailed(): ReservaException {
+    return new ReservaException("No se pudo generar un código único para la reserva. Intente nuevamente.", 500);
+  }
 }
