@@ -1,6 +1,7 @@
 import { PrismaClient } from "../../../generated/prisma/client";
 import { Huesped, CreateHuespedData } from "../../domain/entities/huesped.entity";
 import { IHuespedRepository, UpdateHuespedData } from "../../domain/interfaces/huesped.repository.interface";
+import { PaginatedResult, PaginationParams } from "../../common/types/pagination.types";
 
 export class HuespedRepository implements IHuespedRepository {
   constructor(private readonly prisma: PrismaClient) {}
@@ -55,6 +56,49 @@ export class HuespedRepository implements IHuespedRepository {
           h.updatedAt,
         ),
     );
+  }
+
+  async findAllPaginated(params: PaginationParams): Promise<PaginatedResult<Huesped>> {
+    const { page, limit } = params;
+    const skip = (page - 1) * limit;
+
+    const [huespedes, total] = await Promise.all([
+      this.prisma.huesped.findMany({
+        take: limit,
+        skip: skip,
+        orderBy: { createdAt: "desc" },
+      }),
+      this.prisma.huesped.count(),
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      list: huespedes.map(
+        (h) =>
+          new Huesped(
+            h.id,
+            h.tipoDoc,
+            h.nroDoc,
+            h.nombres,
+            h.apellidos,
+            h.email,
+            h.telefono,
+            h.nacionalidad,
+            h.observacion,
+            h.createdAt,
+            h.updatedAt,
+          ),
+      ),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
+      },
+    };
   }
 
   async findById(id: string): Promise<Huesped | null> {

@@ -16,13 +16,31 @@ Todos los endpoints requieren autenticación mediante Better Auth. El token de s
 
 ## Endpoints
 
-### 1. Listar Huéspedes
+### 1. Listar Huéspedes (Paginado)
 
-Obtiene la lista completa de huéspedes registrados en el sistema.
+Obtiene una lista paginada de huéspedes registrados en el sistema.
 
 **Endpoint:** `GET /api/huespedes`
 
 **Autenticación:** Requerida
+
+**Query Parameters:**
+
+- `page` (number, opcional): Número de página (por defecto: 1, mínimo: 1)
+- `limit` (number, opcional): Cantidad de resultados por página (por defecto: 10, mínimo: 1, máximo: 100)
+
+**Ejemplo de petición:**
+
+```bash
+# Sin parámetros (usa valores por defecto: page=1, limit=10)
+GET /api/huespedes
+
+# Con parámetros personalizados
+GET /api/huespedes?page=2&limit=20
+
+# Primera página con 50 registros
+GET /api/huespedes?page=1&limit=50
+```
 
 **Respuesta exitosa (200):**
 
@@ -30,21 +48,53 @@ Obtiene la lista completa de huéspedes registrados en el sistema.
 {
   "success": true,
   "message": "Huéspedes obtenidos exitosamente",
-  "data": [
-    {
-      "id": "550e8400-e29b-41d4-a716-446655440000",
-      "tipo_doc": "DNI",
-      "nro_doc": "12345678",
-      "nombres": "Juan Carlos",
-      "apellidos": "Pérez García",
-      "email": "juan.perez@example.com",
-      "telefono": "+51987654321",
-      "nacionalidad": "Perú",
-      "observacion": "Cliente frecuente, prefiere habitaciones con vista",
-      "created_at": "2026-03-15T10:30:00.000Z",
-      "updated_at": "2026-03-15T10:30:00.000Z"
+  "data": {
+    "list": [
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440000",
+        "tipo_doc": "DNI",
+        "nro_doc": "12345678",
+        "nombres": "Juan Carlos",
+        "apellidos": "Pérez García",
+        "email": "juan.perez@example.com",
+        "telefono": "+51987654321",
+        "nacionalidad": "Perú",
+        "observacion": "Cliente frecuente",
+        "created_at": "2026-03-15T10:30:00.000Z",
+        "updated_at": "2026-03-15T10:30:00.000Z"
+      }
+    ],
+    "pagination": {
+      "page": 2,
+      "limit": 20,
+      "total": 45,
+      "totalPages": 3,
+      "hasNextPage": true,
+      "hasPreviousPage": true
     }
-  ],
+  },
+  "timestamp": 1710498600000
+}
+```
+
+**Campos de la respuesta:**
+
+- `list`: Array de huéspedes en la página actual
+- `pagination`: Objeto con información de paginación
+  - `page`: Número de página actual
+  - `limit`: Cantidad de resultados por página
+  - `total`: Total de huéspedes en el sistema
+  - `totalPages`: Total de páginas disponibles
+  - `hasNextPage`: `true` si existe una página siguiente, `false` en caso contrario
+  - `hasPreviousPage`: `true` si existe una página anterior, `false` en caso contrario
+
+**Respuesta de error (400) - Validación:**
+
+```json
+{
+  "success": false,
+  "message": "Error de validación en query: page: La página debe ser mayor a 0",
+  "data": null,
   "timestamp": 1710498600000
 }
 ```
@@ -286,9 +336,40 @@ Elimina un huésped del sistema.
 
 ## Notas Importantes
 
+### Paginación
+
+El endpoint principal de listado (`GET /api/huespedes`) utiliza paginación para optimizar el rendimiento y la experiencia del usuario:
+
+- **Valores por defecto**: Si no se especifican parámetros, se usa `page=1` y `limit=10`
+- **Límite máximo**: El parámetro `limit` tiene un máximo de 100 registros por página
+- **Ordenamiento**: Los resultados se ordenan por fecha de creación descendente (más recientes primero)
+- **Metadata completa**: La respuesta incluye información útil como total de páginas, total de registros, y si hay páginas siguiente/anterior
+
+**Ejemplos de uso:**
+
+```bash
+# Primera página con valores por defecto (10 registros)
+GET /api/huespedes
+
+# Segunda página con 20 registros
+GET /api/huespedes?page=2&limit=20
+
+# Obtener todos los registros posibles (máximo 100 por página)
+GET /api/huespedes?limit=100
+```
+
 ### Email Único
 
 El email es un campo único en el sistema. No se pueden registrar dos huéspedes con el mismo email. Al actualizar, el sistema valida que el nuevo email no esté en uso por otro huésped.
+
+### Validación de Datos
+
+Todos los endpoints validan los datos de entrada:
+
+- **Tipos de documento**: Solo se aceptan "DNI", "PASAPORTE", "RUC", "CE"
+- **Email**: Debe ser un formato válido de email
+- **UUID**: Los IDs deben ser UUIDs válidos
+- **Longitudes**: Se respetan los límites máximos de caracteres especificados
 
 ### Eliminación
 

@@ -1,16 +1,17 @@
 import { AppContext } from "../../common/types/app.types";
 import { ApiResponse } from "../api.response";
 import { CreateHuespedUseCase } from "../../application/use-cases/huesped/create-huesped.use-case";
-import { ListHuespedUseCase } from "../../application/use-cases/huesped/list-huesped.use-case";
+import { ListHuespedPaginatedUseCase } from "../../application/use-cases/huesped/list-huesped-paginated.use-case";
 import { FindHuespedByIdUseCase } from "../../application/use-cases/huesped/find-huesped-by-id.use-case";
 import { UpdateHuespedUseCase } from "../../application/use-cases/huesped/update-huesped.use-case";
 import { DeleteHuespedUseCase } from "../../application/use-cases/huesped/delete-huesped.use-case";
 import type { CreateHuespedDto, UpdateHuespedDto } from "../../application/dtos/huesped.dto";
+import type { PaginationQuery } from "../schemas/pagination.schema";
 
 export class HuespedController {
   constructor(
     private readonly createUseCase: CreateHuespedUseCase,
-    private readonly listUseCase: ListHuespedUseCase,
+    private readonly listPaginatedUseCase: ListHuespedPaginatedUseCase,
     private readonly findByIdUseCase: FindHuespedByIdUseCase,
     private readonly updateUseCase: UpdateHuespedUseCase,
     private readonly deleteUseCase: DeleteHuespedUseCase,
@@ -22,9 +23,13 @@ export class HuespedController {
     return c.json(ApiResponse.success("Huésped creado exitosamente", huesped.toOutput()), 201);
   }
 
-  async list(c: AppContext) {
-    const huespedes = await this.listUseCase.execute();
-    const output = huespedes.map((h) => h.toOutput());
+  async listPaginated(c: AppContext) {
+    const validData = c.get("validData") as PaginationQuery;
+    const result = await this.listPaginatedUseCase.execute(validData);
+    const output = {
+      list: result.list.map((h) => h.toOutput()),
+      pagination: result.pagination,
+    };
     return c.json(ApiResponse.success("Huéspedes obtenidos exitosamente", output), 200);
   }
 

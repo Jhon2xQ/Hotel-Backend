@@ -1,4 +1,5 @@
 import { Huesped, CreateHuespedData } from "../entities/huesped.entity";
+import { PaginatedResult, PaginationParams } from "../../common/types/pagination.types";
 
 export interface UpdateHuespedData {
   tipo_doc?: "DNI" | "PASAPORTE" | "RUC" | "CE" | null;
@@ -14,6 +15,7 @@ export interface UpdateHuespedData {
 export interface IHuespedRepository {
   create(data: CreateHuespedData): Promise<Huesped>;
   findAll(): Promise<Huesped[]>;
+  findAllPaginated(params: PaginationParams): Promise<PaginatedResult<Huesped>>;
   findById(id: string): Promise<Huesped | null>;
   findByEmail(email: string): Promise<Huesped | null>;
   update(id: string, data: UpdateHuespedData): Promise<Huesped>;
