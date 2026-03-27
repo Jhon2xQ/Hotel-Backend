@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { HuespedController } from "../../src/presentation/controllers/huesped.controller";
 import { CreateHuespedUseCase } from "../../src/application/use-cases/huesped/create-huesped.use-case";
-import { ListHuespedUseCase } from "../../src/application/use-cases/huesped/list-huesped.use-case";
+import { ListHuespedPaginatedUseCase } from "../../src/application/use-cases/huesped/list-huesped-paginated.use-case";
 import { FindHuespedByIdUseCase } from "../../src/application/use-cases/huesped/find-huesped-by-id.use-case";
 import { UpdateHuespedUseCase } from "../../src/application/use-cases/huesped/update-huesped.use-case";
 import { DeleteHuespedUseCase } from "../../src/application/use-cases/huesped/delete-huesped.use-case";
@@ -11,21 +11,21 @@ import { createMockHuesped } from "../helpers/huesped-fixtures";
 describe("HuespedController", () => {
   let controller: HuespedController;
   let mockCreateUseCase: any;
-  let mockListUseCase: any;
+  let mockListPaginatedUseCase: any;
   let mockFindByIdUseCase: any;
   let mockUpdateUseCase: any;
   let mockDeleteUseCase: any;
 
   beforeEach(() => {
     mockCreateUseCase = { execute: vi.fn() };
-    mockListUseCase = { execute: vi.fn() };
+    mockListPaginatedUseCase = { execute: vi.fn() };
     mockFindByIdUseCase = { execute: vi.fn() };
     mockUpdateUseCase = { execute: vi.fn() };
     mockDeleteUseCase = { execute: vi.fn() };
 
     controller = new HuespedController(
       mockCreateUseCase,
-      mockListUseCase,
+      mockListPaginatedUseCase,
       mockFindByIdUseCase,
       mockUpdateUseCase,
       mockDeleteUseCase,
@@ -83,20 +83,40 @@ describe("HuespedController", () => {
     });
   });
 
-  describe("list", () => {
-    it("should list all huespedes and return 200", async () => {
+  describe("listPaginated", () => {
+    it("should list paginated huespedes and return 200", async () => {
       const mockContext = createMockContext();
       const mockHuespedes = [createMockHuesped({ id: "huesped-1" }), createMockHuesped({ id: "huesped-2" })];
 
-      mockListUseCase.execute.mockResolvedValue(mockHuespedes);
+      const paginatedResult = {
+        list: mockHuespedes,
+        pagination: {
+          page: 1,
+          limit: 10,
+          total: 2,
+          totalPages: 1,
+          hasNextPage: false,
+          hasPreviousPage: false,
+        },
+      };
 
-      await controller.list(mockContext);
+      mockContext.get = vi.fn().mockReturnValue({ page: 1, limit: 10 });
+      mockListPaginatedUseCase.execute.mockResolvedValue(paginatedResult);
 
-      expect(mockListUseCase.execute).toHaveBeenCalled();
+      await controller.listPaginated(mockContext);
+
+      expect(mockListPaginatedUseCase.execute).toHaveBeenCalledWith({ page: 1, limit: 10 });
       expect(mockContext.json).toHaveBeenCalledWith(
         expect.objectContaining({
           success: true,
           message: "Huéspedes obtenidos exitosamente",
+          data: expect.objectContaining({
+            pagination: expect.objectContaining({
+              page: 1,
+              limit: 10,
+              total: 2,
+            }),
+          }),
         }),
         200,
       );
@@ -105,14 +125,29 @@ describe("HuespedController", () => {
     it("should return empty array when no huespedes exist", async () => {
       const mockContext = createMockContext();
 
-      mockListUseCase.execute.mockResolvedValue([]);
+      const paginatedResult = {
+        list: [],
+        pagination: {
+          page: 1,
+          limit: 10,
+          total: 0,
+          totalPages: 0,
+          hasNextPage: false,
+          hasPreviousPage: false,
+        },
+      };
 
-      await controller.list(mockContext);
+      mockContext.get = vi.fn().mockReturnValue({ page: 1, limit: 10 });
+      mockListPaginatedUseCase.execute.mockResolvedValue(paginatedResult);
+
+      await controller.listPaginated(mockContext);
 
       expect(mockContext.json).toHaveBeenCalledWith(
         expect.objectContaining({
           success: true,
-          data: [],
+          data: expect.objectContaining({
+            list: [],
+          }),
         }),
         200,
       );

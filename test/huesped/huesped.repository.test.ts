@@ -43,7 +43,6 @@ describe("HuespedRepository", () => {
         updatedAt: new Date(),
       };
 
-      mockPrisma.huesped.findUnique.mockResolvedValue(null);
       mockPrisma.huesped.create.mockResolvedValue(mockResult);
 
       const result = await repository.create(input);
@@ -52,23 +51,6 @@ describe("HuespedRepository", () => {
       expect(result.apellidos).toBe("Pérez García");
       expect(result.email).toBe("juan.perez@example.com");
       expect(mockPrisma.huesped.create).toHaveBeenCalled();
-    });
-
-    it("should throw error if email already exists", async () => {
-      const input = {
-        nombres: "Juan Carlos",
-        apellidos: "Pérez García",
-        email: "juan.perez@example.com",
-        telefono: "+51987654321",
-        nacionalidad: "Perú",
-      };
-
-      mockPrisma.huesped.findUnique.mockResolvedValue({
-        id: "existing-id",
-        email: "juan.perez@example.com",
-      });
-
-      await expect(repository.create(input)).rejects.toThrow(HuespedException);
     });
 
     it("should create huesped with all fields", async () => {
@@ -97,7 +79,6 @@ describe("HuespedRepository", () => {
         updatedAt: new Date(),
       };
 
-      mockPrisma.huesped.findUnique.mockResolvedValue(null);
       mockPrisma.huesped.create.mockResolvedValue(mockResult);
 
       const result = await repository.create(input);
@@ -224,7 +205,6 @@ describe("HuespedRepository", () => {
         updatedAt: new Date(),
       };
 
-      mockPrisma.huesped.findUnique.mockResolvedValue(existingHuesped);
       mockPrisma.huesped.update.mockResolvedValue(mockResult);
 
       const result = await repository.update("test-huesped-id", updateData);
@@ -233,68 +213,10 @@ describe("HuespedRepository", () => {
       expect(result.observacion).toBe("Actualizado");
       expect(mockPrisma.huesped.update).toHaveBeenCalled();
     });
-
-    it("should throw exception when huesped not found", async () => {
-      mockPrisma.huesped.findUnique.mockResolvedValue(null);
-
-      await expect(repository.update("non-existent-id", { telefono: "+51999999999" })).rejects.toThrow(
-        HuespedException,
-      );
-    });
-
-    it("should throw exception when updating to duplicate email", async () => {
-      const existingHuesped = {
-        id: "test-huesped-id",
-        email: "juan.perez@example.com",
-      };
-
-      const anotherHuesped = {
-        id: "another-id",
-        email: "maria@example.com",
-      };
-
-      mockPrisma.huesped.findUnique.mockResolvedValueOnce(existingHuesped).mockResolvedValueOnce(anotherHuesped);
-
-      await expect(repository.update("test-huesped-id", { email: "maria@example.com" })).rejects.toThrow(
-        HuespedException,
-      );
-    });
-
-    it("should allow updating to same email", async () => {
-      const existingHuesped = {
-        id: "test-huesped-id",
-        tipoDoc: null,
-        nroDoc: null,
-        nombres: "Juan Carlos",
-        apellidos: "Pérez García",
-        email: "juan.perez@example.com",
-        telefono: "+51987654321",
-        nacionalidad: "Perú",
-        observacion: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-
-      mockPrisma.huesped.findUnique.mockResolvedValue(existingHuesped);
-      mockPrisma.huesped.update.mockResolvedValue(existingHuesped);
-
-      const result = await repository.update("test-huesped-id", {
-        email: "juan.perez@example.com",
-        telefono: "+51999999999",
-      });
-
-      expect(result).toBeDefined();
-    });
   });
 
   describe("delete", () => {
     it("should delete huesped", async () => {
-      const existingHuesped = {
-        id: "test-huesped-id",
-        email: "juan.perez@example.com",
-      };
-
-      mockPrisma.huesped.findUnique.mockResolvedValue(existingHuesped);
       mockPrisma.huesped.delete.mockResolvedValue({});
 
       await repository.delete("test-huesped-id");
@@ -302,12 +224,6 @@ describe("HuespedRepository", () => {
       expect(mockPrisma.huesped.delete).toHaveBeenCalledWith({
         where: { id: "test-huesped-id" },
       });
-    });
-
-    it("should throw exception when huesped not found", async () => {
-      mockPrisma.huesped.findUnique.mockResolvedValue(null);
-
-      await expect(repository.delete("non-existent-id")).rejects.toThrow(HuespedException);
     });
   });
 });

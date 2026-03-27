@@ -1,20 +1,12 @@
 import { PrismaClient } from "../../../generated/prisma/client";
 import { Huesped, CreateHuespedData } from "../../domain/entities/huesped.entity";
 import { IHuespedRepository, UpdateHuespedData } from "../../domain/interfaces/huesped.repository.interface";
-import { HuespedException } from "../../domain/exceptions/huesped.exception";
+import { PaginatedResult, PaginationParams } from "../../common/types/pagination.types";
 
 export class HuespedRepository implements IHuespedRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
   async create(data: CreateHuespedData): Promise<Huesped> {
-    const existing = await this.prisma.huesped.findUnique({
-      where: { email: data.email },
-    });
-
-    if (existing) {
-      throw HuespedException.duplicateEmail(data.email);
-    }
-
     const huesped = await this.prisma.huesped.create({
       data: {
         tipoDoc: data.tipo_doc ?? null,
@@ -66,6 +58,49 @@ export class HuespedRepository implements IHuespedRepository {
     );
   }
 
+  async findAllPaginated(params: PaginationParams): Promise<PaginatedResult<Huesped>> {
+    const { page, limit } = params;
+    const skip = (page - 1) * limit;
+
+    const [huespedes, total] = await Promise.all([
+      this.prisma.huesped.findMany({
+        take: limit,
+        skip: skip,
+        orderBy: { createdAt: "desc" },
+      }),
+      this.prisma.huesped.count(),
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      list: huespedes.map(
+        (h) =>
+          new Huesped(
+            h.id,
+            h.tipoDoc,
+            h.nroDoc,
+            h.nombres,
+            h.apellidos,
+            h.email,
+            h.telefono,
+            h.nacionalidad,
+            h.observacion,
+            h.createdAt,
+            h.updatedAt,
+          ),
+      ),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
+      },
+    };
+  }
+
   async findById(id: string): Promise<Huesped | null> {
     const huesped = await this.prisma.huesped.findUnique({
       where: { id },
@@ -90,25 +125,31 @@ export class HuespedRepository implements IHuespedRepository {
     );
   }
 
-  async update(id: string, data: UpdateHuespedData): Promise<Huesped> {
-    const existing = await this.prisma.huesped.findUnique({
-      where: { id },
+  async findByEmail(email: string): Promise<Huesped | null> {
+    const huesped = await this.prisma.huesped.findUnique({
+      where: { email },
     });
 
-    if (!existing) {
-      throw HuespedException.notFoundById(id);
+    if (!huesped) {
+      return null;
     }
 
-    if (data.email && data.email !== existing.email) {
-      const emailExists = await this.prisma.huesped.findUnique({
-        where: { email: data.email },
-      });
+    return new Huesped(
+      huesped.id,
+      huesped.tipoDoc,
+      huesped.nroDoc,
+      huesped.nombres,
+      huesped.apellidos,
+      huesped.email,
+      huesped.telefono,
+      huesped.nacionalidad,
+      huesped.observacion,
+      huesped.createdAt,
+      huesped.updatedAt,
+    );
+  }
 
-      if (emailExists) {
-        throw HuespedException.duplicateEmail(data.email);
-      }
-    }
-
+  async update(id: string, data: UpdateHuespedData): Promise<Huesped> {
     const updated = await this.prisma.huesped.update({
       where: { id },
       data: {
@@ -139,14 +180,6 @@ export class HuespedRepository implements IHuespedRepository {
   }
 
   async delete(id: string): Promise<void> {
-    const existing = await this.prisma.huesped.findUnique({
-      where: { id },
-    });
-
-    if (!existing) {
-      throw HuespedException.notFoundById(id);
-    }
-
     await this.prisma.huesped.delete({
       where: { id },
     });
