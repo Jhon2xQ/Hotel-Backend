@@ -1,7 +1,6 @@
 import { EstadoReserva } from "../../domain/entities/reserva.entity";
 
 export interface CreateReservaInput {
-  codigo: string;
   huespedId: string;
   habitacionId: string;
   tarifaId: string;
@@ -27,4 +26,8 @@ export interface UpdateReservaInput {
 
 export interface CancelReservaInput {
   motivoCancel: string;
+}
+
+export interface UpdateEstadoReservaInput {
+  estado: EstadoReserva;
 }

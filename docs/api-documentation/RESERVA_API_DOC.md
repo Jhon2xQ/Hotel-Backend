@@ -33,7 +33,7 @@ Obtiene todas las reservas del sistema.
   "data": [
     {
       "id": "uuid",
-      "codigo": "RES-2024-001",
+      "codigo": "KOR-20260327-A7K9P2",
       "huesped": {
         "id": "uuid",
         "tipo_doc": "DNI",
@@ -126,7 +126,7 @@ Obtiene una reserva específica por su ID.
   "message": "Reserva encontrada",
   "data": {
     "id": "uuid",
-    "codigo": "RES-2024-001",
+    "codigo": "KOR-20260327-A7K9P2",
     "huesped": {
       /* objeto completo */
     },
@@ -176,7 +176,7 @@ Obtiene una reserva específica por su ID.
 
 ### 3. Crear Reserva
 
-Crea una nueva reserva. Los campos snapshot (nombre_huesped, nro_habitacion, etc.) se sincronizan automáticamente desde las entidades relacionadas.
+Crea una nueva reserva. El código de reserva se genera automáticamente en formato `KOR-YYYYMMDD-XXXXXX`. Los campos snapshot (nombre_huesped, nro_habitacion, etc.) se sincronizan automáticamente desde las entidades relacionadas.
 
 **Endpoint:** `POST /api/reservas`
 
@@ -186,7 +186,6 @@ Crea una nueva reserva. Los campos snapshot (nombre_huesped, nro_habitacion, etc
 
 ```json
 {
-  "codigo": "RES-2024-001",
   "huespedId": "uuid",
   "habitacionId": "uuid",
   "tarifaId": "uuid",
@@ -200,7 +199,6 @@ Crea una nueva reserva. Los campos snapshot (nombre_huesped, nro_habitacion, etc
 
 **Validaciones:**
 
-- `codigo`: Requerido, único
 - `huespedId`: Requerido, UUID válido, debe existir
 - `habitacionId`: Requerido, UUID válido, debe existir
 - `tarifaId`: Requerido, UUID válido, debe existir
@@ -210,6 +208,16 @@ Crea una nueva reserva. Los campos snapshot (nombre_huesped, nro_habitacion, etc
 - `ninos`: Opcional, mínimo 0, default 0
 - `montoDescuento`: Opcional, mínimo 0, default 0
 
+**Código de Reserva:**
+
+El código se genera automáticamente en el formato `KOR-YYYYMMDD-XXXXXX`:
+
+- `KOR`: Prefijo fijo
+- `YYYYMMDD`: Fecha actual (año/mes/día)
+- `XXXXXX`: 6 caracteres aleatorios (letras mayúsculas y números)
+
+Ejemplo: `KOR-20260327-A7K9P2`
+
 **Respuesta Exitosa (201):**
 
 ```json
@@ -218,7 +226,7 @@ Crea una nueva reserva. Los campos snapshot (nombre_huesped, nro_habitacion, etc
   "message": "Reserva creada exitosamente",
   "data": {
     "id": "uuid",
-    "codigo": "RES-2024-001"
+    "codigo": "KOR-20260327-A7K9P2"
     /* ... resto de campos */
   },
   "timestamp": 1711188000000
@@ -229,17 +237,17 @@ Crea una nueva reserva. Los campos snapshot (nombre_huesped, nro_habitacion, etc
 
 - `400`: Validación fallida (fechas inválidas, adultos < 1, etc.)
 - `404`: Huésped, habitación o tarifa no encontrados
-- `409`: Código de reserva duplicado
+- `500`: Error al generar código único (muy raro, después de 10 intentos)
 
 ---
 
 ### 4. Actualizar Reserva
 
-Actualiza una reserva existente. Si el estado es COMPLETADA, la reserva es inmutable y no se puede modificar.
+Actualiza una reserva existente. Cualquier usuario autenticado puede actualizar reservas. Si el estado es COMPLETADA, la reserva es inmutable y no se puede modificar a través de este endpoint (use el endpoint de actualización de estado si es admin).
 
 **Endpoint:** `PUT /api/reservas/:id`
 
-**Autenticación:** Requerida (rol ADMIN)
+**Autenticación:** Requerida
 
 **Parámetros de URL:**
 
@@ -350,7 +358,72 @@ Cancela una reserva estableciendo su estado a CANCELADA. No se pueden cancelar r
 
 ---
 
-### 6. Eliminar Reserva
+### 6. Actualizar Estado de Reserva
+
+Actualiza únicamente el estado de una reserva. Este endpoint está diseñado para cambios de estado del flujo normal de la reserva. Para cancelar una reserva, use el endpoint específico de cancelación.
+
+**Endpoint:** `PATCH /api/reservas/:id/estado`
+
+**Autenticación:** Requerida (rol ADMIN)
+
+**Parámetros de URL:**
+
+- `id` (string, UUID): ID de la reserva
+
+**Body:**
+
+```json
+{
+  "estado": "CONFIRMADA"
+}
+```
+
+**Estados válidos:**
+
+- `TENTATIVA`: Reserva tentativa, pendiente de confirmación
+- `CONFIRMADA`: Reserva confirmada por el cliente
+- `EN_CASA`: Cliente ya se encuentra en el hotel (check-in realizado)
+- `COMPLETADA`: Reserva completada (check-out realizado)
+- `NO_LLEGO`: Cliente no se presentó (no-show)
+
+**Validaciones:**
+
+- `estado`: Requerido, debe ser uno de los estados válidos
+- No se puede usar este endpoint para cambiar a CANCELADA (usar endpoint de cancelación)
+- Los administradores pueden cambiar de cualquier estado a cualquier estado (incluso desde COMPLETADA)
+
+**Flujo típico de estados:**
+
+```
+TENTATIVA → CONFIRMADA → EN_CASA → COMPLETADA
+         ↘ NO_LLEGO
+```
+
+**Respuesta Exitosa (200):**
+
+```json
+{
+  "success": true,
+  "message": "Estado de reserva actualizado exitosamente",
+  "data": {
+    "id": "uuid",
+    "estado": "CONFIRMADA"
+    /* ... resto de campos */
+  },
+  "timestamp": 1711188000000
+}
+```
+
+**Respuestas de Error:**
+
+- `400`: Estado inválido o intento de cambiar a CANCELADA
+- `404`: Reserva no encontrada
+
+**Nota:** Para cancelar una reserva, use `PATCH /api/reservas/:id/cancel` con el motivo de cancelación. Los administradores tienen permisos completos para cambiar estados, incluso desde COMPLETADA.
+
+---
+
+### 7. Eliminar Reserva
 
 Elimina permanentemente una reserva del sistema.
 
@@ -437,14 +510,16 @@ Los siguientes campos se sincronizan automáticamente desde las entidades relaci
 
 ## Notas Importantes
 
-1. **Inmutabilidad**: Las reservas con estado COMPLETADA son inmutables y no pueden ser modificadas.
+1. **Código Automático**: El código de reserva se genera automáticamente en formato `KOR-YYYYMMDD-XXXXXX`. No es necesario enviarlo en el request de creación.
 
-2. **Sincronización Automática**: Los campos snapshot se actualizan automáticamente cuando cambian las relaciones, no es necesario enviarlos en el request.
+2. **Inmutabilidad**: Las reservas con estado COMPLETADA son inmutables y no pueden ser modificadas.
 
-3. **Cálculo Automático**: Los montos totales y finales se calculan automáticamente basados en las fechas, precio de la tarifa y descuento.
+3. **Sincronización Automática**: Los campos snapshot se actualizan automáticamente cuando cambian las relaciones, no es necesario enviarlos en el request.
 
-4. **Cancelación vs Eliminación**:
+4. **Cálculo Automático**: Los montos totales y finales se calculan automáticamente basados en las fechas, precio de la tarifa y descuento.
+
+5. **Cancelación vs Eliminación**:
    - Cancelar una reserva la marca como CANCELADA pero mantiene el registro
    - Eliminar una reserva la borra permanentemente del sistema
 
-5. **Historial**: Los campos snapshot permiten mantener un historial preciso incluso si las entidades relacionadas cambian posteriormente.
+6. **Historial**: Los campos snapshot permiten mantener un historial preciso incluso si las entidades relacionadas cambian posteriormente.

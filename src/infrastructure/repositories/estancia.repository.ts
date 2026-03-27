@@ -244,16 +244,16 @@ export class EstanciaRepository implements IEstanciaRepository {
     // Construir Huesped de la estancia
     const huesped = new Huesped(
       data.huesped.id,
-      data.huesped.tipo_doc,
-      data.huesped.nro_doc,
+      data.huesped.tipoDoc,
+      data.huesped.nroDoc,
       data.huesped.nombres,
       data.huesped.apellidos,
       data.huesped.email,
       data.huesped.telefono,
       data.huesped.nacionalidad,
       data.huesped.observacion,
-      data.huesped.created_at,
-      data.huesped.updated_at,
+      data.huesped.createdAt,
+      data.huesped.updatedAt,
     );
 
     return new Estancia(

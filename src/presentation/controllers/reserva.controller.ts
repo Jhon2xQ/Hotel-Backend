@@ -6,7 +6,13 @@ import { FindReservaByIdUseCase } from "../../application/use-cases/reserva/find
 import { UpdateReservaUseCase } from "../../application/use-cases/reserva/update-reserva.use-case";
 import { DeleteReservaUseCase } from "../../application/use-cases/reserva/delete-reserva.use-case";
 import { CancelReservaUseCase } from "../../application/use-cases/reserva/cancel-reserva.use-case";
-import { CreateReservaInput, UpdateReservaInput, CancelReservaInput } from "../../application/dtos/reserva.dto";
+import { UpdateEstadoReservaUseCase } from "../../application/use-cases/reserva/update-estado-reserva.use-case";
+import {
+  CreateReservaInput,
+  UpdateReservaInput,
+  CancelReservaInput,
+  UpdateEstadoReservaInput,
+} from "../../application/dtos/reserva.dto";
 
 export class ReservaController {
   constructor(
@@ -16,12 +22,12 @@ export class ReservaController {
     private updateUseCase: UpdateReservaUseCase,
     private deleteUseCase: DeleteReservaUseCase,
     private cancelUseCase: CancelReservaUseCase,
+    private updateEstadoUseCase: UpdateEstadoReservaUseCase,
   ) {}
 
   async create(c: AppContext) {
     const validData = c.get("validData") as any;
     const input: CreateReservaInput = {
-      codigo: validData.codigo,
       huespedId: validData.huespedId,
       habitacionId: validData.habitacionId,
       tarifaId: validData.tarifaId,
@@ -80,5 +86,12 @@ export class ReservaController {
     const validData = c.get("validData") as CancelReservaInput;
     const reserva = await this.cancelUseCase.execute(id, validData);
     return c.json(ApiResponse.success("Reserva cancelada exitosamente", reserva.toOutput()), 200);
+  }
+
+  async updateEstado(c: AppContext) {
+    const id = c.req.param("id") as string;
+    const validData = c.get("validData") as UpdateEstadoReservaInput;
+    const reserva = await this.updateEstadoUseCase.execute(id, validData);
+    return c.json(ApiResponse.success("Estado de reserva actualizado exitosamente", reserva.toOutput()), 200);
   }
 }

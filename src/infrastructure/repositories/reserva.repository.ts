@@ -13,25 +13,6 @@ export class ReservaRepository implements IReservaRepository {
   constructor(private prisma: PrismaClient) {}
 
   async create(data: CreateReservaData): Promise<Reserva> {
-    // Validaciones
-    if (data.fechaSalida <= data.fechaEntrada) {
-      throw ReservaException.invalidDateRange();
-    }
-    if (data.adultos < 1) {
-      throw ReservaException.invalidAdultos();
-    }
-    if (data.ninos < 0) {
-      throw ReservaException.invalidNinos();
-    }
-
-    // Verificar código único
-    const existingCodigo = await this.prisma.reserva.findUnique({
-      where: { codigo: data.codigo },
-    });
-    if (existingCodigo) {
-      throw ReservaException.duplicateCodigo(data.codigo);
-    }
-
     // Obtener entidades relacionadas para snapshot
     const snapshotData = await this.fetchSnapshotData(data.huespedId, data.habitacionId, data.tarifaId);
 
@@ -103,24 +84,6 @@ export class ReservaRepository implements IReservaRepository {
 
       if (!existing) {
         throw ReservaException.notFoundById();
-      }
-
-      // Verificar si está completada
-      if (existing.estado === "COMPLETADA") {
-        throw ReservaException.cannotModifyCompleted();
-      }
-
-      // Validaciones
-      if (data.fechaEntrada && data.fechaSalida) {
-        if (data.fechaSalida <= data.fechaEntrada) {
-          throw ReservaException.invalidDateRange();
-        }
-      }
-      if (data.adultos !== undefined && data.adultos < 1) {
-        throw ReservaException.invalidAdultos();
-      }
-      if (data.ninos !== undefined && data.ninos < 0) {
-        throw ReservaException.invalidNinos();
       }
 
       const updateData: any = {};
@@ -218,26 +181,6 @@ export class ReservaRepository implements IReservaRepository {
   }
 
   async cancel(id: string, motivoCancel: string): Promise<Reserva> {
-    const existing = await this.prisma.reserva.findUnique({
-      where: { id },
-    });
-
-    if (!existing) {
-      throw ReservaException.notFoundById();
-    }
-
-    if (existing.estado === "COMPLETADA") {
-      throw ReservaException.cannotCancelCompleted();
-    }
-
-    if (existing.estado === "CANCELADA") {
-      throw ReservaException.alreadyCancelled();
-    }
-
-    if (!motivoCancel || motivoCancel.trim() === "") {
-      throw ReservaException.cancelRequiresMotivo();
-    }
-
     const result = await this.prisma.reserva.update({
       where: { id },
       data: {
@@ -334,16 +277,16 @@ export class ReservaRepository implements IReservaRepository {
 
     const huesped = new Huesped(
       data.huesped.id,
-      data.huesped.tipo_doc,
-      data.huesped.nro_doc,
+      data.huesped.tipoDoc,
+      data.huesped.nroDoc,
       data.huesped.nombres,
       data.huesped.apellidos,
       data.huesped.email,
       data.huesped.telefono,
       data.huesped.nacionalidad,
       data.huesped.observacion,
-      data.huesped.created_at,
-      data.huesped.updated_at,
+      data.huesped.createdAt,
+      data.huesped.updatedAt,
     );
 
     const tipoHabitacion = new TipoHabitacion(
