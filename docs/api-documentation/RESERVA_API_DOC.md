@@ -243,11 +243,11 @@ Ejemplo: `KOR-20260327-A7K9P2`
 
 ### 4. Actualizar Reserva
 
-Actualiza una reserva existente. Si el estado es COMPLETADA, la reserva es inmutable y no se puede modificar.
+Actualiza una reserva existente. Cualquier usuario autenticado puede actualizar reservas. Si el estado es COMPLETADA, la reserva es inmutable y no se puede modificar a través de este endpoint (use el endpoint de actualización de estado si es admin).
 
 **Endpoint:** `PUT /api/reservas/:id`
 
-**Autenticación:** Requerida (rol ADMIN)
+**Autenticación:** Requerida
 
 **Parámetros de URL:**
 
@@ -358,7 +358,72 @@ Cancela una reserva estableciendo su estado a CANCELADA. No se pueden cancelar r
 
 ---
 
-### 6. Eliminar Reserva
+### 6. Actualizar Estado de Reserva
+
+Actualiza únicamente el estado de una reserva. Este endpoint está diseñado para cambios de estado del flujo normal de la reserva. Para cancelar una reserva, use el endpoint específico de cancelación.
+
+**Endpoint:** `PATCH /api/reservas/:id/estado`
+
+**Autenticación:** Requerida (rol ADMIN)
+
+**Parámetros de URL:**
+
+- `id` (string, UUID): ID de la reserva
+
+**Body:**
+
+```json
+{
+  "estado": "CONFIRMADA"
+}
+```
+
+**Estados válidos:**
+
+- `TENTATIVA`: Reserva tentativa, pendiente de confirmación
+- `CONFIRMADA`: Reserva confirmada por el cliente
+- `EN_CASA`: Cliente ya se encuentra en el hotel (check-in realizado)
+- `COMPLETADA`: Reserva completada (check-out realizado)
+- `NO_LLEGO`: Cliente no se presentó (no-show)
+
+**Validaciones:**
+
+- `estado`: Requerido, debe ser uno de los estados válidos
+- No se puede usar este endpoint para cambiar a CANCELADA (usar endpoint de cancelación)
+- Los administradores pueden cambiar de cualquier estado a cualquier estado (incluso desde COMPLETADA)
+
+**Flujo típico de estados:**
+
+```
+TENTATIVA → CONFIRMADA → EN_CASA → COMPLETADA
+         ↘ NO_LLEGO
+```
+
+**Respuesta Exitosa (200):**
+
+```json
+{
+  "success": true,
+  "message": "Estado de reserva actualizado exitosamente",
+  "data": {
+    "id": "uuid",
+    "estado": "CONFIRMADA"
+    /* ... resto de campos */
+  },
+  "timestamp": 1711188000000
+}
+```
+
+**Respuestas de Error:**
+
+- `400`: Estado inválido o intento de cambiar a CANCELADA
+- `404`: Reserva no encontrada
+
+**Nota:** Para cancelar una reserva, use `PATCH /api/reservas/:id/cancel` con el motivo de cancelación. Los administradores tienen permisos completos para cambiar estados, incluso desde COMPLETADA.
+
+---
+
+### 7. Eliminar Reserva
 
 Elimina permanentemente una reserva del sistema.
 

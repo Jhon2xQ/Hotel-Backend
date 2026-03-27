@@ -27,3 +27,7 @@ export interface UpdateReservaInput {
 export interface CancelReservaInput {
   motivoCancel: string;
 }
+
+export interface UpdateEstadoReservaInput {
+  estado: EstadoReserva;
+}

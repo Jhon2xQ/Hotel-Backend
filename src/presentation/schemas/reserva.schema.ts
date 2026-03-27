@@ -47,3 +47,9 @@ export const UpdateReservaSchema = z
 export const CancelReservaSchema = z.object({
   motivoCancel: z.string().min(1, "El motivo de cancelación es requerido"),
 });
+
+export const UpdateEstadoReservaSchema = z.object({
+  estado: z.enum(["TENTATIVA", "CONFIRMADA", "EN_CASA", "COMPLETADA", "CANCELADA", "NO_LLEGO"], {
+    message: "Estado inválido",
+  }),
+});

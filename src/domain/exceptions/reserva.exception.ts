@@ -61,4 +61,11 @@ export class ReservaException extends DomainException {
   static codigoGenerationFailed(): ReservaException {
     return new ReservaException("No se pudo generar un código único para la reserva. Intente nuevamente.", 500);
   }
+
+  static useCancelEndpoint(): ReservaException {
+    return new ReservaException(
+      "Para cancelar una reserva use el endpoint PATCH /api/reservas/:id/cancel con el motivo de cancelación",
+      400,
+    );
+  }
 }
