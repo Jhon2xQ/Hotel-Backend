@@ -23,11 +23,6 @@ export class Tarifa {
     public readonly updatedAt: Date,
   ) {}
 
-  static create(data: CreateTarifaData): Tarifa {
-    // Este método no se usa en producción, solo para tests
-    throw new Error("Use repository.create() instead");
-  }
-
   toOutput() {
     return {
       id: this.id,

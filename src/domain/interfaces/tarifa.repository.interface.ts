@@ -17,4 +17,6 @@ export interface ITarifaRepository {
   delete(id: string): Promise<void>;
   hasRelatedRecords(id: string): Promise<boolean>;
   findByTipoHabitacionAndCanal(tipoHabitacionId: string, canalId: string): Promise<Tarifa[]>;
+  tipoHabitacionExists(id: string): Promise<boolean>;
+  canalExists(id: string): Promise<boolean>;
 }

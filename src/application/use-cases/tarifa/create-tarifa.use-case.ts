@@ -10,6 +10,16 @@ export class CreateTarifaUseCase {
       throw TarifaException.invalidPrecio();
     }
 
+    const tipoHabitacionExists = await this.repository.tipoHabitacionExists(input.tipo_habitacion_id);
+    if (!tipoHabitacionExists) {
+      throw TarifaException.tipoHabitacionNotFound();
+    }
+
+    const canalExists = await this.repository.canalExists(input.canal_id);
+    if (!canalExists) {
+      throw TarifaException.canalNotFound();
+    }
+
     const tarifa = await this.repository.create({
       tipoHabitacionId: input.tipo_habitacion_id,
       canalId: input.canal_id,

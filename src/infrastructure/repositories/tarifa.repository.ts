@@ -2,30 +2,15 @@ import { PrismaClient, Prisma } from "../../../generated/prisma/client";
 import { Tarifa, CreateTarifaData } from "../../domain/entities/tarifa.entity";
 import { ITarifaRepository, UpdateTarifaData } from "../../domain/interfaces/tarifa.repository.interface";
 import { TarifaException } from "../../domain/exceptions/tarifa.exception";
+import { TipoHabitacion } from "../../domain/entities/tipo-habitacion.entity";
+import { Canal } from "../../domain/entities/canal.entity";
+import { TarifaModel } from "../../../generated/prisma/models";
 
 export class TarifaRepository implements ITarifaRepository {
   constructor(private prisma: PrismaClient) {}
 
   async create(data: CreateTarifaData): Promise<Tarifa> {
-    if (data.precioNoche <= 0) {
-      throw TarifaException.invalidPrecio();
-    }
-
-    const tipoHabitacion = await this.prisma.tipoHabitacion.findUnique({
-      where: { id: data.tipoHabitacionId },
-    });
-    if (!tipoHabitacion) {
-      throw TarifaException.tipoHabitacionNotFound();
-    }
-
-    const canal = await this.prisma.canal.findUnique({
-      where: { id: data.canalId },
-    });
-    if (!canal) {
-      throw TarifaException.canalNotFound();
-    }
-
-    const result = await this.prisma.tarifa.create({
+    const result: TarifaModel = await this.prisma.tarifa.create({
       data: {
         tipoHabitacionId: data.tipoHabitacionId,
         canalId: data.canalId,
@@ -33,6 +18,10 @@ export class TarifaRepository implements ITarifaRepository {
         IVA: data.IVA ?? null,
         cargoServicios: data.cargoServicios ?? null,
         moneda: data.moneda ?? "USD",
+      },
+      include: {
+        tipoHabitacion: true,
+        canal: true,
       },
     });
     return this.toDomain(result);
@@ -62,35 +51,6 @@ export class TarifaRepository implements ITarifaRepository {
 
   async update(id: string, data: UpdateTarifaData): Promise<Tarifa> {
     try {
-      const existing = await this.prisma.tarifa.findUnique({
-        where: { id },
-      });
-      if (!existing) {
-        throw TarifaException.notFoundById();
-      }
-
-      if (data.precioNoche !== undefined && data.precioNoche <= 0) {
-        throw TarifaException.invalidPrecio();
-      }
-
-      if (data.tipoHabitacionId) {
-        const tipoHabitacion = await this.prisma.tipoHabitacion.findUnique({
-          where: { id: data.tipoHabitacionId },
-        });
-        if (!tipoHabitacion) {
-          throw TarifaException.tipoHabitacionNotFound();
-        }
-      }
-
-      if (data.canalId) {
-        const canal = await this.prisma.canal.findUnique({
-          where: { id: data.canalId },
-        });
-        if (!canal) {
-          throw TarifaException.canalNotFound();
-        }
-      }
-
       const updateData: any = {};
       if (data.tipoHabitacionId !== undefined) updateData.tipoHabitacionId = data.tipoHabitacionId;
       if (data.canalId !== undefined) updateData.canalId = data.canalId;
@@ -102,6 +62,10 @@ export class TarifaRepository implements ITarifaRepository {
       const result = await this.prisma.tarifa.update({
         where: { id },
         data: updateData,
+        include: {
+          tipoHabitacion: true,
+          canal: true,
+        },
       });
       return this.toDomain(result);
     } catch (error) {
@@ -130,8 +94,10 @@ export class TarifaRepository implements ITarifaRepository {
   }
 
   async hasRelatedRecords(id: string): Promise<boolean> {
-    // Tarifas no tiene relaciones con otras tablas actualmente
-    return false;
+    const reservasCount = await this.prisma.reserva.count({
+      where: { tarifaId: id },
+    });
+    return reservasCount > 0;
   }
 
   async findByTipoHabitacionAndCanal(tipoHabitacionId: string, canalId: string): Promise<Tarifa[]> {
@@ -149,12 +115,26 @@ export class TarifaRepository implements ITarifaRepository {
     return results.map((r) => this.toDomain(r));
   }
 
+  async tipoHabitacionExists(id: string): Promise<boolean> {
+    const count = await this.prisma.tipoHabitacion.count({
+      where: { id },
+    });
+    return count > 0;
+  }
+
+  async canalExists(id: string): Promise<boolean> {
+    const count = await this.prisma.canal.count({
+      where: { id },
+    });
+    return count > 0;
+  }
+
   private toDomain(data: any): Tarifa {
     if (!data.tipoHabitacion || !data.canal) {
       throw new Error("Tarifa must include tipoHabitacion and canal relations");
     }
 
-    const tipoHabitacion = new (require("../../domain/entities/tipo-habitacion.entity").TipoHabitacion)(
+    const tipoHabitacion = new TipoHabitacion(
       data.tipoHabitacion.id,
       data.tipoHabitacion.nombre,
       data.tipoHabitacion.descripcion,
@@ -162,7 +142,7 @@ export class TarifaRepository implements ITarifaRepository {
       data.tipoHabitacion.updatedAt,
     );
 
-    const canal = new (require("../../domain/entities/canal.entity").Canal)(
+    const canal = new Canal(
       data.canal.id,
       data.canal.nombre,
       data.canal.tipo,
