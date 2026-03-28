@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { TipoHabitacionRepository } from "../../src/infrastructure/repositories/tipo-habitacion.repository";
 import { createMockPrismaClient } from "../helpers/mock-prisma";
-import { TipoHabitacionException } from "../../src/domain/exceptions/tipo-habitacion.exception";
 import { Prisma } from "../../generated/prisma/client";
 
 describe("TipoHabitacionRepository", () => {
@@ -135,35 +134,19 @@ describe("TipoHabitacionRepository", () => {
         descripcion: "Descripción actualizada",
       };
 
-      const existingResult = {
-        id: "test-id",
-        nombre: "Suite Deluxe",
-        descripcion: "Suite de lujo",
-        tieneDucha: true,
-        tieneBanio: true,
-        muebles: [],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-
       const mockResult = {
         id: "test-id",
         nombre: "Suite Deluxe Premium",
         descripcion: "Descripción actualizada",
-        tieneDucha: true,
-        tieneBanio: true,
-        muebles: [],
         createdAt: new Date(),
         updatedAt: new Date(),
       };
 
-      mockPrisma.tipoHabitacion.findUnique.mockResolvedValue(existingResult);
       mockPrisma.tipoHabitacion.update.mockResolvedValue(mockResult);
 
       const result = await repository.update("test-id", updateData);
 
       expect(result.nombre).toBe("Suite Deluxe Premium");
-      expect(mockPrisma.tipoHabitacion.findUnique).toHaveBeenCalled();
       expect(mockPrisma.tipoHabitacion.update).toHaveBeenCalled();
     });
 
@@ -175,7 +158,9 @@ describe("TipoHabitacionRepository", () => {
 
       mockPrisma.tipoHabitacion.update.mockRejectedValue(error);
 
-      await expect(repository.update("non-existent-id", { nombre: "Test" })).rejects.toThrow(TipoHabitacionException);
+      await expect(repository.update("non-existent-id", { nombre: "Test" })).rejects.toThrow(
+        Prisma.PrismaClientKnownRequestError,
+      );
     });
   });
 
@@ -198,7 +183,7 @@ describe("TipoHabitacionRepository", () => {
 
       mockPrisma.tipoHabitacion.delete.mockRejectedValue(error);
 
-      await expect(repository.delete("non-existent-id")).rejects.toThrow(TipoHabitacionException);
+      await expect(repository.delete("non-existent-id")).rejects.toThrow(Prisma.PrismaClientKnownRequestError);
     });
   });
 

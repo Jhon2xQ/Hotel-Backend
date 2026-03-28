@@ -18,23 +18,6 @@ export enum MetodoPago {
   TRANSFERENCIA = "TRANSFERENCIA",
 }
 
-export interface UserBasic {
-  id: string;
-  name: string;
-  email: string;
-}
-
-export interface CreatePagoData {
-  concepto: ConceptoPago;
-  estado?: EstadoPago;
-  fechaPago?: Date;
-  monto: number;
-  moneda?: string;
-  metodo: MetodoPago;
-  recibidoPorId?: string | null;
-  observacion?: string | null;
-}
-
 export class Pago {
   constructor(
     public readonly id: string,
@@ -45,46 +28,8 @@ export class Pago {
     public readonly moneda: string,
     public readonly metodo: MetodoPago,
     public readonly recibidoPorId: string | null,
-    public readonly recibidoPor: UserBasic | null,
+    public readonly recibidoPor: { id: string; name: string; email: string } | null,
     public readonly observacion: string | null,
     public readonly createdAt: Date,
   ) {}
-
-  static create(data: CreatePagoData): Pago {
-    return new Pago(
-      crypto.randomUUID(),
-      data.concepto,
-      data.estado ?? EstadoPago.CONFIRMADO,
-      data.fechaPago ?? new Date(),
-      data.monto,
-      data.moneda ?? "SOL",
-      data.metodo,
-      data.recibidoPorId ?? null,
-      null,
-      data.observacion ?? null,
-      new Date(),
-    );
-  }
-
-  toOutput() {
-    return {
-      id: this.id,
-      concepto: this.concepto,
-      estado: this.estado,
-      fecha_pago: this.fechaPago.toISOString(),
-      monto: this.monto.toString(),
-      moneda: this.moneda,
-      metodo: this.metodo,
-      recibido_por_id: this.recibidoPorId,
-      recibido_por: this.recibidoPor
-        ? {
-            id: this.recibidoPor.id,
-            name: this.recibidoPor.name,
-            email: this.recibidoPor.email,
-          }
-        : null,
-      observacion: this.observacion,
-      created_at: this.createdAt.toISOString(),
-    };
-  }
 }

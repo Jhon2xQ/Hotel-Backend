@@ -1,16 +1,29 @@
 # API de Estancias
 
-Documentación de los endpoints para gestionar estancias (check-in/check-out) en el sistema hotelero.
+
+> **Autorización:** Las rutas que restrigen por rol usan `requireRoles(...)` (`src/presentation/middlewares/roles.middleware.ts`) con valores en `src/common/constants/roles.ts` (p. ej. `admin`, `recepcionista`). Cualquier mención a "ADMIN" u otros roles aquí es orientativa; la fuente de verdad es el `*.routes.ts` correspondiente.
+
+
+Documentación del módulo `estancia.routes.ts`: estancias (check-in / checkout).
 
 ## Base URL
 
 ```
-/api/estancias
+/api/private/estancias
 ```
+
+## Orden de endpoints
+
+1. `GET /` — listar  
+2. `GET /:id` — por id  
+3. `POST /` — crear  
+4. `PUT /:id` — actualizar  
+5. `PATCH /:id/checkout` — checkout  
+6. `DELETE /:id` — eliminar  
 
 ## Autenticación
 
-Todos los endpoints requieren autenticación mediante Better Auth. Los endpoints de creación, actualización, eliminación y checkout requieren rol `ADMIN`.
+Sesión Better Auth. Creación, actualización, eliminación y checkout suelen requerir rol `ADMIN` (según despliegue).
 
 ---
 
@@ -20,7 +33,7 @@ Todos los endpoints requieren autenticación mediante Better Auth. Los endpoints
 
 Obtiene todas las estancias del sistema.
 
-**Endpoint:** `GET /api/estancias`
+**Endpoint:** `GET /api/private/estancias`
 
 **Autenticación:** Requerida
 
@@ -78,7 +91,7 @@ Obtiene todas las estancias del sistema.
 
 Obtiene una estancia específica por su ID.
 
-**Endpoint:** `GET /api/estancias/:id`
+**Endpoint:** `GET /api/private/estancias/:id`
 
 **Autenticación:** Requerida
 
@@ -129,7 +142,7 @@ Obtiene una estancia específica por su ID.
 
 Crea una nueva estancia registrando el check-in de un huésped.
 
-**Endpoint:** `POST /api/estancias`
+**Endpoint:** `POST /api/private/estancias`
 
 **Autenticación:** Requerida (rol ADMIN)
 
@@ -183,7 +196,7 @@ Crea una nueva estancia registrando el check-in de un huésped.
 
 Actualiza una estancia existente. No se puede modificar si el estado es COMPLETADA.
 
-**Endpoint:** `PUT /api/estancias/:id`
+**Endpoint:** `PUT /api/private/estancias/:id`
 
 **Autenticación:** Requerida (rol ADMIN)
 
@@ -243,7 +256,7 @@ Actualiza una estancia existente. No se puede modificar si el estado es COMPLETA
 
 Completa el checkout de una estancia estableciendo la fecha de salida y cambiando el estado a COMPLETADA.
 
-**Endpoint:** `PATCH /api/estancias/:id/checkout`
+**Endpoint:** `PATCH /api/private/estancias/:id/checkout`
 
 **Autenticación:** Requerida (rol ADMIN)
 
@@ -292,7 +305,7 @@ Completa el checkout de una estancia estableciendo la fecha de salida y cambiand
 
 Elimina permanentemente una estancia del sistema.
 
-**Endpoint:** `DELETE /api/estancias/:id`
+**Endpoint:** `DELETE /api/private/estancias/:id`
 
 **Autenticación:** Requerida (rol ADMIN)
 

@@ -1,11 +1,15 @@
 # API de Pagos
 
+
+> **Autorización:** Las rutas que restrigen por rol usan `requireRoles(...)` (`src/presentation/middlewares/roles.middleware.ts`) con valores en `src/common/constants/roles.ts` (p. ej. `admin`, `recepcionista`). Cualquier mención a "ADMIN" u otros roles aquí es orientativa; la fuente de verdad es el `*.routes.ts` correspondiente.
+
+
 Documentación de los endpoints para la gestión de pagos en el sistema hotelero.
 
 ## Base URL
 
 ```
-/api/pagos
+/api/private/pagos
 ```
 
 ## Autenticación
@@ -20,7 +24,7 @@ Todos los endpoints requieren autenticación mediante Better Auth. Los endpoints
 
 Crea un nuevo registro de pago.
 
-**Endpoint:** `POST /api/pagos`
+**Endpoint:** `POST /api/private/pagos`
 
 **Permisos:** `ADMIN`
 
@@ -90,7 +94,7 @@ Crea un nuevo registro de pago.
 
 Obtiene todos los pagos registrados, ordenados por fecha de creación descendente.
 
-**Endpoint:** `GET /api/pagos`
+**Endpoint:** `GET /api/private/pagos`
 
 **Permisos:** Usuario autenticado
 
@@ -129,7 +133,7 @@ Obtiene todos los pagos registrados, ordenados por fecha de creación descendent
 
 Obtiene los detalles de un pago específico.
 
-**Endpoint:** `GET /api/pagos/:id`
+**Endpoint:** `GET /api/private/pagos/:id`
 
 **Permisos:** Usuario autenticado
 
@@ -175,7 +179,7 @@ Obtiene los detalles de un pago específico.
 
 Actualiza los datos de un pago existente.
 
-**Endpoint:** `PUT /api/pagos/:id`
+**Endpoint:** `PUT /api/private/pagos/:id`
 
 **Permisos:** `ADMIN`
 
@@ -244,7 +248,7 @@ Actualiza los datos de un pago existente.
 
 Elimina un pago del sistema.
 
-**Endpoint:** `DELETE /api/pagos/:id`
+**Endpoint:** `DELETE /api/private/pagos/:id`
 
 **Permisos:** `ADMIN`
 

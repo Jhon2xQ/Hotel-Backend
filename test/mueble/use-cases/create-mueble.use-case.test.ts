@@ -5,7 +5,6 @@ import { IHabitacionRepository } from "../../../src/domain/interfaces/habitacion
 import { MuebleException } from "../../../src/domain/exceptions/mueble.exception";
 import { createMockMueble } from "../../helpers/mueble-fixtures";
 import { createMockHabitacion } from "../../helpers/habitacion-fixtures";
-import { CategoriaMuebleRepository } from "../../../src/infrastructure/repositories/categoria-mueble.repository";
 import { CategoriaMuebleException } from "../../../src/domain/exceptions/categoria-mueble.exception";
 
 describe("CreateMuebleUseCase", () => {

@@ -1,14 +1,14 @@
 import { inject, injectable } from "tsyringe";
-import { Huesped } from "../../../domain/entities/huesped.entity";
-import type { IHuespedRepository, UpdateHuespedData } from "../../../domain/interfaces/huesped.repository.interface";
+import type { IHuespedRepository } from "../../../domain/interfaces/huesped.repository.interface";
 import { HuespedException } from "../../../domain/exceptions/huesped.exception";
+import { UpdateHuespedDto, HuespedDto, toHuespedDto } from "../../dtos/huesped.dto";
 import { DI_TOKENS } from "../../../common/IoC/tokens";
 
 @injectable()
 export class UpdateHuespedUseCase {
   constructor(@inject(DI_TOKENS.IHuespedRepository) private readonly repository: IHuespedRepository) {}
 
-  async execute(id: string, data: UpdateHuespedData): Promise<Huesped> {
+  async execute(id: string, data: UpdateHuespedDto): Promise<HuespedDto> {
     const existing = await this.repository.findById(id);
 
     if (!existing) {
@@ -23,6 +23,17 @@ export class UpdateHuespedUseCase {
       }
     }
 
-    return await this.repository.update(id, data);
+    const huesped = await this.repository.update(id, {
+      tipo_doc: data.tipo_doc,
+      nro_doc: data.nro_doc,
+      nombres: data.nombres,
+      apellidos: data.apellidos,
+      email: data.email,
+      telefono: data.telefono,
+      nacionalidad: data.nacionalidad,
+      observacion: data.observacion,
+    });
+
+    return toHuespedDto(huesped);
   }
 }

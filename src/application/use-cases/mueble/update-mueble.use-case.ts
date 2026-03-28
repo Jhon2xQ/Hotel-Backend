@@ -1,8 +1,9 @@
 import { inject, injectable } from "tsyringe";
 import type { IMuebleRepository } from "../../../domain/interfaces/mueble.repository.interface";
 import type { IHabitacionRepository } from "../../../domain/interfaces/habitacion.repository.interface";
+import type { UpdateMuebleParams } from "../../../domain/interfaces/mueble.repository.interface";
 import { MuebleException } from "../../../domain/exceptions/mueble.exception";
-import { UpdateMuebleInput, MuebleOutput } from "../../dtos/mueble.dto";
+import { UpdateMuebleDto, MuebleDto, toMuebleDto } from "../../dtos/mueble.dto";
 import { DI_TOKENS } from "../../../common/IoC/tokens";
 
 @injectable()
@@ -12,7 +13,7 @@ export class UpdateMuebleUseCase {
     @inject(DI_TOKENS.IHabitacionRepository) private habitacionRepository: IHabitacionRepository,
   ) {}
 
-  async execute(id: string, input: UpdateMuebleInput): Promise<MuebleOutput> {
+  async execute(id: string, input: UpdateMuebleDto): Promise<MuebleDto> {
     const existing = await this.repository.findById(id);
     if (!existing) {
       throw MuebleException.notFoundById();
@@ -32,7 +33,7 @@ export class UpdateMuebleUseCase {
       }
     }
 
-    const updateData: any = {};
+    const updateData: UpdateMuebleParams = {};
     if (input.codigo !== undefined) updateData.codigo = input.codigo;
     if (input.nombre !== undefined) updateData.nombre = input.nombre;
     if (input.categoria_id !== undefined) updateData.categoriaId = input.categoria_id;
@@ -48,6 +49,6 @@ export class UpdateMuebleUseCase {
     if (input.habitacion_id !== undefined) updateData.habitacionId = input.habitacion_id ?? null;
 
     const updated = await this.repository.update(id, updateData);
-    return updated.toOutput();
+    return toMuebleDto(updated);
   }
 }

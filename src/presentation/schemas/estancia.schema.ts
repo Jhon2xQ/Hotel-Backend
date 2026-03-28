@@ -1,8 +1,9 @@
 import { z } from "zod";
+import { EstadoEstadia } from "../../domain/entities/estancia.entity";
 
-const EstadoEstadiaEnum = z.enum(["EN_CASA", "COMPLETADA", "SALIDA_ANTICIPADA"]);
+const EstadoEstadiaEnum = z.nativeEnum(EstadoEstadia);
 
-export const CreateEstanciaSchema = z
+const CreateEstanciaSchemaRaw = z
   .object({
     reservaId: z.string().uuid("ID de reserva inválido"),
     habitacionId: z.string().uuid("ID de habitación inválido"),
@@ -25,7 +26,22 @@ export const CreateEstanciaSchema = z
     },
   );
 
-export const UpdateEstanciaSchema = z
+export const CreateEstanciaSchema = CreateEstanciaSchemaRaw.transform((data) => ({
+  reservaId: data.reservaId,
+  habitacionId: data.habitacionId,
+  huespedId: data.huespedId,
+  fechaEntrada: data.fechaEntrada ? new Date(data.fechaEntrada) : undefined,
+  fechaSalida:
+    data.fechaSalida === undefined
+      ? undefined
+      : data.fechaSalida === null
+        ? null
+        : new Date(data.fechaSalida),
+  estado: data.estado,
+  notas: data.notas,
+}));
+
+const UpdateEstanciaSchemaRaw = z
   .object({
     reservaId: z.string().uuid("ID de reserva inválido").optional(),
     habitacionId: z.string().uuid("ID de habitación inválido").optional(),
@@ -48,6 +64,25 @@ export const UpdateEstanciaSchema = z
     },
   );
 
-export const CheckoutEstanciaSchema = z.object({
+export const UpdateEstanciaSchema = UpdateEstanciaSchemaRaw.transform((data) => ({
+  reservaId: data.reservaId,
+  habitacionId: data.habitacionId,
+  huespedId: data.huespedId,
+  fechaEntrada: data.fechaEntrada === undefined ? undefined : new Date(data.fechaEntrada),
+  fechaSalida:
+    data.fechaSalida === undefined
+      ? undefined
+      : data.fechaSalida === null
+        ? null
+        : new Date(data.fechaSalida),
+  estado: data.estado,
+  notas: data.notas,
+}));
+
+const CheckoutEstanciaSchemaRaw = z.object({
   fechaSalida: z.string().datetime("Fecha de salida inválida"),
 });
+
+export const CheckoutEstanciaSchema = CheckoutEstanciaSchemaRaw.transform((data) => ({
+  fechaSalida: new Date(data.fechaSalida),
+}));

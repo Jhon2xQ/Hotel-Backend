@@ -1,16 +1,10 @@
-import { Habitacion } from "./habitacion.entity";
-import { Huesped } from "./huesped.entity";
+import type { Habitacion } from "./habitacion.entity";
+import type { Huesped } from "./huesped.entity";
 
-export type EstadoEstadia = "EN_CASA" | "COMPLETADA" | "SALIDA_ANTICIPADA";
-
-export interface CreateEstanciaData {
-  reservaId: string;
-  habitacionId: string;
-  huespedId: string;
-  fechaEntrada?: Date;
-  fechaSalida?: Date | null;
-  estado?: EstadoEstadia;
-  notas?: string | null;
+export enum EstadoEstadia {
+  EN_CASA = "EN_CASA",
+  COMPLETADA = "COMPLETADA",
+  SALIDA_ANTICIPADA = "SALIDA_ANTICIPADA",
 }
 
 export class Estancia {
@@ -28,25 +22,10 @@ export class Estancia {
   ) {}
 
   isCompletada(): boolean {
-    return this.estado === "COMPLETADA";
+    return this.estado === EstadoEstadia.COMPLETADA;
   }
 
   isEnCasa(): boolean {
-    return this.estado === "EN_CASA";
-  }
-
-  toOutput() {
-    return {
-      id: this.id,
-      reserva_id: this.reservaId,
-      habitacion: this.habitacion.toOutput(),
-      huesped: this.huesped.toOutput(),
-      fecha_entrada: this.fechaEntrada.toISOString(),
-      fecha_salida: this.fechaSalida?.toISOString() || null,
-      estado: this.estado,
-      notas: this.notas,
-      created_at: this.createdAt.toISOString(),
-      updated_at: this.updatedAt.toISOString(),
-    };
+    return this.estado === EstadoEstadia.EN_CASA;
   }
 }

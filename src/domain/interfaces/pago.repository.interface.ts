@@ -1,6 +1,17 @@
-import { Pago, CreatePagoData, ConceptoPago, EstadoPago, MetodoPago } from "../entities/pago.entity";
+import type { Pago, ConceptoPago, EstadoPago, MetodoPago } from "../entities/pago.entity";
 
-export interface UpdatePagoData {
+export interface CreatePagoParams {
+  concepto: ConceptoPago;
+  estado?: EstadoPago;
+  fechaPago?: Date;
+  monto: number;
+  moneda?: string;
+  metodo: MetodoPago;
+  recibidoPorId?: string | null;
+  observacion?: string | null;
+}
+
+export interface UpdatePagoParams {
   concepto?: ConceptoPago;
   estado?: EstadoPago;
   fechaPago?: Date;
@@ -11,9 +22,9 @@ export interface UpdatePagoData {
 }
 
 export interface IPagoRepository {
-  create(data: CreatePagoData): Promise<Pago>;
+  create(data: CreatePagoParams): Promise<Pago>;
   findAll(): Promise<Pago[]>;
   findById(id: string): Promise<Pago | null>;
-  update(id: string, data: UpdatePagoData): Promise<Pago>;
+  update(id: string, data: UpdatePagoParams): Promise<Pago>;
   delete(id: string): Promise<void>;
 }

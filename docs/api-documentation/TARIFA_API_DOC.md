@@ -1,11 +1,15 @@
 # API de Tarifas
 
+
+> **Autorización:** Las rutas que restrigen por rol usan `requireRoles(...)` (`src/presentation/middlewares/roles.middleware.ts`) con valores en `src/common/constants/roles.ts` (p. ej. `admin`, `recepcionista`). Cualquier mención a "ADMIN" u otros roles aquí es orientativa; la fuente de verdad es el `*.routes.ts` correspondiente.
+
+
 Documentación de los endpoints para la gestión de tarifas de habitaciones por canal.
 
 ## Base URL
 
 ```
-/api/tarifas
+/api/private/tarifas
 ```
 
 ## Autenticación
@@ -20,7 +24,7 @@ Todos los endpoints requieren autenticación mediante Better Auth. Los endpoints
 
 Obtiene la lista de todas las tarifas registradas con sus relaciones completas (tipo de habitación y canal).
 
-**Endpoint:** `GET /api/tarifas`
+**Endpoint:** `GET /api/private/tarifas`
 
 **Autenticación:** Requerida
 
@@ -67,7 +71,7 @@ Obtiene la lista de todas las tarifas registradas con sus relaciones completas (
 
 Obtiene los detalles de una tarifa específica con sus relaciones completas.
 
-**Endpoint:** `GET /api/tarifas/:id`
+**Endpoint:** `GET /api/private/tarifas/:id`
 
 **Autenticación:** Requerida
 
@@ -127,7 +131,7 @@ Obtiene los detalles de una tarifa específica con sus relaciones completas.
 
 Crea una nueva tarifa para un tipo de habitación y canal específicos.
 
-**Endpoint:** `POST /api/tarifas`
+**Endpoint:** `POST /api/private/tarifas`
 
 **Autenticación:** Requerida (rol ADMIN)
 
@@ -216,7 +220,7 @@ Crea una nueva tarifa para un tipo de habitación y canal específicos.
 
 Actualiza los datos de una tarifa existente.
 
-**Endpoint:** `PUT /api/tarifas/:id`
+**Endpoint:** `PUT /api/private/tarifas/:id`
 
 **Autenticación:** Requerida (rol ADMIN)
 
@@ -295,7 +299,7 @@ Actualiza los datos de una tarifa existente.
 
 Elimina una tarifa del sistema.
 
-**Endpoint:** `DELETE /api/tarifas/:id`
+**Endpoint:** `DELETE /api/private/tarifas/:id`
 
 **Autenticación:** Requerida (rol ADMIN)
 

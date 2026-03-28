@@ -6,7 +6,7 @@ import { ListTarifaUseCase } from "../../application/use-cases/tarifa/list-tarif
 import { FindTarifaByIdUseCase } from "../../application/use-cases/tarifa/find-tarifa-by-id.use-case";
 import { UpdateTarifaUseCase } from "../../application/use-cases/tarifa/update-tarifa.use-case";
 import { DeleteTarifaUseCase } from "../../application/use-cases/tarifa/delete-tarifa.use-case";
-import { CreateTarifaInput, UpdateTarifaInput } from "../../application/dtos/tarifa.dto";
+import { CreateTarifaDto, UpdateTarifaDto } from "../../application/dtos/tarifa.dto";
 
 @injectable()
 export class TarifaController {
@@ -19,7 +19,7 @@ export class TarifaController {
   ) {}
 
   async create(c: AppContext) {
-    const input = c.get("validData") as CreateTarifaInput;
+    const input = c.get("validData") as CreateTarifaDto;
     const result = await this.createUseCase.execute(input);
     return c.json(ApiResponse.success("Tarifa creada exitosamente", result), 201);
   }
@@ -37,7 +37,7 @@ export class TarifaController {
 
   async update(c: AppContext) {
     const { id } = c.req.param();
-    const input = c.get("validData") as UpdateTarifaInput;
+    const input = c.get("validData") as UpdateTarifaDto;
     const result = await this.updateUseCase.execute(id, input);
     return c.json(ApiResponse.success("Tarifa actualizada exitosamente", result), 200);
   }

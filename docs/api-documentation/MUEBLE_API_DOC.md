@@ -1,14 +1,132 @@
 # API de Muebles
 
-Documentación de los endpoints para la gestión de muebles del hotel.
+
+> **Autorización:** Las rutas que restrigen por rol usan `requireRoles(...)` (`src/presentation/middlewares/roles.middleware.ts`) con valores en `src/common/constants/roles.ts` (p. ej. `admin`, `recepcionista`). Cualquier mención a "ADMIN" u otros roles aquí es orientativa; la fuente de verdad es el `*.routes.ts` correspondiente.
+
+
+Documentación del módulo `muebles.routes.ts`: gestión de muebles del hotel.
+
+## Base URL
+
+```
+/api/private/muebles
+```
+
+## Orden de endpoints
+
+1. `GET /` — listar  
+2. `GET /:id` — por id  
+3. `POST /` — crear  
+4. `PUT /:id` — actualizar  
+5. `DELETE /:id` — eliminar  
 
 ## Endpoints
 
-### 1. Crear Mueble
+### 1. Listar Muebles
+
+Obtiene la lista de todos los muebles registrados.
+
+**Endpoint:** `GET /api/private/muebles`
+
+**Autenticación:** Requerida (Admin)
+
+**Response (200 OK):**
+
+```json
+{
+  "success": true,
+  "message": "Muebles obtenidos exitosamente",
+  "data": [
+    {
+      "id": "uuid-mueble-1",
+      "codigo": "CAMA-001",
+      "nombre": "Cama King Size",
+      "descripcion": "Cama de lujo",
+      "categoria_id": "uuid-categoria",
+      "imagen_url": "https://example.com/cama.jpg",
+      "condicion": "BUENO",
+      "fecha_adquisicion": "2025-01-15",
+      "ultima_revision": "2026-03-01",
+      "habitacion_id": "uuid-habitacion",
+      "created_at": "2026-03-24T08:00:00.000Z",
+      "updated_at": "2026-03-24T08:00:00.000Z"
+    },
+    {
+      "id": "uuid-mueble-2",
+      "codigo": "SILLA-001",
+      "nombre": "Silla de Escritorio",
+      "descripcion": "Silla ergonómica",
+      "categoria_id": "uuid-categoria-2",
+      "imagen_url": "https://example.com/silla.jpg",
+      "condicion": "BUENO",
+      "fecha_adquisicion": "2025-02-10",
+      "ultima_revision": null,
+      "habitacion_id": null,
+      "created_at": "2026-03-24T09:00:00.000Z",
+      "updated_at": "2026-03-24T09:00:00.000Z"
+    }
+  ],
+  "timestamp": 1711267200000
+}
+```
+
+**Errores:**
+
+- `401 Unauthorized`: No autenticado
+- `403 Forbidden`: No tiene permisos de administrador
+
+---
+
+### 2. Obtener Mueble por ID
+
+Obtiene los detalles de un mueble específico.
+
+**Endpoint:** `GET /api/private/muebles/:id`
+
+**Autenticación:** Requerida (Admin)
+
+**Parámetros de URL:**
+
+- `id` (uuid, requerido): ID del mueble
+
+**Response (200 OK):**
+
+```json
+{
+  "success": true,
+  "message": "Mueble encontrado",
+  "data": {
+    "id": "uuid-mueble",
+    "codigo": "CAMA-001",
+    "nombre": "Cama King Size",
+    "descripcion": "Cama de lujo con colchón ortopédico",
+    "categoria_id": "uuid-categoria",
+    "imagen_url": "https://example.com/cama.jpg",
+    "condicion": "BUENO",
+    "fecha_adquisicion": "2025-01-15",
+    "ultima_revision": "2026-03-01",
+    "habitacion_id": "uuid-habitacion",
+    "created_at": "2026-03-24T08:00:00.000Z",
+    "updated_at": "2026-03-24T08:00:00.000Z"
+  },
+  "timestamp": 1711267200000
+}
+```
+
+**Errores:**
+
+- `400 Bad Request`: ID inválido
+- `401 Unauthorized`: No autenticado
+- `403 Forbidden`: No tiene permisos de administrador
+- `404 Not Found`: Mueble no encontrado
+
+---
+
+### 3. Crear Mueble
 
 Crea un nuevo mueble en el sistema.
 
-**Endpoint:** `POST /api/muebles`
+**Endpoint:** `POST /api/private/muebles`
 
 **Autenticación:** Requerida (Admin)
 
@@ -74,111 +192,11 @@ Crea un nuevo mueble en el sistema.
 
 ---
 
-### 2. Listar Muebles
-
-Obtiene la lista de todos los muebles registrados.
-
-**Endpoint:** `GET /api/muebles`
-
-**Autenticación:** Requerida (Admin)
-
-**Response (200 OK):**
-
-```json
-{
-  "success": true,
-  "message": "Muebles obtenidos exitosamente",
-  "data": [
-    {
-      "id": "uuid-mueble-1",
-      "codigo": "CAMA-001",
-      "nombre": "Cama King Size",
-      "descripcion": "Cama de lujo",
-      "categoria_id": "uuid-categoria",
-      "imagen_url": "https://example.com/cama.jpg",
-      "condicion": "BUENO",
-      "fecha_adquisicion": "2025-01-15",
-      "ultima_revision": "2026-03-01",
-      "habitacion_id": "uuid-habitacion",
-      "created_at": "2026-03-24T08:00:00.000Z",
-      "updated_at": "2026-03-24T08:00:00.000Z"
-    },
-    {
-      "id": "uuid-mueble-2",
-      "codigo": "SILLA-001",
-      "nombre": "Silla de Escritorio",
-      "descripcion": "Silla ergonómica",
-      "categoria_id": "uuid-categoria-2",
-      "imagen_url": "https://example.com/silla.jpg",
-      "condicion": "BUENO",
-      "fecha_adquisicion": "2025-02-10",
-      "ultima_revision": null,
-      "habitacion_id": null,
-      "created_at": "2026-03-24T09:00:00.000Z",
-      "updated_at": "2026-03-24T09:00:00.000Z"
-    }
-  ],
-  "timestamp": 1711267200000
-}
-```
-
-**Errores:**
-
-- `401 Unauthorized`: No autenticado
-- `403 Forbidden`: No tiene permisos de administrador
-
----
-
-### 3. Obtener Mueble por ID
-
-Obtiene los detalles de un mueble específico.
-
-**Endpoint:** `GET /api/muebles/:id`
-
-**Autenticación:** Requerida (Admin)
-
-**Parámetros de URL:**
-
-- `id` (uuid, requerido): ID del mueble
-
-**Response (200 OK):**
-
-```json
-{
-  "success": true,
-  "message": "Mueble encontrado",
-  "data": {
-    "id": "uuid-mueble",
-    "codigo": "CAMA-001",
-    "nombre": "Cama King Size",
-    "descripcion": "Cama de lujo con colchón ortopédico",
-    "categoria_id": "uuid-categoria",
-    "imagen_url": "https://example.com/cama.jpg",
-    "condicion": "BUENO",
-    "fecha_adquisicion": "2025-01-15",
-    "ultima_revision": "2026-03-01",
-    "habitacion_id": "uuid-habitacion",
-    "created_at": "2026-03-24T08:00:00.000Z",
-    "updated_at": "2026-03-24T08:00:00.000Z"
-  },
-  "timestamp": 1711267200000
-}
-```
-
-**Errores:**
-
-- `400 Bad Request`: ID inválido
-- `401 Unauthorized`: No autenticado
-- `403 Forbidden`: No tiene permisos de administrador
-- `404 Not Found`: Mueble no encontrado
-
----
-
 ### 4. Actualizar Mueble
 
 Actualiza la información de un mueble existente.
 
-**Endpoint:** `PUT /api/muebles/:id`
+**Endpoint:** `PUT /api/private/muebles/:id`
 
 **Autenticación:** Requerida (Admin)
 
@@ -254,7 +272,7 @@ Todos los campos son opcionales. Solo se actualizarán los campos proporcionados
 
 Elimina un mueble del sistema.
 
-**Endpoint:** `DELETE /api/muebles/:id`
+**Endpoint:** `DELETE /api/private/muebles/:id`
 
 **Autenticación:** Requerida (Admin)
 
@@ -342,7 +360,7 @@ enum MuebleCondition {
 ### Crear mueble sin habitación asignada
 
 ```json
-POST /api/muebles
+POST /api/private/muebles
 {
   "codigo": "SILLA-001",
   "nombre": "Silla de Escritorio",
@@ -353,7 +371,7 @@ POST /api/muebles
 ### Desasignar mueble de una habitación
 
 ```json
-PUT /api/muebles/:id
+PUT /api/private/muebles/:id
 {
   "habitacion_id": null
 }
@@ -362,7 +380,7 @@ PUT /api/muebles/:id
 ### Actualizar solo la condición
 
 ```json
-PUT /api/muebles/:id
+PUT /api/private/muebles/:id
 {
   "condicion": "DANADO"
 }
