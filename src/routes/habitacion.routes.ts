@@ -16,6 +16,7 @@ import { HabitacionController } from "../presentation/controllers/habitacion.con
 import { authMiddleware } from "../presentation/middlewares/auth.middleware";
 import { adminMiddleware } from "../presentation/middlewares/admin.middleware";
 import { validSchema, validParams, validQuery } from "../presentation/middlewares/valid.middleware";
+import { parseFormDataMiddleware } from "../presentation/middlewares/parse-form-data.middleware";
 import {
   CreateHabitacionSchema,
   UpdateHabitacionSchema,
@@ -51,14 +52,8 @@ export function createHabitacionRoutes(prismaClient: PrismaClient): AppHono {
 
   const router = new Hono<{ Variables: AppVariables }>();
 
-  router.post(
-    "/",
-    authMiddleware,
-    adminMiddleware,
-    validSchema(CreateHabitacionSchema),
-    controller.create.bind(controller),
-  );
-  router.get("/", authMiddleware, controller.list.bind(controller));
+  router.post("/", parseFormDataMiddleware, validSchema(CreateHabitacionSchema), controller.create.bind(controller));
+  router.get("/", controller.list.bind(controller));
   router.get(
     "/disponibles",
     validQuery(SearchAvailableHabitacionesSchema),
@@ -70,6 +65,7 @@ export function createHabitacionRoutes(prismaClient: PrismaClient): AppHono {
     "/:id",
     adminMiddleware,
     validParams(UUIDParamSchema),
+    parseFormDataMiddleware,
     validSchema(UpdateHabitacionSchema),
     controller.update.bind(controller),
   );

@@ -3,6 +3,7 @@ import { ITipoHabitacionRepository } from "../../../domain/interfaces/tipo-habit
 import { HabitacionException } from "../../../domain/exceptions/habitacion.exception";
 import { CreateHabitacionInput, HabitacionOutput } from "../../dtos/habitacion.dto";
 import { EstadoHabitacion } from "../../../domain/entities/habitacion.entity";
+import { S3UploadService } from "../../../infrastructure/services/s3-upload.service";
 
 export class CreateHabitacionUseCase {
   constructor(
@@ -23,6 +24,12 @@ export class CreateHabitacionUseCase {
       throw HabitacionException.duplicateNumero();
     }
 
+    // Upload images to S3 if provided
+    let imageUrls: string[] | null = null;
+    if (input.imagenes && input.imagenes.length > 0) {
+      imageUrls = await S3UploadService.uploadImages(input.imagenes);
+    }
+
     // Create habitacion with defaults (Requirement 6.10, 15.6)
     const habitacion = await this.repository.create({
       nroHabitacion: input.nro_habitacion,
@@ -30,7 +37,7 @@ export class CreateHabitacionUseCase {
       piso: input.piso,
       tieneDucha: input.tiene_ducha ?? false,
       tieneBanio: input.tiene_banio ?? false,
-      urlImagen: input.url_imagen ?? null,
+      urlImagen: imageUrls,
       estado: input.estado ?? EstadoHabitacion.DISPONIBLE,
       notas: input.notas ?? null,
       ultiLimpieza: input.ulti_limpieza ? new Date(input.ulti_limpieza) : null,

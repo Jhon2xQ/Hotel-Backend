@@ -4,6 +4,7 @@ import { IMuebleRepository } from "../../../domain/interfaces/mueble.repository.
 import { HabitacionException } from "../../../domain/exceptions/habitacion.exception";
 import { UpdateHabitacionInput, HabitacionOutput } from "../../dtos/habitacion.dto";
 import type { CatalogoMueble } from "../../../domain/entities/tipo-habitacion.entity";
+import { S3UploadService } from "../../../infrastructure/services/s3-upload.service";
 
 export class UpdateHabitacionUseCase {
   constructor(
@@ -35,6 +36,12 @@ export class UpdateHabitacionUseCase {
       }
     }
 
+    // Upload images to S3 if provided
+    let imageUrls: string[] | undefined = undefined;
+    if (input.imagenes && input.imagenes.length > 0) {
+      imageUrls = await S3UploadService.uploadImages(input.imagenes);
+    }
+
     // Call repository.update and return HabitacionOutput (Requirement 15.9)
     // If estado changes to LIMPIEZA, set ultimaLimpieza to current timestamp (Requirement 9.8)
     const updated = await this.repository.update(id, {
@@ -43,7 +50,7 @@ export class UpdateHabitacionUseCase {
       piso: input.piso,
       tieneDucha: input.tiene_ducha,
       tieneBanio: input.tiene_banio,
-      urlImagen: input.url_imagen,
+      urlImagen: imageUrls,
       estado: input.estado,
       notas: input.notas,
       ultiLimpieza: input.ulti_limpieza ? new Date(input.ulti_limpieza) : null,
