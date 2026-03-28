@@ -10,7 +10,7 @@ Documentación de los endpoints para gestionar reservas en el sistema hotelero.
 
 ## Autenticación
 
-Todos los endpoints requieren autenticación mediante Better Auth. Los endpoints de creación, actualización, eliminación y cancelación requieren rol `ADMIN`.
+Todos los endpoints requieren autenticación mediante Better Auth. Solo el endpoint de actualización de estado (`PATCH /api/reservas/:id/estado`) requiere rol `ADMIN`.
 
 ---
 
@@ -78,7 +78,23 @@ Obtiene todas las reservas del sistema.
         "created_at": "2024-03-23T10:00:00.000Z",
         "updated_at": "2024-03-23T10:00:00.000Z"
       },
-      "pago": null,
+      "pago": {
+        "id": "uuid",
+        "concepto": "RESERVA",
+        "estado": "CONFIRMADO",
+        "fecha_pago": "2024-03-23T10:00:00.000Z",
+        "monto": "300.00",
+        "moneda": "SOL",
+        "metodo": "VISA",
+        "recibido_por_id": "user-id",
+        "recibido_por": {
+          "id": "user-id",
+          "name": "María García",
+          "email": "maria@hotel.com"
+        },
+        "observacion": "Pago adelantado por reserva",
+        "created_at": "2024-03-23T10:00:00.000Z"
+      },
       "fecha_entrada": "2024-03-25T14:00:00.000Z",
       "fecha_salida": "2024-03-27T12:00:00.000Z",
       "adultos": 2,
@@ -93,7 +109,7 @@ Obtiene todas las reservas del sistema.
       "monto_total": 300.0,
       "monto_descuento": 0.0,
       "monto_final": 300.0,
-      "estado": "TENTATIVA",
+      "estado": "CONFIRMADA",
       "motivo_cancel": null,
       "cancelado_en": null,
       "created_at": "2024-03-23T10:00:00.000Z",
@@ -103,6 +119,8 @@ Obtiene todas las reservas del sistema.
   "timestamp": 1711188000000
 }
 ```
+
+**Nota:** El campo `pago` será `null` si la reserva no tiene un pago asociado.
 
 ---
 
@@ -180,7 +198,7 @@ Crea una nueva reserva. El código de reserva se genera automáticamente en form
 
 **Endpoint:** `POST /api/reservas`
 
-**Autenticación:** Requerida (rol ADMIN)
+**Autenticación:** Requerida
 
 **Body:**
 
@@ -243,7 +261,7 @@ Ejemplo: `KOR-20260327-A7K9P2`
 
 ### 4. Actualizar Reserva
 
-Actualiza una reserva existente. Cualquier usuario autenticado puede actualizar reservas. Si el estado es COMPLETADA, la reserva es inmutable y no se puede modificar a través de este endpoint (use el endpoint de actualización de estado si es admin).
+Actualiza una reserva existente. Cualquier usuario autenticado puede actualizar reservas. Si el estado es COMPLETADA, la reserva es inmutable y no se puede modificar (use el endpoint de actualización de estado si es admin para cambiar el estado primero).
 
 **Endpoint:** `PUT /api/reservas/:id`
 
@@ -266,6 +284,32 @@ Actualiza una reserva existente. Cualquier usuario autenticado puede actualizar 
   "adultos": 2,
   "ninos": 1,
   "montoDescuento": 0,
+  "estado": "CONFIRMADA"
+}
+```
+
+**Ejemplos de uso:**
+
+Asociar un pago a la reserva:
+
+```json
+{
+  "pagoId": "uuid-del-pago"
+}
+```
+
+Desasociar un pago de la reserva:
+
+```json
+{
+  "pagoId": null
+}
+```
+
+Cambiar solo el estado:
+
+```json
+{
   "estado": "CONFIRMADA"
 }
 ```
@@ -313,7 +357,7 @@ Cancela una reserva estableciendo su estado a CANCELADA. No se pueden cancelar r
 
 **Endpoint:** `PATCH /api/reservas/:id/cancel`
 
-**Autenticación:** Requerida (rol ADMIN)
+**Autenticación:** Requerida
 
 **Parámetros de URL:**
 
@@ -429,7 +473,7 @@ Elimina permanentemente una reserva del sistema.
 
 **Endpoint:** `DELETE /api/reservas/:id`
 
-**Autenticación:** Requerida (rol ADMIN)
+**Autenticación:** Requerida
 
 **Parámetros de URL:**
 
@@ -456,6 +500,80 @@ Elimina permanentemente una reserva del sistema.
   "timestamp": 1711188000000
 }
 ```
+
+---
+
+## Relación con Pagos
+
+Las reservas tienen una relación **uno a uno opcional** con pagos:
+
+- Una reserva puede tener un pago asociado o no (`pagoId` es opcional)
+- El campo `pago` en la respuesta puede ser `null` si no hay pago asociado
+- Cuando existe un pago, se incluye el objeto completo con toda su información
+
+### Estructura del Objeto Pago
+
+Cuando una reserva tiene un pago asociado, el objeto incluye:
+
+```json
+{
+  "id": "uuid",
+  "concepto": "RESERVA",
+  "estado": "CONFIRMADO",
+  "fecha_pago": "2024-03-23T10:00:00.000Z",
+  "monto": "300.00",
+  "moneda": "SOL",
+  "metodo": "VISA",
+  "recibido_por_id": "user-id",
+  "recibido_por": {
+    "id": "user-id",
+    "name": "Juan Pérez",
+    "email": "juan@hotel.com"
+  },
+  "observacion": "Pago adelantado por reserva",
+  "created_at": "2024-03-23T10:00:00.000Z"
+}
+```
+
+### Conceptos de Pago
+
+- `RESERVA`: Pago relacionado a una reserva
+- `CONSUMO`: Pago relacionado a consumos en el folio
+
+### Estados de Pago
+
+- `CONFIRMADO`: Pago confirmado y procesado
+- `DEVUELTO`: Pago devuelto al cliente
+- `RETENIDO`: Pago retenido temporalmente
+- `ANULADO`: Pago anulado
+
+### Métodos de Pago
+
+- `EFECTIVO`: Pago en efectivo
+- `VISA`: Tarjeta Visa
+- `MASTERCARD`: Tarjeta Mastercard
+- `AMEX`: American Express
+- `TRANSFERENCIA`: Transferencia bancaria
+
+### Asociar un Pago a una Reserva
+
+Para asociar un pago existente a una reserva, use el endpoint `PUT /api/reservas/:id` con el campo `pagoId`:
+
+```json
+{
+  "pagoId": "uuid-del-pago"
+}
+```
+
+Para desasociar un pago, envíe `pagoId: null`:
+
+```json
+{
+  "pagoId": null
+}
+```
+
+**Nota:** Para crear pagos, consulte la documentación de la API de Pagos (`/api/pagos`).
 
 ---
 
@@ -495,6 +613,88 @@ Los siguientes campos se sincronizan automáticamente desde las entidades relaci
 
 ---
 
+## Errores Comunes
+
+### Errores de Validación (400)
+
+```json
+{
+  "success": false,
+  "message": "La fecha de salida debe ser posterior a la fecha de entrada",
+  "data": null,
+  "timestamp": 1711188000000
+}
+```
+
+Mensajes posibles:
+
+- "La fecha de salida debe ser posterior a la fecha de entrada"
+- "Debe haber al menos 1 adulto en la reserva"
+- "El número de niños no puede ser negativo"
+- "La reserva ya está cancelada"
+- "Debe proporcionar un motivo de cancelación"
+- "Para cancelar una reserva use el endpoint PATCH /api/reservas/:id/cancel con el motivo de cancelación"
+
+### Errores de Permisos (403)
+
+```json
+{
+  "success": false,
+  "message": "No se puede modificar una reserva completada. La reserva es inmutable.",
+  "data": null,
+  "timestamp": 1711188000000
+}
+```
+
+Mensajes posibles:
+
+- "No se puede modificar una reserva completada. La reserva es inmutable."
+- "No se puede cancelar una reserva completada"
+
+### Errores de Recursos No Encontrados (404)
+
+```json
+{
+  "success": false,
+  "message": "Reserva con id \"uuid\" no encontrada",
+  "data": null,
+  "timestamp": 1711188000000
+}
+```
+
+Mensajes posibles:
+
+- "Reserva con id \"uuid\" no encontrada"
+- "Reserva con código \"KOR-20260327-A7K9P2\" no encontrada"
+- "El huésped especificado no existe"
+- "La habitación especificada no existe"
+- "La tarifa especificada no existe"
+- "El pago especificado no existe"
+
+### Errores de Conflicto (409)
+
+```json
+{
+  "success": false,
+  "message": "Ya existe una reserva con el código \"KOR-20260327-A7K9P2\"",
+  "data": null,
+  "timestamp": 1711188000000
+}
+```
+
+### Errores del Servidor (500)
+
+```json
+{
+  "success": false,
+  "message": "No se pudo generar un código único para la reserva. Intente nuevamente.",
+  "data": null,
+  "timestamp": 1711188000000
+}
+```
+
+---
+
 ## Códigos de Estado HTTP
 
 - `200 OK`: Operación exitosa
@@ -512,7 +712,7 @@ Los siguientes campos se sincronizan automáticamente desde las entidades relaci
 
 1. **Código Automático**: El código de reserva se genera automáticamente en formato `KOR-YYYYMMDD-XXXXXX`. No es necesario enviarlo en el request de creación.
 
-2. **Inmutabilidad**: Las reservas con estado COMPLETADA son inmutables y no pueden ser modificadas.
+2. **Inmutabilidad**: Las reservas con estado COMPLETADA son inmutables y no pueden ser modificadas mediante el endpoint `PUT /api/reservas/:id`. Los administradores pueden usar el endpoint `PATCH /api/reservas/:id/estado` para cambiar el estado primero si necesitan modificar una reserva completada.
 
 3. **Sincronización Automática**: Los campos snapshot se actualizan automáticamente cuando cambian las relaciones, no es necesario enviarlos en el request.
 
@@ -523,3 +723,11 @@ Los siguientes campos se sincronizan automáticamente desde las entidades relaci
    - Eliminar una reserva la borra permanentemente del sistema
 
 6. **Historial**: Los campos snapshot permiten mantener un historial preciso incluso si las entidades relacionadas cambian posteriormente.
+
+7. **Permisos de Administrador**: Solo los administradores pueden actualizar el estado de una reserva mediante `PATCH /api/reservas/:id/estado`. Este endpoint permite cambiar desde cualquier estado (incluyendo COMPLETADA) a cualquier otro estado válido, excepto CANCELADA (que requiere usar el endpoint de cancelación).
+
+8. **Relación con Pagos**:
+   - Una reserva puede tener un pago asociado opcionalmente mediante el campo `pagoId`
+   - El pago se incluye automáticamente en las respuestas cuando existe
+   - Para crear pagos, use la API de Pagos (`/api/pagos`)
+   - Para asociar/desasociar un pago, use el endpoint `PUT /api/reservas/:id` con el campo `pagoId`
