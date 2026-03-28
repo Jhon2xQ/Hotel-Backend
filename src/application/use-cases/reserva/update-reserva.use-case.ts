@@ -1,10 +1,15 @@
+import { inject, injectable } from "tsyringe";
 import { IReservaRepository } from "../../../domain/interfaces/reserva.repository.interface";
 import { Reserva } from "../../../domain/entities/reserva.entity";
 import { UpdateReservaInput } from "../../dtos/reserva.dto";
 import { ReservaException } from "../../../domain/exceptions/reserva.exception";
+import { DI_TOKENS } from "../../../common/IoC/tokens";
 
+@injectable()
 export class UpdateReservaUseCase {
-  constructor(private reservaRepository: IReservaRepository) {}
+  constructor(
+    @inject(DI_TOKENS.IReservaRepository) private reservaRepository: IReservaRepository,
+  ) {}
 
   async execute(id: string, input: UpdateReservaInput): Promise<Reserva> {
     // Verificar que la reserva existe

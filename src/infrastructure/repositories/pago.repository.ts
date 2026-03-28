@@ -1,3 +1,4 @@
+import { inject, injectable } from "tsyringe";
 import { PrismaClient, Prisma } from "../../../generated/prisma/client";
 import {
   Pago,
@@ -9,9 +10,11 @@ import {
 } from "../../domain/entities/pago.entity";
 import { IPagoRepository, UpdatePagoData } from "../../domain/interfaces/pago.repository.interface";
 import { PagoException } from "../../domain/exceptions/pago.exception";
+import { DI_TOKENS } from "../../common/IoC/tokens";
 
+@injectable()
 export class PagoRepository implements IPagoRepository {
-  constructor(private prisma: PrismaClient) {}
+  constructor(@inject(DI_TOKENS.PrismaClient) private prisma: PrismaClient) {}
 
   async create(data: CreatePagoData): Promise<Pago> {
     const result = await this.prisma.pago.create({

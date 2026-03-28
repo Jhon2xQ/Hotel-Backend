@@ -1,13 +1,16 @@
+import { inject, injectable } from "tsyringe";
 import { IPagoRepository } from "../../../domain/interfaces/pago.repository.interface";
 import { IUserRepository } from "../../../domain/interfaces/user.repository.interface";
 import { PagoException } from "../../../domain/exceptions/pago.exception";
 import { CreatePagoInput, PagoOutput } from "../../dtos/pago.dto";
 import { ConceptoPago, EstadoPago, MetodoPago } from "../../../domain/entities/pago.entity";
+import { DI_TOKENS } from "../../../common/IoC/tokens";
 
+@injectable()
 export class CreatePagoUseCase {
   constructor(
-    private repository: IPagoRepository,
-    private userRepository: IUserRepository,
+    @inject(DI_TOKENS.IPagoRepository) private repository: IPagoRepository,
+    @inject(DI_TOKENS.IUserRepository) private userRepository: IUserRepository,
   ) {}
 
   async execute(input: CreatePagoInput): Promise<PagoOutput> {

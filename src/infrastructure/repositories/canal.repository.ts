@@ -1,10 +1,13 @@
+import { inject, injectable } from "tsyringe";
 import { PrismaClient, Prisma } from "../../../generated/prisma/client";
 import { Canal, CreateCanalData } from "../../domain/entities/canal.entity";
 import { ICanalRepository, UpdateCanalData } from "../../domain/interfaces/canal.repository.interface";
 import { CanalException } from "../../domain/exceptions/canal.exception";
+import { DI_TOKENS } from "../../common/IoC/tokens";
 
+@injectable()
 export class CanalRepository implements ICanalRepository {
-  constructor(private prisma: PrismaClient) {}
+  constructor(@inject(DI_TOKENS.PrismaClient) private prisma: PrismaClient) {}
 
   async create(data: CreateCanalData): Promise<Canal> {
     const result = await this.prisma.canal.create({

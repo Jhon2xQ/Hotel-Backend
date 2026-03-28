@@ -1,9 +1,12 @@
+import { inject, injectable } from "tsyringe";
 import { Huesped } from "../../../domain/entities/huesped.entity";
 import { IHuespedRepository, UpdateHuespedData } from "../../../domain/interfaces/huesped.repository.interface";
 import { HuespedException } from "../../../domain/exceptions/huesped.exception";
+import { DI_TOKENS } from "../../../common/IoC/tokens";
 
+@injectable()
 export class UpdateHuespedUseCase {
-  constructor(private readonly repository: IHuespedRepository) {}
+  constructor(@inject(DI_TOKENS.IHuespedRepository) private readonly repository: IHuespedRepository) {}
 
   async execute(id: string, data: UpdateHuespedData): Promise<Huesped> {
     const existing = await this.repository.findById(id);

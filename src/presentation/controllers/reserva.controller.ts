@@ -1,3 +1,4 @@
+import { injectable } from "tsyringe";
 import { AppContext } from "../../common/types/app.types";
 import { ApiResponse } from "../api.response";
 import { CreateReservaUseCase } from "../../application/use-cases/reserva/create-reserva.use-case";
@@ -14,6 +15,7 @@ import {
   UpdateEstadoReservaInput,
 } from "../../application/dtos/reserva.dto";
 
+@injectable()
 export class ReservaController {
   constructor(
     private createUseCase: CreateReservaUseCase,

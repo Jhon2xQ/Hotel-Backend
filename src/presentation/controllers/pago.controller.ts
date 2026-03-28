@@ -1,3 +1,4 @@
+import { injectable } from "tsyringe";
 import { AppContext } from "../../common/types/app.types";
 import { ApiResponse } from "../api.response";
 import { CreatePagoUseCase } from "../../application/use-cases/pago/create-pago.use-case";
@@ -7,6 +8,7 @@ import { UpdatePagoUseCase } from "../../application/use-cases/pago/update-pago.
 import { DeletePagoUseCase } from "../../application/use-cases/pago/delete-pago.use-case";
 import { CreatePagoInput, UpdatePagoInput } from "../../application/dtos/pago.dto";
 
+@injectable()
 export class PagoController {
   constructor(
     private createUseCase: CreatePagoUseCase,

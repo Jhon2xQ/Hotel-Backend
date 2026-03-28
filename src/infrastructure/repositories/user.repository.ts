@@ -1,8 +1,11 @@
+import { inject, injectable } from "tsyringe";
 import { PrismaClient } from "../../../generated/prisma/client";
 import { IUserRepository } from "../../domain/interfaces/user.repository.interface";
+import { DI_TOKENS } from "../../common/IoC/tokens";
 
+@injectable()
 export class UserRepository implements IUserRepository {
-  constructor(private prisma: PrismaClient) {}
+  constructor(@inject(DI_TOKENS.PrismaClient) private prisma: PrismaClient) {}
 
   async findById(id: string): Promise<{ id: string; name: string; email: string } | null> {
     const user = await this.prisma.user.findUnique({

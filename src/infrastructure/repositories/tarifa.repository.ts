@@ -1,3 +1,4 @@
+import { inject, injectable } from "tsyringe";
 import { PrismaClient, Prisma } from "../../../generated/prisma/client";
 import { Tarifa, CreateTarifaData } from "../../domain/entities/tarifa.entity";
 import { ITarifaRepository, UpdateTarifaData } from "../../domain/interfaces/tarifa.repository.interface";
@@ -5,9 +6,11 @@ import { TarifaException } from "../../domain/exceptions/tarifa.exception";
 import { TipoHabitacion } from "../../domain/entities/tipo-habitacion.entity";
 import { Canal } from "../../domain/entities/canal.entity";
 import { TarifaModel } from "../../../generated/prisma/models";
+import { DI_TOKENS } from "../../common/IoC/tokens";
 
+@injectable()
 export class TarifaRepository implements ITarifaRepository {
-  constructor(private prisma: PrismaClient) {}
+  constructor(@inject(DI_TOKENS.PrismaClient) private prisma: PrismaClient) {}
 
   async create(data: CreateTarifaData): Promise<Tarifa> {
     const result: TarifaModel = await this.prisma.tarifa.create({

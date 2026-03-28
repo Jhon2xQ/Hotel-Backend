@@ -1,8 +1,11 @@
+import { inject, injectable } from "tsyringe";
 import { ITarifaRepository } from "../../../domain/interfaces/tarifa.repository.interface";
 import { TarifaException } from "../../../domain/exceptions/tarifa.exception";
+import { DI_TOKENS } from "../../../common/IoC/tokens";
 
+@injectable()
 export class DeleteTarifaUseCase {
-  constructor(private repository: ITarifaRepository) {}
+  constructor(@inject(DI_TOKENS.ITarifaRepository) private repository: ITarifaRepository) {}
 
   async execute(id: string): Promise<void> {
     const existing = await this.repository.findById(id);

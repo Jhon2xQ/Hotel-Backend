@@ -1,3 +1,4 @@
+import { inject, injectable } from "tsyringe";
 import { PrismaClient, Prisma } from "../../../generated/prisma/client";
 import { Reserva, CreateReservaData, EstadoReserva } from "../../domain/entities/reserva.entity";
 import { Huesped } from "../../domain/entities/huesped.entity";
@@ -8,9 +9,11 @@ import { TipoHabitacion } from "../../domain/entities/tipo-habitacion.entity";
 import { Canal } from "../../domain/entities/canal.entity";
 import { IReservaRepository, UpdateReservaData } from "../../domain/interfaces/reserva.repository.interface";
 import { ReservaException } from "../../domain/exceptions/reserva.exception";
+import { DI_TOKENS } from "../../common/IoC/tokens";
 
+@injectable()
 export class ReservaRepository implements IReservaRepository {
-  constructor(private prisma: PrismaClient) {}
+  constructor(@inject(DI_TOKENS.PrismaClient) private prisma: PrismaClient) {}
 
   async create(data: CreateReservaData): Promise<Reserva> {
     // Obtener entidades relacionadas para snapshot

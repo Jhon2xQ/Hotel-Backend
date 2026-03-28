@@ -1,3 +1,4 @@
+import { injectable } from "tsyringe";
 import { AppContext } from "../../common/types/app.types";
 import { ApiResponse } from "../api.response";
 import { CreateEstanciaUseCase } from "../../application/use-cases/estancia/create-estancia.use-case";
@@ -8,6 +9,7 @@ import { DeleteEstanciaUseCase } from "../../application/use-cases/estancia/dele
 import { CheckoutEstanciaUseCase } from "../../application/use-cases/estancia/checkout-estancia.use-case";
 import { CreateEstanciaInput, UpdateEstanciaInput, CheckoutEstanciaInput } from "../../application/dtos/estancia.dto";
 
+@injectable()
 export class EstanciaController {
   constructor(
     private createUseCase: CreateEstanciaUseCase,

@@ -1,13 +1,17 @@
+import { inject, injectable } from "tsyringe";
 import { IHabitacionRepository } from "../../../domain/interfaces/habitacion.repository.interface";
 import { ITipoHabitacionRepository } from "../../../domain/interfaces/tipo-habitacion.repository.interface";
 import { HabitacionException } from "../../../domain/exceptions/habitacion.exception";
 import { CreateHabitacionInput, HabitacionOutput } from "../../dtos/habitacion.dto";
 import { EstadoHabitacion } from "../../../domain/entities/habitacion.entity";
 import { S3UploadService } from "../../../infrastructure/services/s3-upload.service";
+import { DI_TOKENS } from "../../../common/IoC/tokens";
 
+@injectable()
 export class CreateHabitacionUseCase {
   constructor(
-    private repository: IHabitacionRepository,
+    @inject(DI_TOKENS.IHabitacionRepository) private repository: IHabitacionRepository,
+    @inject(DI_TOKENS.ITipoHabitacionRepository)
     private tipoHabitacionRepository: ITipoHabitacionRepository,
   ) {}
 

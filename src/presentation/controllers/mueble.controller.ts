@@ -1,3 +1,4 @@
+import { injectable } from "tsyringe";
 import { AppContext } from "../../common/types/app.types";
 import { ApiResponse } from "../api.response";
 import { CreateMuebleUseCase } from "../../application/use-cases/mueble/create-mueble.use-case";
@@ -7,6 +8,7 @@ import { UpdateMuebleUseCase } from "../../application/use-cases/mueble/update-m
 import { DeleteMuebleUseCase } from "../../application/use-cases/mueble/delete-mueble.use-case";
 import { CreateMuebleInput, UpdateMuebleInput } from "../../application/dtos/mueble.dto";
 
+@injectable()
 export class MuebleController {
   constructor(
     private createUseCase: CreateMuebleUseCase,

@@ -1,28 +1,14 @@
 import { Hono } from "hono";
+import { container } from "tsyringe";
 import { AppHono, AppVariables } from "../common/types/app.types";
-import { PrismaClient } from "../../generated/prisma/client";
-import { CanalRepository } from "../infrastructure/repositories/canal.repository";
-import { CreateCanalUseCase } from "../application/use-cases/canal/create-canal.use-case";
-import { ListCanalUseCase } from "../application/use-cases/canal/list-canal.use-case";
-import { FindCanalByIdUseCase } from "../application/use-cases/canal/find-canal-by-id.use-case";
-import { UpdateCanalUseCase } from "../application/use-cases/canal/update-canal.use-case";
-import { DeleteCanalUseCase } from "../application/use-cases/canal/delete-canal.use-case";
 import { CanalController } from "../presentation/controllers/canal.controller";
 import { authMiddleware } from "../presentation/middlewares/auth.middleware";
 import { adminMiddleware } from "../presentation/middlewares/admin.middleware";
 import { validSchema, validParams } from "../presentation/middlewares/valid.middleware";
 import { CreateCanalSchema, UpdateCanalSchema, UUIDParamSchema } from "../presentation/schemas/canal.schema";
 
-export function createCanalRoutes(prismaClient: PrismaClient): AppHono {
-  const repository = new CanalRepository(prismaClient);
-
-  const createUseCase = new CreateCanalUseCase(repository);
-  const listUseCase = new ListCanalUseCase(repository);
-  const findByIdUseCase = new FindCanalByIdUseCase(repository);
-  const updateUseCase = new UpdateCanalUseCase(repository);
-  const deleteUseCase = new DeleteCanalUseCase(repository);
-
-  const controller = new CanalController(createUseCase, listUseCase, findByIdUseCase, updateUseCase, deleteUseCase);
+export function createCanalRoutes(): AppHono {
+  const controller = container.resolve(CanalController);
 
   const router = new Hono<{ Variables: AppVariables }>();
 

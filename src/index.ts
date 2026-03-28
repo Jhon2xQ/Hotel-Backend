@@ -1,5 +1,7 @@
+import "reflect-metadata";
 import { Hono } from "hono";
 import { corsConfig } from "./common/configs/cors.config";
+import { registerDependencies } from "./common/IoC/container";
 import { auth } from "./common/libraries/auth";
 import { prisma } from "./common/libraries/prisma";
 import { createMuebleRoutes } from "./routes/mueble.routes";
@@ -14,6 +16,8 @@ import { createEstanciaRoutes } from "./routes/estancia.routes";
 import { errorHandler } from "./presentation/middlewares/exception.middleware";
 import { categoriaMuebleRoutes } from "./routes/categoria-mueble.routes";
 
+registerDependencies(prisma);
+
 const app = new Hono();
 
 app.use("/api/*", corsConfig);
@@ -24,16 +28,16 @@ app.get("/api/health", (c) => {
 
 app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
 
-app.route("/api/muebles", createMuebleRoutes(prisma));
-app.route("/api/tipos-habitacion", createTipoHabitacionRoutes(prisma));
-app.route("/api/habitaciones", createHabitacionRoutes(prisma));
-app.route("/api/pagos", createPagoRoutes(prisma));
-app.route("/api/huespedes", createHuespedRoutes(prisma));
-app.route("/api/categorias-mueble", categoriaMuebleRoutes(prisma));
-app.route("/api/canales", createCanalRoutes(prisma));
-app.route("/api/tarifas", createTarifaRoutes(prisma));
-app.route("/api/reservas", createReservaRoutes(prisma));
-app.route("/api/estancias", createEstanciaRoutes(prisma));
+app.route("/api/muebles", createMuebleRoutes());
+app.route("/api/tipos-habitacion", createTipoHabitacionRoutes());
+app.route("/api/habitaciones", createHabitacionRoutes());
+app.route("/api/pagos", createPagoRoutes());
+app.route("/api/huespedes", createHuespedRoutes());
+app.route("/api/categorias-mueble", categoriaMuebleRoutes());
+app.route("/api/canales", createCanalRoutes());
+app.route("/api/tarifas", createTarifaRoutes());
+app.route("/api/reservas", createReservaRoutes());
+app.route("/api/estancias", createEstanciaRoutes());
 
 app.onError(errorHandler);
 

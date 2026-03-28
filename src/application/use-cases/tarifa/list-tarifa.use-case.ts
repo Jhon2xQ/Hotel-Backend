@@ -1,8 +1,11 @@
+import { inject, injectable } from "tsyringe";
 import { ITarifaRepository } from "../../../domain/interfaces/tarifa.repository.interface";
 import { TarifaOutput } from "../../dtos/tarifa.dto";
+import { DI_TOKENS } from "../../../common/IoC/tokens";
 
+@injectable()
 export class ListTarifaUseCase {
-  constructor(private repository: ITarifaRepository) {}
+  constructor(@inject(DI_TOKENS.ITarifaRepository) private repository: ITarifaRepository) {}
 
   async execute(): Promise<TarifaOutput[]> {
     const tarifas = await this.repository.findAll();

@@ -1,11 +1,14 @@
+import { inject, injectable } from "tsyringe";
 import { PrismaClient } from "../../../generated/prisma/client";
 import { Prisma } from "../../../generated/prisma/client";
 import { Mueble, MuebleCondition, CreateMuebleData } from "../../domain/entities/mueble.entity";
 import { IMuebleRepository, UpdateMuebleData } from "../../domain/interfaces/mueble.repository.interface";
 import { MuebleException } from "../../domain/exceptions/mueble.exception";
+import { DI_TOKENS } from "../../common/IoC/tokens";
 
+@injectable()
 export class MuebleRepository implements IMuebleRepository {
-  constructor(private prisma: PrismaClient) {}
+  constructor(@inject(DI_TOKENS.PrismaClient) private prisma: PrismaClient) {}
 
   async create(data: CreateMuebleData): Promise<Mueble> {
     try {

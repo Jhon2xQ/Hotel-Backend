@@ -1,8 +1,13 @@
+import { inject, injectable } from "tsyringe";
 import { ITipoHabitacionRepository } from "../../../domain/interfaces/tipo-habitacion.repository.interface";
 import { TipoHabitacionException } from "../../../domain/exceptions/tipo-habitacion.exception";
+import { DI_TOKENS } from "../../../common/IoC/tokens";
 
+@injectable()
 export class DeleteTipoHabitacionUseCase {
-  constructor(private repository: ITipoHabitacionRepository) {}
+  constructor(
+    @inject(DI_TOKENS.ITipoHabitacionRepository) private repository: ITipoHabitacionRepository,
+  ) {}
 
   async execute(id: string): Promise<void> {
     // Validate TipoHabitacion exists

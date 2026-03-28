@@ -1,3 +1,4 @@
+import { injectable } from "tsyringe";
 import { AppContext } from "../../common/types/app.types";
 import { ApiResponse } from "../api.response";
 import { CreateTarifaUseCase } from "../../application/use-cases/tarifa/create-tarifa.use-case";
@@ -7,6 +8,7 @@ import { UpdateTarifaUseCase } from "../../application/use-cases/tarifa/update-t
 import { DeleteTarifaUseCase } from "../../application/use-cases/tarifa/delete-tarifa.use-case";
 import { CreateTarifaInput, UpdateTarifaInput } from "../../application/dtos/tarifa.dto";
 
+@injectable()
 export class TarifaController {
   constructor(
     private createUseCase: CreateTarifaUseCase,

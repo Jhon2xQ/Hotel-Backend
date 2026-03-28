@@ -1,8 +1,11 @@
+import { inject, injectable } from "tsyringe";
 import { IHabitacionRepository } from "../../../domain/interfaces/habitacion.repository.interface";
 import { HabitacionException } from "../../../domain/exceptions/habitacion.exception";
+import { DI_TOKENS } from "../../../common/IoC/tokens";
 
+@injectable()
 export class DeleteHabitacionUseCase {
-  constructor(private repository: IHabitacionRepository) {}
+  constructor(@inject(DI_TOKENS.IHabitacionRepository) private repository: IHabitacionRepository) {}
 
   async execute(id: string): Promise<void> {
     // Validate Habitacion exists (Requirement 11.5)

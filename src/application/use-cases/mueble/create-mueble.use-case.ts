@@ -1,15 +1,18 @@
+import { inject, injectable } from "tsyringe";
 import { IMuebleRepository } from "../../../domain/interfaces/mueble.repository.interface";
 import { IHabitacionRepository } from "../../../domain/interfaces/habitacion.repository.interface";
+import { ICategoriaMuebleRepository } from "../../../domain/interfaces/categoria-mueble.repository.interface";
 import { MuebleException } from "../../../domain/exceptions/mueble.exception";
 import { CreateMuebleInput, MuebleOutput } from "../../dtos/mueble.dto";
-import { CategoriaMuebleRepository } from "../../../infrastructure/repositories/categoria-mueble.repository";
 import { CategoriaMuebleException } from "../../../domain/exceptions/categoria-mueble.exception";
+import { DI_TOKENS } from "../../../common/IoC/tokens";
 
+@injectable()
 export class CreateMuebleUseCase {
   constructor(
-    private repository: IMuebleRepository,
-    private habitacionRepository: IHabitacionRepository,
-    private categoriaRepository: CategoriaMuebleRepository,
+    @inject(DI_TOKENS.IMuebleRepository) private repository: IMuebleRepository,
+    @inject(DI_TOKENS.IHabitacionRepository) private habitacionRepository: IHabitacionRepository,
+    @inject(DI_TOKENS.ICategoriaMuebleRepository) private categoriaRepository: ICategoriaMuebleRepository,
   ) {}
 
   async execute(input: CreateMuebleInput): Promise<MuebleOutput> {
