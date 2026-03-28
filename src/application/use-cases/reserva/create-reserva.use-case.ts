@@ -1,11 +1,16 @@
-import { IReservaRepository } from "../../../domain/interfaces/reserva.repository.interface";
+import { inject, injectable } from "tsyringe";
+import type { IReservaRepository } from "../../../domain/interfaces/reserva.repository.interface";
 import { Reserva } from "../../../domain/entities/reserva.entity";
 import { CreateReservaInput } from "../../dtos/reserva.dto";
 import { ReservaException } from "../../../domain/exceptions/reserva.exception";
 import { generateCodigoReserva } from "../../../common/utils/codigo-generator";
+import { DI_TOKENS } from "../../../common/IoC/tokens";
 
+@injectable()
 export class CreateReservaUseCase {
-  constructor(private reservaRepository: IReservaRepository) {}
+  constructor(
+    @inject(DI_TOKENS.IReservaRepository) private reservaRepository: IReservaRepository,
+  ) {}
 
   async execute(input: CreateReservaInput): Promise<Reserva> {
     // Validaciones de negocio

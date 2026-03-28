@@ -1,3 +1,4 @@
+import { injectable } from "tsyringe";
 import { CreateCategoriaMuebleUseCase } from "../../application/use-cases/categoria-mueble/create-categoria-mueble.use-case";
 import { DeleteCategoriaMuebleUseCase } from "../../application/use-cases/categoria-mueble/delete-categoria-mueble.use-case";
 import { FindCategoriaMuebleUseCase } from "../../application/use-cases/categoria-mueble/find-categoria-mueble-by-id.use-case";
@@ -6,6 +7,7 @@ import { UpdateCategoriaMuebleUseCase } from "../../application/use-cases/catego
 import { AppContext } from "../../common/types/app.types";
 import { ApiResponse } from "../api.response";
 
+@injectable()
 export class CategoriaMuebleController {
     constructor(
         private readonly createUseCase: CreateCategoriaMuebleUseCase,
@@ -26,7 +28,10 @@ export class CategoriaMuebleController {
             descripcion: validData.descripcion,
         });
 
-        return c.json({ApiResponse: ApiResponse.success("Categoría de mueble creada exitosamente", categoriaMueble.toOutput()),}, 201);
+        return c.json(
+            ApiResponse.success("Categoría de mueble creada exitosamente", categoriaMueble.toOutput()),
+            201,
+        );
     }
 
     async list(c: AppContext) {

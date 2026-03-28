@@ -19,6 +19,7 @@ describe("HabitacionController", () => {
   let mockUpdateStatusUseCase: any;
   let mockDeleteUseCase: any;
   let mockSearchAvailableUseCase: any;
+  let mockFindByIdWithPriceUseCase: any;
 
   beforeEach(() => {
     mockCreateUseCase = { execute: vi.fn() };
@@ -28,6 +29,7 @@ describe("HabitacionController", () => {
     mockUpdateStatusUseCase = { execute: vi.fn() };
     mockDeleteUseCase = { execute: vi.fn() };
     mockSearchAvailableUseCase = { execute: vi.fn() };
+    mockFindByIdWithPriceUseCase = { execute: vi.fn() };
 
     controller = new HabitacionController(
       mockCreateUseCase,
@@ -37,6 +39,7 @@ describe("HabitacionController", () => {
       mockUpdateStatusUseCase,
       mockDeleteUseCase,
       mockSearchAvailableUseCase,
+      mockFindByIdWithPriceUseCase,
     );
   });
 

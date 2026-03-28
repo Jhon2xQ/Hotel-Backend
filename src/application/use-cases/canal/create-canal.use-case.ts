@@ -1,9 +1,12 @@
+import { inject, injectable } from "tsyringe";
 import { CanalException } from "../../../domain/exceptions/canal.exception";
-import { ICanalRepository } from "../../../domain/interfaces/canal.repository.interface";
+import type { ICanalRepository } from "../../../domain/interfaces/canal.repository.interface";
 import { CreateCanalInput, CanalOutput } from "../../dtos/canal.dto";
+import { DI_TOKENS } from "../../../common/IoC/tokens";
 
+@injectable()
 export class CreateCanalUseCase {
-  constructor(private repository: ICanalRepository) {}
+  constructor(@inject(DI_TOKENS.ICanalRepository) private repository: ICanalRepository) {}
 
   async execute(input: CreateCanalInput): Promise<CanalOutput> {
     const existingCanal = await this.repository.findByName(input.nombre);

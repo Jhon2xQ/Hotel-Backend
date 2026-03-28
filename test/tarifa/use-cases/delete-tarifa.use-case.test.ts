@@ -17,6 +17,8 @@ describe("DeleteTarifaUseCase", () => {
       delete: async () => {},
       hasRelatedRecords: async () => false,
       findByTipoHabitacionAndCanal: async () => [],
+      tipoHabitacionExists: async () => true,
+      canalExists: async () => true,
     };
 
     useCase = new DeleteTarifaUseCase(mockRepository);

@@ -1,3 +1,4 @@
+import { inject, injectable } from "tsyringe";
 import { PrismaClient, Prisma } from "../../../generated/prisma/client";
 import {
   Pago,
@@ -7,11 +8,13 @@ import {
   MetodoPago,
   UserBasic,
 } from "../../domain/entities/pago.entity";
-import { IPagoRepository, UpdatePagoData } from "../../domain/interfaces/pago.repository.interface";
+import type { IPagoRepository, UpdatePagoData } from "../../domain/interfaces/pago.repository.interface";
 import { PagoException } from "../../domain/exceptions/pago.exception";
+import { DI_TOKENS } from "../../common/IoC/tokens";
 
+@injectable()
 export class PagoRepository implements IPagoRepository {
-  constructor(private prisma: PrismaClient) {}
+  constructor(@inject(DI_TOKENS.PrismaClient) private prisma: PrismaClient) {}
 
   async create(data: CreatePagoData): Promise<Pago> {
     const result = await this.prisma.pago.create({
@@ -25,18 +28,12 @@ export class PagoRepository implements IPagoRepository {
         recibidoPorId: data.recibidoPorId ?? null,
         observacion: data.observacion ?? null,
       },
-      include: {
-        recibidoPor: true,
-      },
     });
     return this.toDomain(result);
   }
 
   async findAll(): Promise<Pago[]> {
     const results = await this.prisma.pago.findMany({
-      include: {
-        recibidoPor: true,
-      },
       orderBy: { createdAt: "desc" },
     });
     return results.map((r) => this.toDomain(r));
@@ -45,9 +42,6 @@ export class PagoRepository implements IPagoRepository {
   async findById(id: string): Promise<Pago | null> {
     const result = await this.prisma.pago.findUnique({
       where: { id },
-      include: {
-        recibidoPor: true,
-      },
     });
     return result ? this.toDomain(result) : null;
   }
@@ -67,9 +61,6 @@ export class PagoRepository implements IPagoRepository {
       const result = await this.prisma.pago.update({
         where: { id },
         data: updateData,
-        include: {
-          recibidoPor: true,
-        },
       });
       return this.toDomain(result);
     } catch (error) {

@@ -1,3 +1,4 @@
+import { injectable } from "tsyringe";
 import { AppContext } from "../../common/types/app.types";
 import { ApiResponse } from "../api.response";
 import { CreateCanalUseCase } from "../../application/use-cases/canal/create-canal.use-case";
@@ -7,6 +8,7 @@ import { UpdateCanalUseCase } from "../../application/use-cases/canal/update-can
 import { DeleteCanalUseCase } from "../../application/use-cases/canal/delete-canal.use-case";
 import { CreateCanalInput, UpdateCanalInput } from "../../application/dtos/canal.dto";
 
+@injectable()
 export class CanalController {
   constructor(
     private createUseCase: CreateCanalUseCase,

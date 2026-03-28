@@ -1,52 +1,27 @@
 import { Hono } from "hono";
+import { container } from "tsyringe";
 import { AppHono, AppVariables } from "../common/types/app.types";
-import { PrismaClient } from "../../generated/prisma/client";
-import { TipoHabitacionRepository } from "../infrastructure/repositories/tipo-habitacion.repository";
-import { CreateTipoHabitacionUseCase } from "../application/use-cases/tipo-habitacion/create-tipo-habitacion.use-case";
-import { ListTipoHabitacionUseCase } from "../application/use-cases/tipo-habitacion/list-tipo-habitacion.use-case";
-import { FindTipoHabitacionByIdUseCase } from "../application/use-cases/tipo-habitacion/find-tipo-habitacion-by-id.use-case";
-import { UpdateTipoHabitacionUseCase } from "../application/use-cases/tipo-habitacion/update-tipo-habitacion.use-case";
-import { DeleteTipoHabitacionUseCase } from "../application/use-cases/tipo-habitacion/delete-tipo-habitacion.use-case";
 import { TipoHabitacionController } from "../presentation/controllers/tipo-habitacion.controller";
-import { authMiddleware } from "../presentation/middlewares/auth.middleware";
-import { adminMiddleware } from "../presentation/middlewares/admin.middleware";
 import { validSchema, validParams } from "../presentation/middlewares/valid.middleware";
-import {
-  CreateTipoHabitacionSchema,
-  UpdateTipoHabitacionSchema,
-  UUIDParamSchema,
-} from "../presentation/schemas/tipo-habitacion.schema";
+import { CreateTipoHabitacionSchema, UpdateTipoHabitacionSchema, UUIDParamSchema } from "../presentation/schemas/tipo-habitacion.schema";
 
-export function createTipoHabitacionRoutes(prismaClient: PrismaClient): AppHono {
-  const repository = new TipoHabitacionRepository(prismaClient);
-
-  const createUseCase = new CreateTipoHabitacionUseCase(repository);
-  const listUseCase = new ListTipoHabitacionUseCase(repository);
-  const findByIdUseCase = new FindTipoHabitacionByIdUseCase(repository);
-  const updateUseCase = new UpdateTipoHabitacionUseCase(repository);
-  const deleteUseCase = new DeleteTipoHabitacionUseCase(repository);
-
-  const controller = new TipoHabitacionController(
-    createUseCase,
-    listUseCase,
-    findByIdUseCase,
-    updateUseCase,
-    deleteUseCase,
-  );
-
+export function createTipoHabitacionRoutes(): AppHono {
+  const ctrl = container.resolve(TipoHabitacionController);
   const router = new Hono<{ Variables: AppVariables }>();
 
-  router.post("/", authMiddleware, validSchema(CreateTipoHabitacionSchema), controller.create.bind(controller));
-  router.get("/", controller.list.bind(controller));
-  router.get("/:id", authMiddleware, validParams(UUIDParamSchema), controller.findById.bind(controller));
-  router.put(
-    "/:id",
-    authMiddleware,
-    validParams(UUIDParamSchema),
-    validSchema(UpdateTipoHabitacionSchema),
-    controller.update.bind(controller),
-  );
-  router.delete("/:id", authMiddleware, validParams(UUIDParamSchema), controller.delete.bind(controller));
+  router.post("/", validSchema(CreateTipoHabitacionSchema), (c) => ctrl.create(c));
+  router.put("/:id", validParams(UUIDParamSchema), validSchema(UpdateTipoHabitacionSchema), (c) => ctrl.update(c));
+  router.delete("/:id", validParams(UUIDParamSchema), (c) => ctrl.delete(c));
+
+  return router;
+}
+
+export function createTipoHabitacionPublicRoutes(): AppHono {
+  const ctrl = container.resolve(TipoHabitacionController);
+  const router = new Hono<{ Variables: AppVariables }>();
+
+  router.get("/", (c) => ctrl.list(c));
+  router.get("/:id", validParams(UUIDParamSchema), (c) => ctrl.findById(c));
 
   return router;
 }

@@ -1,10 +1,13 @@
-import { IPagoRepository } from "../../../domain/interfaces/pago.repository.interface";
+import { inject, injectable } from "tsyringe";
+import type { IPagoRepository } from "../../../domain/interfaces/pago.repository.interface";
 import { PagoException } from "../../../domain/exceptions/pago.exception";
 import { UpdatePagoInput, PagoOutput } from "../../dtos/pago.dto";
 import { ConceptoPago, EstadoPago, MetodoPago } from "../../../domain/entities/pago.entity";
+import { DI_TOKENS } from "../../../common/IoC/tokens";
 
+@injectable()
 export class UpdatePagoUseCase {
-  constructor(private repository: IPagoRepository) {}
+  constructor(@inject(DI_TOKENS.IPagoRepository) private repository: IPagoRepository) {}
 
   async execute(id: string, input: UpdatePagoInput): Promise<PagoOutput> {
     // Verify pago exists

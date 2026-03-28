@@ -1,9 +1,12 @@
-import { IPagoRepository } from "../../../domain/interfaces/pago.repository.interface";
+import { inject, injectable } from "tsyringe";
+import type { IPagoRepository } from "../../../domain/interfaces/pago.repository.interface";
 import { PagoException } from "../../../domain/exceptions/pago.exception";
 import { PagoOutput } from "../../dtos/pago.dto";
+import { DI_TOKENS } from "../../../common/IoC/tokens";
 
+@injectable()
 export class FindPagoByIdUseCase {
-  constructor(private repository: IPagoRepository) {}
+  constructor(@inject(DI_TOKENS.IPagoRepository) private repository: IPagoRepository) {}
 
   async execute(id: string): Promise<PagoOutput> {
     const pago = await this.repository.findById(id);

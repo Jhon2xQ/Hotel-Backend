@@ -29,6 +29,8 @@
     "better-auth": "^1.5.5",
     "hono": "^4.12.8",
     "pg": "^8.20.0",
+    "reflect-metadata": "^0.2.2",
+    "tsyringe": "^4.10.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {

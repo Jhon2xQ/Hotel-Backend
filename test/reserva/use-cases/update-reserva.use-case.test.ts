@@ -31,6 +31,7 @@ describe("UpdateReservaUseCase", () => {
     };
 
     const mockReserva = createMockReserva({ adultos: 3, ninos: 2, estado: "CONFIRMADA" });
+    mockRepository.findById = async () => createMockReserva({ estado: "TENTATIVA" });
     mockRepository.update = async (id, data) => mockReserva;
 
     const result = await useCase.execute("reserva-test-id", input);
@@ -45,6 +46,7 @@ describe("UpdateReservaUseCase", () => {
       estado: "CONFIRMADA",
     };
 
+    mockRepository.findById = async () => createMockReserva({ estado: "TENTATIVA" });
     mockRepository.update = async () => {
       throw ReservaException.notFoundById();
     };
@@ -57,6 +59,7 @@ describe("UpdateReservaUseCase", () => {
       adultos: 3,
     };
 
+    mockRepository.findById = async () => createMockReserva({ estado: "COMPLETADA" });
     mockRepository.update = async () => {
       throw ReservaException.cannotModifyCompleted();
     };

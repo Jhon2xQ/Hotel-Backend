@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
+import { registerDependencies, resetContainer } from "../../src/common/IoC/container";
 import { createTipoHabitacionRoutes } from "../../src/routes/tipo-habitacion.routes";
 import { createMockPrismaClient } from "../helpers/mock-prisma";
 
@@ -7,6 +8,7 @@ describe("TipoHabitacion Routes Integration", () => {
   let mockPrisma: any;
 
   beforeEach(() => {
+    resetContainer();
     mockPrisma = createMockPrismaClient();
     mockPrisma.tipoHabitacion = {
       create: vi.fn(),
@@ -24,7 +26,8 @@ describe("TipoHabitacion Routes Integration", () => {
     mockPrisma.reserva = {
       count: vi.fn(),
     };
-    app = createTipoHabitacionRoutes(mockPrisma);
+    registerDependencies(mockPrisma);
+    app = createTipoHabitacionRoutes();
   });
 
   it("should have routes defined", () => {

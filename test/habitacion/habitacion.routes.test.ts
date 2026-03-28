@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
+import { registerDependencies, resetContainer } from "../../src/common/IoC/container";
 import { createHabitacionRoutes } from "../../src/routes/habitacion.routes";
 import { createMockPrismaClient } from "../helpers/mock-prisma";
 import { EstadoHabitacion } from "../../src/domain/entities/habitacion.entity";
@@ -7,6 +8,7 @@ describe("Habitacion Routes Integration", () => {
   let mockPrisma: any;
 
   beforeEach(() => {
+    resetContainer();
     mockPrisma = createMockPrismaClient();
     mockPrisma.habitacion = {
       create: vi.fn(),
@@ -22,10 +24,11 @@ describe("Habitacion Routes Integration", () => {
     mockPrisma.catalogoMueble = {
       findUnique: vi.fn(),
     };
+    registerDependencies(mockPrisma);
   });
 
   it("should have routes defined", () => {
-    const routes = createHabitacionRoutes(mockPrisma);
+    const routes = createHabitacionRoutes();
     expect(routes).toBeDefined();
   });
 
@@ -63,7 +66,7 @@ describe("Habitacion Routes Integration", () => {
     mockPrisma.habitacion.findUnique.mockResolvedValue(null);
     mockPrisma.habitacion.create.mockResolvedValue(mockHabitacion);
 
-    const routes = createHabitacionRoutes(mockPrisma);
+    const routes = createHabitacionRoutes();
     expect(routes).toBeDefined();
   });
 });

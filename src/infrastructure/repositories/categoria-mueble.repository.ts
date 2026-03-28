@@ -1,11 +1,14 @@
+import { inject, injectable } from "tsyringe";
 import { PrismaClient } from "../../../generated/prisma/client";
 import { CategoriaMueble, CreateCategoriaMuebleData } from "../../domain/entities/categoria-mueble.entity";
 import { CategoriaMuebleException } from "../../domain/exceptions/categoria-mueble.exception";
-import { ICategoriaMuebleRepository, UpdateCategoriaMuebleData } from "../../domain/interfaces/categoria-mueble.repository.interface";
+import type { ICategoriaMuebleRepository, UpdateCategoriaMuebleData } from "../../domain/interfaces/categoria-mueble.repository.interface";
+import { DI_TOKENS } from "../../common/IoC/tokens";
 
+@injectable()
 export class CategoriaMuebleRepository implements ICategoriaMuebleRepository {
     constructor(
-        private readonly prisma: PrismaClient,
+        @inject(DI_TOKENS.PrismaClient) private readonly prisma: PrismaClient,
     ) {}
 
     async create(data: CreateCategoriaMuebleData): Promise<CategoriaMueble> {

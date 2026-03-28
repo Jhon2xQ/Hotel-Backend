@@ -1,9 +1,14 @@
+import { inject, injectable } from "tsyringe";
 import { TipoHabitacionException } from "../../../domain/exceptions/tipo-habitacion.exception";
-import { ITipoHabitacionRepository } from "../../../domain/interfaces/tipo-habitacion.repository.interface";
+import type { ITipoHabitacionRepository } from "../../../domain/interfaces/tipo-habitacion.repository.interface";
 import { CreateTipoHabitacionInput, TipoHabitacionOutput } from "../../dtos/tipo-habitacion.dto";
+import { DI_TOKENS } from "../../../common/IoC/tokens";
 
+@injectable()
 export class CreateTipoHabitacionUseCase {
-  constructor(private repository: ITipoHabitacionRepository) {}
+  constructor(
+    @inject(DI_TOKENS.ITipoHabitacionRepository) private repository: ITipoHabitacionRepository,
+  ) {}
 
   async execute(input: CreateTipoHabitacionInput): Promise<TipoHabitacionOutput> {
 
