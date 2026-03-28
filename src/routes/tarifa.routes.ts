@@ -8,23 +8,21 @@ import { validSchema, validParams } from "../presentation/middlewares/valid.midd
 import { CreateTarifaSchema, UpdateTarifaSchema, UUIDParamSchema } from "../presentation/schemas/tarifa.schema";
 
 export function createTarifaRoutes(): AppHono {
-  const controller = container.resolve(TarifaController);
-
+  const ctrl = container.resolve(TarifaController);
   const router = new Hono<{ Variables: AppVariables }>();
 
   router.use("*", authMiddleware);
-
-  router.post("/", adminMiddleware, validSchema(CreateTarifaSchema), controller.create.bind(controller));
-  router.get("/", controller.list.bind(controller));
-  router.get("/:id", validParams(UUIDParamSchema), controller.findById.bind(controller));
+  router.post("/", adminMiddleware, validSchema(CreateTarifaSchema), (c) => ctrl.create(c));
+  router.get("/", (c) => ctrl.list(c));
+  router.get("/:id", validParams(UUIDParamSchema), (c) => ctrl.findById(c));
   router.put(
     "/:id",
     adminMiddleware,
     validParams(UUIDParamSchema),
     validSchema(UpdateTarifaSchema),
-    controller.update.bind(controller),
+    (c) => ctrl.update(c),
   );
-  router.delete("/:id", adminMiddleware, validParams(UUIDParamSchema), controller.delete.bind(controller));
+  router.delete("/:id", adminMiddleware, validParams(UUIDParamSchema), (c) => ctrl.delete(c));
 
   return router;
 }

@@ -11,21 +11,20 @@ import {
 } from "../presentation/schemas/tipo-habitacion.schema";
 
 export function createTipoHabitacionRoutes(): AppHono {
-  const controller = container.resolve(TipoHabitacionController);
-
+  const ctrl = container.resolve(TipoHabitacionController);
   const router = new Hono<{ Variables: AppVariables }>();
 
-  router.post("/", authMiddleware, validSchema(CreateTipoHabitacionSchema), controller.create.bind(controller));
-  router.get("/", controller.list.bind(controller));
-  router.get("/:id", authMiddleware, validParams(UUIDParamSchema), controller.findById.bind(controller));
+  router.post("/", authMiddleware, validSchema(CreateTipoHabitacionSchema), (c) => ctrl.create(c));
+  router.get("/", (c) => ctrl.list(c));
+  router.get("/:id", authMiddleware, validParams(UUIDParamSchema), (c) => ctrl.findById(c));
   router.put(
     "/:id",
     authMiddleware,
     validParams(UUIDParamSchema),
     validSchema(UpdateTipoHabitacionSchema),
-    controller.update.bind(controller),
+    (c) => ctrl.update(c),
   );
-  router.delete("/:id", authMiddleware, validParams(UUIDParamSchema), controller.delete.bind(controller));
+  router.delete("/:id", authMiddleware, validParams(UUIDParamSchema), (c) => ctrl.delete(c));
 
   return router;
 }

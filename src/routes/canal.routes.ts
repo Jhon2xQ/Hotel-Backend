@@ -8,23 +8,21 @@ import { validSchema, validParams } from "../presentation/middlewares/valid.midd
 import { CreateCanalSchema, UpdateCanalSchema, UUIDParamSchema } from "../presentation/schemas/canal.schema";
 
 export function createCanalRoutes(): AppHono {
-  const controller = container.resolve(CanalController);
-
+  const ctrl = container.resolve(CanalController);
   const router = new Hono<{ Variables: AppVariables }>();
 
   router.use("*", authMiddleware);
-
-  router.post("/", adminMiddleware, validSchema(CreateCanalSchema), controller.create.bind(controller));
-  router.get("/", controller.list.bind(controller));
-  router.get("/:id", validParams(UUIDParamSchema), controller.findById.bind(controller));
+  router.post("/", adminMiddleware, validSchema(CreateCanalSchema), (c) => ctrl.create(c));
+  router.get("/", (c) => ctrl.list(c));
+  router.get("/:id", validParams(UUIDParamSchema), (c) => ctrl.findById(c));
   router.put(
     "/:id",
     adminMiddleware,
     validParams(UUIDParamSchema),
     validSchema(UpdateCanalSchema),
-    controller.update.bind(controller),
+    (c) => ctrl.update(c),
   );
-  router.delete("/:id", adminMiddleware, validParams(UUIDParamSchema), controller.delete.bind(controller));
+  router.delete("/:id", adminMiddleware, validParams(UUIDParamSchema), (c) => ctrl.delete(c));
 
   return router;
 }

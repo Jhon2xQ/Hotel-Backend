@@ -9,23 +9,21 @@ import { CreatePagoSchema, UpdatePagoSchema } from "../presentation/schemas/pago
 import { UUIDParamSchema } from "../presentation/schemas/tipo-habitacion.schema";
 
 export function createPagoRoutes(): AppHono {
-  const controller = container.resolve(PagoController);
-
+  const ctrl = container.resolve(PagoController);
   const router = new Hono<{ Variables: AppVariables }>();
 
   router.use("*", authMiddleware);
-
-  router.post("/", adminMiddleware, validSchema(CreatePagoSchema), controller.create.bind(controller));
-  router.get("/", controller.list.bind(controller));
-  router.get("/:id", validParams(UUIDParamSchema), controller.findById.bind(controller));
+  router.post("/", adminMiddleware, validSchema(CreatePagoSchema), (c) => ctrl.create(c));
+  router.get("/", (c) => ctrl.list(c));
+  router.get("/:id", validParams(UUIDParamSchema), (c) => ctrl.findById(c));
   router.put(
     "/:id",
     adminMiddleware,
     validParams(UUIDParamSchema),
     validSchema(UpdatePagoSchema),
-    controller.update.bind(controller),
+    (c) => ctrl.update(c),
   );
-  router.delete("/:id", adminMiddleware, validParams(UUIDParamSchema), controller.delete.bind(controller));
+  router.delete("/:id", adminMiddleware, validParams(UUIDParamSchema), (c) => ctrl.delete(c));
 
   return router;
 }

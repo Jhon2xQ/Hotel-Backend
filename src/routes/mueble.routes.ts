@@ -8,24 +8,21 @@ import { validSchema, validParams } from "../presentation/middlewares/valid.midd
 import { CreateMuebleSchema, UpdateMuebleSchema, UUIDParamSchema } from "../presentation/schemas/mueble.schema";
 
 export function createMuebleRoutes(): AppHono {
-  const controller = container.resolve(MuebleController);
-
+  const ctrl = container.resolve(MuebleController);
   const router = new Hono<{ Variables: AppVariables }>();
 
   router.use("*", authMiddleware);
-
-  router.get("/", adminMiddleware, controller.list.bind(controller));
-  router.get("/:id", adminMiddleware, validParams(UUIDParamSchema), controller.findById.bind(controller));
-
-  router.post("/", adminMiddleware, validSchema(CreateMuebleSchema), controller.create.bind(controller));
+  router.get("/", adminMiddleware, (c) => ctrl.list(c));
+  router.get("/:id", adminMiddleware, validParams(UUIDParamSchema), (c) => ctrl.findById(c));
+  router.post("/", adminMiddleware, validSchema(CreateMuebleSchema), (c) => ctrl.create(c));
   router.put(
     "/:id",
     adminMiddleware,
     validParams(UUIDParamSchema),
     validSchema(UpdateMuebleSchema),
-    controller.update.bind(controller),
+    (c) => ctrl.update(c),
   );
-  router.delete("/:id", adminMiddleware, validParams(UUIDParamSchema), controller.delete.bind(controller));
+  router.delete("/:id", adminMiddleware, validParams(UUIDParamSchema), (c) => ctrl.delete(c));
 
   return router;
 }

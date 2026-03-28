@@ -14,26 +14,31 @@ import {
 import { UUIDParamSchema } from "../presentation/schemas/tipo-habitacion.schema";
 
 export function createHabitacionRoutes(): AppHono {
-  const controller = container.resolve(HabitacionController);
-
+  const ctrl = container.resolve(HabitacionController);
   const router = new Hono<{ Variables: AppVariables }>();
 
-  router.post("/", authMiddleware, parseFormDataMiddleware, validSchema(CreateHabitacionSchema), controller.create.bind(controller));
-  router.get("/", authMiddleware, controller.list.bind(controller));
-  router.get("/:id", authMiddleware, validParams(UUIDParamSchema), controller.findById.bind(controller));
+  router.post("/", authMiddleware, parseFormDataMiddleware, validSchema(CreateHabitacionSchema), (c) => ctrl.create(c));
+  router.get("/", authMiddleware, (c) => ctrl.list(c));
+  router.get("/:id", authMiddleware, validParams(UUIDParamSchema), (c) => ctrl.findById(c));
   router.put(
     "/:id",
     authMiddleware,
     validParams(UUIDParamSchema),
     parseFormDataMiddleware,
     validSchema(UpdateHabitacionSchema),
-    controller.update.bind(controller),
+    (c) => ctrl.update(c),
   );
-  router.patch("/:id/estado", authMiddleware, validParams(UUIDParamSchema), validSchema(UpdateHabitacionStatusSchema), controller.updateStatus.bind(controller));
-  router.delete("/:id", authMiddleware, validParams(UUIDParamSchema), controller.delete.bind(controller));
+  router.patch(
+    "/:id/estado",
+    authMiddleware,
+    validParams(UUIDParamSchema),
+    validSchema(UpdateHabitacionStatusSchema),
+    (c) => ctrl.updateStatus(c),
+  );
+  router.delete("/:id", authMiddleware, validParams(UUIDParamSchema), (c) => ctrl.delete(c));
 
-  router.get("/disponibles", validQuery(SearchAvailableHabitacionesSchema), controller.searchAvailable.bind(controller));
-  router.get("/disponibles/:id", validParams(UUIDParamSchema), controller.findByIdWithPrice.bind(controller));
+  router.get("/disponibles", validQuery(SearchAvailableHabitacionesSchema), (c) => ctrl.searchAvailable(c));
+  router.get("/disponibles/:id", validParams(UUIDParamSchema), (c) => ctrl.findByIdWithPrice(c));
 
   return router;
 }

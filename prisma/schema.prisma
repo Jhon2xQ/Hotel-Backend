@@ -12,7 +12,6 @@ datasource db {
   provider = "postgresql"
 }
 
-
 //======================================================================================
 //====================================BETTER-AUTH=======================================
 //======================================================================================
@@ -23,14 +22,14 @@ model User {
   email         String
   emailVerified Boolean   @default(false)
   image         String?
-  role          String    @default("PERSONAL")
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-
+  role          String?
+  banned        Boolean?  @default(false)
+  banReason     String?
+  banExpires    DateTime?
   sessions      Session[]
   accounts      Account[]
-  staff         Personal?
-  pagosRecibidos Pago[]   @relation("PagosRecibidos")
 
   @@unique([email])
   @@map("user")
@@ -46,6 +45,8 @@ model Session {
   userAgent String?
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  impersonatedBy String?
 
   @@unique([token])
   @@index([userId])
@@ -279,7 +280,7 @@ model Canal {
   createdAt DateTime  @default(now()) @db.Timestamptz
   updatedAt DateTime  @updatedAt @db.Timestamptz
 
-  tarifas  Tarifa[]
+  tarifas Tarifa[]
 
   @@map("canales")
 }
@@ -301,7 +302,7 @@ model Huesped {
   createdAt    DateTime          @default(now()) @db.Timestamptz
   updatedAt    DateTime          @updatedAt @db.Timestamptz
 
-  reservas Reserva[]
+  reservas  Reserva[]
   estancias Estancia[]
 
   @@map("huespedes")
@@ -310,29 +311,31 @@ model Huesped {
 // ------------------------------------------------------------
 // 4. MUEBLES
 // ------------------------------------------------------------
-model Mueble {
-  id             String           @id @default(uuid()) @db.Uuid
-  codigo         String           @unique @db.VarChar(30)
-  nombre         String           @db.VarChar(100)
-  categoriaId    String           @db.Uuid
-  imagenUrl      String?          @db.Text
-  condicion      CondicionMueble  @default(BUENO)
-  fechaAdq       DateTime?        @db.Date
-  ultimaRevision DateTime?        @db.Date
-  descripcion    String?          @db.Text
-  habitacionId   String?          @db.Uuid
-  createdAt      DateTime         @default(now()) @db.Timestamptz
-  updatedAt      DateTime         @updatedAt @db.Timestamptz
 
-  categoria     CategoriaMueble   @relation(fields: [categoriaId], references: [id])
-  habitacion    Habitacion?       @relation(fields: [habitacionId], references: [id])
-  
+model Mueble {
+  id             String          @id @default(uuid()) @db.Uuid
+  codigo         String          @unique @db.VarChar(30)
+  nombre         String          @db.VarChar(100)
+  categoriaId    String          @db.Uuid
+  imagenUrl      String?         @db.Text
+  condicion      CondicionMueble @default(BUENO)
+  fechaAdq       DateTime?       @db.Date
+  ultimaRevision DateTime?       @db.Date
+  descripcion    String?         @db.Text
+  habitacionId   String?         @db.Uuid
+  createdAt      DateTime        @default(now()) @db.Timestamptz
+  updatedAt      DateTime        @updatedAt @db.Timestamptz
+
+  categoria  CategoriaMueble @relation(fields: [categoriaId], references: [id])
+  habitacion Habitacion?     @relation(fields: [habitacionId], references: [id])
+
   @@map("muebles")
 }
 
 // ------------------------------------------------------------
 // 5. TIPOS DE HABITACIÓN
 // ------------------------------------------------------------
+
 model TipoHabitacion {
   id          String   @id @default(uuid()) @db.Uuid
   nombre      String   @db.VarChar(100) @unique
@@ -349,72 +352,49 @@ model TipoHabitacion {
 // ------------------------------------------------------------
 // 6. HABITACIONES
 // ------------------------------------------------------------
-model Habitacion {
-  id                String           @id @default(uuid()) @db.Uuid
-  nroHabitacion     String           @unique @db.VarChar(10)
-  tipoHabitacionId  String           @db.Uuid
-  piso              Int
-  tieneDucha        Boolean          @default(false)
-  tieneBanio        Boolean          @default(false)
-  urlImagen         String[]         @db.VarChar(255)
-  estado            EstadoHabitacion @default(DISPONIBLE)
-  notas             String?          @db.Text
-  ultimaLimpieza    DateTime?        @db.Timestamptz
-  createdAt         DateTime         @default(now()) @db.Timestamptz
-  updatedAt         DateTime         @updatedAt @db.Timestamptz
 
-  muebles          Mueble[]
-  tipo             TipoHabitacion    @relation(fields: [tipoHabitacionId], references: [id])
-  reservas         Reserva[]
-  estancias        Estancia[]
-  
+model Habitacion {
+  id               String           @id @default(uuid()) @db.Uuid
+  nroHabitacion    String           @unique @db.VarChar(10)
+  tipoHabitacionId String           @db.Uuid
+  piso             Int
+  tieneDucha       Boolean          @default(false)
+  tieneBanio       Boolean          @default(false)
+  urlImagen        String[]         @db.VarChar(255)
+  estado           EstadoHabitacion @default(DISPONIBLE)
+  notas            String?          @db.Text
+  ultimaLimpieza   DateTime?        @db.Timestamptz
+  createdAt        DateTime         @default(now()) @db.Timestamptz
+  updatedAt        DateTime         @updatedAt @db.Timestamptz
+
+  muebles   Mueble[]
+  tipo      TipoHabitacion @relation(fields: [tipoHabitacionId], references: [id])
+  reservas  Reserva[]
+  estancias Estancia[]
+
   @@map("habitaciones")
 }
 
 // ------------------------------------------------------------
 // 7. TARIFAS
 // ------------------------------------------------------------
+
 model Tarifa {
-  id                String   @id @default(uuid()) @db.Uuid
-  tipoHabitacionId  String   @db.Uuid
-  canalId           String   @db.Uuid
-  precioNoche       Decimal  @db.Decimal(10, 2)
-  IVA               Decimal? @db.Decimal(4, 2)
-  cargoServicios    Decimal? @db.Decimal(4, 2)
-  moneda            String   @default("USD") @db.Char(3)
-  createdAt         DateTime @default(now()) @db.Timestamptz
-  updatedAt         DateTime @updatedAt @db.Timestamptz
+  id               String   @id @default(uuid()) @db.Uuid
+  tipoHabitacionId String   @db.Uuid
+  canalId          String   @db.Uuid
+  precioNoche      Decimal  @db.Decimal(10, 2)
+  IVA              Decimal? @db.Decimal(4, 2)
+  cargoServicios   Decimal? @db.Decimal(4, 2)
+  moneda           String   @default("USD") @db.Char(3)
+  createdAt        DateTime @default(now()) @db.Timestamptz
+  updatedAt        DateTime @updatedAt @db.Timestamptz
 
   tipoHabitacion TipoHabitacion @relation(fields: [tipoHabitacionId], references: [id])
   canal          Canal          @relation(fields: [canalId], references: [id])
   reservas       Reserva[]
 
   @@map("tarifas")
-}
-
-// ------------------------------------------------------------
-// 12. PERSONAL
-// ------------------------------------------------------------
-
-model Personal {
-  id            String      @id @default(uuid()) @db.Uuid
-  userId        String?     @unique // FK a better-auth User
-  codigo        String      @unique @db.VarChar(20)
-  nombres       String      @db.VarChar(80)
-  apellidos     String      @db.VarChar(80)
-  rol           RolPersonal
-  email         String?     @db.VarChar(100)
-  telefono      String?     @db.VarChar(20)
-  fechaIngreso  DateTime?   @db.Date
-  activo        Boolean     @default(true)
-  createdAt     DateTime    @default(now()) @db.Timestamptz
-  updatedAt     DateTime    @updatedAt @db.Timestamptz
-
-  user             User?         @relation(fields: [userId], references: [id])
-
-  cargosRegistrados CargoFolio[]   @relation("CargosRegistrados")
-
-  @@map("personal")
 }
 
 // ------------------------------------------------------------
@@ -444,54 +424,52 @@ model Servicio {
 // ------------------------------------------------------------
 
 model Reserva {
-  id           String        @id @default(uuid()) @db.Uuid
-  codigo       String        @unique @db.VarChar(20)
-  
+  id           String  @id @default(uuid()) @db.Uuid
+  codigo       String  @unique @db.VarChar(20)
   // Relaciones
-  huespedId    String        @db.Uuid
-  habitacionId String        @db.Uuid 
-  tarifaId     String        @db.Uuid
-  pagoId       String?       @unique @db.Uuid
+  huespedId    String  @db.Uuid
+  habitacionId String  @db.Uuid
+  tarifaId     String  @db.Uuid
+  pagoId       String? @unique @db.Uuid
 
   // Fechas
-  fechaEntrada DateTime      @db.Timestamptz
-  fechaSalida  DateTime      @db.Timestamptz
+  fechaEntrada DateTime @db.Timestamptz
+  fechaSalida  DateTime @db.Timestamptz
 
   // Ocupación
-  adultos      Int           @default(1) @db.SmallInt
-  ninos        Int           @default(0) @db.SmallInt
+  adultos Int @default(1) @db.SmallInt
+  ninos   Int @default(0) @db.SmallInt
 
   // Snapshot (desnormalización)
-  nombreHuesped   String     @db.VarChar(100)
-  nroHabitacion   String     @db.VarChar(10)
-  nombreTipoHab   String     @db.VarChar(100)
-  nombreCanal     String     @db.VarChar(50)
+  nombreHuesped String @db.VarChar(100)
+  nroHabitacion String @db.VarChar(10)
+  nombreTipoHab String @db.VarChar(100)
+  nombreCanal   String @db.VarChar(50)
 
   // Precios
-  precioNoche     Decimal    @db.Decimal(10, 2)
-  IVA             Decimal    @default(0) @db.Decimal(4, 2)
-  cargoServicios  Decimal    @default(0) @db.Decimal(4, 2)
+  precioNoche    Decimal @db.Decimal(10, 2)
+  IVA            Decimal @default(0) @db.Decimal(4, 2)
+  cargoServicios Decimal @default(0) @db.Decimal(4, 2)
 
   // Totales
-  montoTotal      Decimal    @db.Decimal(10, 2)
-  montoDescuento  Decimal    @default(0) @db.Decimal(10, 2)
-  montoFinal      Decimal?   @db.Decimal(10, 2)
+  montoTotal     Decimal  @db.Decimal(10, 2)
+  montoDescuento Decimal  @default(0) @db.Decimal(10, 2)
+  montoFinal     Decimal? @db.Decimal(10, 2)
 
   // Estado
   estado       EstadoReserva @default(TENTATIVA)
   motivoCancel String?       @db.Text
   canceladoEn  DateTime?     @db.Timestamptz
-  
   // Auditoría
   createdAt    DateTime      @default(now()) @db.Timestamptz
   updatedAt    DateTime      @updatedAt @db.Timestamptz
 
   // Relaciones
-  huesped      Huesped       @relation(fields: [huespedId], references: [id])
-  habitacion   Habitacion    @relation(fields: [habitacionId], references: [id])
-  tarifa       Tarifa        @relation(fields: [tarifaId], references: [id])
-  pago         Pago?         @relation("PagoReserva", fields: [pagoId], references: [id])
-  estancias    Estancia[]
+  huesped    Huesped    @relation(fields: [huespedId], references: [id])
+  habitacion Habitacion @relation(fields: [habitacionId], references: [id])
+  tarifa     Tarifa     @relation(fields: [tarifaId], references: [id])
+  pago       Pago?      @relation("PagoReserva", fields: [pagoId], references: [id])
+  estancias  Estancia[]
 
   @@index([huespedId])
   @@index([habitacionId])
@@ -514,14 +492,13 @@ model Pago {
   monto         Decimal      @db.Decimal(12, 2)
   moneda        String       @default("SOL") @db.Char(3)
   metodo        MetodoPago
-  recibidoPorId String?      // No es UUID, es el ID de User de Better Auth
+  recibidoPorId String? // No es UUID, es el ID de User de Better Auth
   observacion   String?      @db.Text
   createdAt     DateTime     @default(now()) @db.Timestamptz
   updatedAt     DateTime     @updatedAt @db.Timestamptz
 
-  reserva   Reserva? @relation("PagoReserva")
-  folio     Folio?   @relation("PagoFolio")
-  recibidoPor  User? @relation("PagosRecibidos", fields: [recibidoPorId], references: [id])
+  reserva     Reserva? @relation("PagoReserva")
+  folio       Folio?   @relation("PagoFolio")
 
   @@map("pagos")
 }
@@ -531,18 +508,18 @@ model Pago {
 // ------------------------------------------------------------
 
 model Estancia {
-  id           String        @id @default(uuid()) @db.Uuid
-  reservaId    String        @db.Uuid
-  habitacionId String        @db.Uuid
-  huespedId    String        @db.Uuid
+  id           String @id @default(uuid()) @db.Uuid
+  reservaId    String @db.Uuid
+  habitacionId String @db.Uuid
+  huespedId    String @db.Uuid
 
-  fechaEntrada DateTime      @default(now()) @db.Timestamptz
-  fechaSalida  DateTime?     @db.Timestamptz
+  fechaEntrada DateTime  @default(now()) @db.Timestamptz
+  fechaSalida  DateTime? @db.Timestamptz
 
-  estado       EstadoEstadia @default(EN_CASA)
-  notas        String?       @db.Text
-  createdAt    DateTime      @default(now()) @db.Timestamptz
-  updatedAt    DateTime      @updatedAt @db.Timestamptz
+  estado    EstadoEstadia @default(EN_CASA)
+  notas     String?       @db.Text
+  createdAt DateTime      @default(now()) @db.Timestamptz
+  updatedAt DateTime      @updatedAt @db.Timestamptz
 
   reserva    Reserva    @relation(fields: [reservaId], references: [id])
   habitacion Habitacion @relation(fields: [habitacionId], references: [id])
@@ -558,18 +535,18 @@ model Estancia {
 // ------------------------------------------------------------
 
 model Folio {
-  id           String      @id @default(uuid()) @db.Uuid
-  estanciaId   String      @unique @db.Uuid
-  nroFolio     String      @unique @db.VarChar(20)
-  estado       EstadoFolio @default(ABIERTO)
-  moneda       String      @default("USD") @db.Char(3)
-  totalCargos  Decimal     @default(0) @db.Decimal(12, 2)
-  totalPagos   Decimal     @default(0) @db.Decimal(12, 2)
-  cerradoEn    DateTime?   @db.Timestamptz
-  notas        String?     @db.Text
-  pagoId       String?     @unique @db.Uuid
-  createdAt    DateTime    @default(now()) @db.Timestamptz
-  updatedAt    DateTime    @updatedAt @db.Timestamptz
+  id          String      @id @default(uuid()) @db.Uuid
+  estanciaId  String      @unique @db.Uuid
+  nroFolio    String      @unique @db.VarChar(20)
+  estado      EstadoFolio @default(ABIERTO)
+  moneda      String      @default("USD") @db.Char(3)
+  totalCargos Decimal     @default(0) @db.Decimal(12, 2)
+  totalPagos  Decimal     @default(0) @db.Decimal(12, 2)
+  cerradoEn   DateTime?   @db.Timestamptz
+  notas       String?     @db.Text
+  pagoId      String?     @unique @db.Uuid
+  createdAt   DateTime    @default(now()) @db.Timestamptz
+  updatedAt   DateTime    @updatedAt @db.Timestamptz
 
   cargos       CargoFolio[]
   comprobantes Comprobante[]
@@ -584,27 +561,26 @@ model Folio {
 // ------------------------------------------------------------
 
 model CargoFolio {
-  id            String   @id @default(uuid()) @db.Uuid
-  folioId       String   @db.Uuid
-  servicioId    String   @db.Uuid
+  id         String @id @default(uuid()) @db.Uuid
+  folioId    String @db.Uuid
+  servicioId String @db.Uuid
 
-  fechaCargo    DateTime @default(now()) @db.Date
-  cantidad      Decimal  @default(1) @db.Decimal(8, 2)
-  precioUnit    Decimal  @db.Decimal(10, 2)
+  fechaCargo      DateTime @default(now()) @db.Date
+  cantidad        Decimal  @default(1) @db.Decimal(8, 2)
+  precioUnit      Decimal  @db.Decimal(10, 2)
   // subtotal, montoIgv, total: calculados en BD, solo lectura
-  subtotal      Decimal? @db.Decimal(12, 2)
-  igvPct        Decimal  @default(18.00) @db.Decimal(5, 2)
-  montoIgv      Decimal? @db.Decimal(12, 2)
-  total         Decimal? @db.Decimal(12, 2)
-  descripcion   String?  @db.Text
-  registradoPorId String? @db.Uuid
-  anulado       Boolean  @default(false)
-  motivoAnul    String?  @db.Text
-  createdAt     DateTime @default(now()) @db.Timestamptz
+  subtotal        Decimal? @db.Decimal(12, 2)
+  igvPct          Decimal  @default(18.00) @db.Decimal(5, 2)
+  montoIgv        Decimal? @db.Decimal(12, 2)
+  total           Decimal? @db.Decimal(12, 2)
+  descripcion     String?  @db.Text
+  registradoPorId String?  @db.Uuid
+  anulado         Boolean  @default(false)
+  motivoAnul      String?  @db.Text
+  createdAt       DateTime @default(now()) @db.Timestamptz
 
   folio         Folio     @relation(fields: [folioId], references: [id])
   servicio      Servicio  @relation(fields: [servicioId], references: [id])
-  registradoPor Personal? @relation("CargosRegistrados", fields: [registradoPorId], references: [id])
 
   @@map("cargos_folio")
 }
@@ -614,22 +590,22 @@ model CargoFolio {
 // ------------------------------------------------------------
 
 model Comprobante {
-  id               String          @id @default(uuid()) @db.Uuid
-  folioId          String          @db.Uuid
-  tipo             TipoComprobante
-  serie            String          @db.VarChar(5)
-  numero           Int
-  fechaEmision     DateTime        @default(now()) @db.Date
-  tipoDocReceptor  String?         @db.VarChar(10)
-  nroDocReceptor   String?         @db.VarChar(11)
-  nombreReceptor   String?         @db.VarChar(200)
-  dirReceptor      String?         @db.Text
-  subtotal         Decimal         @db.Decimal(12, 2)
-  igv              Decimal         @db.Decimal(10, 2)
-  total            Decimal         @db.Decimal(12, 2)
-  estadoSunat      EstadoSunat     @default(PENDIENTE)
-  codigoSunat      String?         @db.VarChar(50)
-  createdAt        DateTime        @default(now()) @db.Timestamptz
+  id              String          @id @default(uuid()) @db.Uuid
+  folioId         String          @db.Uuid
+  tipo            TipoComprobante
+  serie           String          @db.VarChar(5)
+  numero          Int
+  fechaEmision    DateTime        @default(now()) @db.Date
+  tipoDocReceptor String?         @db.VarChar(10)
+  nroDocReceptor  String?         @db.VarChar(11)
+  nombreReceptor  String?         @db.VarChar(200)
+  dirReceptor     String?         @db.Text
+  subtotal        Decimal         @db.Decimal(12, 2)
+  igv             Decimal         @db.Decimal(10, 2)
+  total           Decimal         @db.Decimal(12, 2)
+  estadoSunat     EstadoSunat     @default(PENDIENTE)
+  codigoSunat     String?         @db.VarChar(50)
+  createdAt       DateTime        @default(now()) @db.Timestamptz
 
   folio Folio @relation(fields: [folioId], references: [id])
 
@@ -642,14 +618,14 @@ model Comprobante {
 // ------------------------------------------------------------
 
 model CategoriaMueble {
-  id            String    @id @default(uuid()) @db.Uuid
-  nombre        String    @unique @db.VarChar(50)
-  descripcion   String?   @db.Text
-  activo        Boolean   @default(true)
-  createdAt     DateTime  @default(now()) @db.Timestamptz
-  updatedAt     DateTime  @updatedAt @db.Timestamptz
+  id          String   @id @default(uuid()) @db.Uuid
+  nombre      String   @unique @db.VarChar(50)
+  descripcion String?  @db.Text
+  activo      Boolean  @default(true)
+  createdAt   DateTime @default(now()) @db.Timestamptz
+  updatedAt   DateTime @updatedAt @db.Timestamptz
 
-  muebles       Mueble[]
+  muebles Mueble[]
 
   @@map("categoria_mueble")
 }

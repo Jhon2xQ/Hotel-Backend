@@ -12,22 +12,20 @@ import {
 } from "../presentation/schemas/estancia.schema";
 
 export function createEstanciaRoutes(): AppHono {
-  const controller = container.resolve(EstanciaController);
-
+  const ctrl = container.resolve(EstanciaController);
   const router = new Hono<{ Variables: AppVariables }>();
 
   router.use("*", authMiddleware);
-
-  router.get("/", controller.list.bind(controller));
-  router.get("/:id", controller.findById.bind(controller));
-  router.post("/", adminMiddleware, validSchema(CreateEstanciaSchema), controller.create.bind(controller));
-  router.put("/:id", adminMiddleware, validSchema(UpdateEstanciaSchema), controller.update.bind(controller));
-  router.delete("/:id", adminMiddleware, controller.delete.bind(controller));
+  router.get("/", (c) => ctrl.list(c));
+  router.get("/:id", (c) => ctrl.findById(c));
+  router.post("/", adminMiddleware, validSchema(CreateEstanciaSchema), (c) => ctrl.create(c));
+  router.put("/:id", adminMiddleware, validSchema(UpdateEstanciaSchema), (c) => ctrl.update(c));
+  router.delete("/:id", adminMiddleware, (c) => ctrl.delete(c));
   router.patch(
     "/:id/checkout",
     adminMiddleware,
     validSchema(CheckoutEstanciaSchema),
-    controller.checkout.bind(controller),
+    (c) => ctrl.checkout(c),
   );
 
   return router;

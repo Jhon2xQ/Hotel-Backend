@@ -13,23 +13,21 @@ import {
 } from "../presentation/schemas/reserva.schema";
 
 export function createReservaRoutes(): AppHono {
-  const controller = container.resolve(ReservaController);
-
+  const ctrl = container.resolve(ReservaController);
   const router = new Hono<{ Variables: AppVariables }>();
 
   router.use("*", authMiddleware);
-
-  router.get("/", controller.list.bind(controller));
-  router.get("/:id", controller.findById.bind(controller));
-  router.post("/", validSchema(CreateReservaSchema), controller.create.bind(controller));
-  router.put("/:id", validSchema(UpdateReservaSchema), controller.update.bind(controller));
-  router.delete("/:id", controller.delete.bind(controller));
-  router.patch("/:id/cancel", validSchema(CancelReservaSchema), controller.cancel.bind(controller));
+  router.get("/", (c) => ctrl.list(c));
+  router.get("/:id", (c) => ctrl.findById(c));
+  router.post("/", validSchema(CreateReservaSchema), (c) => ctrl.create(c));
+  router.put("/:id", validSchema(UpdateReservaSchema), (c) => ctrl.update(c));
+  router.delete("/:id", (c) => ctrl.delete(c));
+  router.patch("/:id/cancel", validSchema(CancelReservaSchema), (c) => ctrl.cancel(c));
   router.patch(
     "/:id/estado",
     adminMiddleware,
     validSchema(UpdateEstadoReservaSchema),
-    controller.updateEstado.bind(controller),
+    (c) => ctrl.updateEstado(c),
   );
 
   return router;

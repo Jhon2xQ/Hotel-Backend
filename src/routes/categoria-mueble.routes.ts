@@ -12,23 +12,21 @@ import {
 import { adminMiddleware } from "../presentation/middlewares/admin.middleware";
 
 export function categoriaMuebleRoutes(): AppHono {
-  const controller = container.resolve(CategoriaMuebleController);
-
+  const ctrl = container.resolve(CategoriaMuebleController);
   const router = new Hono<{ Variables: AppVariables }>();
 
   router.use("*", authMiddleware);
-
-  router.get("/", adminMiddleware, controller.list.bind(controller));
-  router.get("/:id", adminMiddleware, validParams(CategoriaMuebleIdSchema), controller.findById.bind(controller));
-  router.post("/", adminMiddleware, validSchema(CreateCategoriaMuebleSchema), controller.create.bind(controller));
+  router.get("/", adminMiddleware, (c) => ctrl.list(c));
+  router.get("/:id", adminMiddleware, validParams(CategoriaMuebleIdSchema), (c) => ctrl.findById(c));
+  router.post("/", adminMiddleware, validSchema(CreateCategoriaMuebleSchema), (c) => ctrl.create(c));
   router.put(
     "/:id",
     adminMiddleware,
     validParams(CategoriaMuebleIdSchema),
     validSchema(UpdateCategoriaMuebleSchema),
-    controller.update.bind(controller),
+    (c) => ctrl.update(c),
   );
-  router.delete("/:id", adminMiddleware, validParams(CategoriaMuebleIdSchema), controller.delete.bind(controller));
+  router.delete("/:id", adminMiddleware, validParams(CategoriaMuebleIdSchema), (c) => ctrl.delete(c));
 
   return router;
 }

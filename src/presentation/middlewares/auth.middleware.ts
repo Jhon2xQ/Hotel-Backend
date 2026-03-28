@@ -1,9 +1,8 @@
-import { Next } from "hono";
-import { AppContext } from "../../common/types/app.types";
+import { createMiddleware } from "hono/factory";
 import { auth } from "../../common/libraries/auth";
 import { ApiResponse } from "../api.response";
 
-export async function authMiddleware(c: AppContext, next: Next) {
+export const authMiddleware = createMiddleware(async (c, next) => {
   const session = await auth.api.getSession({ headers: c.req.raw.headers });
 
   if (!session) {
@@ -12,6 +11,5 @@ export async function authMiddleware(c: AppContext, next: Next) {
 
   c.set("user", session.user);
   c.set("session", session.session);
-
   await next();
-}
+});
