@@ -8,7 +8,9 @@
     "jsxImportSource": "hono/jsx",
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "types": ["bun-types", "vitest/globals"]
+    "types": ["bun-types", "vitest/globals"],
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   },
   "include": ["src/**/*", "test/**/*"],
   "exclude": ["node_modules", "generated"]
