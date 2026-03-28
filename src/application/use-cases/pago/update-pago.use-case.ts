@@ -1,7 +1,7 @@
 import { inject, injectable } from "tsyringe";
 import type { IPagoRepository } from "../../../domain/interfaces/pago.repository.interface";
 import { PagoException } from "../../../domain/exceptions/pago.exception";
-import { UpdatePagoInput, PagoOutput } from "../../dtos/pago.dto";
+import { UpdatePagoDto, PagoDto, toPagoDto } from "../../dtos/pago.dto";
 import { ConceptoPago, EstadoPago, MetodoPago } from "../../../domain/entities/pago.entity";
 import { DI_TOKENS } from "../../../common/IoC/tokens";
 
@@ -9,14 +9,12 @@ import { DI_TOKENS } from "../../../common/IoC/tokens";
 export class UpdatePagoUseCase {
   constructor(@inject(DI_TOKENS.IPagoRepository) private repository: IPagoRepository) {}
 
-  async execute(id: string, input: UpdatePagoInput): Promise<PagoOutput> {
-    // Verify pago exists
+  async execute(id: string, input: UpdatePagoDto): Promise<PagoDto> {
     const existingPago = await this.repository.findById(id);
     if (!existingPago) {
       throw PagoException.notFoundById();
     }
 
-    // Validate monto if provided
     if (input.monto !== undefined && input.monto <= 0) {
       throw PagoException.invalidAmount();
     }
@@ -31,6 +29,6 @@ export class UpdatePagoUseCase {
       observacion: input.observacion,
     });
 
-    return pago.toOutput();
+    return toPagoDto(pago);
   }
 }

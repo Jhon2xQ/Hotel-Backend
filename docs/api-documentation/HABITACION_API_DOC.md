@@ -1,16 +1,39 @@
 # API de Habitaciones
 
-Documentación de los endpoints para gestionar las habitaciones físicas del hotel.
 
-## Base URL
+> **Autorización:** Las rutas que restrigen por rol usan `requireRoles(...)` (`src/presentation/middlewares/roles.middleware.ts`) con valores en `src/common/constants/roles.ts` (p. ej. `admin`, `recepcionista`). Cualquier mención a "ADMIN" u otros roles aquí es orientativa; la fuente de verdad es el `*.routes.ts` correspondiente.
 
-```
-/api/habitaciones
-```
+
+Documentación unificada del módulo `habitacion.routes.ts` (privado y público): CRUD, estado, búsqueda de disponibles e imágenes (`multipart/form-data`).
+
+## Bases URL
+
+| Prefijo | Uso |
+| ------- | --- |
+| `/api/private/habitaciones` | CRUD y gestión (requiere sesión Better Auth) |
+| `/api/public/habitaciones` | Consulta pública: disponibles y precio canal DIRECTO (sin sesión) |
+
+## Orden de endpoints (convención del proyecto)
+
+1. **GET** listado (privado): `GET /api/private/habitaciones`
+2. **GET** por id (privado): `GET /api/private/habitaciones/:id`
+3. **GET** búsqueda / disponibles (público, query opcional): `GET /api/public/habitaciones`
+4. **GET** habitación con precio (público): `GET /api/public/habitaciones/:id`
+5. **POST** crear (privado, `multipart/form-data` si hay imágenes)
+6. **PUT** actualizar (privado, `multipart/form-data` si hay imágenes)
+7. **PATCH** estado / limpieza (privado): `PATCH /api/private/habitaciones/:id/estado`
+8. **DELETE** (privado): `DELETE /api/private/habitaciones/:id`
+
+En las respuestas, el objeto anidado `tipo` sigue el mismo contrato que **Tipo de habitación** (`TipoHabitacionDto`: incluye `id`, `nombre`, `descripcion`, `created_at`, `updated_at`).
 
 ## Autenticación
 
-Todos los endpoints requieren autenticación mediante sesión de Better Auth.
+- **Privado:** sesión Better Auth en todas las rutas bajo `/api/private/habitaciones`.
+- **Público:** sin autenticación en `/api/public/habitaciones`.
+
+## Imágenes (S3 / multipart)
+
+Creación y actualización aceptan `multipart/form-data` con campos de habitación y archivos de imagen; las URLs resultantes se guardan en `url_imagen`. Variables de entorno S3: `S3_REGION`, `S3_ENDPOINT`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_BUCKET_NAME`, `S3_FORCE_PATH_STYLE`.
 
 ## Enums
 
@@ -30,7 +53,7 @@ Estados operacionales de una habitación:
 
 Obtiene la lista completa de habitaciones del hotel.
 
-**Endpoint:** `GET /api/habitaciones`
+**Endpoint:** `GET /api/private/habitaciones`
 
 **Permisos:** Usuario autenticado
 
@@ -97,7 +120,7 @@ Obtiene la lista completa de habitaciones del hotel.
 
 Obtiene los detalles de una habitación específica.
 
-**Endpoint:** `GET /api/habitaciones/:id`
+**Endpoint:** `GET /api/private/habitaciones/:id`
 
 **Permisos:** Usuario autenticado
 
@@ -149,11 +172,29 @@ Obtiene los detalles de una habitación específica.
 
 ---
 
-### 3. Crear Habitación
+### 3. Búsqueda de habitaciones (público)
+
+**Endpoint:** `GET /api/public/habitaciones`
+
+**Autenticación:** no requerida.
+
+**Query (opcional):** `tipo`, `fecha_inicio`, `fecha_fin` (ISO 8601), `orden_precio` (`asc` | `desc`). Si se envían fechas, `fecha_inicio` &lt; `fecha_fin`. Respuesta: listado con precio de tarifa del canal **DIRECTO** (`precio_noche`).
+
+### 4. Habitación por ID con precio (público)
+
+**Endpoint:** `GET /api/public/habitaciones/:id`
+
+**Autenticación:** no requerida.
+
+Devuelve la habitación con `precio_noche` desde la tarifa del canal DIRECTO.
+
+---
+
+### 5. Crear Habitación
 
 Crea una nueva habitación física en el sistema.
 
-**Endpoint:** `POST /api/habitaciones`
+**Endpoint:** `POST /api/private/habitaciones`
 
 **Permisos:** ADMIN
 
@@ -271,11 +312,11 @@ Crea una nueva habitación física en el sistema.
 
 ---
 
-### 4. Actualizar Habitación (Completo)
+### 6. Actualizar Habitación (Completo)
 
 Actualiza los datos completos de una habitación existente.
 
-**Endpoint:** `PUT /api/habitaciones/:id`
+**Endpoint:** `PUT /api/private/habitaciones/:id`
 
 **Permisos:** ADMIN
 
@@ -364,11 +405,11 @@ Actualiza los datos completos de una habitación existente.
 
 ---
 
-### 5. Actualizar Estado de Habitación
+### 7. Actualizar Estado de Habitación
 
 Actualiza únicamente el estado operacional de una habitación. Este endpoint está disponible para todos los usuarios autenticados (no requiere rol ADMIN).
 
-**Endpoint:** `PATCH /api/habitaciones/:id/estado`
+**Endpoint:** `PATCH /api/private/habitaciones/:id/estado`
 
 **Permisos:** Usuario autenticado (cualquier rol)
 
@@ -463,11 +504,11 @@ Actualiza únicamente el estado operacional de una habitación. Este endpoint es
 
 ---
 
-### 6. Eliminar Habitación
+### 8. Eliminar Habitación
 
 Elimina una habitación del sistema.
 
-**Endpoint:** `DELETE /api/habitaciones/:id`
+**Endpoint:** `DELETE /api/private/habitaciones/:id`
 
 **Permisos:** ADMIN
 
@@ -619,7 +660,7 @@ Elimina una habitación del sistema.
 ### Crear una habitación básica
 
 ```bash
-curl -X POST https://api.hotel.com/api/habitaciones \
+curl -X POST https://api.hotel.com/api/private/habitaciones \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <token>" \
   -d '{
@@ -634,7 +675,7 @@ curl -X POST https://api.hotel.com/api/habitaciones \
 ### Crear una habitación completa con imágenes
 
 ```bash
-curl -X POST https://api.hotel.com/api/habitaciones \
+curl -X POST https://api.hotel.com/api/private/habitaciones \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <token>" \
   -d '{
@@ -656,7 +697,7 @@ curl -X POST https://api.hotel.com/api/habitaciones \
 ### Actualizar estado operacional (recepción)
 
 ```bash
-curl -X PATCH https://api.hotel.com/api/habitaciones/789e4567-e89b-12d3-a456-426614174000/estado \
+curl -X PATCH https://api.hotel.com/api/private/habitaciones/789e4567-e89b-12d3-a456-426614174000/estado \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <token>" \
   -d '{
@@ -667,7 +708,7 @@ curl -X PATCH https://api.hotel.com/api/habitaciones/789e4567-e89b-12d3-a456-426
 ### Actualizar fecha de limpieza
 
 ```bash
-curl -X PATCH https://api.hotel.com/api/habitaciones/789e4567-e89b-12d3-a456-426614174000/estado \
+curl -X PATCH https://api.hotel.com/api/private/habitaciones/789e4567-e89b-12d3-a456-426614174000/estado \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <token>" \
   -d '{
@@ -678,7 +719,7 @@ curl -X PATCH https://api.hotel.com/api/habitaciones/789e4567-e89b-12d3-a456-426
 ### Actualización completa de habitación (ADMIN)
 
 ```bash
-curl -X PUT https://api.hotel.com/api/habitaciones/789e4567-e89b-12d3-a456-426614174000 \
+curl -X PUT https://api.hotel.com/api/private/habitaciones/789e4567-e89b-12d3-a456-426614174000 \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <token>" \
   -d '{
@@ -694,20 +735,20 @@ curl -X PUT https://api.hotel.com/api/habitaciones/789e4567-e89b-12d3-a456-42661
 ### Listar todas las habitaciones
 
 ```bash
-curl -X GET https://api.hotel.com/api/habitaciones \
+curl -X GET https://api.hotel.com/api/private/habitaciones \
   -H "Authorization: Bearer <token>"
 ```
 
 ### Obtener habitación específica
 
 ```bash
-curl -X GET https://api.hotel.com/api/habitaciones/789e4567-e89b-12d3-a456-426614174000 \
+curl -X GET https://api.hotel.com/api/private/habitaciones/789e4567-e89b-12d3-a456-426614174000 \
   -H "Authorization: Bearer <token>"
 ```
 
 ### Eliminar una habitación
 
 ```bash
-curl -X DELETE https://api.hotel.com/api/habitaciones/789e4567-e89b-12d3-a456-426614174000 \
+curl -X DELETE https://api.hotel.com/api/private/habitaciones/789e4567-e89b-12d3-a456-426614174000 \
   -H "Authorization: Bearer <token>"
 ```

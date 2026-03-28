@@ -1,7 +1,9 @@
-import { Pago, ConceptoPago, EstadoPago, MetodoPago, UserBasic } from "../../src/domain/entities/pago.entity";
+import { Pago, ConceptoPago, EstadoPago, MetodoPago } from "../../src/domain/entities/pago.entity";
+
+type RecibidoPor = { id: string; name: string; email: string };
 
 export function createMockPago(overrides?: Partial<Pago>): Pago {
-  const mockUser: UserBasic = {
+  const mockUser: RecibidoPor = {
     id: "user-123",
     name: "Juan Pérez",
     email: "juan.perez@hotel.com",
@@ -22,7 +24,7 @@ export function createMockPago(overrides?: Partial<Pago>): Pago {
   );
 }
 
-export function createMockUser(overrides?: Partial<UserBasic>): UserBasic {
+export function createMockUser(overrides?: Partial<RecibidoPor>): RecibidoPor {
   return {
     id: overrides?.id ?? "user-123",
     name: overrides?.name ?? "Juan Pérez",

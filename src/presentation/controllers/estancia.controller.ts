@@ -7,7 +7,7 @@ import { FindEstanciaByIdUseCase } from "../../application/use-cases/estancia/fi
 import { UpdateEstanciaUseCase } from "../../application/use-cases/estancia/update-estancia.use-case";
 import { DeleteEstanciaUseCase } from "../../application/use-cases/estancia/delete-estancia.use-case";
 import { CheckoutEstanciaUseCase } from "../../application/use-cases/estancia/checkout-estancia.use-case";
-import { CreateEstanciaInput, UpdateEstanciaInput, CheckoutEstanciaInput } from "../../application/dtos/estancia.dto";
+import type { CreateEstanciaDto, UpdateEstanciaDto, CheckoutEstanciaDto } from "../../application/dtos/estancia.dto";
 
 @injectable()
 export class EstanciaController {
@@ -21,54 +21,27 @@ export class EstanciaController {
   ) {}
 
   async create(c: AppContext) {
-    const validData = c.get("validData") as any;
-    const input: CreateEstanciaInput = {
-      reservaId: validData.reservaId,
-      habitacionId: validData.habitacionId,
-      huespedId: validData.huespedId,
-      fechaEntrada: validData.fechaEntrada ? new Date(validData.fechaEntrada) : undefined,
-      fechaSalida: validData.fechaSalida ? new Date(validData.fechaSalida) : null,
-      estado: validData.estado,
-      notas: validData.notas,
-    };
-
+    const input = c.get("validData") as CreateEstanciaDto;
     const estancia = await this.createUseCase.execute(input);
-    return c.json(ApiResponse.success("Estancia creada exitosamente", estancia.toOutput()), 201);
+    return c.json(ApiResponse.success("Estancia creada exitosamente", estancia), 201);
   }
 
   async list(c: AppContext) {
     const estancias = await this.listUseCase.execute();
-    const output = estancias.map((e) => e.toOutput());
-    return c.json(ApiResponse.success("Estancias obtenidas exitosamente", output), 200);
+    return c.json(ApiResponse.success("Estancias obtenidas exitosamente", estancias), 200);
   }
 
   async findById(c: AppContext) {
     const id = c.req.param("id") as string;
     const estancia = await this.findByIdUseCase.execute(id);
-    return c.json(ApiResponse.success("Estancia encontrada", estancia.toOutput()), 200);
+    return c.json(ApiResponse.success("Estancia encontrada", estancia), 200);
   }
 
   async update(c: AppContext) {
     const id = c.req.param("id") as string;
-    const validData = c.get("validData") as any;
-
-    const input: UpdateEstanciaInput = {
-      reservaId: validData.reservaId,
-      habitacionId: validData.habitacionId,
-      huespedId: validData.huespedId,
-      fechaEntrada: validData.fechaEntrada ? new Date(validData.fechaEntrada) : undefined,
-      fechaSalida:
-        validData.fechaSalida !== undefined
-          ? validData.fechaSalida
-            ? new Date(validData.fechaSalida)
-            : null
-          : undefined,
-      estado: validData.estado,
-      notas: validData.notas,
-    };
-
+    const input = c.get("validData") as UpdateEstanciaDto;
     const estancia = await this.updateUseCase.execute(id, input);
-    return c.json(ApiResponse.success("Estancia actualizada exitosamente", estancia.toOutput()), 200);
+    return c.json(ApiResponse.success("Estancia actualizada exitosamente", estancia), 200);
   }
 
   async delete(c: AppContext) {
@@ -79,11 +52,8 @@ export class EstanciaController {
 
   async checkout(c: AppContext) {
     const id = c.req.param("id") as string;
-    const validData = c.get("validData") as CheckoutEstanciaInput;
-    const input: CheckoutEstanciaInput = {
-      fechaSalida: new Date(validData.fechaSalida),
-    };
+    const input = c.get("validData") as CheckoutEstanciaDto;
     const estancia = await this.checkoutUseCase.execute(id, input);
-    return c.json(ApiResponse.success("Checkout realizado exitosamente", estancia.toOutput()), 200);
+    return c.json(ApiResponse.success("Checkout realizado exitosamente", estancia), 200);
   }
 }

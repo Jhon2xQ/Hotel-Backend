@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { ListReservaUseCase } from "../../../src/application/use-cases/reserva/list-reserva.use-case";
 import { IReservaRepository } from "../../../src/domain/interfaces/reserva.repository.interface";
 import { createMockReserva } from "../../helpers/reserva-fixtures";
+import { toReservaDto } from "../../../src/application/dtos/reserva.dto";
 
 describe("ListReservaUseCase", () => {
   let useCase: ListReservaUseCase;
@@ -39,6 +40,6 @@ describe("ListReservaUseCase", () => {
     const result = await useCase.execute();
 
     expect(result).toHaveLength(2);
-    expect(result).toEqual(mockReservas);
+    expect(result).toEqual(mockReservas.map((r) => toReservaDto(r)));
   });
 });

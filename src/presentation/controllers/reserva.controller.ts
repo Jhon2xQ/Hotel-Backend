@@ -9,10 +9,11 @@ import { DeleteReservaUseCase } from "../../application/use-cases/reserva/delete
 import { CancelReservaUseCase } from "../../application/use-cases/reserva/cancel-reserva.use-case";
 import { UpdateEstadoReservaUseCase } from "../../application/use-cases/reserva/update-estado-reserva.use-case";
 import {
-  CreateReservaInput,
-  UpdateReservaInput,
-  CancelReservaInput,
-  UpdateEstadoReservaInput,
+  CreateReservaDto,
+  UpdateReservaDto,
+  CancelReservaDto,
+  UpdateEstadoReservaDto,
+  toReservaDto,
 } from "../../application/dtos/reserva.dto";
 
 @injectable()
@@ -28,53 +29,27 @@ export class ReservaController {
   ) {}
 
   async create(c: AppContext) {
-    const validData = c.get("validData") as any;
-    const input: CreateReservaInput = {
-      huespedId: validData.huespedId,
-      habitacionId: validData.habitacionId,
-      tarifaId: validData.tarifaId,
-      fechaEntrada: new Date(validData.fechaEntrada),
-      fechaSalida: new Date(validData.fechaSalida),
-      adultos: validData.adultos,
-      ninos: validData.ninos,
-      montoDescuento: validData.montoDescuento,
-    };
-
+    const input = c.get("validData") as CreateReservaDto;
     const reserva = await this.createUseCase.execute(input);
-    return c.json(ApiResponse.success("Reserva creada exitosamente", reserva.toOutput()), 201);
+    return c.json(ApiResponse.success("Reserva creada exitosamente", toReservaDto(reserva)), 201);
   }
 
   async list(c: AppContext) {
     const reservas = await this.listUseCase.execute();
-    const output = reservas.map((r) => r.toOutput());
-    return c.json(ApiResponse.success("Reservas obtenidas exitosamente", output), 200);
+    return c.json(ApiResponse.success("Reservas obtenidas exitosamente", reservas), 200);
   }
 
   async findById(c: AppContext) {
     const id = c.req.param("id") as string;
     const reserva = await this.findByIdUseCase.execute(id);
-    return c.json(ApiResponse.success("Reserva encontrada", reserva.toOutput()), 200);
+    return c.json(ApiResponse.success("Reserva encontrada", reserva), 200);
   }
 
   async update(c: AppContext) {
     const id = c.req.param("id") as string;
-    const validData = c.get("validData") as any;
-
-    const input: UpdateReservaInput = {
-      huespedId: validData.huespedId,
-      habitacionId: validData.habitacionId,
-      tarifaId: validData.tarifaId,
-      pagoId: validData.pagoId,
-      fechaEntrada: validData.fechaEntrada ? new Date(validData.fechaEntrada) : undefined,
-      fechaSalida: validData.fechaSalida ? new Date(validData.fechaSalida) : undefined,
-      adultos: validData.adultos,
-      ninos: validData.ninos,
-      montoDescuento: validData.montoDescuento,
-      estado: validData.estado,
-    };
-
+    const input = c.get("validData") as UpdateReservaDto;
     const reserva = await this.updateUseCase.execute(id, input);
-    return c.json(ApiResponse.success("Reserva actualizada exitosamente", reserva.toOutput()), 200);
+    return c.json(ApiResponse.success("Reserva actualizada exitosamente", toReservaDto(reserva)), 200);
   }
 
   async delete(c: AppContext) {
@@ -85,15 +60,15 @@ export class ReservaController {
 
   async cancel(c: AppContext) {
     const id = c.req.param("id") as string;
-    const validData = c.get("validData") as CancelReservaInput;
+    const validData = c.get("validData") as CancelReservaDto;
     const reserva = await this.cancelUseCase.execute(id, validData);
-    return c.json(ApiResponse.success("Reserva cancelada exitosamente", reserva.toOutput()), 200);
+    return c.json(ApiResponse.success("Reserva cancelada exitosamente", toReservaDto(reserva)), 200);
   }
 
   async updateEstado(c: AppContext) {
     const id = c.req.param("id") as string;
-    const validData = c.get("validData") as UpdateEstadoReservaInput;
+    const validData = c.get("validData") as UpdateEstadoReservaDto;
     const reserva = await this.updateEstadoUseCase.execute(id, validData);
-    return c.json(ApiResponse.success("Estado de reserva actualizado exitosamente", reserva.toOutput()), 200);
+    return c.json(ApiResponse.success("Estado de reserva actualizado exitosamente", toReservaDto(reserva)), 200);
   }
 }

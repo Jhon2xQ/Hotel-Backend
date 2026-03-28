@@ -3,7 +3,8 @@ import type { IHabitacionRepository } from "../../../domain/interfaces/habitacio
 import type { ITipoHabitacionRepository } from "../../../domain/interfaces/tipo-habitacion.repository.interface";
 import type { IMuebleRepository } from "../../../domain/interfaces/mueble.repository.interface";
 import { HabitacionException } from "../../../domain/exceptions/habitacion.exception";
-import { UpdateHabitacionInput, HabitacionOutput } from "../../dtos/habitacion.dto";
+import { UpdateHabitacionDto, HabitacionDto, toHabitacionDto } from "../../dtos/habitacion.dto";
+import { EstadoHabitacion } from "../../../domain/entities/habitacion.entity";
 import { S3UploadService } from "../../../infrastructure/services/s3-upload.service";
 import { DI_TOKENS } from "../../../common/IoC/tokens";
 
@@ -16,7 +17,7 @@ export class UpdateHabitacionUseCase {
     @inject(DI_TOKENS.IMuebleRepository) private furnitureRepository: IMuebleRepository,
   ) {}
 
-  async execute(id: string, input: UpdateHabitacionInput): Promise<HabitacionOutput> {
+  async execute(id: string, input: UpdateHabitacionDto): Promise<HabitacionDto> {
     // Validate Habitacion exists (Requirement 9.1, 9.10)
     const existing = await this.repository.findById(id);
     if (!existing) {
@@ -45,8 +46,13 @@ export class UpdateHabitacionUseCase {
       imageUrls = await S3UploadService.uploadImages(input.imagenes);
     }
 
-    // Call repository.update and return HabitacionOutput (Requirement 15.9)
-    // If estado changes to LIMPIEZA, set ultimaLimpieza to current timestamp (Requirement 9.8)
+    let ultiLimpieza: Date | null | undefined = undefined;
+    if (input.estado === EstadoHabitacion.LIMPIEZA) {
+      ultiLimpieza = new Date();
+    } else if (input.ulti_limpieza !== undefined) {
+      ultiLimpieza = input.ulti_limpieza ? new Date(input.ulti_limpieza) : null;
+    }
+
     const updated = await this.repository.update(id, {
       nroHabitacion: input.nro_habitacion,
       tipoHabitacionId: input.tipo_habitacion_id,
@@ -56,9 +62,9 @@ export class UpdateHabitacionUseCase {
       urlImagen: imageUrls,
       estado: input.estado,
       notas: input.notas,
-      ultiLimpieza: input.ulti_limpieza ? new Date(input.ulti_limpieza) : null,
+      ultiLimpieza,
     });
 
-    return updated.toOutput();
+    return toHabitacionDto(updated);
   }
 }

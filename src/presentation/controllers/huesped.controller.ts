@@ -22,14 +22,14 @@ export class HuespedController {
   async create(c: AppContext) {
     const validData = c.get("validData") as CreateHuespedDto;
     const huesped = await this.createUseCase.execute(validData);
-    return c.json(ApiResponse.success("Huésped creado exitosamente", huesped.toOutput()), 201);
+    return c.json(ApiResponse.success("Huésped creado exitosamente", huesped), 201);
   }
 
   async listPaginated(c: AppContext) {
     const validData = c.get("validData") as PaginationQuery;
     const result = await this.listPaginatedUseCase.execute(validData);
     const output = {
-      list: result.list.map((h) => h.toOutput()),
+      list: result.list,
       pagination: result.pagination,
     };
     return c.json(ApiResponse.success("Huéspedes obtenidos exitosamente", output), 200);
@@ -38,14 +38,14 @@ export class HuespedController {
   async findById(c: AppContext) {
     const id = c.req.param("id") as string;
     const huesped = await this.findByIdUseCase.execute(id);
-    return c.json(ApiResponse.success("Huésped encontrado", huesped.toOutput()), 200);
+    return c.json(ApiResponse.success("Huésped encontrado", huesped), 200);
   }
 
   async update(c: AppContext) {
     const id = c.req.param("id") as string;
     const validData = c.get("validData") as UpdateHuespedDto;
     const huesped = await this.updateUseCase.execute(id, validData);
-    return c.json(ApiResponse.success("Huésped actualizado exitosamente", huesped.toOutput()), 200);
+    return c.json(ApiResponse.success("Huésped actualizado exitosamente", huesped), 200);
   }
 
   async delete(c: AppContext) {

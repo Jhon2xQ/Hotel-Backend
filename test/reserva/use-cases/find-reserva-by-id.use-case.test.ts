@@ -3,6 +3,7 @@ import { FindReservaByIdUseCase } from "../../../src/application/use-cases/reser
 import { IReservaRepository } from "../../../src/domain/interfaces/reserva.repository.interface";
 import { ReservaException } from "../../../src/domain/exceptions/reserva.exception";
 import { createMockReserva } from "../../helpers/reserva-fixtures";
+import { toReservaDto } from "../../../src/application/dtos/reserva.dto";
 
 describe("FindReservaByIdUseCase", () => {
   let useCase: FindReservaByIdUseCase;
@@ -28,7 +29,7 @@ describe("FindReservaByIdUseCase", () => {
 
     const result = await useCase.execute("reserva-test-id");
 
-    expect(result).toBe(mockReserva);
+    expect(result).toEqual(toReservaDto(mockReserva));
   });
 
   it("debe lanzar ReservaException cuando no existe", async () => {

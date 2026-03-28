@@ -1,6 +1,6 @@
-import type { ConceptoPago, EstadoPago, MetodoPago } from "../../domain/entities/pago.entity";
+import type { ConceptoPago, EstadoPago, MetodoPago, Pago } from "../../domain/entities/pago.entity";
 
-export interface CreatePagoInput {
+export interface CreatePagoDto {
   concepto: ConceptoPago;
   estado?: EstadoPago;
   fecha_pago?: Date;
@@ -11,7 +11,7 @@ export interface CreatePagoInput {
   observacion?: string;
 }
 
-export interface UpdatePagoInput {
+export interface UpdatePagoDto {
   concepto?: ConceptoPago;
   estado?: EstadoPago;
   fecha_pago?: Date;
@@ -21,7 +21,7 @@ export interface UpdatePagoInput {
   observacion?: string;
 }
 
-export interface PagoOutput {
+export interface PagoDto {
   id: string;
   concepto: string;
   estado: string;
@@ -37,4 +37,20 @@ export interface PagoOutput {
   } | null;
   observacion: string | null;
   created_at: string;
+}
+
+export function toPagoDto(p: Pago): PagoDto {
+  return {
+    id: p.id,
+    concepto: p.concepto,
+    estado: p.estado,
+    fecha_pago: p.fechaPago.toISOString(),
+    monto: p.monto.toString(),
+    moneda: p.moneda,
+    metodo: p.metodo,
+    recibido_por_id: p.recibidoPorId,
+    recibido_por: p.recibidoPor,
+    observacion: p.observacion,
+    created_at: p.createdAt.toISOString(),
+  };
 }

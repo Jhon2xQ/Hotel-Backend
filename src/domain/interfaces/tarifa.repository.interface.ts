@@ -1,6 +1,15 @@
-import { Tarifa, CreateTarifaData } from "../entities/tarifa.entity";
+import type { Tarifa } from "../entities/tarifa.entity";
 
-export interface UpdateTarifaData {
+export interface CreateTarifaParams {
+  tipoHabitacionId: string;
+  canalId: string;
+  precioNoche: number;
+  IVA?: number | null;
+  cargoServicios?: number | null;
+  moneda?: string;
+}
+
+export interface UpdateTarifaParams {
   tipoHabitacionId?: string;
   canalId?: string;
   precioNoche?: number;
@@ -10,10 +19,10 @@ export interface UpdateTarifaData {
 }
 
 export interface ITarifaRepository {
-  create(data: CreateTarifaData): Promise<Tarifa>;
+  create(data: CreateTarifaParams): Promise<Tarifa>;
   findAll(): Promise<Tarifa[]>;
   findById(id: string): Promise<Tarifa | null>;
-  update(id: string, data: UpdateTarifaData): Promise<Tarifa>;
+  update(id: string, data: UpdateTarifaParams): Promise<Tarifa>;
   delete(id: string): Promise<void>;
   hasRelatedRecords(id: string): Promise<boolean>;
   findByTipoHabitacionAndCanal(tipoHabitacionId: string, canalId: string): Promise<Tarifa[]>;

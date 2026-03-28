@@ -1,14 +1,14 @@
 import { inject, injectable } from "tsyringe";
 import { CanalException } from "../../../domain/exceptions/canal.exception";
 import type { ICanalRepository } from "../../../domain/interfaces/canal.repository.interface";
-import { CreateCanalInput, CanalOutput } from "../../dtos/canal.dto";
+import { CreateCanalDto, CanalDto, toCanalDto } from "../../dtos/canal.dto";
 import { DI_TOKENS } from "../../../common/IoC/tokens";
 
 @injectable()
 export class CreateCanalUseCase {
   constructor(@inject(DI_TOKENS.ICanalRepository) private repository: ICanalRepository) {}
 
-  async execute(input: CreateCanalInput): Promise<CanalOutput> {
+  async execute(input: CreateCanalDto): Promise<CanalDto> {
     const existingCanal = await this.repository.findByName(input.nombre);
     if (existingCanal) {
       throw CanalException.duplicateNombre(input.nombre);
@@ -21,6 +21,6 @@ export class CreateCanalUseCase {
       notas: input.notas ?? null,
     });
 
-    return canal.toOutput();
+    return toCanalDto(canal);
   }
 }

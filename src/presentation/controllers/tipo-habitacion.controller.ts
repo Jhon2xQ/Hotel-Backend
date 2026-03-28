@@ -6,7 +6,7 @@ import { ListTipoHabitacionUseCase } from "../../application/use-cases/tipo-habi
 import { FindTipoHabitacionByIdUseCase } from "../../application/use-cases/tipo-habitacion/find-tipo-habitacion-by-id.use-case";
 import { UpdateTipoHabitacionUseCase } from "../../application/use-cases/tipo-habitacion/update-tipo-habitacion.use-case";
 import { DeleteTipoHabitacionUseCase } from "../../application/use-cases/tipo-habitacion/delete-tipo-habitacion.use-case";
-import { CreateTipoHabitacionInput, UpdateTipoHabitacionInput } from "../../application/dtos/tipo-habitacion.dto";
+import { CreateTipoHabitacionDto, UpdateTipoHabitacionDto } from "../../application/dtos/tipo-habitacion.dto";
 
 @injectable()
 export class TipoHabitacionController {
@@ -19,7 +19,7 @@ export class TipoHabitacionController {
   ) {}
 
   async create(c: AppContext) {
-    const input = c.get("validData") as CreateTipoHabitacionInput;
+    const input = c.get("validData") as CreateTipoHabitacionDto;
     const result = await this.createUseCase.execute(input);
     return c.json(ApiResponse.success("Tipo de habitación creado exitosamente", result), 201);
   }
@@ -37,7 +37,7 @@ export class TipoHabitacionController {
 
   async update(c: AppContext) {
     const { id } = c.req.param();
-    const input = c.get("validData") as UpdateTipoHabitacionInput;
+    const input = c.get("validData") as UpdateTipoHabitacionDto;
     const result = await this.updateUseCase.execute(id, input);
     return c.json(ApiResponse.success("Tipo de habitación actualizado exitosamente", result), 200);
   }

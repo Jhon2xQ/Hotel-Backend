@@ -1,5 +1,6 @@
 import { createMiddleware } from "hono/factory";
 import { ROLES } from "../../common/constants/roles";
+import { ApiResponse } from "../api.response";
 
 export const requireRoles = (...allowedRoles: string[]) =>
   createMiddleware(async (c, next) => {
@@ -10,7 +11,7 @@ export const requireRoles = (...allowedRoles: string[]) =>
     const hasRole = isAdmin || userRoles.some((role) => allowedRoles.includes(role));
 
     if (!hasRole) {
-      return c.json({ message: "Acceso prohibido" }, 403);
+      return c.json(ApiResponse.error("Acceso prohibido"), 403);
     }
 
     await next();

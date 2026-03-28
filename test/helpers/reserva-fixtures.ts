@@ -36,7 +36,6 @@ export function createMockReserva(overrides?: Partial<Reserva>): Reserva {
     new Habitacion(
       "habitacion-test-id",
       "101",
-      "tipo-habitacion-test-id",
       tipoHabitacion,
       1,
       true,
@@ -78,7 +77,7 @@ export function createMockReserva(overrides?: Partial<Reserva>): Reserva {
     overrides?.montoTotal ?? 300.0,
     overrides?.montoDescuento ?? 0.0,
     overrides?.montoFinal ?? 300.0,
-    overrides?.estado ?? "TENTATIVA",
+    overrides?.estado ?? EstadoReserva.TENTATIVA,
     overrides?.motivoCancel ?? null,
     overrides?.canceladoEn ?? null,
     overrides?.createdAt ?? new Date(),

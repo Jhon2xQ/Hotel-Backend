@@ -1,16 +1,20 @@
 # API de Reservas
 
+
+> **Autorización:** Las rutas que restrigen por rol usan `requireRoles(...)` (`src/presentation/middlewares/roles.middleware.ts`) con valores en `src/common/constants/roles.ts` (p. ej. `admin`, `recepcionista`). Cualquier mención a "ADMIN" u otros roles aquí es orientativa; la fuente de verdad es el `*.routes.ts` correspondiente.
+
+
 Documentación de los endpoints para gestionar reservas en el sistema hotelero.
 
 ## Base URL
 
 ```
-/api/reservas
+/api/private/reservas
 ```
 
 ## Autenticación
 
-Todos los endpoints requieren autenticación mediante Better Auth. Solo el endpoint de actualización de estado (`PATCH /api/reservas/:id/estado`) requiere rol `ADMIN`.
+Todos los endpoints requieren autenticación mediante Better Auth. Solo el endpoint de actualización de estado (`PATCH /api/private/reservas/:id/estado`) requiere rol `ADMIN`.
 
 ---
 
@@ -20,7 +24,7 @@ Todos los endpoints requieren autenticación mediante Better Auth. Solo el endpo
 
 Obtiene todas las reservas del sistema.
 
-**Endpoint:** `GET /api/reservas`
+**Endpoint:** `GET /api/private/reservas`
 
 **Autenticación:** Requerida
 
@@ -128,7 +132,7 @@ Obtiene todas las reservas del sistema.
 
 Obtiene una reserva específica por su ID.
 
-**Endpoint:** `GET /api/reservas/:id`
+**Endpoint:** `GET /api/private/reservas/:id`
 
 **Autenticación:** Requerida
 
@@ -196,7 +200,7 @@ Obtiene una reserva específica por su ID.
 
 Crea una nueva reserva. El código de reserva se genera automáticamente en formato `KOR-YYYYMMDD-XXXXXX`. Los campos snapshot (nombre_huesped, nro_habitacion, etc.) se sincronizan automáticamente desde las entidades relacionadas.
 
-**Endpoint:** `POST /api/reservas`
+**Endpoint:** `POST /api/private/reservas`
 
 **Autenticación:** Requerida
 
@@ -263,7 +267,7 @@ Ejemplo: `KOR-20260327-A7K9P2`
 
 Actualiza una reserva existente. Cualquier usuario autenticado puede actualizar reservas. Si el estado es COMPLETADA, la reserva es inmutable y no se puede modificar (use el endpoint de actualización de estado si es admin para cambiar el estado primero).
 
-**Endpoint:** `PUT /api/reservas/:id`
+**Endpoint:** `PUT /api/private/reservas/:id`
 
 **Autenticación:** Requerida
 
@@ -355,7 +359,7 @@ Cambiar solo el estado:
 
 Cancela una reserva estableciendo su estado a CANCELADA. No se pueden cancelar reservas completadas.
 
-**Endpoint:** `PATCH /api/reservas/:id/cancel`
+**Endpoint:** `PATCH /api/private/reservas/:id/cancel`
 
 **Autenticación:** Requerida
 
@@ -406,7 +410,7 @@ Cancela una reserva estableciendo su estado a CANCELADA. No se pueden cancelar r
 
 Actualiza únicamente el estado de una reserva. Este endpoint está diseñado para cambios de estado del flujo normal de la reserva. Para cancelar una reserva, use el endpoint específico de cancelación.
 
-**Endpoint:** `PATCH /api/reservas/:id/estado`
+**Endpoint:** `PATCH /api/private/reservas/:id/estado`
 
 **Autenticación:** Requerida (rol ADMIN)
 
@@ -463,7 +467,7 @@ TENTATIVA → CONFIRMADA → EN_CASA → COMPLETADA
 - `400`: Estado inválido o intento de cambiar a CANCELADA
 - `404`: Reserva no encontrada
 
-**Nota:** Para cancelar una reserva, use `PATCH /api/reservas/:id/cancel` con el motivo de cancelación. Los administradores tienen permisos completos para cambiar estados, incluso desde COMPLETADA.
+**Nota:** Para cancelar una reserva, use `PATCH /api/private/reservas/:id/cancel` con el motivo de cancelación. Los administradores tienen permisos completos para cambiar estados, incluso desde COMPLETADA.
 
 ---
 
@@ -471,7 +475,7 @@ TENTATIVA → CONFIRMADA → EN_CASA → COMPLETADA
 
 Elimina permanentemente una reserva del sistema.
 
-**Endpoint:** `DELETE /api/reservas/:id`
+**Endpoint:** `DELETE /api/private/reservas/:id`
 
 **Autenticación:** Requerida
 
@@ -557,7 +561,7 @@ Cuando una reserva tiene un pago asociado, el objeto incluye:
 
 ### Asociar un Pago a una Reserva
 
-Para asociar un pago existente a una reserva, use el endpoint `PUT /api/reservas/:id` con el campo `pagoId`:
+Para asociar un pago existente a una reserva, use el endpoint `PUT /api/private/reservas/:id` con el campo `pagoId`:
 
 ```json
 {
@@ -633,7 +637,7 @@ Mensajes posibles:
 - "El número de niños no puede ser negativo"
 - "La reserva ya está cancelada"
 - "Debe proporcionar un motivo de cancelación"
-- "Para cancelar una reserva use el endpoint PATCH /api/reservas/:id/cancel con el motivo de cancelación"
+- "Para cancelar una reserva use el endpoint PATCH /api/private/reservas/:id/cancel con el motivo de cancelación"
 
 ### Errores de Permisos (403)
 
@@ -712,7 +716,7 @@ Mensajes posibles:
 
 1. **Código Automático**: El código de reserva se genera automáticamente en formato `KOR-YYYYMMDD-XXXXXX`. No es necesario enviarlo en el request de creación.
 
-2. **Inmutabilidad**: Las reservas con estado COMPLETADA son inmutables y no pueden ser modificadas mediante el endpoint `PUT /api/reservas/:id`. Los administradores pueden usar el endpoint `PATCH /api/reservas/:id/estado` para cambiar el estado primero si necesitan modificar una reserva completada.
+2. **Inmutabilidad**: Las reservas con estado COMPLETADA son inmutables y no pueden ser modificadas mediante el endpoint `PUT /api/private/reservas/:id`. Los administradores pueden usar el endpoint `PATCH /api/private/reservas/:id/estado` para cambiar el estado primero si necesitan modificar una reserva completada.
 
 3. **Sincronización Automática**: Los campos snapshot se actualizan automáticamente cuando cambian las relaciones, no es necesario enviarlos en el request.
 
@@ -724,10 +728,10 @@ Mensajes posibles:
 
 6. **Historial**: Los campos snapshot permiten mantener un historial preciso incluso si las entidades relacionadas cambian posteriormente.
 
-7. **Permisos de Administrador**: Solo los administradores pueden actualizar el estado de una reserva mediante `PATCH /api/reservas/:id/estado`. Este endpoint permite cambiar desde cualquier estado (incluyendo COMPLETADA) a cualquier otro estado válido, excepto CANCELADA (que requiere usar el endpoint de cancelación).
+7. **Permisos de Administrador**: Solo los administradores pueden actualizar el estado de una reserva mediante `PATCH /api/private/reservas/:id/estado`. Este endpoint permite cambiar desde cualquier estado (incluyendo COMPLETADA) a cualquier otro estado válido, excepto CANCELADA (que requiere usar el endpoint de cancelación).
 
 8. **Relación con Pagos**:
    - Una reserva puede tener un pago asociado opcionalmente mediante el campo `pagoId`
    - El pago se incluye automáticamente en las respuestas cuando existe
    - Para crear pagos, use la API de Pagos (`/api/pagos`)
-   - Para asociar/desasociar un pago, use el endpoint `PUT /api/reservas/:id` con el campo `pagoId`
+   - Para asociar/desasociar un pago, use el endpoint `PUT /api/private/reservas/:id` con el campo `pagoId`
