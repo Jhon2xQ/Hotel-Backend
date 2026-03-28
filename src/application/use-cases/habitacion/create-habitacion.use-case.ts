@@ -2,7 +2,7 @@ import { inject, injectable } from "tsyringe";
 import type { IHabitacionRepository } from "../../../domain/interfaces/habitacion.repository.interface";
 import type { ITipoHabitacionRepository } from "../../../domain/interfaces/tipo-habitacion.repository.interface";
 import { HabitacionException } from "../../../domain/exceptions/habitacion.exception";
-import { CreateHabitacionInput, HabitacionOutput } from "../../dtos/habitacion.dto";
+import { CreateHabitacionDto, HabitacionDto, toHabitacionDto } from "../../dtos/habitacion.dto";
 import { EstadoHabitacion } from "../../../domain/entities/habitacion.entity";
 import { S3UploadService } from "../../../infrastructure/services/s3-upload.service";
 import { DI_TOKENS } from "../../../common/IoC/tokens";
@@ -15,7 +15,7 @@ export class CreateHabitacionUseCase {
     private tipoHabitacionRepository: ITipoHabitacionRepository,
   ) {}
 
-  async execute(input: CreateHabitacionInput): Promise<HabitacionOutput> {
+  async execute(input: CreateHabitacionDto): Promise<HabitacionDto> {
     // Validate TipoHabitacion exists (Requirement 6.4)
     const tipoHabitacion = await this.tipoHabitacionRepository.findById(input.tipo_habitacion_id);
     if (!tipoHabitacion) {
@@ -47,6 +47,6 @@ export class CreateHabitacionUseCase {
       ultiLimpieza: input.ulti_limpieza ? new Date(input.ulti_limpieza) : null,
     });
 
-    return habitacion.toOutput();
+    return toHabitacionDto(habitacion);
   }
 }

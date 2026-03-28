@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { HabitacionRepository } from "../../src/infrastructure/repositories/habitacion.repository";
 import { createMockPrismaClient } from "../helpers/mock-prisma";
-import { HabitacionException } from "../../src/domain/exceptions/habitacion.exception";
 import { Prisma } from "../../generated/prisma/client";
 import { EstadoHabitacion } from "../../src/domain/entities/habitacion.entity";
 
@@ -62,7 +61,7 @@ describe("HabitacionRepository", () => {
       expect(mockPrisma.habitacion.create).toHaveBeenCalled();
     });
 
-    it("should throw exception on duplicate nroHabitacion", async () => {
+    it("should propagate Prisma errors on duplicate nroHabitacion", async () => {
       const input = {
         nroHabitacion: "301",
         tipoHabitacionId: "tipo-id",
@@ -76,7 +75,7 @@ describe("HabitacionRepository", () => {
 
       mockPrisma.habitacion.create.mockRejectedValue(error);
 
-      await expect(repository.create(input)).rejects.toThrow(HabitacionException);
+      await expect(repository.create(input)).rejects.toThrow(Prisma.PrismaClientKnownRequestError);
     });
   });
 
@@ -234,13 +233,14 @@ describe("HabitacionRepository", () => {
 
       mockPrisma.habitacion.update.mockRejectedValue(error);
 
-      await expect(repository.update("non-existent-id", { notas: "Test" })).rejects.toThrow(HabitacionException);
+      await expect(repository.update("non-existent-id", { notas: "Test" })).rejects.toThrow(
+        Prisma.PrismaClientKnownRequestError,
+      );
     });
 
-    it("should set ultimaLimpieza when estado changes to LIMPIEZA", async () => {
-      const updateData = {
-        estado: EstadoHabitacion.LIMPIEZA,
-      };
+    it("should pass ultimaLimpieza to Prisma when provided", async () => {
+      const ts = new Date();
+      const updateData = { ultiLimpieza: ts };
 
       const mockResult = {
         id: "test-id",
@@ -250,9 +250,9 @@ describe("HabitacionRepository", () => {
         tieneDucha: true,
         tieneBanio: true,
         urlImagen: null,
-        estado: "LIMPIEZA",
+        estado: "DISPONIBLE",
         notas: null,
-        ultimaLimpieza: new Date(),
+        ultimaLimpieza: ts,
         tipo: { id: "tipo-id", nombre: "Suite", descripcion: null },
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -260,13 +260,12 @@ describe("HabitacionRepository", () => {
 
       mockPrisma.habitacion.update.mockResolvedValue(mockResult);
 
-      const result = await repository.update("test-id", updateData);
+      await repository.update("test-id", updateData);
 
-      expect(result.estado).toBe(EstadoHabitacion.LIMPIEZA);
       expect(mockPrisma.habitacion.update).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
-            ultimaLimpieza: expect.any(Date),
+            ultimaLimpieza: ts,
           }),
         }),
       );
@@ -311,7 +310,7 @@ describe("HabitacionRepository", () => {
       mockPrisma.habitacion.update.mockRejectedValue(error);
 
       await expect(repository.updateStatus("non-existent-id", { estado: EstadoHabitacion.OCUPADA })).rejects.toThrow(
-        HabitacionException,
+        Prisma.PrismaClientKnownRequestError,
       );
     });
   });
@@ -335,7 +334,7 @@ describe("HabitacionRepository", () => {
 
       mockPrisma.habitacion.delete.mockRejectedValue(error);
 
-      await expect(repository.delete("non-existent-id")).rejects.toThrow(HabitacionException);
+      await expect(repository.delete("non-existent-id")).rejects.toThrow(Prisma.PrismaClientKnownRequestError);
     });
   });
 

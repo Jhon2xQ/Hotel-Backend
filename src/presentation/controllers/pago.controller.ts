@@ -6,7 +6,7 @@ import { ListPagoUseCase } from "../../application/use-cases/pago/list-pago.use-
 import { FindPagoByIdUseCase } from "../../application/use-cases/pago/find-pago-by-id.use-case";
 import { UpdatePagoUseCase } from "../../application/use-cases/pago/update-pago.use-case";
 import { DeletePagoUseCase } from "../../application/use-cases/pago/delete-pago.use-case";
-import { CreatePagoInput, UpdatePagoInput } from "../../application/dtos/pago.dto";
+import { CreatePagoDto, UpdatePagoDto } from "../../application/dtos/pago.dto";
 
 @injectable()
 export class PagoController {
@@ -19,7 +19,7 @@ export class PagoController {
   ) {}
 
   async create(c: AppContext) {
-    const input = c.get("validData") as CreatePagoInput;
+    const input = c.get("validData") as CreatePagoDto;
     const result = await this.createUseCase.execute(input);
     return c.json(ApiResponse.success("Pago creado exitosamente", result), 201);
   }
@@ -37,7 +37,7 @@ export class PagoController {
 
   async update(c: AppContext) {
     const { id } = c.req.param();
-    const input = c.get("validData") as UpdatePagoInput;
+    const input = c.get("validData") as UpdatePagoDto;
     const result = await this.updateUseCase.execute(id, input);
     return c.json(ApiResponse.success("Pago actualizado exitosamente", result), 200);
   }

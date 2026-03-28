@@ -1,14 +1,19 @@
 import { inject, injectable } from "tsyringe";
 import type { IHabitacionRepository } from "../../../domain/interfaces/habitacion.repository.interface";
-import { HabitacionWithPriceOutput, SearchAvailableHabitacionesInput } from "../../dtos/habitacion.dto";
+import type { Habitacion } from "../../../domain/entities/habitacion.entity";
+import {
+  HabitacionWithPriceDto,
+  SearchAvailableHabitacionesDto,
+  toHabitacionDto,
+} from "../../dtos/habitacion.dto";
 import { DI_TOKENS } from "../../../common/IoC/tokens";
 
 @injectable()
 export class SearchAvailableHabitacionesUseCase {
   constructor(@inject(DI_TOKENS.IHabitacionRepository) private repository: IHabitacionRepository) {}
 
-  async execute(input: SearchAvailableHabitacionesInput): Promise<HabitacionWithPriceOutput[]> {
-    let results: Array<{ habitacion: any; precioNoche: number | null }>;
+  async execute(input: SearchAvailableHabitacionesDto): Promise<HabitacionWithPriceDto[]> {
+    let results: Array<{ habitacion: Habitacion; precioNoche: number | null }>;
 
     // Caso 1: Filtro por rango de fechas (con o sin tipo)
     if (input.fecha_inicio && input.fecha_fin) {
@@ -25,9 +30,8 @@ export class SearchAvailableHabitacionesUseCase {
       results = await this.repository.findAllWithDirectPrice();
     }
 
-    // Mapear a DTO
     let output = results.map((r) => ({
-      habitacion: r.habitacion.toOutput(),
+      habitacion: toHabitacionDto(r.habitacion),
       precio_noche: r.precioNoche,
     }));
 

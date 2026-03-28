@@ -2,7 +2,6 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { PagoRepository } from "../../src/infrastructure/repositories/pago.repository";
 import { createMockPrismaClient } from "../helpers/mock-prisma";
 import { ConceptoPago, EstadoPago, MetodoPago } from "../../src/domain/entities/pago.entity";
-import { PagoException } from "../../src/domain/exceptions/pago.exception";
 import { Prisma } from "../../generated/prisma/client";
 
 describe("PagoRepository", () => {
@@ -133,7 +132,6 @@ describe("PagoRepository", () => {
       expect(result[0].id).toBe("pago-1");
       expect(result[1].id).toBe("pago-2");
       expect(mockPrisma.pago.findMany).toHaveBeenCalledWith({
-        include: { recibidoPor: true },
         orderBy: { createdAt: "desc" },
       });
     });
@@ -171,7 +169,6 @@ describe("PagoRepository", () => {
       expect(result?.id).toBe("test-pago-id");
       expect(mockPrisma.pago.findUnique).toHaveBeenCalledWith({
         where: { id: "test-pago-id" },
-        include: { recibidoPor: true },
       });
     });
 
@@ -249,7 +246,9 @@ describe("PagoRepository", () => {
 
       mockPrisma.pago.update.mockRejectedValue(error);
 
-      await expect(repository.update("non-existent-id", { observacion: "Test" })).rejects.toThrow(PagoException);
+      await expect(repository.update("non-existent-id", { observacion: "Test" })).rejects.toThrow(
+        Prisma.PrismaClientKnownRequestError,
+      );
     });
 
     it("should update monto correctly", async () => {
@@ -298,7 +297,7 @@ describe("PagoRepository", () => {
 
       mockPrisma.pago.delete.mockRejectedValue(error);
 
-      await expect(repository.delete("non-existent-id")).rejects.toThrow(PagoException);
+      await expect(repository.delete("non-existent-id")).rejects.toThrow(Prisma.PrismaClientKnownRequestError);
     });
   });
 });

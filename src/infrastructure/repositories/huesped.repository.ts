@@ -1,15 +1,20 @@
 import { inject, injectable } from "tsyringe";
 import { PrismaClient } from "../../../generated/prisma/client";
-import { Huesped, CreateHuespedData } from "../../domain/entities/huesped.entity";
-import type { IHuespedRepository, UpdateHuespedData } from "../../domain/interfaces/huesped.repository.interface";
-import { PaginatedResult, PaginationParams } from "../../common/types/pagination.types";
+import { Huesped } from "../../domain/entities/huesped.entity";
+import type {
+  IHuespedRepository,
+  CreateHuespedParams,
+  UpdateHuespedParams,
+} from "../../domain/interfaces/huesped.repository.interface";
+import type { PaginatedResult, PaginationParams } from "../../common/types/pagination.types";
+import { mapHuespedFromPrisma } from "../mappers/huesped.mapper";
 import { DI_TOKENS } from "../../common/IoC/tokens";
 
 @injectable()
 export class HuespedRepository implements IHuespedRepository {
   constructor(@inject(DI_TOKENS.PrismaClient) private readonly prisma: PrismaClient) {}
 
-  async create(data: CreateHuespedData): Promise<Huesped> {
+  async create(data: CreateHuespedParams): Promise<Huesped> {
     const huesped = await this.prisma.huesped.create({
       data: {
         tipoDoc: data.tipo_doc ?? null,
@@ -22,43 +27,14 @@ export class HuespedRepository implements IHuespedRepository {
         observacion: data.observacion ?? null,
       },
     });
-
-    return new Huesped(
-      huesped.id,
-      huesped.tipoDoc,
-      huesped.nroDoc,
-      huesped.nombres,
-      huesped.apellidos,
-      huesped.email,
-      huesped.telefono,
-      huesped.nacionalidad,
-      huesped.observacion,
-      huesped.createdAt,
-      huesped.updatedAt,
-    );
+    return mapHuespedFromPrisma(huesped);
   }
 
   async findAll(): Promise<Huesped[]> {
     const huespedes = await this.prisma.huesped.findMany({
       orderBy: { createdAt: "desc" },
     });
-
-    return huespedes.map(
-      (h) =>
-        new Huesped(
-          h.id,
-          h.tipoDoc,
-          h.nroDoc,
-          h.nombres,
-          h.apellidos,
-          h.email,
-          h.telefono,
-          h.nacionalidad,
-          h.observacion,
-          h.createdAt,
-          h.updatedAt,
-        ),
-    );
+    return huespedes.map((h) => mapHuespedFromPrisma(h));
   }
 
   async findAllPaginated(params: PaginationParams): Promise<PaginatedResult<Huesped>> {
@@ -68,7 +44,7 @@ export class HuespedRepository implements IHuespedRepository {
     const [huespedes, total] = await Promise.all([
       this.prisma.huesped.findMany({
         take: limit,
-        skip: skip,
+        skip,
         orderBy: { createdAt: "desc" },
       }),
       this.prisma.huesped.count(),
@@ -77,22 +53,7 @@ export class HuespedRepository implements IHuespedRepository {
     const totalPages = Math.ceil(total / limit);
 
     return {
-      list: huespedes.map(
-        (h) =>
-          new Huesped(
-            h.id,
-            h.tipoDoc,
-            h.nroDoc,
-            h.nombres,
-            h.apellidos,
-            h.email,
-            h.telefono,
-            h.nacionalidad,
-            h.observacion,
-            h.createdAt,
-            h.updatedAt,
-          ),
-      ),
+      list: huespedes.map((h) => mapHuespedFromPrisma(h)),
       pagination: {
         page,
         limit,
@@ -105,54 +66,16 @@ export class HuespedRepository implements IHuespedRepository {
   }
 
   async findById(id: string): Promise<Huesped | null> {
-    const huesped = await this.prisma.huesped.findUnique({
-      where: { id },
-    });
-
-    if (!huesped) {
-      return null;
-    }
-
-    return new Huesped(
-      huesped.id,
-      huesped.tipoDoc,
-      huesped.nroDoc,
-      huesped.nombres,
-      huesped.apellidos,
-      huesped.email,
-      huesped.telefono,
-      huesped.nacionalidad,
-      huesped.observacion,
-      huesped.createdAt,
-      huesped.updatedAt,
-    );
+    const huesped = await this.prisma.huesped.findUnique({ where: { id } });
+    return huesped ? mapHuespedFromPrisma(huesped) : null;
   }
 
   async findByEmail(email: string): Promise<Huesped | null> {
-    const huesped = await this.prisma.huesped.findUnique({
-      where: { email },
-    });
-
-    if (!huesped) {
-      return null;
-    }
-
-    return new Huesped(
-      huesped.id,
-      huesped.tipoDoc,
-      huesped.nroDoc,
-      huesped.nombres,
-      huesped.apellidos,
-      huesped.email,
-      huesped.telefono,
-      huesped.nacionalidad,
-      huesped.observacion,
-      huesped.createdAt,
-      huesped.updatedAt,
-    );
+    const huesped = await this.prisma.huesped.findUnique({ where: { email } });
+    return huesped ? mapHuespedFromPrisma(huesped) : null;
   }
 
-  async update(id: string, data: UpdateHuespedData): Promise<Huesped> {
+  async update(id: string, data: UpdateHuespedParams): Promise<Huesped> {
     const updated = await this.prisma.huesped.update({
       where: { id },
       data: {
@@ -166,25 +89,10 @@ export class HuespedRepository implements IHuespedRepository {
         observacion: data.observacion,
       },
     });
-
-    return new Huesped(
-      updated.id,
-      updated.tipoDoc,
-      updated.nroDoc,
-      updated.nombres,
-      updated.apellidos,
-      updated.email,
-      updated.telefono,
-      updated.nacionalidad,
-      updated.observacion,
-      updated.createdAt,
-      updated.updatedAt,
-    );
+    return mapHuespedFromPrisma(updated);
   }
 
   async delete(id: string): Promise<void> {
-    await this.prisma.huesped.delete({
-      where: { id },
-    });
+    await this.prisma.huesped.delete({ where: { id } });
   }
 }

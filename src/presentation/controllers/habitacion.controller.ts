@@ -10,10 +10,10 @@ import { DeleteHabitacionUseCase } from "../../application/use-cases/habitacion/
 import { SearchAvailableHabitacionesUseCase } from "../../application/use-cases/habitacion/search-available-habitaciones.use-case";
 import { FindHabitacionByIdWithPriceUseCase } from "../../application/use-cases/habitacion/find-habitacion-by-id-with-price.use-case";
 import {
-  CreateHabitacionInput,
-  UpdateHabitacionInput,
-  UpdateHabitacionStatusInput,
-  SearchAvailableHabitacionesInput,
+  CreateHabitacionDto,
+  UpdateHabitacionDto,
+  UpdateHabitacionStatusDto,
+  SearchAvailableHabitacionesDto,
 } from "../../application/dtos/habitacion.dto";
 
 @injectable()
@@ -30,7 +30,7 @@ export class HabitacionController {
   ) {}
 
   async create(c: AppContext) {
-    const input = c.get("validData") as CreateHabitacionInput;
+    const input = c.get("validData") as CreateHabitacionDto;
     const result = await this.createUseCase.execute(input);
     return c.json(ApiResponse.success("Habitación creada exitosamente", result), 201);
   }
@@ -48,14 +48,14 @@ export class HabitacionController {
 
   async update(c: AppContext) {
     const { id } = c.req.param();
-    const input = c.get("validData") as UpdateHabitacionInput;
+    const input = c.get("validData") as UpdateHabitacionDto;
     const result = await this.updateUseCase.execute(id, input);
     return c.json(ApiResponse.success("Habitación actualizada exitosamente", result), 200);
   }
 
   async updateStatus(c: AppContext) {
     const { id } = c.req.param();
-    const input = c.get("validData") as UpdateHabitacionStatusInput;
+    const input = c.get("validData") as UpdateHabitacionStatusDto;
     const result = await this.updateStatusUseCase.execute(id, input);
     return c.json(ApiResponse.success("Estado de habitación actualizado exitosamente", result), 200);
   }
@@ -68,7 +68,7 @@ export class HabitacionController {
 
   async searchAvailable(c: AppContext) {
     const query = c.req.query();
-    const input: SearchAvailableHabitacionesInput = {
+    const input: SearchAvailableHabitacionesDto = {
       tipo: query.tipo,
       fecha_inicio: query.fecha_inicio,
       fecha_fin: query.fecha_fin,

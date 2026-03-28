@@ -1,9 +1,10 @@
 import { inject, injectable } from "tsyringe";
 import type { IReservaRepository } from "../../../domain/interfaces/reserva.repository.interface";
-import { Reserva } from "../../../domain/entities/reserva.entity";
-import { UpdateReservaInput } from "../../dtos/reserva.dto";
+import { EstadoReserva } from "../../../domain/entities/reserva.entity";
+import { UpdateReservaDto } from "../../dtos/reserva.dto";
 import { ReservaException } from "../../../domain/exceptions/reserva.exception";
 import { DI_TOKENS } from "../../../common/IoC/tokens";
+import type { Reserva } from "../../../domain/entities/reserva.entity";
 
 @injectable()
 export class UpdateReservaUseCase {
@@ -11,19 +12,16 @@ export class UpdateReservaUseCase {
     @inject(DI_TOKENS.IReservaRepository) private reservaRepository: IReservaRepository,
   ) {}
 
-  async execute(id: string, input: UpdateReservaInput): Promise<Reserva> {
-    // Verificar que la reserva existe
+  async execute(id: string, input: UpdateReservaDto): Promise<Reserva> {
     const existing = await this.reservaRepository.findById(id);
     if (!existing) {
       throw ReservaException.notFoundById();
     }
 
-    // Verificar si está completada
-    if (existing.estado === "COMPLETADA") {
+    if (existing.estado === EstadoReserva.COMPLETADA) {
       throw ReservaException.cannotModifyCompleted();
     }
 
-    // Validaciones de negocio
     if (input.fechaEntrada && input.fechaSalida) {
       if (input.fechaSalida <= input.fechaEntrada) {
         throw ReservaException.invalidDateRange();
@@ -36,6 +34,11 @@ export class UpdateReservaUseCase {
       throw ReservaException.invalidNinos();
     }
 
-    return await this.reservaRepository.update(id, input);
+    const updated = await this.reservaRepository.update(id, input);
+    if (!updated) {
+      throw ReservaException.notFoundById();
+    }
+
+    return updated;
   }
 }

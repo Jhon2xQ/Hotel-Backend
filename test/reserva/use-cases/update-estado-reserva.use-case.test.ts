@@ -1,9 +1,10 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { UpdateEstadoReservaUseCase } from "../../../src/application/use-cases/reserva/update-estado-reserva.use-case";
-import { IReservaRepository } from "../../../src/domain/interfaces/reserva.repository.interface";
+import type { IReservaRepository } from "../../../src/domain/interfaces/reserva.repository.interface";
+import { EstadoReserva } from "../../../src/domain/entities/reserva.entity";
 import { ReservaException } from "../../../src/domain/exceptions/reserva.exception";
 import { createMockReserva } from "../../helpers/reserva-fixtures";
-import { UpdateEstadoReservaInput } from "../../../src/application/dtos/reserva.dto";
+import type { UpdateEstadoReservaDto } from "../../../src/application/dtos/reserva.dto";
 
 describe("UpdateEstadoReservaUseCase", () => {
   let useCase: UpdateEstadoReservaUseCase;
@@ -11,95 +12,95 @@ describe("UpdateEstadoReservaUseCase", () => {
 
   beforeEach(() => {
     mockRepository = {
-      create: async (_data: any) => createMockReserva(),
+      create: async () => createMockReserva(),
       findAll: async () => [],
-      findById: async (_id: string) => createMockReserva(),
-      findByCodigo: async (_codigo: string) => null,
-      update: async (_id: string, _data: any) => createMockReserva({ estado: "CONFIRMADA" }),
-      delete: async (_id: string) => {},
-      cancel: async (_id: string, _motivo: string) => createMockReserva(),
-    } as any;
+      findById: async () => createMockReserva(),
+      findByCodigo: async () => null,
+      update: async () => createMockReserva({ estado: EstadoReserva.CONFIRMADA }),
+      delete: async () => {},
+      cancel: async () => createMockReserva(),
+    } as unknown as IReservaRepository;
 
     useCase = new UpdateEstadoReservaUseCase(mockRepository);
   });
 
   it("debe actualizar el estado de una reserva exitosamente", async () => {
-    const input: UpdateEstadoReservaInput = {
-      estado: "CONFIRMADA",
+    const input: UpdateEstadoReservaDto = {
+      estado: EstadoReserva.CONFIRMADA,
     };
 
-    const mockReserva = createMockReserva({ estado: "CONFIRMADA" });
+    const mockReserva = createMockReserva({ estado: EstadoReserva.CONFIRMADA });
     mockRepository.update = async (_id, data) => {
-      expect(data.estado).toBe("CONFIRMADA");
+      expect(data.estado).toBe(EstadoReserva.CONFIRMADA);
       return mockReserva;
     };
 
     const result = await useCase.execute("reserva-id", input);
 
     expect(result).toBe(mockReserva);
-    expect(result.estado).toBe("CONFIRMADA");
+    expect(result.estado).toBe(EstadoReserva.CONFIRMADA);
   });
 
   it("debe lanzar error si la reserva no existe", async () => {
-    mockRepository.findById = async (_id: string) => null;
+    mockRepository.findById = async () => null;
 
-    const input: UpdateEstadoReservaInput = {
-      estado: "CONFIRMADA",
+    const input: UpdateEstadoReservaDto = {
+      estado: EstadoReserva.CONFIRMADA,
     };
 
     await expect(useCase.execute("reserva-id", input)).rejects.toThrow(ReservaException);
   });
 
   it("debe permitir cambiar el estado incluso si la reserva está completada (admin)", async () => {
-    mockRepository.findById = async (_id: string) => createMockReserva({ estado: "COMPLETADA" });
+    mockRepository.findById = async () => createMockReserva({ estado: EstadoReserva.COMPLETADA });
 
-    const input: UpdateEstadoReservaInput = {
-      estado: "EN_CASA",
+    const input: UpdateEstadoReservaDto = {
+      estado: EstadoReserva.EN_CASA,
     };
 
-    const mockReserva = createMockReserva({ estado: "EN_CASA" });
-    mockRepository.update = async (_id, _data) => mockReserva;
+    const mockReserva = createMockReserva({ estado: EstadoReserva.EN_CASA });
+    mockRepository.update = async () => mockReserva;
 
     const result = await useCase.execute("reserva-id", input);
 
-    expect(result.estado).toBe("EN_CASA");
+    expect(result.estado).toBe(EstadoReserva.EN_CASA);
   });
 
   it("debe lanzar error si se intenta cambiar a CANCELADA", async () => {
-    const input: UpdateEstadoReservaInput = {
-      estado: "CANCELADA",
+    const input: UpdateEstadoReservaDto = {
+      estado: EstadoReserva.CANCELADA,
     };
 
     await expect(useCase.execute("reserva-id", input)).rejects.toThrow(ReservaException);
   });
 
   it("debe permitir cambiar de TENTATIVA a EN_CASA", async () => {
-    mockRepository.findById = async (_id: string) => createMockReserva({ estado: "TENTATIVA" });
+    mockRepository.findById = async () => createMockReserva({ estado: EstadoReserva.TENTATIVA });
 
-    const input: UpdateEstadoReservaInput = {
-      estado: "EN_CASA",
+    const input: UpdateEstadoReservaDto = {
+      estado: EstadoReserva.EN_CASA,
     };
 
-    const mockReserva = createMockReserva({ estado: "EN_CASA" });
-    mockRepository.update = async (_id, _data) => mockReserva;
+    const mockReserva = createMockReserva({ estado: EstadoReserva.EN_CASA });
+    mockRepository.update = async () => mockReserva;
 
     const result = await useCase.execute("reserva-id", input);
 
-    expect(result.estado).toBe("EN_CASA");
+    expect(result.estado).toBe(EstadoReserva.EN_CASA);
   });
 
   it("debe permitir cambiar de EN_CASA a COMPLETADA", async () => {
-    mockRepository.findById = async (_id: string) => createMockReserva({ estado: "EN_CASA" });
+    mockRepository.findById = async () => createMockReserva({ estado: EstadoReserva.EN_CASA });
 
-    const input: UpdateEstadoReservaInput = {
-      estado: "COMPLETADA",
+    const input: UpdateEstadoReservaDto = {
+      estado: EstadoReserva.COMPLETADA,
     };
 
-    const mockReserva = createMockReserva({ estado: "COMPLETADA" });
-    mockRepository.update = async (_id, _data) => mockReserva;
+    const mockReserva = createMockReserva({ estado: EstadoReserva.COMPLETADA });
+    mockRepository.update = async () => mockReserva;
 
     const result = await useCase.execute("reserva-id", input);
 
-    expect(result.estado).toBe("COMPLETADA");
+    expect(result.estado).toBe(EstadoReserva.COMPLETADA);
   });
 });

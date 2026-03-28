@@ -1,27 +1,34 @@
-import {
-  MuebleCondition,
-  CreateMuebleData,
-  Mueble,
-} from "../entities/mueble.entity";
+import { Mueble, MuebleCondition } from "../entities/mueble.entity";
 
-export interface UpdateMuebleData {
+export interface CreateMuebleParams {
+  codigo: string;
+  nombre: string;
+  descripcion?: string | null;
+  categoriaId: string;
+  imagenUrl?: string | null;
+  condicion?: MuebleCondition;
+  fechaAdq?: Date | null;
+  ultimaRevision?: Date | null;
+  habitacionId?: string | null;
+}
+
+export interface UpdateMuebleParams {
   codigo?: string;
   nombre?: string;
   categoriaId?: string;
   imagenUrl?: string | null;
-  tipo?: string | null;
   condicion?: MuebleCondition;
   fechaAdq?: Date | null;
   ultimaRevision?: Date | null;
   descripcion?: string | null;
-  habitacionId?: string;
+  habitacionId?: string | null;
 }
 
 export interface IMuebleRepository {
-  create(data: CreateMuebleData): Promise<Mueble>;
+  create(data: CreateMuebleParams): Promise<Mueble>;
   findAll(): Promise<Mueble[]>;
   findById(id: string): Promise<Mueble | null>;
   findByCodigo(codigo: string): Promise<Mueble | null>;
-  update(id: string, data: UpdateMuebleData): Promise<Mueble>;
+  update(id: string, data: UpdateMuebleParams): Promise<Mueble>;
   delete(id: string): Promise<void>;
 }

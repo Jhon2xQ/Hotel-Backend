@@ -6,7 +6,7 @@ import { ListCanalUseCase } from "../../application/use-cases/canal/list-canal.u
 import { FindCanalByIdUseCase } from "../../application/use-cases/canal/find-canal-by-id.use-case";
 import { UpdateCanalUseCase } from "../../application/use-cases/canal/update-canal.use-case";
 import { DeleteCanalUseCase } from "../../application/use-cases/canal/delete-canal.use-case";
-import { CreateCanalInput, UpdateCanalInput } from "../../application/dtos/canal.dto";
+import { CreateCanalDto, UpdateCanalDto } from "../../application/dtos/canal.dto";
 
 @injectable()
 export class CanalController {
@@ -19,7 +19,7 @@ export class CanalController {
   ) {}
 
   async create(c: AppContext) {
-    const input = c.get("validData") as CreateCanalInput;
+    const input = c.get("validData") as CreateCanalDto;
     const result = await this.createUseCase.execute(input);
     return c.json(ApiResponse.success("Canal creado exitosamente", result), 201);
   }
@@ -37,7 +37,7 @@ export class CanalController {
 
   async update(c: AppContext) {
     const { id } = c.req.param();
-    const input = c.get("validData") as UpdateCanalInput;
+    const input = c.get("validData") as UpdateCanalDto;
     const result = await this.updateUseCase.execute(id, input);
     return c.json(ApiResponse.success("Canal actualizado exitosamente", result), 200);
   }

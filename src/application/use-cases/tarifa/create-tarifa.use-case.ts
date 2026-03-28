@@ -1,14 +1,14 @@
 import { inject, injectable } from "tsyringe";
 import { TarifaException } from "../../../domain/exceptions/tarifa.exception";
 import type { ITarifaRepository } from "../../../domain/interfaces/tarifa.repository.interface";
-import { CreateTarifaInput, TarifaOutput } from "../../dtos/tarifa.dto";
+import { CreateTarifaDto, TarifaDto, toTarifaDto } from "../../dtos/tarifa.dto";
 import { DI_TOKENS } from "../../../common/IoC/tokens";
 
 @injectable()
 export class CreateTarifaUseCase {
   constructor(@inject(DI_TOKENS.ITarifaRepository) private repository: ITarifaRepository) {}
 
-  async execute(input: CreateTarifaInput): Promise<TarifaOutput> {
+  async execute(input: CreateTarifaDto): Promise<TarifaDto> {
     if (input.precio_noche <= 0) {
       throw TarifaException.invalidPrecio();
     }
@@ -32,6 +32,6 @@ export class CreateTarifaUseCase {
       moneda: input.moneda ?? "USD",
     });
 
-    return tarifa.toOutput();
+    return toTarifaDto(tarifa);
   }
 }

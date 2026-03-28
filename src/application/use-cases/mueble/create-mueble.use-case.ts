@@ -3,7 +3,7 @@ import type { IMuebleRepository } from "../../../domain/interfaces/mueble.reposi
 import type { IHabitacionRepository } from "../../../domain/interfaces/habitacion.repository.interface";
 import type { ICategoriaMuebleRepository } from "../../../domain/interfaces/categoria-mueble.repository.interface";
 import { MuebleException } from "../../../domain/exceptions/mueble.exception";
-import { CreateMuebleInput, MuebleOutput } from "../../dtos/mueble.dto";
+import { CreateMuebleDto, MuebleDto, toMuebleDto } from "../../dtos/mueble.dto";
 import { CategoriaMuebleException } from "../../../domain/exceptions/categoria-mueble.exception";
 import { DI_TOKENS } from "../../../common/IoC/tokens";
 
@@ -15,7 +15,7 @@ export class CreateMuebleUseCase {
     @inject(DI_TOKENS.ICategoriaMuebleRepository) private categoriaRepository: ICategoriaMuebleRepository,
   ) {}
 
-  async execute(input: CreateMuebleInput): Promise<MuebleOutput> {
+  async execute(input: CreateMuebleDto): Promise<MuebleDto> {
     const existing = await this.repository.findByCodigo(input.codigo);
     if (existing) {
       throw MuebleException.duplicateCodigo();
@@ -44,6 +44,6 @@ export class CreateMuebleUseCase {
       ultimaRevision: input.ultima_revision ? new Date(input.ultima_revision) : null,
       habitacionId: input.habitacion_id ?? null,
     });
-    return furniture.toOutput();
+    return toMuebleDto(furniture);
   }
 }

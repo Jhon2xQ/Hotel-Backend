@@ -1,7 +1,7 @@
 import { inject, injectable } from "tsyringe";
 import type { ITipoHabitacionRepository } from "../../../domain/interfaces/tipo-habitacion.repository.interface";
 import { TipoHabitacionException } from "../../../domain/exceptions/tipo-habitacion.exception";
-import { UpdateTipoHabitacionInput, TipoHabitacionOutput } from "../../dtos/tipo-habitacion.dto";
+import { UpdateTipoHabitacionDto, TipoHabitacionDto, toTipoHabitacionDto } from "../../dtos/tipo-habitacion.dto";
 import { DI_TOKENS } from "../../../common/IoC/tokens";
 
 @injectable()
@@ -10,19 +10,24 @@ export class UpdateTipoHabitacionUseCase {
     @inject(DI_TOKENS.ITipoHabitacionRepository) private repository: ITipoHabitacionRepository,
   ) {}
 
-  async execute(id: string, input: UpdateTipoHabitacionInput): Promise<TipoHabitacionOutput> {
-    // Validate TipoHabitacion exists
+  async execute(id: string, input: UpdateTipoHabitacionDto): Promise<TipoHabitacionDto> {
     const existing = await this.repository.findById(id);
     if (!existing) {
       throw TipoHabitacionException.notFoundById();
     }
 
-    // Call repository.update and return TipoHabitacionOutput
+    if (input.nombre !== undefined && input.nombre !== existing.nombre) {
+      const duplicate = await this.repository.findByName(input.nombre);
+      if (duplicate && duplicate.id !== id) {
+        throw TipoHabitacionException.duplicateNombre(input.nombre);
+      }
+    }
+
     const updated = await this.repository.update(id, {
       nombre: input.nombre,
       descripcion: input.descripcion,
     });
 
-    return updated.toOutput();
+    return toTipoHabitacionDto(updated);
   }
 }

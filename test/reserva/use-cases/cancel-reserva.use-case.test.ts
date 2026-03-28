@@ -1,9 +1,10 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { CancelReservaUseCase } from "../../../src/application/use-cases/reserva/cancel-reserva.use-case";
-import { IReservaRepository } from "../../../src/domain/interfaces/reserva.repository.interface";
+import type { IReservaRepository } from "../../../src/domain/interfaces/reserva.repository.interface";
+import { EstadoReserva } from "../../../src/domain/entities/reserva.entity";
 import { ReservaException } from "../../../src/domain/exceptions/reserva.exception";
 import { createMockReserva } from "../../helpers/reserva-fixtures";
-import { CancelReservaInput } from "../../../src/application/dtos/reserva.dto";
+import { CancelReservaDto } from "../../../src/application/dtos/reserva.dto";
 
 describe("CancelReservaUseCase", () => {
   let useCase: CancelReservaUseCase;
@@ -24,31 +25,31 @@ describe("CancelReservaUseCase", () => {
   });
 
   it("debe cancelar una reserva exitosamente", async () => {
-    const input: CancelReservaInput = {
+    const input: CancelReservaDto = {
       motivoCancel: "Cliente solicitó cancelación",
     };
 
     const mockReserva = createMockReserva({
-      estado: "CANCELADA",
+      estado: EstadoReserva.CANCELADA,
       motivoCancel: "Cliente solicitó cancelación",
       canceladoEn: new Date(),
     });
-    mockRepository.findById = async () => createMockReserva({ estado: "CONFIRMADA" });
+    mockRepository.findById = async () => createMockReserva({ estado: EstadoReserva.CONFIRMADA });
     mockRepository.cancel = async (id, motivo) => mockReserva;
 
     const result = await useCase.execute("reserva-test-id", input);
 
-    expect(result.estado).toBe("CANCELADA");
+    expect(result.estado).toBe(EstadoReserva.CANCELADA);
     expect(result.motivoCancel).toBe("Cliente solicitó cancelación");
     expect(result.canceladoEn).toBeDefined();
   });
 
   it("debe lanzar error al cancelar reserva completada", async () => {
-    const input: CancelReservaInput = {
+    const input: CancelReservaDto = {
       motivoCancel: "Cliente solicitó cancelación",
     };
 
-    mockRepository.findById = async () => createMockReserva({ estado: "COMPLETADA" });
+    mockRepository.findById = async () => createMockReserva({ estado: EstadoReserva.COMPLETADA });
     mockRepository.cancel = async () => {
       throw ReservaException.cannotCancelCompleted();
     };
@@ -57,11 +58,11 @@ describe("CancelReservaUseCase", () => {
   });
 
   it("debe lanzar error al cancelar reserva ya cancelada", async () => {
-    const input: CancelReservaInput = {
+    const input: CancelReservaDto = {
       motivoCancel: "Cliente solicitó cancelación",
     };
 
-    mockRepository.findById = async () => createMockReserva({ estado: "CANCELADA" });
+    mockRepository.findById = async () => createMockReserva({ estado: EstadoReserva.CANCELADA });
     mockRepository.cancel = async () => {
       throw ReservaException.alreadyCancelled();
     };
@@ -70,11 +71,11 @@ describe("CancelReservaUseCase", () => {
   });
 
   it("debe lanzar error si no se proporciona motivo", async () => {
-    const input: CancelReservaInput = {
+    const input: CancelReservaDto = {
       motivoCancel: "",
     };
 
-    mockRepository.findById = async () => createMockReserva({ estado: "CONFIRMADA" });
+    mockRepository.findById = async () => createMockReserva({ estado: EstadoReserva.CONFIRMADA });
     mockRepository.cancel = async () => {
       throw ReservaException.cancelRequiresMotivo();
     };
