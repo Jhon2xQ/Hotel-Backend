@@ -1,7 +1,7 @@
 import { inject, injectable } from "tsyringe";
 import { PrismaClient } from "../../../generated/prisma/client";
 import { Huesped, CreateHuespedData } from "../../domain/entities/huesped.entity";
-import { IHuespedRepository, UpdateHuespedData } from "../../domain/interfaces/huesped.repository.interface";
+import type { IHuespedRepository, UpdateHuespedData } from "../../domain/interfaces/huesped.repository.interface";
 import { PaginatedResult, PaginationParams } from "../../common/types/pagination.types";
 import { DI_TOKENS } from "../../common/IoC/tokens";
 

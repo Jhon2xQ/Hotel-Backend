@@ -7,7 +7,7 @@ import { Tarifa } from "../../domain/entities/tarifa.entity";
 import { Pago } from "../../domain/entities/pago.entity";
 import { TipoHabitacion } from "../../domain/entities/tipo-habitacion.entity";
 import { Canal } from "../../domain/entities/canal.entity";
-import { IReservaRepository, UpdateReservaData } from "../../domain/interfaces/reserva.repository.interface";
+import type { IReservaRepository, UpdateReservaData } from "../../domain/interfaces/reserva.repository.interface";
 import { ReservaException } from "../../domain/exceptions/reserva.exception";
 import { DI_TOKENS } from "../../common/IoC/tokens";
 
@@ -265,11 +265,7 @@ export class ReservaRepository implements IReservaRepository {
           canal: true,
         },
       },
-      pago: {
-        include: {
-          recibidoPor: true,
-        },
-      },
+      pago: true,
     };
   }
 

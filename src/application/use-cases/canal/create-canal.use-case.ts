@@ -1,6 +1,6 @@
 import { inject, injectable } from "tsyringe";
 import { CanalException } from "../../../domain/exceptions/canal.exception";
-import { ICanalRepository } from "../../../domain/interfaces/canal.repository.interface";
+import type { ICanalRepository } from "../../../domain/interfaces/canal.repository.interface";
 import { CreateCanalInput, CanalOutput } from "../../dtos/canal.dto";
 import { DI_TOKENS } from "../../../common/IoC/tokens";
 

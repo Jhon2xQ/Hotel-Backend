@@ -1,6 +1,6 @@
 import { inject, injectable } from "tsyringe";
 import { Huesped } from "../../../domain/entities/huesped.entity";
-import { IHuespedRepository } from "../../../domain/interfaces/huesped.repository.interface";
+import type { IHuespedRepository } from "../../../domain/interfaces/huesped.repository.interface";
 import { HuespedException } from "../../../domain/exceptions/huesped.exception";
 import { DI_TOKENS } from "../../../common/IoC/tokens";
 

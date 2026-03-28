@@ -1,6 +1,6 @@
 import { inject, injectable } from "tsyringe";
-import { IPagoRepository } from "../../../domain/interfaces/pago.repository.interface";
-import { IUserRepository } from "../../../domain/interfaces/user.repository.interface";
+import type { IPagoRepository } from "../../../domain/interfaces/pago.repository.interface";
+import type { IUserRepository } from "../../../domain/interfaces/user.repository.interface";
 import { PagoException } from "../../../domain/exceptions/pago.exception";
 import { CreatePagoInput, PagoOutput } from "../../dtos/pago.dto";
 import { ConceptoPago, EstadoPago, MetodoPago } from "../../../domain/entities/pago.entity";

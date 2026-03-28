@@ -1,5 +1,5 @@
 import { inject, injectable } from "tsyringe";
-import { IHabitacionRepository } from "../../../domain/interfaces/habitacion.repository.interface";
+import type { IHabitacionRepository } from "../../../domain/interfaces/habitacion.repository.interface";
 import { HabitacionException } from "../../../domain/exceptions/habitacion.exception";
 import { HabitacionWithPriceOutput } from "../../dtos/habitacion.dto";
 import { DI_TOKENS } from "../../../common/IoC/tokens";

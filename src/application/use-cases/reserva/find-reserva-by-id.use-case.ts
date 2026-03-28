@@ -1,5 +1,5 @@
 import { inject, injectable } from "tsyringe";
-import { IReservaRepository } from "../../../domain/interfaces/reserva.repository.interface";
+import type { IReservaRepository } from "../../../domain/interfaces/reserva.repository.interface";
 import { Reserva } from "../../../domain/entities/reserva.entity";
 import { ReservaException } from "../../../domain/exceptions/reserva.exception";
 import { DI_TOKENS } from "../../../common/IoC/tokens";

@@ -1,6 +1,6 @@
 import { inject, injectable } from "tsyringe";
-import { IMuebleRepository } from "../../../domain/interfaces/mueble.repository.interface";
-import { IHabitacionRepository } from "../../../domain/interfaces/habitacion.repository.interface";
+import type { IMuebleRepository } from "../../../domain/interfaces/mueble.repository.interface";
+import type { IHabitacionRepository } from "../../../domain/interfaces/habitacion.repository.interface";
 import { MuebleException } from "../../../domain/exceptions/mueble.exception";
 import { UpdateMuebleInput, MuebleOutput } from "../../dtos/mueble.dto";
 import { DI_TOKENS } from "../../../common/IoC/tokens";

@@ -1,6 +1,6 @@
 import { inject, injectable } from "tsyringe";
 import { PrismaClient } from "../../../generated/prisma/client";
-import { IUserRepository } from "../../domain/interfaces/user.repository.interface";
+import type { IUserRepository } from "../../domain/interfaces/user.repository.interface";
 import { DI_TOKENS } from "../../common/IoC/tokens";
 
 @injectable()

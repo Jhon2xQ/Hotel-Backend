@@ -1,7 +1,7 @@
 import { inject, injectable } from "tsyringe";
 import { PrismaClient, Prisma } from "../../../generated/prisma/client";
 import { Tarifa, CreateTarifaData } from "../../domain/entities/tarifa.entity";
-import { ITarifaRepository, UpdateTarifaData } from "../../domain/interfaces/tarifa.repository.interface";
+import type { ITarifaRepository, UpdateTarifaData } from "../../domain/interfaces/tarifa.repository.interface";
 import { TarifaException } from "../../domain/exceptions/tarifa.exception";
 import { TipoHabitacion } from "../../domain/entities/tipo-habitacion.entity";
 import { Canal } from "../../domain/entities/canal.entity";

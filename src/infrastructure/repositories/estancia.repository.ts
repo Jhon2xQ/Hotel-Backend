@@ -4,7 +4,7 @@ import { Estancia, CreateEstanciaData, EstadoEstadia } from "../../domain/entiti
 import { Habitacion } from "../../domain/entities/habitacion.entity";
 import { Huesped } from "../../domain/entities/huesped.entity";
 import { TipoHabitacion } from "../../domain/entities/tipo-habitacion.entity";
-import { IEstanciaRepository, UpdateEstanciaData } from "../../domain/interfaces/estancia.repository.interface";
+import type { IEstanciaRepository, UpdateEstanciaData } from "../../domain/interfaces/estancia.repository.interface";
 import { EstanciaException } from "../../domain/exceptions/estancia.exception";
 import { DI_TOKENS } from "../../common/IoC/tokens";
 

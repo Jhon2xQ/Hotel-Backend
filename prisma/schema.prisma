@@ -28,8 +28,8 @@ model User {
   banned        Boolean?  @default(false)
   banReason     String?
   banExpires    DateTime?
-  sessions      Session[]
-  accounts      Account[]
+  sessions        Session[]
+  accounts        Account[]
 
   @@unique([email])
   @@map("user")
@@ -250,18 +250,6 @@ enum EstadoSunat {
   @@map("estado_sunat")
 }
 
-enum RolPersonal {
-  RECEPCIONISTA
-  GERENTE
-  CAMARERA
-  BELLBOY
-  MOZO
-  CONTADOR
-  SEGURIDAD
-  OTRO
-
-  @@map("rol_personal")
-}
 
 // ============================================================
 // MODELOS

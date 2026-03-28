@@ -1,5 +1,5 @@
 import { inject, injectable } from "tsyringe";
-import { IMuebleRepository } from "../../../domain/interfaces/mueble.repository.interface";
+import type { IMuebleRepository } from "../../../domain/interfaces/mueble.repository.interface";
 import { MuebleOutput } from "../../dtos/mueble.dto";
 import { DI_TOKENS } from "../../../common/IoC/tokens";
 

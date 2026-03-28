@@ -1,7 +1,7 @@
 import { inject, injectable } from "tsyringe";
-import { IHabitacionRepository } from "../../../domain/interfaces/habitacion.repository.interface";
-import { ITipoHabitacionRepository } from "../../../domain/interfaces/tipo-habitacion.repository.interface";
-import { IMuebleRepository } from "../../../domain/interfaces/mueble.repository.interface";
+import type { IHabitacionRepository } from "../../../domain/interfaces/habitacion.repository.interface";
+import type { ITipoHabitacionRepository } from "../../../domain/interfaces/tipo-habitacion.repository.interface";
+import type { IMuebleRepository } from "../../../domain/interfaces/mueble.repository.interface";
 import { HabitacionException } from "../../../domain/exceptions/habitacion.exception";
 import { UpdateHabitacionInput, HabitacionOutput } from "../../dtos/habitacion.dto";
 import { S3UploadService } from "../../../infrastructure/services/s3-upload.service";

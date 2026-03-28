@@ -1,6 +1,6 @@
 import { inject, injectable } from "tsyringe";
 import { TarifaException } from "../../../domain/exceptions/tarifa.exception";
-import { ITarifaRepository } from "../../../domain/interfaces/tarifa.repository.interface";
+import type { ITarifaRepository } from "../../../domain/interfaces/tarifa.repository.interface";
 import { CreateTarifaInput, TarifaOutput } from "../../dtos/tarifa.dto";
 import { DI_TOKENS } from "../../../common/IoC/tokens";
 

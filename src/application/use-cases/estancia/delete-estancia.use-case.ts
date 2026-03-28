@@ -1,5 +1,5 @@
 import { inject, injectable } from "tsyringe";
-import { IEstanciaRepository } from "../../../domain/interfaces/estancia.repository.interface";
+import type { IEstanciaRepository } from "../../../domain/interfaces/estancia.repository.interface";
 import { DI_TOKENS } from "../../../common/IoC/tokens";
 
 @injectable()

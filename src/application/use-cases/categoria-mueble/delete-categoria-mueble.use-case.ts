@@ -1,5 +1,5 @@
 import { inject, injectable } from "tsyringe";
-import { ICategoriaMuebleRepository } from "../../../domain/interfaces/categoria-mueble.repository.interface";
+import type { ICategoriaMuebleRepository } from "../../../domain/interfaces/categoria-mueble.repository.interface";
 import { DI_TOKENS } from "../../../common/IoC/tokens";
 
 @injectable()

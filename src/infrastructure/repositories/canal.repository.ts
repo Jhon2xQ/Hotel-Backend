@@ -1,7 +1,7 @@
 import { inject, injectable } from "tsyringe";
 import { PrismaClient, Prisma } from "../../../generated/prisma/client";
 import { Canal, CreateCanalData } from "../../domain/entities/canal.entity";
-import { ICanalRepository, UpdateCanalData } from "../../domain/interfaces/canal.repository.interface";
+import type { ICanalRepository, UpdateCanalData } from "../../domain/interfaces/canal.repository.interface";
 import { CanalException } from "../../domain/exceptions/canal.exception";
 import { DI_TOKENS } from "../../common/IoC/tokens";
 
