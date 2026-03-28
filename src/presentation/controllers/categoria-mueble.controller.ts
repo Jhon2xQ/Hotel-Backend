@@ -28,7 +28,10 @@ export class CategoriaMuebleController {
             descripcion: validData.descripcion,
         });
 
-        return c.json({ApiResponse: ApiResponse.success("Categoría de mueble creada exitosamente", categoriaMueble.toOutput()),}, 201);
+        return c.json(
+            ApiResponse.success("Categoría de mueble creada exitosamente", categoriaMueble.toOutput()),
+            201,
+        );
     }
 
     async list(c: AppContext) {

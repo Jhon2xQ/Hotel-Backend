@@ -4,17 +4,18 @@ import { corsConfig } from "./common/configs/cors.config";
 import { registerDependencies } from "./common/IoC/container";
 import { auth } from "./common/libraries/auth";
 import { prisma } from "./common/libraries/prisma";
-import { createMuebleRoutes } from "./routes/mueble.routes";
-import { createTipoHabitacionRoutes } from "./routes/tipo-habitacion.routes";
-import { createHabitacionRoutes } from "./routes/habitacion.routes";
+import { createHabitacionRoutes, createHabitacionPublicRoutes } from "./routes/habitacion.routes";
+import { createTipoHabitacionRoutes, createTipoHabitacionPublicRoutes } from "./routes/tipo-habitacion.routes";
 import { createPagoRoutes } from "./routes/pago.routes";
 import { createHuespedRoutes } from "./routes/huesped.routes";
 import { createCanalRoutes } from "./routes/canal.routes";
 import { createTarifaRoutes } from "./routes/tarifa.routes";
 import { createReservaRoutes } from "./routes/reserva.routes";
 import { createEstanciaRoutes } from "./routes/estancia.routes";
+import { createMuebleRoutes } from "./routes/mueble.routes";
+import { createCategoriaMuebleRoutes } from "./routes/categoria-mueble.routes";
 import { errorHandler } from "./presentation/middlewares/exception.middleware";
-import { categoriaMuebleRoutes } from "./routes/categoria-mueble.routes";
+import { authMiddleware } from "./presentation/middlewares/auth.middleware";
 
 registerDependencies(prisma);
 
@@ -22,22 +23,33 @@ const app = new Hono();
 
 app.use("/api/*", corsConfig);
 
-app.get("/api/health", (c) => {
-  return c.json({ status: "ok", timestamp: new Date().toISOString() });
-});
+//health-check-------------------------------------------------------------------------------
+app.get("/api/health", (c) => c.json({ status: "ok", timestamp: new Date().toISOString() }));
 
+//better-auth----------------------------------------------------------
 app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
 
-app.route("/api/muebles", createMuebleRoutes());
-app.route("/api/tipos-habitacion", createTipoHabitacionRoutes());
-app.route("/api/habitaciones", createHabitacionRoutes());
-app.route("/api/pagos", createPagoRoutes());
-app.route("/api/huespedes", createHuespedRoutes());
-app.route("/api/categorias-mueble", categoriaMuebleRoutes());
-app.route("/api/canales", createCanalRoutes());
-app.route("/api/tarifas", createTarifaRoutes());
-app.route("/api/reservas", createReservaRoutes());
-app.route("/api/estancias", createEstanciaRoutes());
+//RUTAS-PUBLICAS______________________________________________________
+const publicApi = new Hono();
+publicApi.route("/habitaciones", createHabitacionPublicRoutes());
+publicApi.route("/tipos-habitacion", createTipoHabitacionPublicRoutes());
+
+//RUTAS-PRIVADAS______________________________________________________
+const privateApi = new Hono();
+privateApi.use("*", authMiddleware);
+privateApi.route("/habitaciones", createHabitacionRoutes());
+privateApi.route("/categorias-mueble", createCategoriaMuebleRoutes());
+privateApi.route("/muebles", createMuebleRoutes());
+privateApi.route("/tipos-habitacion", createTipoHabitacionRoutes());
+privateApi.route("/reservas", createReservaRoutes());
+privateApi.route("/huespedes", createHuespedRoutes());
+privateApi.route("/estancias", createEstanciaRoutes());
+privateApi.route("/pagos", createPagoRoutes());
+privateApi.route("/canales", createCanalRoutes());
+privateApi.route("/tarifas", createTarifaRoutes());
+
+app.route("/api/public", publicApi);
+app.route("/api/private", privateApi);
 
 app.onError(errorHandler);
 
