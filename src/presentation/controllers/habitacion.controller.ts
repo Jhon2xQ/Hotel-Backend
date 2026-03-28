@@ -1,3 +1,4 @@
+import { injectable } from "tsyringe";
 import { AppContext } from "../../common/types/app.types";
 import { ApiResponse } from "../api.response";
 import { CreateHabitacionUseCase } from "../../application/use-cases/habitacion/create-habitacion.use-case";
@@ -15,6 +16,7 @@ import {
   SearchAvailableHabitacionesInput,
 } from "../../application/dtos/habitacion.dto";
 
+@injectable()
 export class HabitacionController {
   constructor(
     private createUseCase: CreateHabitacionUseCase,

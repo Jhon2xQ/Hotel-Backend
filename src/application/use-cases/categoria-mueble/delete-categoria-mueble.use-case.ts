@@ -1,7 +1,11 @@
-import { ICategoriaMuebleRepository } from "../../../domain/interfaces/categoria-mueble.repository.interface";
+import { inject, injectable } from "tsyringe";
+import type { ICategoriaMuebleRepository } from "../../../domain/interfaces/categoria-mueble.repository.interface";
+import { DI_TOKENS } from "../../../common/IoC/tokens";
 
+@injectable()
 export class DeleteCategoriaMuebleUseCase {
     constructor(
+        @inject(DI_TOKENS.ICategoriaMuebleRepository)
         private readonly categoriaMuebleRepository: ICategoriaMuebleRepository,
     ) {}
 

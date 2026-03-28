@@ -1,3 +1,4 @@
+import { injectable } from "tsyringe";
 import { AppContext } from "../../common/types/app.types";
 import { ApiResponse } from "../api.response";
 import { CreateHuespedUseCase } from "../../application/use-cases/huesped/create-huesped.use-case";
@@ -8,6 +9,7 @@ import { DeleteHuespedUseCase } from "../../application/use-cases/huesped/delete
 import type { CreateHuespedDto, UpdateHuespedDto } from "../../application/dtos/huesped.dto";
 import type { PaginationQuery } from "../schemas/pagination.schema";
 
+@injectable()
 export class HuespedController {
   constructor(
     private readonly createUseCase: CreateHuespedUseCase,

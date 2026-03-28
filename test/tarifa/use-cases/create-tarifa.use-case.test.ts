@@ -2,6 +2,8 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { CreateTarifaUseCase } from "../../../src/application/use-cases/tarifa/create-tarifa.use-case";
 import { ITarifaRepository } from "../../../src/domain/interfaces/tarifa.repository.interface";
 import { TarifaException } from "../../../src/domain/exceptions/tarifa.exception";
+import { TipoHabitacion } from "../../../src/domain/entities/tipo-habitacion.entity";
+import { Canal } from "../../../src/domain/entities/canal.entity";
 import { createMockTarifa } from "../../helpers/tarifa-fixtures";
 
 describe("CreateTarifaUseCase", () => {
@@ -17,6 +19,8 @@ describe("CreateTarifaUseCase", () => {
       delete: async () => {},
       hasRelatedRecords: async () => false,
       findByTipoHabitacionAndCanal: async () => [],
+      tipoHabitacionExists: async () => true,
+      canalExists: async () => true,
     };
 
     useCase = new CreateTarifaUseCase(mockRepository);
@@ -24,8 +28,6 @@ describe("CreateTarifaUseCase", () => {
 
   it("should create tarifa successfully", async () => {
     const mockTarifa = createMockTarifa({
-      tipoHabitacionId: "tipo-id",
-      canalId: "canal-id",
       precioNoche: 150.0,
       IVA: 18.0,
       cargoServicios: 10.0,
@@ -49,9 +51,10 @@ describe("CreateTarifaUseCase", () => {
 
   it("should create tarifa without optional fields", async () => {
     mockRepository.create = async (data) => {
+      const now = new Date();
       return createMockTarifa({
-        tipoHabitacionId: data.tipoHabitacionId,
-        canalId: data.canalId,
+        tipoHabitacion: new TipoHabitacion(data.tipoHabitacionId, "Suite", "desc", now, now),
+        canal: new Canal(data.canalId, "Booking", "OTA", true, null, now, now),
         precioNoche: data.precioNoche,
         IVA: data.IVA ?? null,
         cargoServicios: data.cargoServicios ?? null,

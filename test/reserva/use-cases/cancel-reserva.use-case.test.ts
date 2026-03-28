@@ -33,6 +33,7 @@ describe("CancelReservaUseCase", () => {
       motivoCancel: "Cliente solicitó cancelación",
       canceladoEn: new Date(),
     });
+    mockRepository.findById = async () => createMockReserva({ estado: "CONFIRMADA" });
     mockRepository.cancel = async (id, motivo) => mockReserva;
 
     const result = await useCase.execute("reserva-test-id", input);
@@ -47,6 +48,7 @@ describe("CancelReservaUseCase", () => {
       motivoCancel: "Cliente solicitó cancelación",
     };
 
+    mockRepository.findById = async () => createMockReserva({ estado: "COMPLETADA" });
     mockRepository.cancel = async () => {
       throw ReservaException.cannotCancelCompleted();
     };
@@ -59,6 +61,7 @@ describe("CancelReservaUseCase", () => {
       motivoCancel: "Cliente solicitó cancelación",
     };
 
+    mockRepository.findById = async () => createMockReserva({ estado: "CANCELADA" });
     mockRepository.cancel = async () => {
       throw ReservaException.alreadyCancelled();
     };
@@ -71,6 +74,7 @@ describe("CancelReservaUseCase", () => {
       motivoCancel: "",
     };
 
+    mockRepository.findById = async () => createMockReserva({ estado: "CONFIRMADA" });
     mockRepository.cancel = async () => {
       throw ReservaException.cancelRequiresMotivo();
     };

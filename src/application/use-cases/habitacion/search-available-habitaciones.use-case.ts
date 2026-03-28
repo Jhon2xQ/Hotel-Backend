@@ -1,8 +1,11 @@
-import { IHabitacionRepository } from "../../../domain/interfaces/habitacion.repository.interface";
+import { inject, injectable } from "tsyringe";
+import type { IHabitacionRepository } from "../../../domain/interfaces/habitacion.repository.interface";
 import { HabitacionWithPriceOutput, SearchAvailableHabitacionesInput } from "../../dtos/habitacion.dto";
+import { DI_TOKENS } from "../../../common/IoC/tokens";
 
+@injectable()
 export class SearchAvailableHabitacionesUseCase {
-  constructor(private repository: IHabitacionRepository) {}
+  constructor(@inject(DI_TOKENS.IHabitacionRepository) private repository: IHabitacionRepository) {}
 
   async execute(input: SearchAvailableHabitacionesInput): Promise<HabitacionWithPriceOutput[]> {
     let results: Array<{ habitacion: any; precioNoche: number | null }>;

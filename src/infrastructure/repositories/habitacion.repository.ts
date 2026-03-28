@@ -1,3 +1,4 @@
+import { inject, injectable } from "tsyringe";
 import { PrismaClient, Prisma } from "../../../generated/prisma/client";
 import {
   Habitacion,
@@ -12,9 +13,11 @@ import {
 } from "../../domain/interfaces/habitacion.repository.interface";
 import { HabitacionException } from "../../domain/exceptions/habitacion.exception";
 import type { CatalogoMueble } from "../../domain/entities/tipo-habitacion.entity";
+import { DI_TOKENS } from "../../common/IoC/tokens";
 
+@injectable()
 export class HabitacionRepository implements IHabitacionRepository {
-  constructor(private prisma: PrismaClient) {}
+  constructor(@inject(DI_TOKENS.PrismaClient) private prisma: PrismaClient) {}
 
   async create(data: CreateHabitacionData): Promise<Habitacion> {
     try {

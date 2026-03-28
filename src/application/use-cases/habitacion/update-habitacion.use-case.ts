@@ -1,16 +1,19 @@
-import { IHabitacionRepository } from "../../../domain/interfaces/habitacion.repository.interface";
-import { ITipoHabitacionRepository } from "../../../domain/interfaces/tipo-habitacion.repository.interface";
-import { IMuebleRepository } from "../../../domain/interfaces/mueble.repository.interface";
+import { inject, injectable } from "tsyringe";
+import type { IHabitacionRepository } from "../../../domain/interfaces/habitacion.repository.interface";
+import type { ITipoHabitacionRepository } from "../../../domain/interfaces/tipo-habitacion.repository.interface";
+import type { IMuebleRepository } from "../../../domain/interfaces/mueble.repository.interface";
 import { HabitacionException } from "../../../domain/exceptions/habitacion.exception";
 import { UpdateHabitacionInput, HabitacionOutput } from "../../dtos/habitacion.dto";
-import type { CatalogoMueble } from "../../../domain/entities/tipo-habitacion.entity";
 import { S3UploadService } from "../../../infrastructure/services/s3-upload.service";
+import { DI_TOKENS } from "../../../common/IoC/tokens";
 
+@injectable()
 export class UpdateHabitacionUseCase {
   constructor(
-    private repository: IHabitacionRepository,
+    @inject(DI_TOKENS.IHabitacionRepository) private repository: IHabitacionRepository,
+    @inject(DI_TOKENS.ITipoHabitacionRepository)
     private tipoHabitacionRepository: ITipoHabitacionRepository,
-    private furnitureRepository: IMuebleRepository,
+    @inject(DI_TOKENS.IMuebleRepository) private furnitureRepository: IMuebleRepository,
   ) {}
 
   async execute(id: string, input: UpdateHabitacionInput): Promise<HabitacionOutput> {

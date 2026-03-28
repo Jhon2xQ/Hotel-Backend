@@ -1,9 +1,12 @@
-import { ITarifaRepository } from "../../../domain/interfaces/tarifa.repository.interface";
+import { inject, injectable } from "tsyringe";
+import type { ITarifaRepository } from "../../../domain/interfaces/tarifa.repository.interface";
 import { TarifaException } from "../../../domain/exceptions/tarifa.exception";
 import { UpdateTarifaInput, TarifaOutput } from "../../dtos/tarifa.dto";
+import { DI_TOKENS } from "../../../common/IoC/tokens";
 
+@injectable()
 export class UpdateTarifaUseCase {
-  constructor(private repository: ITarifaRepository) {}
+  constructor(@inject(DI_TOKENS.ITarifaRepository) private repository: ITarifaRepository) {}
 
   async execute(id: string, input: UpdateTarifaInput): Promise<TarifaOutput> {
     const existing = await this.repository.findById(id);

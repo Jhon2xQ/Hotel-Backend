@@ -1,3 +1,4 @@
+import { injectable } from "tsyringe";
 import { AppContext } from "../../common/types/app.types";
 import { ApiResponse } from "../api.response";
 import { CreateTipoHabitacionUseCase } from "../../application/use-cases/tipo-habitacion/create-tipo-habitacion.use-case";
@@ -7,6 +8,7 @@ import { UpdateTipoHabitacionUseCase } from "../../application/use-cases/tipo-ha
 import { DeleteTipoHabitacionUseCase } from "../../application/use-cases/tipo-habitacion/delete-tipo-habitacion.use-case";
 import { CreateTipoHabitacionInput, UpdateTipoHabitacionInput } from "../../application/dtos/tipo-habitacion.dto";
 
+@injectable()
 export class TipoHabitacionController {
   constructor(
     private createUseCase: CreateTipoHabitacionUseCase,
