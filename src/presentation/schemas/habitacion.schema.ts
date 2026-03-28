@@ -59,4 +59,9 @@ export const SearchAvailableHabitacionesSchema = z
     {
       message: "fecha_inicio debe ser anterior a fecha_fin",
     },
-  );
+  )
+  .transform((data) => ({
+    ...data,
+    fecha_inicio: data.fecha_inicio ? new Date(data.fecha_inicio) : undefined,
+    fecha_fin: data.fecha_fin ? new Date(data.fecha_fin) : undefined,
+  }));

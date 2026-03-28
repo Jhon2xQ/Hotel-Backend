@@ -1,11 +1,15 @@
 # API de Canales
 
+
+> **Autorización:** Las rutas que restrigen por rol usan `requireRoles(...)` (`src/presentation/middlewares/roles.middleware.ts`) con valores en `src/common/constants/roles.ts` (p. ej. `admin`, `recepcionista`). Cualquier mención a "ADMIN" u otros roles aquí es orientativa; la fuente de verdad es el `*.routes.ts` correspondiente.
+
+
 Documentación de los endpoints para la gestión de canales de venta.
 
 ## Base URL
 
 ```
-/api/canales
+/api/private/canales
 ```
 
 ## Autenticación
@@ -20,7 +24,7 @@ Todos los endpoints requieren autenticación mediante Better Auth. Los endpoints
 
 Obtiene la lista de todos los canales registrados.
 
-**Endpoint:** `GET /api/canales`
+**Endpoint:** `GET /api/private/canales`
 
 **Autenticación:** Requerida
 
@@ -51,7 +55,7 @@ Obtiene la lista de todos los canales registrados.
 
 Obtiene los detalles de un canal específico.
 
-**Endpoint:** `GET /api/canales/:id`
+**Endpoint:** `GET /api/private/canales/:id`
 
 **Autenticación:** Requerida
 
@@ -95,7 +99,7 @@ Obtiene los detalles de un canal específico.
 
 Crea un nuevo canal de venta.
 
-**Endpoint:** `POST /api/canales`
+**Endpoint:** `POST /api/private/canales`
 
 **Autenticación:** Requerida (rol ADMIN)
 
@@ -153,7 +157,7 @@ Crea un nuevo canal de venta.
 
 Actualiza los datos de un canal existente.
 
-**Endpoint:** `PUT /api/canales/:id`
+**Endpoint:** `PUT /api/private/canales/:id`
 
 **Autenticación:** Requerida (rol ADMIN)
 
@@ -226,7 +230,7 @@ Actualiza los datos de un canal existente.
 
 Elimina un canal del sistema.
 
-**Endpoint:** `DELETE /api/canales/:id`
+**Endpoint:** `DELETE /api/private/canales/:id`
 
 **Autenticación:** Requerida (rol ADMIN)
 

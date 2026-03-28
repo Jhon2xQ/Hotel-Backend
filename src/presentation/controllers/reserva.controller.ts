@@ -29,18 +29,7 @@ export class ReservaController {
   ) {}
 
   async create(c: AppContext) {
-    const validData = c.get("validData") as Record<string, unknown>;
-    const input: CreateReservaDto = {
-      huespedId: validData.huespedId as string,
-      habitacionId: validData.habitacionId as string,
-      tarifaId: validData.tarifaId as string,
-      fechaEntrada: new Date(validData.fechaEntrada as string),
-      fechaSalida: new Date(validData.fechaSalida as string),
-      adultos: validData.adultos as number,
-      ninos: validData.ninos as number,
-      montoDescuento: validData.montoDescuento as number | undefined,
-    };
-
+    const input = c.get("validData") as CreateReservaDto;
     const reserva = await this.createUseCase.execute(input);
     return c.json(ApiResponse.success("Reserva creada exitosamente", toReservaDto(reserva)), 201);
   }
@@ -58,21 +47,7 @@ export class ReservaController {
 
   async update(c: AppContext) {
     const id = c.req.param("id") as string;
-    const validData = c.get("validData") as Record<string, unknown>;
-
-    const input: UpdateReservaDto = {
-      huespedId: validData.huespedId as string | undefined,
-      habitacionId: validData.habitacionId as string | undefined,
-      tarifaId: validData.tarifaId as string | undefined,
-      pagoId: validData.pagoId as string | null | undefined,
-      fechaEntrada: validData.fechaEntrada ? new Date(validData.fechaEntrada as string) : undefined,
-      fechaSalida: validData.fechaSalida ? new Date(validData.fechaSalida as string) : undefined,
-      adultos: validData.adultos as number | undefined,
-      ninos: validData.ninos as number | undefined,
-      montoDescuento: validData.montoDescuento as number | undefined,
-      estado: validData.estado as UpdateReservaDto["estado"],
-    };
-
+    const input = c.get("validData") as UpdateReservaDto;
     const reserva = await this.updateUseCase.execute(id, input);
     return c.json(ApiResponse.success("Reserva actualizada exitosamente", toReservaDto(reserva)), 200);
   }

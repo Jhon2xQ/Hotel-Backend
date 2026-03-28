@@ -1,9 +1,9 @@
 import { Habitacion, EstadoHabitacion } from "../../domain/entities/habitacion.entity";
+import { mapTipoHabitacionFromPrisma, type TipoHabitacionPrismaRow } from "./tipo-habitacion.mapper";
 
 export type HabitacionPrismaRow = {
   id: string;
   nroHabitacion: string;
-  tipoHabitacionId: string;
   piso: number;
   tieneDucha: boolean;
   tieneBanio: boolean;
@@ -13,18 +13,23 @@ export type HabitacionPrismaRow = {
   ultimaLimpieza: Date | null;
   createdAt: Date;
   updatedAt: Date;
-  tipo: { id: string; nombre: string; descripcion: string | null } | null;
+  tipo: (TipoHabitacionPrismaRow & Record<string, unknown>) | null;
 };
 
 export function mapHabitacionFromPrisma(data: HabitacionPrismaRow): Habitacion {
   const tipo = data.tipo
-    ? { id: data.tipo.id, nombre: data.tipo.nombre, descripcion: data.tipo.descripcion }
+    ? mapTipoHabitacionFromPrisma({
+        id: data.tipo.id,
+        nombre: data.tipo.nombre,
+        descripcion: data.tipo.descripcion,
+        createdAt: data.tipo.createdAt,
+        updatedAt: data.tipo.updatedAt,
+      })
     : null;
 
   return new Habitacion(
     data.id,
     data.nroHabitacion,
-    data.tipoHabitacionId,
     tipo,
     data.piso,
     data.tieneDucha,

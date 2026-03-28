@@ -1,11 +1,15 @@
 # API de Tipos de Habitación
 
+
+> **Autorización:** Las rutas que restrigen por rol usan `requireRoles(...)` (`src/presentation/middlewares/roles.middleware.ts`) con valores en `src/common/constants/roles.ts` (p. ej. `admin`, `recepcionista`). Cualquier mención a "ADMIN" u otros roles aquí es orientativa; la fuente de verdad es el `*.routes.ts` correspondiente.
+
+
 Documentación de los endpoints para gestionar los tipos de habitación del hotel.
 
 ## Base URL
 
 ```
-/api/tipos-habitacion
+/api/private/tipos-habitacion
 ```
 
 ## Autenticación
@@ -18,7 +22,7 @@ Todos los endpoints requieren autenticación mediante sesión de Better Auth.
 
 Obtiene la lista completa de tipos de habitación.
 
-**Endpoint:** `GET /api/tipos-habitacion`
+**Endpoint:** `GET /api/private/tipos-habitacion`
 
 **Permisos:** Usuario autenticado
 
@@ -58,7 +62,7 @@ Obtiene la lista completa de tipos de habitación.
 
 Obtiene los detalles de un tipo de habitación específico.
 
-**Endpoint:** `GET /api/tipos-habitacion/:id`
+**Endpoint:** `GET /api/private/tipos-habitacion/:id`
 
 **Permisos:** Usuario autenticado
 
@@ -102,7 +106,7 @@ Obtiene los detalles de un tipo de habitación específico.
 
 Crea un nuevo tipo de habitación en el sistema.
 
-**Endpoint:** `POST /api/tipos-habitacion`
+**Endpoint:** `POST /api/private/tipos-habitacion`
 
 **Permisos:** ADMIN
 
@@ -189,7 +193,7 @@ Crea un nuevo tipo de habitación en el sistema.
 
 Actualiza los datos de un tipo de habitación existente.
 
-**Endpoint:** `PUT /api/tipos-habitacion/:id`
+**Endpoint:** `PUT /api/private/tipos-habitacion/:id`
 
 **Permisos:** ADMIN
 
@@ -264,7 +268,7 @@ Actualiza los datos de un tipo de habitación existente.
 
 Elimina un tipo de habitación del sistema.
 
-**Endpoint:** `DELETE /api/tipos-habitacion/:id`
+**Endpoint:** `DELETE /api/private/tipos-habitacion/:id`
 
 **Permisos:** ADMIN
 
@@ -365,7 +369,7 @@ Elimina un tipo de habitación del sistema.
 ### Crear un tipo de habitación básico
 
 ```bash
-curl -X POST https://api.hotel.com/api/tipos-habitacion \
+curl -X POST https://api.hotel.com/api/private/tipos-habitacion \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <token>" \
   -d '{
@@ -377,7 +381,7 @@ curl -X POST https://api.hotel.com/api/tipos-habitacion \
 ### Crear un tipo de habitación de lujo
 
 ```bash
-curl -X POST https://api.hotel.com/api/tipos-habitacion \
+curl -X POST https://api.hotel.com/api/private/tipos-habitacion \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <token>" \
   -d '{
@@ -389,7 +393,7 @@ curl -X POST https://api.hotel.com/api/tipos-habitacion \
 ### Crear un tipo sin descripción
 
 ```bash
-curl -X POST https://api.hotel.com/api/tipos-habitacion \
+curl -X POST https://api.hotel.com/api/private/tipos-habitacion \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <token>" \
   -d '{
@@ -400,7 +404,7 @@ curl -X POST https://api.hotel.com/api/tipos-habitacion \
 ### Actualizar solo el nombre
 
 ```bash
-curl -X PUT https://api.hotel.com/api/tipos-habitacion/123e4567-e89b-12d3-a456-426614174000 \
+curl -X PUT https://api.hotel.com/api/private/tipos-habitacion/123e4567-e89b-12d3-a456-426614174000 \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <token>" \
   -d '{
@@ -411,7 +415,7 @@ curl -X PUT https://api.hotel.com/api/tipos-habitacion/123e4567-e89b-12d3-a456-4
 ### Actualizar solo la descripción
 
 ```bash
-curl -X PUT https://api.hotel.com/api/tipos-habitacion/123e4567-e89b-12d3-a456-426614174000 \
+curl -X PUT https://api.hotel.com/api/private/tipos-habitacion/123e4567-e89b-12d3-a456-426614174000 \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <token>" \
   -d '{
@@ -422,7 +426,7 @@ curl -X PUT https://api.hotel.com/api/tipos-habitacion/123e4567-e89b-12d3-a456-4
 ### Actualizar nombre y descripción
 
 ```bash
-curl -X PUT https://api.hotel.com/api/tipos-habitacion/123e4567-e89b-12d3-a456-426614174000 \
+curl -X PUT https://api.hotel.com/api/private/tipos-habitacion/123e4567-e89b-12d3-a456-426614174000 \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <token>" \
   -d '{
@@ -434,20 +438,20 @@ curl -X PUT https://api.hotel.com/api/tipos-habitacion/123e4567-e89b-12d3-a456-4
 ### Listar todos los tipos
 
 ```bash
-curl -X GET https://api.hotel.com/api/tipos-habitacion \
+curl -X GET https://api.hotel.com/api/private/tipos-habitacion \
   -H "Authorization: Bearer <token>"
 ```
 
 ### Obtener un tipo específico
 
 ```bash
-curl -X GET https://api.hotel.com/api/tipos-habitacion/123e4567-e89b-12d3-a456-426614174000 \
+curl -X GET https://api.hotel.com/api/private/tipos-habitacion/123e4567-e89b-12d3-a456-426614174000 \
   -H "Authorization: Bearer <token>"
 ```
 
 ### Eliminar un tipo
 
 ```bash
-curl -X DELETE https://api.hotel.com/api/tipos-habitacion/123e4567-e89b-12d3-a456-426614174000 \
+curl -X DELETE https://api.hotel.com/api/private/tipos-habitacion/123e4567-e89b-12d3-a456-426614174000 \
   -H "Authorization: Bearer <token>"
 ```

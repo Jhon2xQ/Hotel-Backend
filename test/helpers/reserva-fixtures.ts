@@ -36,12 +36,7 @@ export function createMockReserva(overrides?: Partial<Reserva>): Reserva {
     new Habitacion(
       "habitacion-test-id",
       "101",
-      "tipo-habitacion-test-id",
-      {
-        id: "tipo-habitacion-test-id",
-        nombre: "Suite Deluxe",
-        descripcion: "Suite de lujo",
-      },
+      tipoHabitacion,
       1,
       true,
       true,

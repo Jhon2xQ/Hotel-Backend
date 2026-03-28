@@ -16,7 +16,12 @@ export const CreateReservaSchema = z
   .refine((data) => new Date(data.fechaSalida) > new Date(data.fechaEntrada), {
     message: "La fecha de salida debe ser posterior a la fecha de entrada",
     path: ["fechaSalida"],
-  });
+  })
+  .transform((data) => ({
+    ...data,
+    fechaEntrada: new Date(data.fechaEntrada),
+    fechaSalida: new Date(data.fechaSalida),
+  }));
 
 export const UpdateReservaSchema = z
   .object({
@@ -42,7 +47,12 @@ export const UpdateReservaSchema = z
       message: "La fecha de salida debe ser posterior a la fecha de entrada",
       path: ["fechaSalida"],
     },
-  );
+  )
+  .transform((data) => ({
+    ...data,
+    fechaEntrada: data.fechaEntrada ? new Date(data.fechaEntrada) : undefined,
+    fechaSalida: data.fechaSalida ? new Date(data.fechaSalida) : undefined,
+  }));
 
 export const CancelReservaSchema = z.object({
   motivoCancel: z.string().min(1, "El motivo de cancelación es requerido"),

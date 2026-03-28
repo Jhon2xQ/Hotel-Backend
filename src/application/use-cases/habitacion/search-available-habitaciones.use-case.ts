@@ -15,18 +15,11 @@ export class SearchAvailableHabitacionesUseCase {
   async execute(input: SearchAvailableHabitacionesDto): Promise<HabitacionWithPriceDto[]> {
     let results: Array<{ habitacion: Habitacion; precioNoche: number | null }>;
 
-    // Caso 1: Filtro por rango de fechas (con o sin tipo)
     if (input.fecha_inicio && input.fecha_fin) {
-      const fechaInicio = new Date(input.fecha_inicio);
-      const fechaFin = new Date(input.fecha_fin);
-      results = await this.repository.findAvailableInDateRange(fechaInicio, fechaFin, input.tipo);
-    }
-    // Caso 2: Filtro solo por tipo
-    else if (input.tipo) {
+      results = await this.repository.findAvailableInDateRange(input.fecha_inicio, input.fecha_fin, input.tipo);
+    } else if (input.tipo) {
       results = await this.repository.findByTipoWithDirectPrice(input.tipo);
-    }
-    // Caso 3: Sin filtros, todas las habitaciones
-    else {
+    } else {
       results = await this.repository.findAllWithDirectPrice();
     }
 

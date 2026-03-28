@@ -67,13 +67,7 @@ export class HabitacionController {
   }
 
   async searchAvailable(c: AppContext) {
-    const query = c.req.query();
-    const input: SearchAvailableHabitacionesDto = {
-      tipo: query.tipo,
-      fecha_inicio: query.fecha_inicio,
-      fecha_fin: query.fecha_fin,
-      orden_precio: query.orden_precio as "asc" | "desc" | undefined,
-    };
+    const input = c.get("validData") as SearchAvailableHabitacionesDto;
     const results = await this.searchAvailableUseCase.execute(input);
     return c.json(ApiResponse.success("Habitaciones disponibles obtenidas exitosamente", results), 200);
   }

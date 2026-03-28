@@ -1,5 +1,5 @@
 import type { Huesped } from "../entities/huesped.entity";
-import type { PaginatedResult, PaginationParams } from "../../common/types/pagination.types";
+import type { PaginatedResult, PaginationParams } from "../../application/paginations/api.pagination";
 
 export interface CreateHuespedParams {
   tipo_doc?: "DNI" | "PASAPORTE" | "RUC" | "CE" | null;

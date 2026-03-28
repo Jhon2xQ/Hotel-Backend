@@ -1,6 +1,6 @@
 import { inject, injectable } from "tsyringe";
 import type { IHuespedRepository } from "../../../domain/interfaces/huesped.repository.interface";
-import type { PaginatedResult, PaginationParams } from "../../../common/types/pagination.types";
+import type { PaginatedResult, PaginationParams } from "../../paginations/api.pagination";
 import { HuespedDto, toHuespedDto } from "../../dtos/huesped.dto";
 import { DI_TOKENS } from "../../../common/IoC/tokens";
 

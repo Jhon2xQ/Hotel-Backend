@@ -21,17 +21,7 @@ export class EstanciaController {
   ) {}
 
   async create(c: AppContext) {
-    const validData = c.get("validData") as Record<string, unknown>;
-    const input: CreateEstanciaDto = {
-      reservaId: validData.reservaId as string,
-      habitacionId: validData.habitacionId as string,
-      huespedId: validData.huespedId as string,
-      fechaEntrada: validData.fechaEntrada ? new Date(validData.fechaEntrada as string) : undefined,
-      fechaSalida: validData.fechaSalida ? new Date(validData.fechaSalida as string) : null,
-      estado: validData.estado as CreateEstanciaDto["estado"],
-      notas: validData.notas as string | null | undefined,
-    };
-
+    const input = c.get("validData") as CreateEstanciaDto;
     const estancia = await this.createUseCase.execute(input);
     return c.json(ApiResponse.success("Estancia creada exitosamente", estancia), 201);
   }
@@ -49,23 +39,7 @@ export class EstanciaController {
 
   async update(c: AppContext) {
     const id = c.req.param("id") as string;
-    const validData = c.get("validData") as Record<string, unknown>;
-
-    const input: UpdateEstanciaDto = {
-      reservaId: validData.reservaId as string | undefined,
-      habitacionId: validData.habitacionId as string | undefined,
-      huespedId: validData.huespedId as string | undefined,
-      fechaEntrada: validData.fechaEntrada ? new Date(validData.fechaEntrada as string) : undefined,
-      fechaSalida:
-        validData.fechaSalida !== undefined
-          ? validData.fechaSalida
-            ? new Date(validData.fechaSalida as string)
-            : null
-          : undefined,
-      estado: validData.estado as UpdateEstanciaDto["estado"],
-      notas: validData.notas as string | null | undefined,
-    };
-
+    const input = c.get("validData") as UpdateEstanciaDto;
     const estancia = await this.updateUseCase.execute(id, input);
     return c.json(ApiResponse.success("Estancia actualizada exitosamente", estancia), 200);
   }
@@ -78,10 +52,7 @@ export class EstanciaController {
 
   async checkout(c: AppContext) {
     const id = c.req.param("id") as string;
-    const validData = c.get("validData") as CheckoutEstanciaDto;
-    const input: CheckoutEstanciaDto = {
-      fechaSalida: new Date(validData.fechaSalida as unknown as string),
-    };
+    const input = c.get("validData") as CheckoutEstanciaDto;
     const estancia = await this.checkoutUseCase.execute(id, input);
     return c.json(ApiResponse.success("Checkout realizado exitosamente", estancia), 200);
   }

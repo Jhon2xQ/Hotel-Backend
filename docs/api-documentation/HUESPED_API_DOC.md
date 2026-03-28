@@ -1,11 +1,15 @@
 # API de Huéspedes
 
+
+> **Autorización:** Las rutas que restrigen por rol usan `requireRoles(...)` (`src/presentation/middlewares/roles.middleware.ts`) con valores en `src/common/constants/roles.ts` (p. ej. `admin`, `recepcionista`). Cualquier mención a "ADMIN" u otros roles aquí es orientativa; la fuente de verdad es el `*.routes.ts` correspondiente.
+
+
 Documentación de los endpoints para la gestión de huéspedes del hotel.
 
 ## Base URL
 
 ```
-/api/huespedes
+/api/private/huespedes
 ```
 
 ## Autenticación
@@ -20,7 +24,7 @@ Todos los endpoints requieren autenticación mediante Better Auth. El token de s
 
 Obtiene una lista paginada de huéspedes registrados en el sistema.
 
-**Endpoint:** `GET /api/huespedes`
+**Endpoint:** `GET /api/private/huespedes`
 
 **Autenticación:** Requerida
 
@@ -33,13 +37,13 @@ Obtiene una lista paginada de huéspedes registrados en el sistema.
 
 ```bash
 # Sin parámetros (usa valores por defecto: page=1, limit=10)
-GET /api/huespedes
+GET /api/private/huespedes
 
 # Con parámetros personalizados
-GET /api/huespedes?page=2&limit=20
+GET /api/private/huespedes?page=2&limit=20
 
 # Primera página con 50 registros
-GET /api/huespedes?page=1&limit=50
+GET /api/private/huespedes?page=1&limit=50
 ```
 
 **Respuesta exitosa (200):**
@@ -105,7 +109,7 @@ GET /api/huespedes?page=1&limit=50
 
 Obtiene los detalles de un huésped específico.
 
-**Endpoint:** `GET /api/huespedes/:id`
+**Endpoint:** `GET /api/private/huespedes/:id`
 
 **Autenticación:** Requerida
 
@@ -153,7 +157,7 @@ Obtiene los detalles de un huésped específico.
 
 Registra un nuevo huésped en el sistema.
 
-**Endpoint:** `POST /api/huespedes`
+**Endpoint:** `POST /api/private/huespedes`
 
 **Autenticación:** Requerida
 
@@ -223,7 +227,7 @@ Registra un nuevo huésped en el sistema.
 
 Actualiza los datos de un huésped existente.
 
-**Endpoint:** `PUT /api/huespedes/:id`
+**Endpoint:** `PUT /api/private/huespedes/:id`
 
 **Autenticación:** Requerida
 
@@ -302,7 +306,7 @@ Actualiza los datos de un huésped existente.
 
 Elimina un huésped del sistema.
 
-**Endpoint:** `DELETE /api/huespedes/:id`
+**Endpoint:** `DELETE /api/private/huespedes/:id`
 
 **Autenticación:** Requerida
 
@@ -338,7 +342,7 @@ Elimina un huésped del sistema.
 
 ### Paginación
 
-El endpoint principal de listado (`GET /api/huespedes`) utiliza paginación para optimizar el rendimiento y la experiencia del usuario:
+El endpoint principal de listado (`GET /api/private/huespedes`) utiliza paginación para optimizar el rendimiento y la experiencia del usuario:
 
 - **Valores por defecto**: Si no se especifican parámetros, se usa `page=1` y `limit=10`
 - **Límite máximo**: El parámetro `limit` tiene un máximo de 100 registros por página
@@ -349,13 +353,13 @@ El endpoint principal de listado (`GET /api/huespedes`) utiliza paginación para
 
 ```bash
 # Primera página con valores por defecto (10 registros)
-GET /api/huespedes
+GET /api/private/huespedes
 
 # Segunda página con 20 registros
-GET /api/huespedes?page=2&limit=20
+GET /api/private/huespedes?page=2&limit=20
 
 # Obtener todos los registros posibles (máximo 100 por página)
-GET /api/huespedes?limit=100
+GET /api/private/huespedes?limit=100
 ```
 
 ### Email Único

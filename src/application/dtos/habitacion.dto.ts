@@ -1,5 +1,7 @@
 import type { EstadoHabitacion } from "../../domain/entities/habitacion.entity";
 import type { Habitacion } from "../../domain/entities/habitacion.entity";
+import type { TipoHabitacionDto } from "./tipo-habitacion.dto";
+import { toTipoHabitacionDto } from "./tipo-habitacion.dto";
 
 export interface CreateHabitacionDto {
   nro_habitacion: string;
@@ -32,8 +34,8 @@ export interface UpdateHabitacionStatusDto {
 
 export interface SearchAvailableHabitacionesDto {
   tipo?: string;
-  fecha_inicio?: string;
-  fecha_fin?: string;
+  fecha_inicio?: Date;
+  fecha_fin?: Date;
   orden_precio?: "asc" | "desc";
 }
 
@@ -41,11 +43,7 @@ export interface HabitacionDto {
   id: string;
   nro_habitacion: string;
   tipo_habitacion_id: string;
-  tipo: {
-    id: string;
-    nombre: string;
-    descripcion: string | null;
-  } | null;
+  tipo: TipoHabitacionDto | null;
   piso: number;
   tiene_ducha: boolean;
   tiene_banio: boolean;
@@ -66,10 +64,8 @@ export function toHabitacionDto(h: Habitacion): HabitacionDto {
   return {
     id: h.id,
     nro_habitacion: h.nroHabitacion,
-    tipo_habitacion_id: h.tipoHabitacionId,
-    tipo: h.tipo
-      ? { id: h.tipo.id, nombre: h.tipo.nombre, descripcion: h.tipo.descripcion }
-      : null,
+    tipo_habitacion_id: h.tipo?.id ?? "",
+    tipo: h.tipo ? toTipoHabitacionDto(h.tipo) : null,
     piso: h.piso,
     tiene_ducha: h.tieneDucha,
     tiene_banio: h.tieneBanio,

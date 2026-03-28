@@ -1,33 +1,19 @@
+import type { z } from "zod";
 import type { Estancia } from "../../domain/entities/estancia.entity";
 import type { EstadoEstadia } from "../../domain/entities/estancia.entity";
 import type { HabitacionDto } from "./habitacion.dto";
 import type { HuespedDto } from "./huesped.dto";
 import { toHabitacionDto } from "./habitacion.dto";
 import { toHuespedDto } from "./huesped.dto";
+import {
+  CreateEstanciaSchema,
+  UpdateEstanciaSchema,
+  CheckoutEstanciaSchema,
+} from "../../presentation/schemas/estancia.schema";
 
-export interface CreateEstanciaDto {
-  reservaId: string;
-  habitacionId: string;
-  huespedId: string;
-  fechaEntrada?: Date;
-  fechaSalida?: Date | null;
-  estado?: EstadoEstadia;
-  notas?: string | null;
-}
-
-export interface UpdateEstanciaDto {
-  reservaId?: string;
-  habitacionId?: string;
-  huespedId?: string;
-  fechaEntrada?: Date;
-  fechaSalida?: Date | null;
-  estado?: EstadoEstadia;
-  notas?: string | null;
-}
-
-export interface CheckoutEstanciaDto {
-  fechaSalida: Date;
-}
+export type CreateEstanciaDto = z.infer<typeof CreateEstanciaSchema>;
+export type UpdateEstanciaDto = z.infer<typeof UpdateEstanciaSchema>;
+export type CheckoutEstanciaDto = z.infer<typeof CheckoutEstanciaSchema>;
 
 export interface EstanciaDto {
   id: string;

@@ -1,15 +1,19 @@
 import { Habitacion, EstadoHabitacion } from "../../src/domain/entities/habitacion.entity";
+import { TipoHabitacion } from "../../src/domain/entities/tipo-habitacion.entity";
+
+const defaultTipo = new TipoHabitacion(
+  "tipo-test-id",
+  "Suite Deluxe",
+  "Suite de lujo",
+  new Date("2025-01-01"),
+  new Date("2025-01-01"),
+);
 
 export function createMockHabitacion(overrides?: Partial<Habitacion>): Habitacion {
   return new Habitacion(
     overrides?.id ?? "habitacion-test-id",
     overrides?.nroHabitacion ?? "101",
-    overrides?.tipoHabitacionId ?? "tipo-test-id",
-    overrides?.tipo ?? {
-      id: "tipo-test-id",
-      nombre: "Suite Deluxe",
-      descripcion: "Suite de lujo",
-    },
+    overrides?.tipo ?? defaultTipo,
     overrides?.piso ?? 1,
     overrides?.tieneDucha ?? true,
     overrides?.tieneBanio ?? true,
