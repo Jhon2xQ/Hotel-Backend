@@ -21,6 +21,8 @@
     "auth:generate": "bun x auth@latest generate --config src/common/libraries/auth.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1019.0",
+    "@aws-sdk/lib-storage": "^3.1019.0",
     "@better-auth/prisma-adapter": "^1.5.5",
     "@prisma/adapter-pg": "^7.5.0",
     "@prisma/client": "^7.5.0",

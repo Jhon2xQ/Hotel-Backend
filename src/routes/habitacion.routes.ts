@@ -16,12 +16,8 @@ import { HabitacionController } from "../presentation/controllers/habitacion.con
 import { authMiddleware } from "../presentation/middlewares/auth.middleware";
 import { adminMiddleware } from "../presentation/middlewares/admin.middleware";
 import { validSchema, validParams, validQuery } from "../presentation/middlewares/valid.middleware";
-import {
-  CreateHabitacionSchema,
-  UpdateHabitacionSchema,
-  UpdateHabitacionStatusSchema,
-  SearchAvailableHabitacionesSchema,
-} from "../presentation/schemas/habitacion.schema";
+import { parseFormDataMiddleware } from "../presentation/middlewares/parse-form-data.middleware";
+import { CreateHabitacionSchema, UpdateHabitacionSchema, UpdateHabitacionStatusSchema, SearchAvailableHabitacionesSchema } from "../presentation/schemas/habitacion.schema";
 import { UUIDParamSchema } from "../presentation/schemas/tipo-habitacion.schema";
 
 export function createHabitacionRoutes(prismaClient: PrismaClient): AppHono {
@@ -38,55 +34,21 @@ export function createHabitacionRoutes(prismaClient: PrismaClient): AppHono {
   const searchAvailableUseCase = new SearchAvailableHabitacionesUseCase(repository);
   const findByIdWithPriceUseCase = new FindHabitacionByIdWithPriceUseCase(repository);
 
-  const controller = new HabitacionController(
-    createUseCase,
-    listUseCase,
-    findByIdUseCase,
-    updateUseCase,
-    updateStatusUseCase,
-    deleteUseCase,
-    searchAvailableUseCase,
-    findByIdWithPriceUseCase,
-  );
+  const controller = new HabitacionController(createUseCase, listUseCase, findByIdUseCase, updateUseCase, updateStatusUseCase, deleteUseCase, searchAvailableUseCase, findByIdWithPriceUseCase);
 
   const router = new Hono<{ Variables: AppVariables }>();
 
-  router.post(
-    "/",
-    authMiddleware,
-    adminMiddleware,
-    validSchema(CreateHabitacionSchema),
-    controller.create.bind(controller),
-  );
+  //enpoints para administración
+  router.post("/", authMiddleware, parseFormDataMiddleware, validSchema(CreateHabitacionSchema), controller.create.bind(controller));
   router.get("/", authMiddleware, controller.list.bind(controller));
-  router.get(
-    "/disponibles",
-    validQuery(SearchAvailableHabitacionesSchema),
-    controller.searchAvailable.bind(controller),
-  );
+  router.get("/:id", authMiddleware, validParams(UUIDParamSchema), controller.findById.bind(controller));
+  router.put("/:id", authMiddleware, validParams(UUIDParamSchema), parseFormDataMiddleware, validSchema(UpdateHabitacionSchema), controller.update.bind(controller));
+  router.patch("/:id/estado", authMiddleware, validParams(UUIDParamSchema), validSchema(UpdateHabitacionStatusSchema), controller.updateStatus.bind(controller));
+  router.delete("/:id", authMiddleware, validParams(UUIDParamSchema), controller.delete.bind(controller));
+
+  //enpoints para la página
+  router.get("/disponibles", validQuery(SearchAvailableHabitacionesSchema), controller.searchAvailable.bind(controller));
   router.get("/disponibles/:id", validParams(UUIDParamSchema), controller.findByIdWithPrice.bind(controller));
-  router.get("/:id", validParams(UUIDParamSchema), controller.findById.bind(controller));
-  router.put(
-    "/:id",
-    adminMiddleware,
-    validParams(UUIDParamSchema),
-    validSchema(UpdateHabitacionSchema),
-    controller.update.bind(controller),
-  );
-  router.patch(
-    "/:id/estado",
-    authMiddleware,
-    validParams(UUIDParamSchema),
-    validSchema(UpdateHabitacionStatusSchema),
-    controller.updateStatus.bind(controller),
-  );
-  router.delete(
-    "/:id",
-    authMiddleware,
-    adminMiddleware,
-    validParams(UUIDParamSchema),
-    controller.delete.bind(controller),
-  );
 
   return router;
 }

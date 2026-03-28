@@ -6,7 +6,9 @@ import { ApiResponse } from "../api.response";
 export function validSchema(schema: ZodSchema) {
   return async (c: AppContext, next: Next) => {
     try {
-      const body = await c.req.json();
+      // Check if we have parsed form data from middleware
+      const rawFormData = c.get("rawFormData");
+      const body = rawFormData || (await c.req.json());
       const validData = schema.parse(body);
       c.set("validData", validData);
       await next();

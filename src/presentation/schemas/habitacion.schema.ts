@@ -13,7 +13,7 @@ export const CreateHabitacionSchema = z.object({
   piso: z.number().int().positive("El piso debe ser un número positivo"),
   tiene_ducha: z.boolean().optional(),
   tiene_banio: z.boolean().optional(),
-  url_imagen: z.array(z.string().max(255, "La URL de imagen no puede exceder 255 caracteres").optional()).default([]),
+  imagenes: z.array(z.instanceof(File)).optional().default([]),
   estado: EstadoHabitacionSchema.optional(),
   notas: z.string().optional(),
 });
@@ -28,7 +28,7 @@ export const UpdateHabitacionSchema = z.object({
   piso: z.number().int().positive("El piso debe ser un número positivo").optional(),
   tiene_ducha: z.boolean().optional(),
   tiene_banio: z.boolean().optional(),
-  url_imagen: z.array(z.string().max(255, "La URL de imagen no puede exceder 255 caracteres").optional()).default([]),
+  imagenes: z.array(z.instanceof(File)).optional().default([]),
   estado: EstadoHabitacionSchema.optional(),
   notas: z.string().optional(),
 });
