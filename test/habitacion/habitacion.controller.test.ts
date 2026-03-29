@@ -55,8 +55,7 @@ describe("HabitacionController", () => {
       const mockOutput = {
         id: "test-id",
         nro_habitacion: "301",
-        tipo_habitacion_id: "tipo-id",
-        tipo: { id: "tipo-id", nombre: "Suite Deluxe", descripcion: "Suite de lujo" },
+        tipo_habitacion: { id: "tipo-id", nombre: "Suite Deluxe", descripcion: "Suite de lujo", created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
         piso: 3,
         tiene_ducha: false,
         tiene_banio: false,
@@ -91,8 +90,7 @@ describe("HabitacionController", () => {
         {
           id: "id-1",
           nro_habitacion: "301",
-          tipo_habitacion_id: "tipo-id",
-          tipo: { id: "tipo-id", nombre: "Suite Deluxe", descripcion: "Suite de lujo" },
+          tipo_habitacion: { id: "tipo-id", nombre: "Suite Deluxe", descripcion: "Suite de lujo", created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
           piso: 3,
           tiene_ducha: false,
           tiene_banio: false,
@@ -128,8 +126,7 @@ describe("HabitacionController", () => {
       const mockOutput = {
         id: "test-id",
         nro_habitacion: "301",
-        tipo_id: "tipo-id",
-        tipo: { id: "tipo-id", nombre: "Suite Deluxe", descripcion: "Suite de lujo" },
+        tipo_habitacion: { id: "tipo-id", nombre: "Suite Deluxe", descripcion: "Suite de lujo", created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
         piso: 3,
         url_imagen: null,
         estado: "DISPONIBLE",
@@ -169,8 +166,7 @@ describe("HabitacionController", () => {
       const mockOutput = {
         id: "test-id",
         nro_habitacion: "302",
-        tipo_habitacion_id: "tipo-id",
-        tipo: { id: "tipo-id", nombre: "Suite Deluxe", descripcion: "Suite de lujo" },
+        tipo_habitacion: { id: "tipo-id", nombre: "Suite Deluxe", descripcion: "Suite de lujo", created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
         piso: 3,
         tiene_ducha: false,
         tiene_banio: false,
@@ -210,8 +206,7 @@ describe("HabitacionController", () => {
       const mockOutput = {
         id: "test-id",
         nro_habitacion: "301",
-        tipo_habitacion_id: "tipo-id",
-        tipo: { id: "tipo-id", nombre: "Suite Deluxe", descripcion: "Suite de lujo" },
+        tipo_habitacion: { id: "tipo-id", nombre: "Suite Deluxe", descripcion: "Suite de lujo", created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
         piso: 3,
         tiene_ducha: false,
         tiene_banio: false,

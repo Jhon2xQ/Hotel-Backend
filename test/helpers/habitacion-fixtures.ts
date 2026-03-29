@@ -13,7 +13,7 @@ export function createMockHabitacion(overrides?: Partial<Habitacion>): Habitacio
   return new Habitacion(
     overrides?.id ?? "habitacion-test-id",
     overrides?.nroHabitacion ?? "101",
-    overrides?.tipo ?? defaultTipo,
+    overrides?.tipoHabitacion ?? defaultTipo,
     overrides?.piso ?? 1,
     overrides?.tieneDucha ?? true,
     overrides?.tieneBanio ?? true,

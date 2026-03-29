@@ -12,7 +12,7 @@ export class Habitacion {
   constructor(
     public readonly id: string,
     public readonly nroHabitacion: string,
-    public readonly tipo: TipoHabitacion | null,
+    public readonly tipoHabitacion: TipoHabitacion,
     public readonly piso: number,
     public readonly tieneDucha: boolean,
     public readonly tieneBanio: boolean,
