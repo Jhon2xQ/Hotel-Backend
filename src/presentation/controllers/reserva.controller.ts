@@ -33,6 +33,9 @@ export class ReservaController {
     const validData = c.get("validData") as ReservaQuery;
     const result = await this.listPaginatedUseCase.execute(validData);
     return c.json(ApiResponse.success("Reservas obtenidas exitosamente", result), 200);
+  async list(c: AppContext) {
+    const reservas = await this.listUseCase.execute();
+    return c.json(ApiResponse.success("Reservas obtenidas exitosamente", reservas), 200);
   }
 
   async findById(c: AppContext) {
