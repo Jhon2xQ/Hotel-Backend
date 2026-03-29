@@ -3,6 +3,7 @@ import type { EstadoReserva } from "../../domain/entities/reserva.entity";
 import { toHuespedDto } from "./huesped.dto";
 import { toTarifaDto } from "./tarifa.dto";
 import { toPagoDto } from "./pago.dto";
+import { toHabitacionDto } from "./habitacion.dto";
 
 export interface CreateReservaDto {
   huespedId: string;
@@ -36,18 +37,11 @@ export interface UpdateEstadoReservaDto {
   estado: EstadoReserva;
 }
 
-export interface HabitacionEnReservaDto {
-  id: string;
-  nro_habitacion: string;
-  piso: number;
-  estado: string;
-}
-
 export interface ReservaDto {
   id: string;
   codigo: string;
   huesped: ReturnType<typeof toHuespedDto>;
-  habitacion: HabitacionEnReservaDto;
+  habitacion: ReturnType<typeof toHabitacionDto>;
   tarifa: ReturnType<typeof toTarifaDto>;
   pago: ReturnType<typeof toPagoDto> | null;
   fecha_entrada: string;
@@ -76,12 +70,7 @@ export function toReservaDto(r: Reserva): ReservaDto {
     id: r.id,
     codigo: r.codigo,
     huesped: toHuespedDto(r.huesped),
-    habitacion: {
-      id: r.habitacion.id,
-      nro_habitacion: r.habitacion.nroHabitacion,
-      piso: r.habitacion.piso,
-      estado: r.habitacion.estado,
-    },
+    habitacion: toHabitacionDto(r.habitacion),
     tarifa: toTarifaDto(r.tarifa),
     pago: r.pago ? toPagoDto(r.pago) : null,
     fecha_entrada: r.fechaEntrada.toISOString(),

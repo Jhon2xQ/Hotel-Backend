@@ -81,8 +81,22 @@ GET /api/private/reservas?name=Garc&tipo=Doble&page=1&limit=10
         "habitacion": {
           "id": "uuid",
           "nro_habitacion": "101",
+          "tipo_habitacion": {
+            "id": "uuid",
+            "nombre": "Suite Deluxe",
+            "descripcion": "Suite con vista al mar",
+            "created_at": "2024-03-23T10:00:00.000Z",
+            "updated_at": "2024-03-23T10:00:00.000Z"
+          },
           "piso": 1,
-          "estado": "RESERVADA"
+          "tiene_ducha": true,
+          "tiene_banio": true,
+          "url_imagen": ["https://example.com/rooms/101-1.jpg"],
+          "estado": "RESERVADA",
+          "notas": null,
+          "ulti_limpieza": "2024-03-24T08:00:00.000Z",
+          "created_at": "2024-03-23T10:00:00.000Z",
+          "updated_at": "2024-03-23T10:00:00.000Z"
         },
         "tarifa": {
           "id": "uuid",
