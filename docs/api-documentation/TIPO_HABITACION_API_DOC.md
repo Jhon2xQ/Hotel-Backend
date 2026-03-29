@@ -1,20 +1,28 @@
 # API de Tipos de Habitación
 
-
 > **Autorización:** Las rutas que restrigen por rol usan `requireRoles(...)` (`src/presentation/middlewares/roles.middleware.ts`) con valores en `src/common/constants/roles.ts` (p. ej. `admin`, `recepcionista`). Cualquier mención a "ADMIN" u otros roles aquí es orientativa; la fuente de verdad es el `*.routes.ts` correspondiente.
-
 
 Documentación de los endpoints para gestionar los tipos de habitación del hotel.
 
 ## Base URL
 
-```
-/api/private/tipos-habitacion
-```
+| Tipo de ruta | URL base |
+|--------------|----------|
+| Público | `/api/public/tipos-habitacion` |
+| Privado | `/api/private/tipos-habitacion` |
 
 ## Autenticación
 
-Todos los endpoints requieren autenticación mediante sesión de Better Auth.
+- **Rutas públicas**: No requieren autenticación
+- **Rutas privadas**: Requieren sesión de Better Auth
+
+## Orden de endpoints
+
+1. `GET /` — listar
+2. `GET /:id` — por id
+3. `POST /` — crear (solo privado)
+4. `PUT /:id` — actualizar (solo privado)
+5. `DELETE /:id` — eliminar (solo privado)
 
 ## Endpoints
 
@@ -22,9 +30,11 @@ Todos los endpoints requieren autenticación mediante sesión de Better Auth.
 
 Obtiene la lista completa de tipos de habitación.
 
-**Endpoint:** `GET /api/private/tipos-habitacion`
+**Endpoint:** `GET /api/private/tipos-habitacion` (o `/api/public/tipos-habitacion`)
 
-**Permisos:** Usuario autenticado
+**Permisos:** 
+- Público: No requiere autenticación
+- Privado: Usuario autenticado
 
 **Respuesta exitosa (200):**
 
@@ -52,19 +62,17 @@ Obtiene la lista completa de tipos de habitación.
 }
 ```
 
-**Notas:**
-
-- Los tipos de habitación se devuelven ordenados por fecha de creación (más recientes primero)
-
 ---
 
 ### 2. Obtener Tipo de Habitación por ID
 
 Obtiene los detalles de un tipo de habitación específico.
 
-**Endpoint:** `GET /api/private/tipos-habitacion/:id`
+**Endpoint:** `GET /api/private/tipos-habitacion/:id` (o `/api/public/tipos-habitacion/:id`)
 
-**Permisos:** Usuario autenticado
+**Permisos:**
+- Público: No requiere autenticación
+- Privado: Usuario autenticado
 
 **Parámetros de ruta:**
 
@@ -91,15 +99,6 @@ Obtiene los detalles de un tipo de habitación específico.
 
 - `404`: Tipo de habitación no encontrado
 
-```json
-{
-  "success": false,
-  "message": "Tipo de habitación no encontrado",
-  "data": null,
-  "timestamp": 1710669600000
-}
-```
-
 ---
 
 ### 3. Crear Tipo de Habitación
@@ -108,7 +107,7 @@ Crea un nuevo tipo de habitación en el sistema.
 
 **Endpoint:** `POST /api/private/tipos-habitacion`
 
-**Permisos:** ADMIN
+**Permisos:** Usuario autenticado
 
 **Body (JSON):**
 
@@ -144,48 +143,8 @@ Crea un nuevo tipo de habitación en el sistema.
 **Errores:**
 
 - `400`: Datos de entrada inválidos
-
-```json
-{
-  "success": false,
-  "message": "El nombre es requerido",
-  "data": null,
-  "timestamp": 1710669600000
-}
-```
-
 - `401`: No autenticado
-
-```json
-{
-  "success": false,
-  "message": "No autorizado",
-  "data": null,
-  "timestamp": 1710669600000
-}
-```
-
-- `403`: No autorizado (requiere rol ADMIN)
-
-```json
-{
-  "success": false,
-  "message": "Acceso denegado. Se requiere rol de administrador",
-  "data": null,
-  "timestamp": 1710669600000
-}
-```
-
 - `409`: Nombre duplicado
-
-```json
-{
-  "success": false,
-  "message": "Ya existe un tipo de habitación con el nombre 'Suite Deluxe'",
-  "data": null,
-  "timestamp": 1710669600000
-}
-```
 
 ---
 
@@ -195,7 +154,7 @@ Actualiza los datos de un tipo de habitación existente.
 
 **Endpoint:** `PUT /api/private/tipos-habitacion/:id`
 
-**Permisos:** ADMIN
+**Permisos:** Usuario autenticado
 
 **Parámetros de ruta:**
 
@@ -233,28 +192,8 @@ Actualiza los datos de un tipo de habitación existente.
 
 - `400`: Datos de entrada inválidos
 - `401`: No autenticado
-- `403`: No autorizado (requiere rol ADMIN)
 - `404`: Tipo de habitación no encontrado
-
-```json
-{
-  "success": false,
-  "message": "Tipo de habitación no encontrado",
-  "data": null,
-  "timestamp": 1710669600000
-}
-```
-
 - `409`: Nombre duplicado
-
-```json
-{
-  "success": false,
-  "message": "Ya existe un tipo de habitación con el nombre 'Suite Deluxe Premium'",
-  "data": null,
-  "timestamp": 1710669600000
-}
-```
 
 **Notas:**
 
@@ -270,7 +209,7 @@ Elimina un tipo de habitación del sistema.
 
 **Endpoint:** `DELETE /api/private/tipos-habitacion/:id`
 
-**Permisos:** ADMIN
+**Permisos:** Usuario autenticado
 
 **Parámetros de ruta:**
 
@@ -290,46 +229,20 @@ Elimina un tipo de habitación del sistema.
 **Errores:**
 
 - `401`: No autenticado
-- `403`: No autorizado (requiere rol ADMIN)
 - `404`: Tipo de habitación no encontrado
-
-```json
-{
-  "success": false,
-  "message": "Tipo de habitación no encontrado",
-  "data": null,
-  "timestamp": 1710669600000
-}
-```
-
-- `409`: No se puede eliminar porque está en uso
-
-```json
-{
-  "success": false,
-  "message": "No se puede eliminar el tipo de habitación porque tiene registros relacionados",
-  "data": null,
-  "timestamp": 1710669600000
-}
-```
-
-**Notas:**
-
-- No se puede eliminar un tipo de habitación si tiene habitaciones asociadas
-- Esta validación protege la integridad referencial de los datos
+- `409`: No se puede eliminar porque está en uso (tiene habitaciones relacionadas)
 
 ---
 
 ## Códigos de Error
 
-| Código | Descripción                                                 |
-| ------ | ----------------------------------------------------------- |
-| 400    | Datos de entrada inválidos (validación de Zod)              |
-| 401    | No autenticado (sesión inválida o inexistente)              |
-| 403    | No autorizado (requiere rol ADMIN)                          |
-| 404    | Tipo de habitación no encontrado                            |
-| 409    | Conflicto (nombre duplicado o tiene registros relacionados) |
-| 500    | Error interno del servidor                                  |
+| Código | Descripción |
+|--------|-------------|
+| 400 | Datos de entrada inválidos (validación de Zod) |
+| 401 | No autenticado (sesión inválida o inexistente) |
+| 404 | Tipo de habitación no encontrado |
+| 409 | Conflicto (nombre duplicado o tiene registros relacionados) |
+| 500 | Error interno del servidor |
 
 ---
 
@@ -341,115 +254,63 @@ Elimina un tipo de habitación del sistema.
 - **Tipo**: String
 - **Longitud mínima**: 1 carácter
 - **Longitud máxima**: 100 caracteres
-- **Único**: Sí (no puede haber dos tipos con el mismo nombre)
-- **Ejemplo**: "Suite Deluxe", "Habitación Estándar", "Suite Presidencial"
+- **Único**: Sí
 
 ### Campo `descripcion`
 
 - **Requerido**: No
 - **Tipo**: String
-- **Longitud máxima**: Sin límite
-- **Ejemplo**: "Suite de lujo con vista panorámica al mar y todas las comodidades"
 
 ---
 
-## Notas
+## Estructura de Datos
 
-- Los tipos de habitación definen las plantillas o categorías de habitaciones disponibles en el hotel
-- Los tipos de habitación se utilizan como referencia para crear habitaciones físicas
-- El campo `nombre` debe ser único en todo el sistema
-- Los campos `created_at` y `updated_at` se gestionan automáticamente por el sistema
-- No se puede eliminar un tipo de habitación si tiene habitaciones asociadas
-- Al crear o actualizar, se valida que el nombre no esté duplicado
+```typescript
+{
+  id: string;              // UUID
+  nombre: string;          // máx. 100 caracteres, único
+  descripcion: string | null;
+  created_at: string;      // ISO 8601
+  updated_at: string;      // ISO 8601
+}
+```
 
 ---
 
 ## Ejemplos de Uso
 
-### Crear un tipo de habitación básico
+### Listar tipos de habitación (público)
 
 ```bash
-curl -X POST https://api.hotel.com/api/private/tipos-habitacion \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <token>" \
-  -d '{
-    "nombre": "Habitación Estándar",
-    "descripcion": "Habitación cómoda con todas las comodidades básicas"
-  }'
+curl -X GET https://api.hotel.com/api/public/tipos-habitacion
 ```
 
-### Crear un tipo de habitación de lujo
-
-```bash
-curl -X POST https://api.hotel.com/api/private/tipos-habitacion \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <token>" \
-  -d '{
-    "nombre": "Suite Deluxe",
-    "descripcion": "Suite de lujo con vista panorámica al mar, jacuzzi y todas las comodidades premium"
-  }'
-```
-
-### Crear un tipo sin descripción
-
-```bash
-curl -X POST https://api.hotel.com/api/private/tipos-habitacion \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <token>" \
-  -d '{
-    "nombre": "Habitación Económica"
-  }'
-```
-
-### Actualizar solo el nombre
-
-```bash
-curl -X PUT https://api.hotel.com/api/private/tipos-habitacion/123e4567-e89b-12d3-a456-426614174000 \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <token>" \
-  -d '{
-    "nombre": "Suite Deluxe Premium"
-  }'
-```
-
-### Actualizar solo la descripción
-
-```bash
-curl -X PUT https://api.hotel.com/api/private/tipos-habitacion/123e4567-e89b-12d3-a456-426614174000 \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <token>" \
-  -d '{
-    "descripcion": "Suite de lujo premium con vista panorámica al mar, jacuzzi privado y servicio de mayordomo 24/7"
-  }'
-```
-
-### Actualizar nombre y descripción
-
-```bash
-curl -X PUT https://api.hotel.com/api/private/tipos-habitacion/123e4567-e89b-12d3-a456-426614174000 \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <token>" \
-  -d '{
-    "nombre": "Suite Presidencial",
-    "descripcion": "La suite más lujosa del hotel con todas las comodidades premium"
-  }'
-```
-
-### Listar todos los tipos
+### Listar tipos de habitación (privado)
 
 ```bash
 curl -X GET https://api.hotel.com/api/private/tipos-habitacion \
   -H "Authorization: Bearer <token>"
 ```
 
-### Obtener un tipo específico
+### Crear tipo de habitación
 
 ```bash
-curl -X GET https://api.hotel.com/api/private/tipos-habitacion/123e4567-e89b-12d3-a456-426614174000 \
-  -H "Authorization: Bearer <token>"
+curl -X POST https://api.hotel.com/api/private/tipos-habitacion \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <token>" \
+  -d '{"nombre": "Suite Deluxe", "descripcion": "Suite de lujo"}'
 ```
 
-### Eliminar un tipo
+### Actualizar tipo de habitación
+
+```bash
+curl -X PUT https://api.hotel.com/api/private/tipos-habitacion/123e4567-e89b-12d3-a456-426614174000 \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <token>" \
+  -d '{"nombre": "Suite Deluxe Premium"}'
+```
+
+### Eliminar tipo de habitación
 
 ```bash
 curl -X DELETE https://api.hotel.com/api/private/tipos-habitacion/123e4567-e89b-12d3-a456-426614174000 \
