@@ -20,18 +20,20 @@ export class MuebleRepository implements IMuebleRepository {
         nombre: data.nombre,
         descripcion: data.descripcion ?? null,
         categoriaId: data.categoriaId,
-        imagenUrl: data.imagenUrl ?? null,
+        urlImagen: data.urlImagen ?? null,
         condicion: data.condicion ?? MuebleCondition.Bueno,
         fechaAdq: data.fechaAdq ?? null,
         ultimaRevision: data.ultimaRevision ?? null,
         habitacionId: data.habitacionId ?? null,
       },
+      include: { categoria: true },
     });
     return mapMuebleFromPrisma(result);
   }
 
   async findAll(): Promise<Mueble[]> {
     const results = await this.prisma.mueble.findMany({
+      include: { categoria: true },
       orderBy: { nombre: "asc" },
     });
     return results.map((r) => mapMuebleFromPrisma(r));
@@ -40,6 +42,7 @@ export class MuebleRepository implements IMuebleRepository {
   async findById(id: string): Promise<Mueble | null> {
     const result = await this.prisma.mueble.findUnique({
       where: { id },
+      include: { categoria: true },
     });
     return result ? mapMuebleFromPrisma(result) : null;
   }
@@ -47,6 +50,7 @@ export class MuebleRepository implements IMuebleRepository {
   async findByCodigo(codigo: string): Promise<Mueble | null> {
     const result = await this.prisma.mueble.findUnique({
       where: { codigo },
+      include: { categoria: true },
     });
     return result ? mapMuebleFromPrisma(result) : null;
   }
@@ -57,7 +61,7 @@ export class MuebleRepository implements IMuebleRepository {
     if (data.codigo !== undefined) updateData.codigo = data.codigo;
     if (data.nombre !== undefined) updateData.nombre = data.nombre;
     if (data.categoriaId !== undefined) updateData.categoriaId = data.categoriaId;
-    if (data.imagenUrl !== undefined) updateData.imagenUrl = data.imagenUrl ?? null;
+    if (data.urlImagen !== undefined) updateData.urlImagen = data.urlImagen;
     if (data.condicion !== undefined) updateData.condicion = data.condicion;
     if (data.fechaAdq !== undefined) updateData.fechaAdq = data.fechaAdq ?? null;
     if (data.ultimaRevision !== undefined) {
@@ -69,6 +73,7 @@ export class MuebleRepository implements IMuebleRepository {
     const result = await this.prisma.mueble.update({
       where: { id },
       data: updateData,
+      include: { categoria: true },
     });
     return mapMuebleFromPrisma(result);
   }

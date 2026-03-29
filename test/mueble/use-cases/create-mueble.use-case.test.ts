@@ -147,7 +147,6 @@ describe("CreateMuebleUseCase", () => {
       nombre: "Cama King Size",
       descripcion: "Cama de lujo",
       categoria_id: "categoria-id",
-      imagen_url: "https://example.com/cama.jpg",
       fecha_adquisicion: "2025-01-15",
       ultima_revision: "2026-03-01",
       habitacion_id: "habitacion-id",

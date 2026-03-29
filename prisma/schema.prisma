@@ -305,7 +305,7 @@ model Mueble {
   codigo         String          @unique @db.VarChar(30)
   nombre         String          @db.VarChar(100)
   categoriaId    String          @db.Uuid
-  imagenUrl      String?         @db.Text
+  urlImagen      String?         @db.Text
   condicion      CondicionMueble @default(BUENO)
   fechaAdq       DateTime?       @db.Date
   ultimaRevision DateTime?       @db.Date

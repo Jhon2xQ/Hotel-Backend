@@ -3,6 +3,15 @@ import { MuebleRepository } from "../../src/infrastructure/repositories/mueble.r
 import { PrismaClient } from "../../generated/prisma/client";
 import { MuebleCondition } from "../../src/domain/entities/mueble.entity";
 
+const mockCategoria = {
+  id: "categoria-id",
+  nombre: "Cama",
+  descripcion: "Muebles para dormir",
+  activo: true,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
+
 describe("MuebleRepository", () => {
   let repository: MuebleRepository;
   let mockPrisma: any;
@@ -28,14 +37,14 @@ describe("MuebleRepository", () => {
         codigo: "CAMA-001",
         nombre: "Cama King Size",
         descripcion: null,
-        categoriaId: "categoria-id",
-        imagenUrl: null,
+        urlImagen: null,
         condicion: "BUENO",
         fechaAdq: null,
         ultimaRevision: null,
         habitacionId: "habitacion-id",
         createdAt: new Date(),
         updatedAt: new Date(),
+        categoria: mockCategoria,
       };
 
       mockPrisma.mueble.create.mockResolvedValue(mockData);
@@ -62,14 +71,14 @@ describe("MuebleRepository", () => {
           codigo: "CAMA-001",
           nombre: "Cama King Size",
           descripcion: null,
-          categoriaId: "categoria-id",
-          imagenUrl: null,
+          urlImagen: null,
           condicion: "BUENO",
           fechaAdq: null,
           ultimaRevision: null,
           habitacionId: "habitacion-id",
           createdAt: new Date(),
           updatedAt: new Date(),
+          categoria: mockCategoria,
         },
       ];
 
@@ -90,14 +99,14 @@ describe("MuebleRepository", () => {
         codigo: "CAMA-001",
         nombre: "Cama King Size",
         descripcion: null,
-        categoriaId: "categoria-id",
-        imagenUrl: null,
+        urlImagen: null,
         condicion: "BUENO",
         fechaAdq: null,
         ultimaRevision: null,
         habitacionId: "habitacion-id",
         createdAt: new Date(),
         updatedAt: new Date(),
+        categoria: mockCategoria,
       };
 
       mockPrisma.mueble.findUnique.mockResolvedValue(mockData);
@@ -108,6 +117,7 @@ describe("MuebleRepository", () => {
       expect(result?.id).toBe("test-id");
       expect(mockPrisma.mueble.findUnique).toHaveBeenCalledWith({
         where: { id: "test-id" },
+        include: { categoria: true },
       });
     });
 
@@ -127,14 +137,14 @@ describe("MuebleRepository", () => {
         codigo: "CAMA-001",
         nombre: "Cama King Size",
         descripcion: null,
-        categoriaId: "categoria-id",
-        imagenUrl: null,
+        urlImagen: null,
         condicion: "BUENO",
         fechaAdq: null,
         ultimaRevision: null,
         habitacionId: "habitacion-id",
         createdAt: new Date(),
         updatedAt: new Date(),
+        categoria: mockCategoria,
       };
 
       mockPrisma.mueble.findUnique.mockResolvedValue(mockData);
@@ -161,14 +171,14 @@ describe("MuebleRepository", () => {
         codigo: "CAMA-001",
         nombre: "Cama Queen Size",
         descripcion: null,
-        categoriaId: "categoria-id",
-        imagenUrl: null,
+        urlImagen: null,
         condicion: "REGULAR",
         fechaAdq: null,
         ultimaRevision: null,
         habitacionId: "habitacion-id",
         createdAt: new Date(),
         updatedAt: new Date(),
+        categoria: mockCategoria,
       };
 
       mockPrisma.mueble.update.mockResolvedValue(mockData);

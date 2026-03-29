@@ -5,7 +5,7 @@ export interface CreateMuebleParams {
   nombre: string;
   descripcion?: string | null;
   categoriaId: string;
-  imagenUrl?: string | null;
+  urlImagen?: string | null;
   condicion?: MuebleCondition;
   fechaAdq?: Date | null;
   ultimaRevision?: Date | null;
@@ -16,7 +16,7 @@ export interface UpdateMuebleParams {
   codigo?: string;
   nombre?: string;
   categoriaId?: string;
-  imagenUrl?: string | null;
+  urlImagen?: string | null;
   condicion?: MuebleCondition;
   fechaAdq?: Date | null;
   ultimaRevision?: Date | null;
