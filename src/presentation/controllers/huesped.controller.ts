@@ -7,7 +7,7 @@ import { FindHuespedByIdUseCase } from "../../application/use-cases/huesped/find
 import { UpdateHuespedUseCase } from "../../application/use-cases/huesped/update-huesped.use-case";
 import { DeleteHuespedUseCase } from "../../application/use-cases/huesped/delete-huesped.use-case";
 import type { CreateHuespedDto, UpdateHuespedDto } from "../../application/dtos/huesped.dto";
-import type { PaginationQuery } from "../schemas/pagination.schema";
+import type { HuespedQuery } from "../schemas/huesped.schema";
 
 @injectable()
 export class HuespedController {
@@ -26,13 +26,9 @@ export class HuespedController {
   }
 
   async listPaginated(c: AppContext) {
-    const validData = c.get("validData") as PaginationQuery;
+    const validData = c.get("validData") as HuespedQuery;
     const result = await this.listPaginatedUseCase.execute(validData);
-    const output = {
-      list: result.list,
-      pagination: result.pagination,
-    };
-    return c.json(ApiResponse.success("Huéspedes obtenidos exitosamente", output), 200);
+    return c.json(ApiResponse.success("Huéspedes obtenidos exitosamente", result), 200);
   }
 
   async findById(c: AppContext) {

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { PaginationQuerySchema } from "./pagination.schema";
 
 export const HuespedIdSchema = z.object({
   id: z.string().uuid("El ID debe ser un UUID válido"),
@@ -44,3 +45,9 @@ export const UpdateHuespedSchema = z.object({
     .optional(),
   observacion: z.string().optional(),
 });
+
+export const HuespedQuerySchema = PaginationQuerySchema.extend({
+  name: z.string().optional(),
+});
+
+export type HuespedQuery = z.infer<typeof HuespedQuerySchema>;

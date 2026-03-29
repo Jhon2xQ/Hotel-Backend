@@ -34,16 +34,23 @@ export class HuespedRepository implements IHuespedRepository {
   }
 
   async findAllPaginated(params: PaginationParams): Promise<PaginatedResult<Huesped>> {
-    const { page, limit } = params;
+    const { page, limit, name } = params;
     const skip = (page - 1) * limit;
+
+    const where = name
+      ? {
+          OR: [{ nombres: { contains: name, mode: "insensitive" as const } }, { apellidos: { contains: name, mode: "insensitive" as const } }],
+        }
+      : undefined;
 
     const [huespedes, total] = await Promise.all([
       this.prisma.huesped.findMany({
+        where,
         take: limit,
         skip,
         orderBy: { createdAt: "desc" },
       }),
-      this.prisma.huesped.count(),
+      this.prisma.huesped.count({ where }),
     ]);
 
     const totalPages = Math.ceil(total / limit);
