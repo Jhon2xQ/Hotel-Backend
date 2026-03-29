@@ -13,24 +13,22 @@ export type HabitacionPrismaRow = {
   ultimaLimpieza: Date | null;
   createdAt: Date;
   updatedAt: Date;
-  tipo: (TipoHabitacionPrismaRow & Record<string, unknown>) | null;
+  tipo: TipoHabitacionPrismaRow & Record<string, unknown>;
 };
 
 export function mapHabitacionFromPrisma(data: HabitacionPrismaRow): Habitacion {
-  const tipo = data.tipo
-    ? mapTipoHabitacionFromPrisma({
-        id: data.tipo.id,
-        nombre: data.tipo.nombre,
-        descripcion: data.tipo.descripcion,
-        createdAt: data.tipo.createdAt,
-        updatedAt: data.tipo.updatedAt,
-      })
-    : null;
+  const tipoHabitacion = mapTipoHabitacionFromPrisma({
+    id: data.tipo.id,
+    nombre: data.tipo.nombre,
+    descripcion: data.tipo.descripcion,
+    createdAt: data.tipo.createdAt,
+    updatedAt: data.tipo.updatedAt,
+  });
 
   return new Habitacion(
     data.id,
     data.nroHabitacion,
-    tipo,
+    tipoHabitacion,
     data.piso,
     data.tieneDucha,
     data.tieneBanio,

@@ -42,8 +42,7 @@ export interface SearchAvailableHabitacionesDto {
 export interface HabitacionDto {
   id: string;
   nro_habitacion: string;
-  tipo_habitacion_id: string;
-  tipo: TipoHabitacionDto | null;
+  tipo_habitacion: TipoHabitacionDto;
   piso: number;
   tiene_ducha: boolean;
   tiene_banio: boolean;
@@ -64,8 +63,7 @@ export function toHabitacionDto(h: Habitacion): HabitacionDto {
   return {
     id: h.id,
     nro_habitacion: h.nroHabitacion,
-    tipo_habitacion_id: h.tipo?.id ?? "",
-    tipo: h.tipo ? toTipoHabitacionDto(h.tipo) : null,
+    tipo_habitacion: toTipoHabitacionDto(h.tipoHabitacion),
     piso: h.piso,
     tiene_ducha: h.tieneDucha,
     tiene_banio: h.tieneBanio,

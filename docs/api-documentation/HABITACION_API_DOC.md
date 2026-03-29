@@ -24,7 +24,7 @@ Documentación unificada del módulo `habitacion.routes.ts` (privado y público)
 7. **PATCH** estado / limpieza (privado): `PATCH /api/private/habitaciones/:id/estado`
 8. **DELETE** (privado): `DELETE /api/private/habitaciones/:id`
 
-En las respuestas, el objeto anidado `tipo` sigue el mismo contrato que **Tipo de habitación** (`TipoHabitacionDto`: incluye `id`, `nombre`, `descripcion`, `created_at`, `updated_at`).
+En las respuestas, el objeto anidado `tipo_habitacion` sigue el mismo contrato que **Tipo de habitación** (`TipoHabitacionDto`: incluye `id`, `nombre`, `descripcion`, `created_at`, `updated_at`).
 
 ## Autenticación
 
@@ -67,8 +67,7 @@ Obtiene la lista completa de habitaciones del hotel.
     {
       "id": "789e4567-e89b-12d3-a456-426614174000",
       "nro_habitacion": "101",
-      "tipo_habitacion_id": "123e4567-e89b-12d3-a456-426614174000",
-      "tipo": {
+      "tipo_habitacion": {
         "id": "123e4567-e89b-12d3-a456-426614174000",
         "nombre": "Suite Deluxe",
         "descripcion": "Suite de lujo con vista panorámica al mar"
@@ -86,8 +85,7 @@ Obtiene la lista completa de habitaciones del hotel.
     {
       "id": "789e4567-e89b-12d3-a456-426614174001",
       "nro_habitacion": "102",
-      "tipo_habitacion_id": "123e4567-e89b-12d3-a456-426614174001",
-      "tipo": {
+      "tipo_habitacion": {
         "id": "123e4567-e89b-12d3-a456-426614174001",
         "nombre": "Habitación Estándar",
         "descripcion": "Habitación cómoda con todas las comodidades básicas"
@@ -137,8 +135,7 @@ Obtiene los detalles de una habitación específica.
   "data": {
     "id": "789e4567-e89b-12d3-a456-426614174000",
     "nro_habitacion": "101",
-    "tipo_habitacion_id": "123e4567-e89b-12d3-a456-426614174000",
-    "tipo": {
+    "tipo_habitacion": {
       "id": "123e4567-e89b-12d3-a456-426614174000",
       "nombre": "Suite Deluxe",
       "descripcion": "Suite de lujo con vista panorámica al mar"
@@ -233,8 +230,7 @@ Crea una nueva habitación física en el sistema.
   "data": {
     "id": "789e4567-e89b-12d3-a456-426614174000",
     "nro_habitacion": "301",
-    "tipo_habitacion_id": "123e4567-e89b-12d3-a456-426614174000",
-    "tipo": {
+    "tipo_habitacion": {
       "id": "123e4567-e89b-12d3-a456-426614174000",
       "nombre": "Suite Deluxe",
       "descripcion": "Suite de lujo con vista panorámica al mar"
@@ -350,8 +346,7 @@ Actualiza los datos completos de una habitación existente.
   "data": {
     "id": "789e4567-e89b-12d3-a456-426614174000",
     "nro_habitacion": "301-A",
-    "tipo_habitacion_id": "123e4567-e89b-12d3-a456-426614174000",
-    "tipo": {
+    "tipo_habitacion": {
       "id": "123e4567-e89b-12d3-a456-426614174000",
       "nombre": "Suite Deluxe",
       "descripcion": "Suite de lujo con vista panorámica al mar"
@@ -441,8 +436,7 @@ Actualiza únicamente el estado operacional de una habitación. Este endpoint es
   "data": {
     "id": "789e4567-e89b-12d3-a456-426614174000",
     "nro_habitacion": "301",
-    "tipo_habitacion_id": "123e4567-e89b-12d3-a456-426614174000",
-    "tipo": {
+    "tipo_habitacion": {
       "id": "123e4567-e89b-12d3-a456-426614174000",
       "nombre": "Suite Deluxe",
       "descripcion": "Suite de lujo con vista panorámica al mar"
