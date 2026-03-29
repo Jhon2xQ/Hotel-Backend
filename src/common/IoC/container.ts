@@ -37,7 +37,6 @@ import { DeleteTipoHabitacionUseCase } from "../../application/use-cases/tipo-ha
 
 import { CreateReservaUseCase } from "../../application/use-cases/reserva/create-reserva.use-case";
 import { ListReservaPaginatedUseCase } from "../../application/use-cases/reserva/list-reserva-paginated.use-case";
-import { ListReservaUseCase } from "../../application/use-cases/reserva/list-reserva.use-case";
 import { FindReservaByIdUseCase } from "../../application/use-cases/reserva/find-reserva-by-id.use-case";
 import { UpdateReservaUseCase } from "../../application/use-cases/reserva/update-reserva.use-case";
 import { DeleteReservaUseCase } from "../../application/use-cases/reserva/delete-reserva.use-case";
@@ -126,16 +125,7 @@ const useCaseAndControllerClasses: Array<new (...args: never[]) => unknown> = [
   UpdateTipoHabitacionUseCase,
   DeleteTipoHabitacionUseCase,
   CreateReservaUseCase,
-episodio@episodio:~/Escritorio/Hono/Hotel-backend$ git pull --rebase origin fix/reserva
-Desde https://github.com/Jhon2xQ/Hotel-Backend
- * branch            fix/reserva -> FETCH_HEAD
-warning: se ha saltado el commit cf217e6 aplicado previamente
-ayuda: use --reapply-cherry-picks para incluir los commits saltados
-ayuda: Disable this message with "git config advice.skippedCherryPicks false"
-descartando $4f15abf5cd7111e422fc479328b0d8f18aec2c13 Fix/reserva (#25) -- contenidos del parche ya están en upstream
-Rebase aplicado satisfactoriamente y actualizado refs/heads/fix/reserva.
-episodio@episodio:~/Escritorio/Hono/Hotel-backend$   ListReservaPaginatedUseCase,
-  ListReservaUseCase,
+  ListReservaPaginatedUseCase,
   FindReservaByIdUseCase,
   UpdateReservaUseCase,
   DeleteReservaUseCase,
