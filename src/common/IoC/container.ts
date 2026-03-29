@@ -36,7 +36,7 @@ import { UpdateTipoHabitacionUseCase } from "../../application/use-cases/tipo-ha
 import { DeleteTipoHabitacionUseCase } from "../../application/use-cases/tipo-habitacion/delete-tipo-habitacion.use-case";
 
 import { CreateReservaUseCase } from "../../application/use-cases/reserva/create-reserva.use-case";
-import { ListReservaUseCase } from "../../application/use-cases/reserva/list-reserva.use-case";
+import { ListReservaPaginatedUseCase } from "../../application/use-cases/reserva/list-reserva-paginated.use-case";
 import { FindReservaByIdUseCase } from "../../application/use-cases/reserva/find-reserva-by-id.use-case";
 import { UpdateReservaUseCase } from "../../application/use-cases/reserva/update-reserva.use-case";
 import { DeleteReservaUseCase } from "../../application/use-cases/reserva/delete-reserva.use-case";
@@ -125,7 +125,7 @@ const useCaseAndControllerClasses: Array<new (...args: never[]) => unknown> = [
   UpdateTipoHabitacionUseCase,
   DeleteTipoHabitacionUseCase,
   CreateReservaUseCase,
-  ListReservaUseCase,
+  ListReservaPaginatedUseCase,
   FindReservaByIdUseCase,
   UpdateReservaUseCase,
   DeleteReservaUseCase,
