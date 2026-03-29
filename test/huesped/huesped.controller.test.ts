@@ -122,6 +122,29 @@ describe("HuespedController", () => {
       );
     });
 
+    it("should pass name filter to use-case", async () => {
+      const mockContext = createMockContext();
+
+      const paginatedResult = {
+        list: [createMockHuesped({ nombres: "Juan" })],
+        pagination: {
+          page: 1,
+          limit: 10,
+          total: 1,
+          totalPages: 1,
+          hasNextPage: false,
+          hasPreviousPage: false,
+        },
+      };
+
+      mockContext.get = vi.fn().mockReturnValue({ page: 1, limit: 10, name: "Juan" });
+      mockListPaginatedUseCase.execute.mockResolvedValue(paginatedResult);
+
+      await controller.listPaginated(mockContext);
+
+      expect(mockListPaginatedUseCase.execute).toHaveBeenCalledWith({ page: 1, limit: 10, name: "Juan" });
+    });
+
     it("should return empty array when no huespedes exist", async () => {
       const mockContext = createMockContext();
 

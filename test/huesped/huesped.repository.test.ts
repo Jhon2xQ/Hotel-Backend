@@ -15,6 +15,7 @@ describe("HuespedRepository", () => {
       findMany: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
+      count: vi.fn(),
     };
     repository = new HuespedRepository(mockPrisma);
   });
@@ -138,6 +139,71 @@ describe("HuespedRepository", () => {
       const result = await repository.findAll();
 
       expect(result).toEqual([]);
+    });
+  });
+
+  describe("findAllPaginated", () => {
+    it("should return paginated results without name filter", async () => {
+      const mockResults = [
+        {
+          id: "huesped-1",
+          tipoDoc: null,
+          nroDoc: null,
+          nombres: "Juan",
+          apellidos: "Pérez",
+          email: "juan@example.com",
+          telefono: "+51987654321",
+          nacionalidad: "Perú",
+          observacion: null,
+          createdAt: new Date("2026-03-18T14:30:00.000Z"),
+          updatedAt: new Date("2026-03-18T14:30:00.000Z"),
+        },
+      ];
+
+      mockPrisma.huesped.findMany.mockResolvedValue(mockResults);
+      mockPrisma.huesped.count.mockResolvedValue(1);
+
+      const result = await repository.findAllPaginated({ page: 1, limit: 10 });
+
+      expect(result.list).toHaveLength(1);
+      expect(result.pagination.total).toBe(1);
+      expect(mockPrisma.huesped.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: undefined,
+          take: 10,
+          skip: 0,
+          orderBy: { createdAt: "desc" },
+        }),
+      );
+      expect(mockPrisma.huesped.count).toHaveBeenCalledWith({ where: undefined });
+    });
+
+    it("should filter by name using case-insensitive contains on nombres and apellidos", async () => {
+      mockPrisma.huesped.findMany.mockResolvedValue([]);
+      mockPrisma.huesped.count.mockResolvedValue(0);
+
+      await repository.findAllPaginated({ page: 1, limit: 10, name: "Juan" });
+
+      expect(mockPrisma.huesped.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: {
+            OR: [
+              { nombres: { contains: "Juan", mode: "insensitive" } },
+              { apellidos: { contains: "Juan", mode: "insensitive" } },
+            ],
+          },
+          take: 10,
+          skip: 0,
+        }),
+      );
+      expect(mockPrisma.huesped.count).toHaveBeenCalledWith({
+        where: {
+          OR: [
+            { nombres: { contains: "Juan", mode: "insensitive" } },
+            { apellidos: { contains: "Juan", mode: "insensitive" } },
+          ],
+        },
+      });
     });
   });
 

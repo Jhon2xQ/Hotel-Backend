@@ -32,6 +32,7 @@ Obtiene una lista paginada de huéspedes registrados en el sistema.
 
 - `page` (number, opcional): Número de página (por defecto: 1, mínimo: 1)
 - `limit` (number, opcional): Cantidad de resultados por página (por defecto: 10, mínimo: 1, máximo: 100)
+- `name` (string, opcional): Filtrar por nombre o apellido (búsqueda parcial, case-insensitive)
 
 **Ejemplo de petición:**
 
@@ -42,8 +43,11 @@ GET /api/private/huespedes
 # Con parámetros personalizados
 GET /api/private/huespedes?page=2&limit=20
 
-# Primera página con 50 registros
-GET /api/private/huespedes?page=1&limit=50
+# Filtrar por nombre (busca en nombres y apellidos)
+GET /api/private/huespedes?name=Juan
+
+# Combinar filtro de nombre con paginación
+GET /api/private/huespedes?name=Garc&page=1&limit=10
 ```
 
 **Respuesta exitosa (200):**
@@ -360,6 +364,9 @@ GET /api/private/huespedes?page=2&limit=20
 
 # Obtener todos los registros posibles (máximo 100 por página)
 GET /api/private/huespedes?limit=100
+
+# Buscar por nombre con paginación
+GET /api/private/huespedes?name=Juan&page=1&limit=10
 ```
 
 ### Email Único
@@ -381,7 +388,17 @@ La eliminación de un huésped es permanente. Si el huésped tiene reservas o es
 
 ### Búsqueda de Huéspedes
 
-Antes de crear un nuevo huésped, se recomienda buscar por email o documento de identidad para evitar duplicados. El sistema valida automáticamente la unicidad del email.
+El endpoint de listado soporta búsqueda por nombre mediante el query param `name`. La búsqueda es parcial y case-insensitive, y busca coincidencias tanto en `nombres` como en `apellidos`. Esto es útil para implementar un buscador en el frontend que filtre mientras el usuario escribe.
+
+```bash
+# Buscar huéspedes cuyo nombre o apellido contenga "mar"
+GET /api/private/huespedes?name=mar
+
+# Buscar con paginación
+GET /api/private/huespedes?name=Garc&page=1&limit=20
+```
+
+> Antes de crear un nuevo huésped, se recomienda buscar por email o documento de identidad para evitar duplicados. El sistema valida automáticamente la unicidad del email.
 
 ---
 
