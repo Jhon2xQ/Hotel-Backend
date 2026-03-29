@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { PaginationQuerySchema } from "./pagination.schema";
 
 const EstadoReservaEnum = z.enum(["TENTATIVA", "CONFIRMADA", "EN_CASA", "COMPLETADA", "CANCELADA", "NO_LLEGO"]);
 
@@ -63,3 +64,10 @@ export const UpdateEstadoReservaSchema = z.object({
     message: "Estado inválido",
   }),
 });
+
+export const ReservaQuerySchema = PaginationQuerySchema.extend({
+  name: z.string().optional(),
+  tipo: z.string().optional(),
+});
+
+export type ReservaQuery = z.infer<typeof ReservaQuerySchema>;

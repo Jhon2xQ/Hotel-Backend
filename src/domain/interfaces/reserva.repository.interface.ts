@@ -1,4 +1,5 @@
 import type { Reserva, EstadoReserva } from "../entities/reserva.entity";
+import type { PaginatedResult, PaginationParams } from "../../application/paginations/api.pagination";
 
 export interface CreateReservaPersistParams {
   codigo: string;
@@ -36,9 +37,14 @@ export interface UpdateReservaParams {
   canceladoEn?: Date | null;
 }
 
+export interface ReservaPaginationParams extends PaginationParams {
+  tipo?: string;
+}
+
 export interface IReservaRepository {
   create(data: CreateReservaPersistParams): Promise<Reserva>;
   findAll(): Promise<Reserva[]>;
+  findAllPaginated(params: ReservaPaginationParams): Promise<PaginatedResult<Reserva>>;
   findById(id: string): Promise<Reserva | null>;
   findByCodigo(codigo: string): Promise<Reserva | null>;
   update(id: string, data: UpdateReservaParams): Promise<Reserva | null>;

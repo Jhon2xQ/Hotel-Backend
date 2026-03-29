@@ -5,7 +5,9 @@ import type {
   IReservaRepository,
   CreateReservaPersistParams,
   UpdateReservaParams,
+  ReservaPaginationParams,
 } from "../../domain/interfaces/reserva.repository.interface";
+import type { PaginatedResult } from "../../application/paginations/api.pagination";
 import { mapReservaFromPrisma } from "../mappers/reserva.mapper";
 import { DI_TOKENS } from "../../common/IoC/tokens";
 
@@ -48,6 +50,52 @@ export class ReservaRepository implements IReservaRepository {
       orderBy: { createdAt: "desc" },
     });
     return results.map((r) => mapReservaFromPrisma(r));
+  }
+
+  async findAllPaginated(params: ReservaPaginationParams): Promise<PaginatedResult<Reserva>> {
+    const { page, limit, name, tipo } = params;
+    const skip = (page - 1) * limit;
+
+    const conditions: Record<string, unknown>[] = [];
+
+    if (name) {
+      conditions.push({
+        nombreHuesped: { contains: name, mode: "insensitive" },
+      });
+    }
+
+    if (tipo) {
+      conditions.push({
+        nombreTipoHab: { contains: tipo, mode: "insensitive" },
+      });
+    }
+
+    const where = conditions.length > 0 ? { AND: conditions } : undefined;
+
+    const [reservas, total] = await Promise.all([
+      this.prisma.reserva.findMany({
+        where,
+        include: this.getIncludeRelations(),
+        take: limit,
+        skip,
+        orderBy: { createdAt: "desc" },
+      }),
+      this.prisma.reserva.count({ where }),
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      list: reservas.map((r) => mapReservaFromPrisma(r)),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
+      },
+    };
   }
 
   async findById(id: string): Promise<Reserva | null> {

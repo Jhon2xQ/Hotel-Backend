@@ -20,13 +20,39 @@ Todos los endpoints requieren autenticación mediante Better Auth. Solo el endpo
 
 ## Endpoints
 
-### 1. Listar Reservas
+### 1. Listar Reservas (Paginado)
 
-Obtiene todas las reservas del sistema.
+Obtiene una lista paginada de reservas con filtros opcionales.
 
 **Endpoint:** `GET /api/private/reservas`
 
 **Autenticación:** Requerida
+
+**Query Parameters:**
+
+- `page` (number, opcional): Número de página (por defecto: 1, mínimo: 1)
+- `limit` (number, opcional): Cantidad de resultados por página (por defecto: 10, mínimo: 1, máximo: 100)
+- `name` (string, opcional): Filtrar por nombre del huésped (búsqueda parcial, case-insensitive)
+- `tipo` (string, opcional): Filtrar por tipo de habitación (búsqueda parcial, case-insensitive)
+
+**Ejemplo de petición:**
+
+```bash
+# Sin parámetros (usa valores por defecto: page=1, limit=10)
+GET /api/private/reservas
+
+# Con parámetros de paginación
+GET /api/private/reservas?page=2&limit=20
+
+# Filtrar por nombre de huésped
+GET /api/private/reservas?name=Juan
+
+# Filtrar por tipo de habitación
+GET /api/private/reservas?tipo=Suite
+
+# Combinar filtros con paginación
+GET /api/private/reservas?name=Garc&tipo=Doble&page=1&limit=10
+```
 
 **Respuesta Exitosa (200):**
 
@@ -34,95 +60,116 @@ Obtiene todas las reservas del sistema.
 {
   "success": true,
   "message": "Reservas obtenidas exitosamente",
-  "data": [
-    {
-      "id": "uuid",
-      "codigo": "KOR-20260327-A7K9P2",
-      "huesped": {
+  "data": {
+    "list": [
+      {
         "id": "uuid",
-        "tipo_doc": "DNI",
-        "nro_doc": "12345678",
-        "nombres": "Juan",
-        "apellidos": "Pérez",
-        "email": "juan@example.com",
-        "telefono": "+51999999999",
-        "nacionalidad": "PE",
-        "observacion": null,
-        "created_at": "2024-03-23T10:00:00.000Z",
-        "updated_at": "2024-03-23T10:00:00.000Z"
-      },
-      "habitacion": {
-        "id": "uuid",
+        "codigo": "KOR-20260327-A7K9P2",
+        "huesped": {
+          "id": "uuid",
+          "tipo_doc": "DNI",
+          "nro_doc": "12345678",
+          "nombres": "Juan",
+          "apellidos": "Pérez",
+          "email": "juan@example.com",
+          "telefono": "+51999999999",
+          "nacionalidad": "PE",
+          "observacion": null,
+          "created_at": "2024-03-23T10:00:00.000Z",
+          "updated_at": "2024-03-23T10:00:00.000Z"
+        },
+        "habitacion": {
+          "id": "uuid",
+          "nro_habitacion": "101",
+          "piso": 1,
+          "estado": "RESERVADA"
+        },
+        "tarifa": {
+          "id": "uuid",
+          "tipo_habitacion": {
+            "id": "uuid",
+            "nombre": "Suite Deluxe",
+            "descripcion": "Suite con vista al mar",
+            "created_at": "2024-03-23T10:00:00.000Z",
+            "updated_at": "2024-03-23T10:00:00.000Z"
+          },
+          "canal": {
+            "id": "uuid",
+            "nombre": "Booking.com",
+            "tipo": "OTA",
+            "activo": true,
+            "notas": null,
+            "created_at": "2024-03-23T10:00:00.000Z",
+            "updated_at": "2024-03-23T10:00:00.000Z"
+          },
+          "precio_noche": 150.0,
+          "iva": 18.0,
+          "cargo_servicios": 10.0,
+          "moneda": "USD",
+          "created_at": "2024-03-23T10:00:00.000Z",
+          "updated_at": "2024-03-23T10:00:00.000Z"
+        },
+        "pago": {
+          "id": "uuid",
+          "concepto": "RESERVA",
+          "estado": "CONFIRMADO",
+          "fecha_pago": "2024-03-23T10:00:00.000Z",
+          "monto": "300.00",
+          "moneda": "SOL",
+          "metodo": "VISA",
+          "recibido_por_id": "user-id",
+          "recibido_por": {
+            "id": "user-id",
+            "name": "María García",
+            "email": "maria@hotel.com"
+          },
+          "observacion": "Pago adelantado por reserva",
+          "created_at": "2024-03-23T10:00:00.000Z"
+        },
+        "fecha_entrada": "2024-03-25T14:00:00.000Z",
+        "fecha_salida": "2024-03-27T12:00:00.000Z",
+        "adultos": 2,
+        "ninos": 1,
+        "nombre_huesped": "Juan Pérez",
         "nro_habitacion": "101",
-        "piso": 1,
-        "estado": "RESERVADA"
-      },
-      "tarifa": {
-        "id": "uuid",
-        "tipo_habitacion": {
-          "id": "uuid",
-          "nombre": "Suite Deluxe",
-          "descripcion": "Suite con vista al mar",
-          "created_at": "2024-03-23T10:00:00.000Z",
-          "updated_at": "2024-03-23T10:00:00.000Z"
-        },
-        "canal": {
-          "id": "uuid",
-          "nombre": "Booking.com",
-          "tipo": "OTA",
-          "activo": true,
-          "notas": null,
-          "created_at": "2024-03-23T10:00:00.000Z",
-          "updated_at": "2024-03-23T10:00:00.000Z"
-        },
+        "nombre_tipo_hab": "Suite Deluxe",
+        "nombre_canal": "Booking.com",
         "precio_noche": 150.0,
         "iva": 18.0,
         "cargo_servicios": 10.0,
-        "moneda": "USD",
+        "monto_total": 300.0,
+        "monto_descuento": 0.0,
+        "monto_final": 300.0,
+        "estado": "CONFIRMADA",
+        "motivo_cancel": null,
+        "cancelado_en": null,
         "created_at": "2024-03-23T10:00:00.000Z",
         "updated_at": "2024-03-23T10:00:00.000Z"
-      },
-      "pago": {
-        "id": "uuid",
-        "concepto": "RESERVA",
-        "estado": "CONFIRMADO",
-        "fecha_pago": "2024-03-23T10:00:00.000Z",
-        "monto": "300.00",
-        "moneda": "SOL",
-        "metodo": "VISA",
-        "recibido_por_id": "user-id",
-        "recibido_por": {
-          "id": "user-id",
-          "name": "María García",
-          "email": "maria@hotel.com"
-        },
-        "observacion": "Pago adelantado por reserva",
-        "created_at": "2024-03-23T10:00:00.000Z"
-      },
-      "fecha_entrada": "2024-03-25T14:00:00.000Z",
-      "fecha_salida": "2024-03-27T12:00:00.000Z",
-      "adultos": 2,
-      "ninos": 1,
-      "nombre_huesped": "Juan Pérez",
-      "nro_habitacion": "101",
-      "nombre_tipo_hab": "Suite Deluxe",
-      "nombre_canal": "Booking.com",
-      "precio_noche": 150.0,
-      "iva": 18.0,
-      "cargo_servicios": 10.0,
-      "monto_total": 300.0,
-      "monto_descuento": 0.0,
-      "monto_final": 300.0,
-      "estado": "CONFIRMADA",
-      "motivo_cancel": null,
-      "cancelado_en": null,
-      "created_at": "2024-03-23T10:00:00.000Z",
-      "updated_at": "2024-03-23T10:00:00.000Z"
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 10,
+      "total": 45,
+      "totalPages": 5,
+      "hasNextPage": true,
+      "hasPreviousPage": false
     }
-  ],
+  },
   "timestamp": 1711188000000
 }
 ```
+
+**Campos de la respuesta:**
+
+- `list`: Array de reservas en la página actual
+- `pagination`: Objeto con información de paginación
+  - `page`: Número de página actual
+  - `limit`: Cantidad de resultados por página
+  - `total`: Total de reservas (considerando filtros)
+  - `totalPages`: Total de páginas disponibles
+  - `hasNextPage`: `true` si existe una página siguiente
+  - `hasPreviousPage`: `true` si existe una página anterior
 
 **Nota:** El campo `pago` será `null` si la reserva no tiene un pago asociado.
 

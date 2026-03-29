@@ -2,14 +2,14 @@ import { Hono } from "hono";
 import { container } from "tsyringe";
 import { AppHono, AppVariables } from "../common/types/app.types";
 import { ReservaController } from "../presentation/controllers/reserva.controller";
-import { validSchema } from "../presentation/middlewares/valid.middleware";
-import { CreateReservaSchema, UpdateReservaSchema, CancelReservaSchema, UpdateEstadoReservaSchema } from "../presentation/schemas/reserva.schema";
+import { validSchema, validQuery } from "../presentation/middlewares/valid.middleware";
+import { CreateReservaSchema, UpdateReservaSchema, CancelReservaSchema, UpdateEstadoReservaSchema, ReservaQuerySchema } from "../presentation/schemas/reserva.schema";
 
 export function createReservaRoutes(): AppHono {
   const ctrl = container.resolve(ReservaController);
   const router = new Hono<{ Variables: AppVariables }>();
 
-  router.get("/", (c) => ctrl.list(c));
+  router.get("/", validQuery(ReservaQuerySchema), (c) => ctrl.listPaginated(c));
   router.get("/:id", (c) => ctrl.findById(c));
   router.post("/", validSchema(CreateReservaSchema), (c) => ctrl.create(c));
   router.put("/:id", validSchema(UpdateReservaSchema), (c) => ctrl.update(c));

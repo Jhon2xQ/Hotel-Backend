@@ -2,25 +2,20 @@ import { injectable } from "tsyringe";
 import { AppContext } from "../../common/types/app.types";
 import { ApiResponse } from "../api.response";
 import { CreateReservaUseCase } from "../../application/use-cases/reserva/create-reserva.use-case";
-import { ListReservaUseCase } from "../../application/use-cases/reserva/list-reserva.use-case";
+import { ListReservaPaginatedUseCase } from "../../application/use-cases/reserva/list-reserva-paginated.use-case";
 import { FindReservaByIdUseCase } from "../../application/use-cases/reserva/find-reserva-by-id.use-case";
 import { UpdateReservaUseCase } from "../../application/use-cases/reserva/update-reserva.use-case";
 import { DeleteReservaUseCase } from "../../application/use-cases/reserva/delete-reserva.use-case";
 import { CancelReservaUseCase } from "../../application/use-cases/reserva/cancel-reserva.use-case";
 import { UpdateEstadoReservaUseCase } from "../../application/use-cases/reserva/update-estado-reserva.use-case";
-import {
-  CreateReservaDto,
-  UpdateReservaDto,
-  CancelReservaDto,
-  UpdateEstadoReservaDto,
-  toReservaDto,
-} from "../../application/dtos/reserva.dto";
+import { CreateReservaDto, UpdateReservaDto, CancelReservaDto, UpdateEstadoReservaDto, toReservaDto } from "../../application/dtos/reserva.dto";
+import type { ReservaQuery } from "../schemas/reserva.schema";
 
 @injectable()
 export class ReservaController {
   constructor(
     private createUseCase: CreateReservaUseCase,
-    private listUseCase: ListReservaUseCase,
+    private listPaginatedUseCase: ListReservaPaginatedUseCase,
     private findByIdUseCase: FindReservaByIdUseCase,
     private updateUseCase: UpdateReservaUseCase,
     private deleteUseCase: DeleteReservaUseCase,
@@ -34,6 +29,10 @@ export class ReservaController {
     return c.json(ApiResponse.success("Reserva creada exitosamente", toReservaDto(reserva)), 201);
   }
 
+  async listPaginated(c: AppContext) {
+    const validData = c.get("validData") as ReservaQuery;
+    const result = await this.listPaginatedUseCase.execute(validData);
+    return c.json(ApiResponse.success("Reservas obtenidas exitosamente", result), 200);
   async list(c: AppContext) {
     const reservas = await this.listUseCase.execute();
     return c.json(ApiResponse.success("Reservas obtenidas exitosamente", reservas), 200);
