@@ -10,7 +10,6 @@ export async function parseFormDataMiddleware(c: AppContext, next: Next) {
 
     for (const [key, value] of formData.entries()) {
       if (value && typeof value === "object" && "name" in value && "type" in value) {
-        // Handle file uploads
         if (!parsedData[key]) {
           parsedData[key] = [];
         }

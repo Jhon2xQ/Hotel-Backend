@@ -1,3 +1,5 @@
+import type { CategoriaMueble } from "./categoria-mueble.entity";
+
 export enum MuebleCondition {
   Bueno = "BUENO",
   Regular = "REGULAR",
@@ -11,8 +13,8 @@ export class Mueble {
     public readonly codigo: string,
     public readonly nombre: string,
     public readonly descripcion: string | null,
-    public readonly categoriaId: string,
-    public readonly imagenUrl: string | null,
+    public readonly categoria: CategoriaMueble,
+    public readonly urlImagen: string | null,
     public readonly condicion: MuebleCondition,
     public readonly fechaAdq: Date | null,
     public readonly ultimaRevision: Date | null,

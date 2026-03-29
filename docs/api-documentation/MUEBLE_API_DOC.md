@@ -14,11 +14,17 @@ Documentación del módulo `muebles.routes.ts`: gestión de muebles del hotel.
 
 ## Orden de endpoints
 
-1. `GET /` — listar  
-2. `GET /:id` — por id  
-3. `POST /` — crear  
-4. `PUT /:id` — actualizar  
-5. `DELETE /:id` — eliminar  
+1. `GET /` — listar
+2. `GET /:id` — por id
+3. `POST /` — crear (`multipart/form-data` si hay imágenes)
+4. `PUT /:id` — actualizar (`multipart/form-data` si hay imágenes)
+5. `DELETE /:id` — eliminar
+
+## Imágenes (S3 / multipart)
+
+Creación y actualización aceptan `multipart/form-data` con campos de mueble y archivos de imagen; las URLs resultantes se guardan en `url_imagen`. Variables de entorno S3: `S3_REGION`, `S3_ENDPOINT`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_BUCKET_NAME`, `S3_FORCE_PATH_STYLE`.
+
+En las respuestas, el objeto anidado `categoria` sigue el mismo contrato que **Categoría de mueble** (`CategoriaMuebleDto`: incluye `id`, `nombre`, `descripcion`, `activo`, `created_at`, `updated_at`).
 
 ## Endpoints
 
@@ -42,8 +48,15 @@ Obtiene la lista de todos los muebles registrados.
       "codigo": "CAMA-001",
       "nombre": "Cama King Size",
       "descripcion": "Cama de lujo",
-      "categoria_id": "uuid-categoria",
-      "imagen_url": "https://example.com/cama.jpg",
+      "categoria": {
+        "id": "uuid-categoria",
+        "nombre": "Cama",
+        "descripcion": "Muebles para dormir",
+        "activo": true,
+        "created_at": "2026-03-24T08:00:00.000Z",
+        "updated_at": "2026-03-24T08:00:00.000Z"
+      },
+      "url_imagen": "https://example.com/cama.jpg",
       "condicion": "BUENO",
       "fecha_adquisicion": "2025-01-15",
       "ultima_revision": "2026-03-01",
@@ -56,8 +69,15 @@ Obtiene la lista de todos los muebles registrados.
       "codigo": "SILLA-001",
       "nombre": "Silla de Escritorio",
       "descripcion": "Silla ergonómica",
-      "categoria_id": "uuid-categoria-2",
-      "imagen_url": "https://example.com/silla.jpg",
+      "categoria": {
+        "id": "uuid-categoria-2",
+        "nombre": "Silla",
+        "descripcion": "Muebles para sentarse",
+        "activo": true,
+        "created_at": "2026-03-24T08:00:00.000Z",
+        "updated_at": "2026-03-24T08:00:00.000Z"
+      },
+      "url_imagen": null,
       "condicion": "BUENO",
       "fecha_adquisicion": "2025-02-10",
       "ultima_revision": null,
@@ -100,8 +120,15 @@ Obtiene los detalles de un mueble específico.
     "codigo": "CAMA-001",
     "nombre": "Cama King Size",
     "descripcion": "Cama de lujo con colchón ortopédico",
-    "categoria_id": "uuid-categoria",
-    "imagen_url": "https://example.com/cama.jpg",
+    "categoria": {
+      "id": "uuid-categoria",
+      "nombre": "Cama",
+      "descripcion": "Muebles para dormir",
+      "activo": true,
+      "created_at": "2026-03-24T08:00:00.000Z",
+      "updated_at": "2026-03-24T08:00:00.000Z"
+    },
+    "url_imagen": "https://example.com/cama.jpg",
     "condicion": "BUENO",
     "fecha_adquisicion": "2025-01-15",
     "ultima_revision": "2026-03-01",
@@ -124,39 +151,25 @@ Obtiene los detalles de un mueble específico.
 
 ### 3. Crear Mueble
 
-Crea un nuevo mueble en el sistema.
+Crea un nuevo mueble en el sistema. Acepta `multipart/form-data` si se incluyen imágenes.
 
 **Endpoint:** `POST /api/private/muebles`
 
 **Autenticación:** Requerida (Admin)
 
-**Request Body:**
+**Body (`multipart/form-data`):**
 
-```json
-{
-  "codigo": "CAMA-001",
-  "nombre": "Cama King Size",
-  "descripcion": "Cama de lujo con colchón ortopédico",
-  "categoria_id": "uuid-categoria",
-  "imagen_url": "https://example.com/cama.jpg",
-  "condicion": "BUENO",
-  "fecha_adquisicion": "2025-01-15",
-  "ultima_revision": "2026-03-01",
-  "habitacion_id": "uuid-habitacion"
-}
-```
-
-**Campos:**
-
-- `codigo` (string, requerido): Código único del mueble (máx. 30 caracteres)
-- `nombre` (string, requerido): Nombre del mueble (máx. 100 caracteres)
-- `descripcion` (string, opcional): Descripción detallada del mueble
-- `categoria_id` (uuid, requerido): ID de la categoría del mueble
-- `imagen_url` (string, opcional): URL de la imagen del mueble
-- `condicion` (enum, opcional): Estado del mueble (BUENO, REGULAR, DANADO, FALTANTE). Por defecto: BUENO
-- `fecha_adquisicion` (date, opcional): Fecha de adquisición (formato: YYYY-MM-DD)
-- `ultima_revision` (date, opcional): Fecha de última revisión (formato: YYYY-MM-DD)
-- `habitacion_id` (uuid, opcional): ID de la habitación donde se encuentra
+| Campo | Tipo | Requerido | Descripción |
+|-------|------|-----------|-------------|
+| `codigo` | string | Sí | Código único (máx. 30 caracteres) |
+| `nombre` | string | Sí | Nombre del mueble (máx. 100 caracteres) |
+| `categoria_id` | uuid | Sí | ID de la categoría del mueble |
+| `descripcion` | string | No | Descripción detallada |
+| `imagen` | File | No | Archivo de imagen a subir a S3 |
+| `condicion` | enum | No | BUENO, REGULAR, DANADO, FALTANTE (default: BUENO) |
+| `fecha_adquisicion` | date | No | Fecha en formato YYYY-MM-DD |
+| `ultima_revision` | date | No | Fecha en formato YYYY-MM-DD |
+| `habitacion_id` | uuid | No | ID de la habitación donde se encuentra |
 
 **Response (201 Created):**
 
@@ -169,8 +182,15 @@ Crea un nuevo mueble en el sistema.
     "codigo": "CAMA-001",
     "nombre": "Cama King Size",
     "descripcion": "Cama de lujo con colchón ortopédico",
-    "categoria_id": "uuid-categoria",
-    "imagen_url": "https://example.com/cama.jpg",
+    "categoria": {
+      "id": "uuid-categoria",
+      "nombre": "Cama",
+      "descripcion": "Muebles para dormir",
+      "activo": true,
+      "created_at": "2026-03-24T08:00:00.000Z",
+      "updated_at": "2026-03-24T08:00:00.000Z"
+    },
+    "url_imagen": "https://s3.amazonaws.com/bucket/uuid-cama.jpg",
     "condicion": "BUENO",
     "fecha_adquisicion": "2025-01-15",
     "ultima_revision": "2026-03-01",
@@ -194,7 +214,7 @@ Crea un nuevo mueble en el sistema.
 
 ### 4. Actualizar Mueble
 
-Actualiza la información de un mueble existente.
+Actualiza la información de un mueble existente. Acepta `multipart/form-data` si se incluyen imágenes.
 
 **Endpoint:** `PUT /api/private/muebles/:id`
 
@@ -204,35 +224,21 @@ Actualiza la información de un mueble existente.
 
 - `id` (uuid, requerido): ID del mueble
 
-**Request Body:**
-
-```json
-{
-  "codigo": "CAMA-002",
-  "nombre": "Cama Queen Size",
-  "descripcion": "Cama queen actualizada",
-  "categoria_id": "uuid-categoria",
-  "imagen_url": "https://example.com/cama-nueva.jpg",
-  "condicion": "REGULAR",
-  "fecha_adquisicion": "2025-02-01",
-  "ultima_revision": "2026-03-15",
-  "habitacion_id": "uuid-habitacion-nueva"
-}
-```
-
-**Campos:**
+**Body (`multipart/form-data`):**
 
 Todos los campos son opcionales. Solo se actualizarán los campos proporcionados.
 
-- `codigo` (string, opcional): Código único del mueble (máx. 30 caracteres)
-- `nombre` (string, opcional): Nombre del mueble (máx. 100 caracteres)
-- `descripcion` (string, opcional): Descripción detallada del mueble
-- `categoria_id` (uuid, opcional): ID de la categoría del mueble
-- `imagen_url` (string, opcional): URL de la imagen del mueble
-- `condicion` (enum, opcional): Estado del mueble (BUENO, REGULAR, DANADO, FALTANTE)
-- `fecha_adquisicion` (date, opcional): Fecha de adquisición (formato: YYYY-MM-DD)
-- `ultima_revision` (date, opcional): Fecha de última revisión (formato: YYYY-MM-DD)
-- `habitacion_id` (uuid, opcional): ID de la habitación donde se encuentra (puede ser null para desasignar)
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `codigo` | string | Código único (máx. 30 caracteres) |
+| `nombre` | string | Nombre del mueble (máx. 100 caracteres) |
+| `categoria_id` | uuid | ID de la categoría del mueble |
+| `descripcion` | string | Descripción detallada |
+| `imagen` | File | Archivo de imagen a subir a S3 (reemplaza la existente) |
+| `condicion` | enum | BUENO, REGULAR, DANADO, FALTANTE |
+| `fecha_adquisicion` | date | Fecha en formato YYYY-MM-DD |
+| `ultima_revision` | date | Fecha en formato YYYY-MM-DD |
+| `habitacion_id` | uuid | ID de la habitación (null para desasignar) |
 
 **Response (200 OK):**
 
@@ -245,8 +251,15 @@ Todos los campos son opcionales. Solo se actualizarán los campos proporcionados
     "codigo": "CAMA-002",
     "nombre": "Cama Queen Size",
     "descripcion": "Cama queen actualizada",
-    "categoria_id": "uuid-categoria",
-    "imagen_url": "https://example.com/cama-nueva.jpg",
+    "categoria": {
+      "id": "uuid-categoria",
+      "nombre": "Cama",
+      "descripcion": "Muebles para dormir",
+      "activo": true,
+      "created_at": "2026-03-24T08:00:00.000Z",
+      "updated_at": "2026-03-24T08:00:00.000Z"
+    },
+    "url_imagen": "https://s3.amazonaws.com/bucket/uuid-cama-nueva.jpg",
     "condicion": "REGULAR",
     "fecha_adquisicion": "2025-02-01",
     "ultima_revision": "2026-03-15",
@@ -306,9 +319,9 @@ Elimina un mueble del sistema.
 
 ```typescript
 enum MuebleCondition {
-  BUENO = "BUENO", // Mueble en buen estado
-  REGULAR = "REGULAR", // Mueble con desgaste normal
-  DANADO = "DANADO", // Mueble dañado que requiere reparación
+  BUENO = "BUENO",       // Mueble en buen estado
+  REGULAR = "REGULAR",   // Mueble con desgaste normal
+  DANADO = "DANADO",     // Mueble dañado que requiere reparación
   FALTANTE = "FALTANTE", // Mueble faltante o extraviado
 }
 ```
@@ -321,18 +334,18 @@ enum MuebleCondition {
 
 ```typescript
 {
-  id: string; // UUID del mueble
-  codigo: string; // Código único (máx. 30 caracteres)
-  nombre: string; // Nombre del mueble (máx. 100 caracteres)
-  descripcion: string | null; // Descripción detallada
-  categoria_id: string; // UUID de la categoría
-  imagen_url: string | null; // URL de la imagen
-  condicion: MuebleCondition; // Estado del mueble
-  fecha_adquisicion: string | null; // Fecha en formato YYYY-MM-DD
-  ultima_revision: string | null; // Fecha en formato YYYY-MM-DD
-  habitacion_id: string | null; // UUID de la habitación (puede ser null)
-  created_at: string; // Timestamp ISO 8601
-  updated_at: string; // Timestamp ISO 8601
+  id: string;                        // UUID del mueble
+  codigo: string;                    // Código único (máx. 30 caracteres)
+  nombre: string;                    // Nombre del mueble (máx. 100 caracteres)
+  descripcion: string | null;        // Descripción detallada
+  categoria: CategoriaMuebleDto;     // Objeto categoría completo
+  url_imagen: string | null;         // URL de la imagen en S3
+  condicion: MuebleCondition;        // Estado del mueble
+  fecha_adquisicion: string | null;  // Fecha en formato YYYY-MM-DD
+  ultima_revision: string | null;    // Fecha en formato YYYY-MM-DD
+  habitacion_id: string | null;      // UUID de la habitación (puede ser null)
+  created_at: string;                // Timestamp ISO 8601
+  updated_at: string;                // Timestamp ISO 8601
 }
 ```
 
@@ -350,7 +363,7 @@ enum MuebleCondition {
    - La habitación debe existir si se proporciona `habitacion_id`
 7. **Actualización parcial**: Al actualizar, solo se modifican los campos proporcionados en el request
 8. **Muebles sin asignar**: Un mueble puede existir sin estar asignado a ninguna habitación (`habitacion_id: null`)
-9. **Respuestas simplificadas**: Las respuestas solo incluyen IDs de relaciones, no objetos anidados
+9. **Imágenes**: La imagen se sube a S3 y la URL se almacena en `url_imagen`. Al actualizar con una nueva imagen, se reemplaza la URL existente.
 10. **Condición por defecto**: Si no se especifica, la condición del mueble será `BUENO`
 
 ---
@@ -359,29 +372,37 @@ enum MuebleCondition {
 
 ### Crear mueble sin habitación asignada
 
-```json
-POST /api/private/muebles
-{
-  "codigo": "SILLA-001",
-  "nombre": "Silla de Escritorio",
-  "categoria_id": "uuid-categoria"
-}
+```bash
+curl -X POST https://api.hotel.com/api/private/muebles \
+  -H "Authorization: Bearer <token>" \
+  -F "codigo=SILLA-001" \
+  -F "nombre=Silla de Escritorio" \
+  -F "categoria_id=uuid-categoria"
+```
+
+### Crear mueble con imagen
+
+```bash
+curl -X POST https://api.hotel.com/api/private/muebles \
+  -H "Authorization: Bearer <token>" \
+  -F "codigo=CAMA-001" \
+  -F "nombre=Cama King Size" \
+  -F "categoria_id=uuid-categoria" \
+  -F "imagen=@/path/to/cama.jpg"
 ```
 
 ### Desasignar mueble de una habitación
 
-```json
-PUT /api/private/muebles/:id
-{
-  "habitacion_id": null
-}
+```bash
+curl -X PUT https://api.hotel.com/api/private/muebles/:id \
+  -H "Authorization: Bearer <token>" \
+  -F "habitacion_id="
 ```
 
 ### Actualizar solo la condición
 
-```json
-PUT /api/private/muebles/:id
-{
-  "condicion": "DANADO"
-}
+```bash
+curl -X PUT https://api.hotel.com/api/private/muebles/:id \
+  -H "Authorization: Bearer <token>" \
+  -F "condicion=DANADO"
 ```

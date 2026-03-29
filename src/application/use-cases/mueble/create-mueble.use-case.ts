@@ -5,6 +5,7 @@ import type { ICategoriaMuebleRepository } from "../../../domain/interfaces/cate
 import { MuebleException } from "../../../domain/exceptions/mueble.exception";
 import { CreateMuebleDto, MuebleDto, toMuebleDto } from "../../dtos/mueble.dto";
 import { CategoriaMuebleException } from "../../../domain/exceptions/categoria-mueble.exception";
+import { S3UploadService } from "../../../infrastructure/services/s3-upload.service";
 import { DI_TOKENS } from "../../../common/IoC/tokens";
 
 @injectable()
@@ -33,12 +34,17 @@ export class CreateMuebleUseCase {
       }
     }
 
+    let urlImagen: string | null = null;
+    if (input.imagen && input.imagen.length > 0) {
+      urlImagen = await S3UploadService.uploadImage(input.imagen[0]);
+    }
+
     const furniture = await this.repository.create({
       codigo: input.codigo,
       nombre: input.nombre,
       descripcion: input.descripcion ?? null,
       categoriaId: input.categoria_id,
-      imagenUrl: input.imagen_url ?? null,
+      urlImagen,
       condicion: input.condicion,
       fechaAdq: input.fecha_adquisicion ? new Date(input.fecha_adquisicion) : null,
       ultimaRevision: input.ultima_revision ? new Date(input.ultima_revision) : null,

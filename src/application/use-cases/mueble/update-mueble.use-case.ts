@@ -4,6 +4,7 @@ import type { IHabitacionRepository } from "../../../domain/interfaces/habitacio
 import type { UpdateMuebleParams } from "../../../domain/interfaces/mueble.repository.interface";
 import { MuebleException } from "../../../domain/exceptions/mueble.exception";
 import { UpdateMuebleDto, MuebleDto, toMuebleDto } from "../../dtos/mueble.dto";
+import { S3UploadService } from "../../../infrastructure/services/s3-upload.service";
 import { DI_TOKENS } from "../../../common/IoC/tokens";
 
 @injectable()
@@ -37,7 +38,15 @@ export class UpdateMuebleUseCase {
     if (input.codigo !== undefined) updateData.codigo = input.codigo;
     if (input.nombre !== undefined) updateData.nombre = input.nombre;
     if (input.categoria_id !== undefined) updateData.categoriaId = input.categoria_id;
-    if (input.imagen_url !== undefined) updateData.imagenUrl = input.imagen_url ?? null;
+
+    if (input.imagen !== undefined) {
+      if (input.imagen && input.imagen.length > 0) {
+        updateData.urlImagen = await S3UploadService.uploadImage(input.imagen[0]);
+      } else {
+        updateData.urlImagen = null;
+      }
+    }
+
     if (input.condicion !== undefined) updateData.condicion = input.condicion;
     if (input.fecha_adquisicion !== undefined) {
       updateData.fechaAdq = input.fecha_adquisicion ? new Date(input.fecha_adquisicion) : null;

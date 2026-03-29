@@ -1,11 +1,13 @@
 import { MuebleCondition, type Mueble } from "../../domain/entities/mueble.entity";
+import type { CategoriaMuebleDto } from "./categoria-mueble.dto";
+import { toCategoriaMuebleDto } from "./categoria-mueble.dto";
 
 export interface CreateMuebleDto {
   codigo: string;
   nombre: string;
   descripcion?: string;
   categoria_id: string;
-  imagen_url?: string;
+  imagen?: File[];
   condicion?: MuebleCondition;
   fecha_adquisicion?: string;
   ultima_revision?: string;
@@ -17,7 +19,7 @@ export interface UpdateMuebleDto {
   nombre?: string;
   descripcion?: string;
   categoria_id?: string;
-  imagen_url?: string;
+  imagen?: File[];
   condicion?: MuebleCondition;
   fecha_adquisicion?: string;
   ultima_revision?: string;
@@ -29,8 +31,8 @@ export interface MuebleDto {
   codigo: string;
   nombre: string;
   descripcion: string | null;
-  categoria_id: string;
-  imagen_url: string | null;
+  categoria: CategoriaMuebleDto;
+  url_imagen: string | null;
   condicion: string;
   fecha_adquisicion: string | null;
   ultima_revision: string | null;
@@ -45,8 +47,8 @@ export function toMuebleDto(m: Mueble): MuebleDto {
     codigo: m.codigo,
     nombre: m.nombre,
     descripcion: m.descripcion,
-    categoria_id: m.categoriaId,
-    imagen_url: m.imagenUrl,
+    categoria: toCategoriaMuebleDto(m.categoria),
+    url_imagen: m.urlImagen,
     condicion: m.condicion,
     fecha_adquisicion: m.fechaAdq?.toISOString().split("T")[0] ?? null,
     ultima_revision: m.ultimaRevision?.toISOString().split("T")[0] ?? null,
