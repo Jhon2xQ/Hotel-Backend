@@ -1,4 +1,3 @@
-import type { EstadoHabitacion } from "../../domain/entities/habitacion.entity";
 import type { Habitacion } from "../../domain/entities/habitacion.entity";
 import type { TipoHabitacionDto } from "./tipo-habitacion.dto";
 import { toTipoHabitacionDto } from "./tipo-habitacion.dto";
@@ -10,9 +9,8 @@ export interface CreateHabitacionDto {
   tiene_ducha?: boolean;
   tiene_banio?: boolean;
   imagenes?: File[];
-  estado?: EstadoHabitacion;
-  notas?: string;
-  ulti_limpieza?: string;
+  estado?: boolean;
+  descripcion?: string;
 }
 
 export interface UpdateHabitacionDto {
@@ -22,14 +20,12 @@ export interface UpdateHabitacionDto {
   tiene_ducha?: boolean;
   tiene_banio?: boolean;
   imagenes?: File[];
-  estado?: EstadoHabitacion;
-  notas?: string;
-  ulti_limpieza?: string;
+  estado?: boolean;
+  descripcion?: string;
 }
 
 export interface UpdateHabitacionStatusDto {
-  estado?: EstadoHabitacion;
-  ulti_limpieza?: string;
+  estado?: boolean;
 }
 
 export interface SearchAvailableHabitacionesDto {
@@ -47,9 +43,8 @@ export interface HabitacionDto {
   tiene_ducha: boolean;
   tiene_banio: boolean;
   url_imagen: string[] | null;
-  estado: string;
-  notas: string | null;
-  ulti_limpieza: string | null;
+  estado: boolean;
+  descripcion: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -69,8 +64,7 @@ export function toHabitacionDto(h: Habitacion): HabitacionDto {
     tiene_banio: h.tieneBanio,
     url_imagen: h.urlImagen,
     estado: h.estado,
-    notas: h.notas,
-    ulti_limpieza: h.ultiLimpieza?.toISOString() ?? null,
+    descripcion: h.descripcion,
     created_at: h.createdAt.toISOString(),
     updated_at: h.updatedAt.toISOString(),
   };

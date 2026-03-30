@@ -1,4 +1,4 @@
-import type { Habitacion, EstadoHabitacion } from "../entities/habitacion.entity";
+import type { Habitacion } from "../entities/habitacion.entity";
 
 export interface CreateHabitacionParams {
   nroHabitacion: string;
@@ -7,9 +7,8 @@ export interface CreateHabitacionParams {
   tieneDucha?: boolean;
   tieneBanio?: boolean;
   urlImagen?: string[] | null;
-  estado?: EstadoHabitacion;
-  notas?: string | null;
-  ultiLimpieza?: Date | null;
+  estado?: boolean;
+  descripcion?: string | null;
 }
 
 export interface UpdateHabitacionParams {
@@ -19,14 +18,12 @@ export interface UpdateHabitacionParams {
   tieneDucha?: boolean;
   tieneBanio?: boolean;
   urlImagen?: string[] | null;
-  estado?: EstadoHabitacion;
-  notas?: string | null;
-  ultiLimpieza?: Date | null;
+  estado?: boolean;
+  descripcion?: string | null;
 }
 
 export interface UpdateHabitacionStatusParams {
-  estado?: EstadoHabitacion;
-  ultiLimpieza?: Date | null;
+  estado?: boolean;
 }
 
 export interface IHabitacionRepository {

@@ -8,7 +8,6 @@ import { UpdateHabitacionStatusUseCase } from "../../src/application/use-cases/h
 import { DeleteHabitacionUseCase } from "../../src/application/use-cases/habitacion/delete-habitacion.use-case";
 import { SearchAvailableHabitacionesUseCase } from "../../src/application/use-cases/habitacion/search-available-habitaciones.use-case";
 import { createMockContext } from "../helpers/mock-context";
-import { EstadoHabitacion } from "../../src/domain/entities/habitacion.entity";
 
 describe("HabitacionController", () => {
   let controller: HabitacionController;
@@ -60,9 +59,8 @@ describe("HabitacionController", () => {
         tiene_ducha: false,
         tiene_banio: false,
         url_imagen: null,
-        estado: "DISPONIBLE",
-        notas: null,
-        ulti_limpieza: null,
+        estado: false,
+        descripcion: null,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
@@ -95,9 +93,8 @@ describe("HabitacionController", () => {
           tiene_ducha: false,
           tiene_banio: false,
           url_imagen: null,
-          estado: "DISPONIBLE",
-          notas: null,
-          ulti_limpieza: null,
+          estado: false,
+          descripcion: null,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         },
@@ -129,11 +126,8 @@ describe("HabitacionController", () => {
         tipo_habitacion: { id: "tipo-id", nombre: "Suite Deluxe", descripcion: "Suite de lujo", created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
         piso: 3,
         url_imagen: null,
-        estado: "DISPONIBLE",
-        limpieza: "LIMPIA",
-        notas: null,
-        ultima_limpieza: null,
-        muebles: [],
+        estado: false,
+        descripcion: null,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
@@ -160,7 +154,7 @@ describe("HabitacionController", () => {
 
       const input = {
         nro_habitacion: "302",
-        notas: "Notas actualizadas",
+        descripcion: "Descripcion actualizada",
       };
 
       const mockOutput = {
@@ -171,9 +165,8 @@ describe("HabitacionController", () => {
         tiene_ducha: false,
         tiene_banio: false,
         url_imagen: null,
-        estado: "DISPONIBLE",
-        notas: "Notas actualizadas",
-        ulti_limpieza: null,
+        estado: false,
+        descripcion: "Descripcion actualizada",
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
@@ -200,7 +193,7 @@ describe("HabitacionController", () => {
       mockContext.req.param = vi.fn().mockReturnValue({ id: "test-id" });
 
       const input = {
-        estado: EstadoHabitacion.OCUPADA,
+        estado: true,
       };
 
       const mockOutput = {
@@ -211,9 +204,8 @@ describe("HabitacionController", () => {
         tiene_ducha: false,
         tiene_banio: false,
         url_imagen: null,
-        estado: "OCUPADA",
-        notas: null,
-        ulti_limpieza: null,
+        estado: true,
+        descripcion: null,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };

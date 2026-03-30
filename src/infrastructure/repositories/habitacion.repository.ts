@@ -1,6 +1,6 @@
 import { inject, injectable } from "tsyringe";
 import { PrismaClient } from "../../../generated/prisma/client";
-import { Habitacion, EstadoHabitacion } from "../../domain/entities/habitacion.entity";
+import { Habitacion } from "../../domain/entities/habitacion.entity";
 import type {
   IHabitacionRepository,
   CreateHabitacionParams,
@@ -23,9 +23,8 @@ export class HabitacionRepository implements IHabitacionRepository {
         tieneDucha: data.tieneDucha ?? false,
         tieneBanio: data.tieneBanio ?? false,
         urlImagen: data.urlImagen ?? undefined,
-        estado: data.estado ?? EstadoHabitacion.DISPONIBLE,
-        notas: data.notas,
-        ultimaLimpieza: data.ultiLimpieza ?? undefined,
+        estado: data.estado ?? false,
+        descripcion: data.descripcion,
       },
       include: { tipo: true },
     });
@@ -66,8 +65,7 @@ export class HabitacionRepository implements IHabitacionRepository {
     if (data.tieneBanio !== undefined) updateData.tieneBanio = data.tieneBanio;
     if (data.urlImagen !== undefined) updateData.urlImagen = data.urlImagen;
     if (data.estado !== undefined) updateData.estado = data.estado;
-    if (data.notas !== undefined) updateData.notas = data.notas;
-    if (data.ultiLimpieza !== undefined) updateData.ultimaLimpieza = data.ultiLimpieza;
+    if (data.descripcion !== undefined) updateData.descripcion = data.descripcion;
 
     const result = await this.prisma.habitacion.update({
       where: { id },
@@ -81,7 +79,6 @@ export class HabitacionRepository implements IHabitacionRepository {
     const updateData: Record<string, unknown> = {};
 
     if (data.estado !== undefined) updateData.estado = data.estado;
-    if (data.ultiLimpieza !== undefined) updateData.ultimaLimpieza = data.ultiLimpieza;
 
     const result = await this.prisma.habitacion.update({
       where: { id },

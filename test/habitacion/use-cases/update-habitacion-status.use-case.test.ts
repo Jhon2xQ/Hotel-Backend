@@ -3,7 +3,6 @@ import { UpdateHabitacionStatusUseCase } from "../../../src/application/use-case
 import { IHabitacionRepository } from "../../../src/domain/interfaces/habitacion.repository.interface";
 import { HabitacionException } from "../../../src/domain/exceptions/habitacion.exception";
 import { createMockHabitacion } from "../../helpers/habitacion-fixtures";
-import { EstadoHabitacion } from "../../../src/domain/entities/habitacion.entity";
 
 describe("UpdateHabitacionStatusUseCase", () => {
   let useCase: UpdateHabitacionStatusUseCase;
@@ -29,8 +28,8 @@ describe("UpdateHabitacionStatusUseCase", () => {
   });
 
   it("should update habitacion status successfully", async () => {
-    const existingHabitacion = createMockHabitacion({ id: "test-id", estado: EstadoHabitacion.DISPONIBLE });
-    const updatedHabitacion = createMockHabitacion({ id: "test-id", estado: EstadoHabitacion.OCUPADA });
+    const existingHabitacion = createMockHabitacion({ id: "test-id", estado: false });
+    const updatedHabitacion = createMockHabitacion({ id: "test-id", estado: true });
 
     mockRepository.findById = async (id: string) => {
       if (id === "test-id") return existingHabitacion;
@@ -39,11 +38,11 @@ describe("UpdateHabitacionStatusUseCase", () => {
     mockRepository.updateStatus = async () => updatedHabitacion;
 
     const result = await useCase.execute("test-id", {
-      estado: EstadoHabitacion.OCUPADA,
+      estado: true,
     });
 
     expect(result).toBeDefined();
-    expect(result.estado).toBe("OCUPADA");
+    expect(result.estado).toBe(true);
   });
 
   it("should throw error when habitacion not found", async () => {
@@ -51,7 +50,7 @@ describe("UpdateHabitacionStatusUseCase", () => {
 
     await expect(
       useCase.execute("non-existent-id", {
-        estado: EstadoHabitacion.OCUPADA,
+        estado: true,
       }),
     ).rejects.toThrow(HabitacionException);
   });

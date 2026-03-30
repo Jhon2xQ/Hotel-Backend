@@ -2,7 +2,6 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { HabitacionRepository } from "../../src/infrastructure/repositories/habitacion.repository";
 import { createMockPrismaClient } from "../helpers/mock-prisma";
 import { Prisma } from "../../generated/prisma/client";
-import { EstadoHabitacion } from "../../src/domain/entities/habitacion.entity";
 
 describe("HabitacionRepository", () => {
   let repository: HabitacionRepository;
@@ -40,9 +39,8 @@ describe("HabitacionRepository", () => {
         tieneDucha: true,
         tieneBanio: true,
         urlImagen: ["https://example.com/301.jpg"],
-        estado: "DISPONIBLE",
-        notas: null,
-        ultimaLimpieza: null,
+        estado: false,
+        descripcion: null,
         tipo: {
           id: "tipo-id",
           nombre: "Suite",
@@ -92,9 +90,8 @@ describe("HabitacionRepository", () => {
           tieneDucha: false,
           tieneBanio: true,
           urlImagen: null,
-          estado: "DISPONIBLE",
-          notas: null,
-          ultimaLimpieza: null,
+          estado: false,
+          descripcion: null,
           tipo: {
             id: "tipo-id",
             nombre: "Suite",
@@ -113,9 +110,8 @@ describe("HabitacionRepository", () => {
           tieneDucha: true,
           tieneBanio: true,
           urlImagen: null,
-          estado: "OCUPADA",
-          notas: null,
-          ultimaLimpieza: null,
+          estado: true,
+          descripcion: null,
           tipo: {
             id: "tipo-id",
             nombre: "Suite",
@@ -151,9 +147,8 @@ describe("HabitacionRepository", () => {
         tieneDucha: true,
         tieneBanio: true,
         urlImagen: null,
-        estado: "DISPONIBLE",
-        notas: null,
-        ultimaLimpieza: null,
+        estado: false,
+        descripcion: null,
         tipo: {
             id: "tipo-id",
             nombre: "Suite",
@@ -196,9 +191,8 @@ describe("HabitacionRepository", () => {
         tieneDucha: true,
         tieneBanio: true,
         urlImagen: null,
-        estado: "DISPONIBLE",
-        notas: null,
-        ultimaLimpieza: null,
+        estado: false,
+        descripcion: null,
         tipo: {
             id: "tipo-id",
             nombre: "Suite",
@@ -223,7 +217,7 @@ describe("HabitacionRepository", () => {
     it("should update habitacion", async () => {
       const updateData = {
         nroHabitacion: "302",
-        notas: "Notas actualizadas",
+        descripcion: "Descripcion actualizada",
       };
 
       const mockResult = {
@@ -234,9 +228,8 @@ describe("HabitacionRepository", () => {
         tieneDucha: true,
         tieneBanio: true,
         urlImagen: null,
-        estado: "DISPONIBLE",
-        notas: "Notas actualizadas",
-        ultimaLimpieza: null,
+        estado: false,
+        descripcion: "Descripcion actualizada",
         tipo: {
             id: "tipo-id",
             nombre: "Suite",
@@ -253,7 +246,7 @@ describe("HabitacionRepository", () => {
       const result = await repository.update("test-id", updateData);
 
       expect(result.nroHabitacion).toBe("302");
-      expect(result.notas).toBe("Notas actualizadas");
+      expect(result.descripcion).toBe("Descripcion actualizada");
       expect(mockPrisma.habitacion.update).toHaveBeenCalled();
     });
 
@@ -265,47 +258,8 @@ describe("HabitacionRepository", () => {
 
       mockPrisma.habitacion.update.mockRejectedValue(error);
 
-      await expect(repository.update("non-existent-id", { notas: "Test" })).rejects.toThrow(
+      await expect(repository.update("non-existent-id", { descripcion: "Test" })).rejects.toThrow(
         Prisma.PrismaClientKnownRequestError,
-      );
-    });
-
-    it("should pass ultimaLimpieza to Prisma when provided", async () => {
-      const ts = new Date();
-      const updateData = { ultiLimpieza: ts };
-
-      const mockResult = {
-        id: "test-id",
-        nroHabitacion: "301",
-        tipoHabitacionId: "tipo-id",
-        piso: 3,
-        tieneDucha: true,
-        tieneBanio: true,
-        urlImagen: null,
-        estado: "DISPONIBLE",
-        notas: null,
-        ultimaLimpieza: ts,
-        tipo: {
-            id: "tipo-id",
-            nombre: "Suite",
-            descripcion: null,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-
-      mockPrisma.habitacion.update.mockResolvedValue(mockResult);
-
-      await repository.update("test-id", updateData);
-
-      expect(mockPrisma.habitacion.update).toHaveBeenCalledWith(
-        expect.objectContaining({
-          data: expect.objectContaining({
-            ultimaLimpieza: ts,
-          }),
-        }),
       );
     });
   });
@@ -313,7 +267,7 @@ describe("HabitacionRepository", () => {
   describe("updateStatus", () => {
     it("should update only estado", async () => {
       const updateData = {
-        estado: EstadoHabitacion.OCUPADA,
+        estado: true,
       };
 
       const mockResult = {
@@ -324,9 +278,8 @@ describe("HabitacionRepository", () => {
         tieneDucha: true,
         tieneBanio: true,
         urlImagen: null,
-        estado: "OCUPADA",
-        notas: null,
-        ultimaLimpieza: null,
+        estado: true,
+        descripcion: null,
         tipo: {
             id: "tipo-id",
             nombre: "Suite",
@@ -342,7 +295,7 @@ describe("HabitacionRepository", () => {
 
       const result = await repository.updateStatus("test-id", updateData);
 
-      expect(result.estado).toBe(EstadoHabitacion.OCUPADA);
+      expect(result.estado).toBe(true);
     });
 
     it("should throw exception when not found", async () => {
@@ -353,7 +306,7 @@ describe("HabitacionRepository", () => {
 
       mockPrisma.habitacion.update.mockRejectedValue(error);
 
-      await expect(repository.updateStatus("non-existent-id", { estado: EstadoHabitacion.OCUPADA })).rejects.toThrow(
+      await expect(repository.updateStatus("non-existent-id", { estado: true })).rejects.toThrow(
         Prisma.PrismaClientKnownRequestError,
       );
     });

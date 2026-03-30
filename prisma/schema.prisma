@@ -120,16 +120,6 @@ enum Genero {
   @@map("genero")
 }
 
-enum EstadoHabitacion {
-  DISPONIBLE
-  RESERVADA
-  OCUPADA
-  LIMPIEZA
-  MANTENIMIENTO
-
-  @@map("estado_habitacion")
-}
-
 enum EstadoLimpieza {
   LIMPIA
   SUCIA
@@ -349,9 +339,8 @@ model Habitacion {
   tieneDucha       Boolean          @default(false)
   tieneBanio       Boolean          @default(false)
   urlImagen        String[]         @db.VarChar(255)
-  estado           EstadoHabitacion @default(DISPONIBLE)
-  notas            String?          @db.Text
-  ultimaLimpieza   DateTime?        @db.Timestamptz
+  estado           Boolean          @default(false)
+  descripcion      String?          @db.Text
   createdAt        DateTime         @default(now()) @db.Timestamptz
   updatedAt        DateTime         @updatedAt @db.Timestamptz
 
