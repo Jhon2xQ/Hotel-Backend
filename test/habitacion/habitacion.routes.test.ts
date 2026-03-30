@@ -2,7 +2,6 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { registerDependencies, resetContainer } from "../../src/common/IoC/container";
 import { createHabitacionRoutes } from "../../src/routes/habitacion.routes";
 import { createMockPrismaClient } from "../helpers/mock-prisma";
-import { EstadoHabitacion } from "../../src/domain/entities/habitacion.entity";
 
 describe("Habitacion Routes Integration", () => {
   let mockPrisma: any;
@@ -41,9 +40,8 @@ describe("Habitacion Routes Integration", () => {
       tieneDucha: false,
       tieneBanio: false,
       urlImagen: null,
-      estado: EstadoHabitacion.DISPONIBLE,
-      notas: null,
-      ultimaLimpieza: null,
+      estado: false,
+      descripcion: null,
       createdAt: new Date(),
       updatedAt: new Date(),
       tipo: {

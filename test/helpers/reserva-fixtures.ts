@@ -1,6 +1,6 @@
 import { Reserva, EstadoReserva } from "../../src/domain/entities/reserva.entity";
 import { Huesped } from "../../src/domain/entities/huesped.entity";
-import { Habitacion, EstadoHabitacion } from "../../src/domain/entities/habitacion.entity";
+import { Habitacion } from "../../src/domain/entities/habitacion.entity";
 import { Tarifa } from "../../src/domain/entities/tarifa.entity";
 import { Pago, ConceptoPago, EstadoPago, MetodoPago } from "../../src/domain/entities/pago.entity";
 import { TipoHabitacion } from "../../src/domain/entities/tipo-habitacion.entity";
@@ -41,8 +41,7 @@ export function createMockReserva(overrides?: Partial<Reserva>): Reserva {
       true,
       true,
       null,
-      EstadoHabitacion.DISPONIBLE,
-      null,
+      false,
       null,
       new Date(),
       new Date(),

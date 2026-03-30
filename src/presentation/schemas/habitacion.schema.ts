@@ -1,7 +1,5 @@
 import { z } from "zod";
 
-export const EstadoHabitacionSchema = z.enum(["DISPONIBLE", "RESERVADA", "OCUPADA", "LIMPIEZA", "MANTENIMIENTO"]);
-
 export const EstadoLimpiezaSchema = z.enum(["LIMPIA", "SUCIA", "EN_LIMPIEZA", "INSPECCION"]);
 
 export const CreateHabitacionSchema = z.object({
@@ -14,8 +12,8 @@ export const CreateHabitacionSchema = z.object({
   tiene_ducha: z.boolean().optional(),
   tiene_banio: z.boolean().optional(),
   imagenes: z.array(z.instanceof(File)).optional().default([]),
-  estado: EstadoHabitacionSchema.optional(),
-  notas: z.string().optional(),
+  estado: z.boolean().optional(),
+  descripcion: z.string().optional(),
 });
 
 export const UpdateHabitacionSchema = z.object({
@@ -29,18 +27,13 @@ export const UpdateHabitacionSchema = z.object({
   tiene_ducha: z.boolean().optional(),
   tiene_banio: z.boolean().optional(),
   imagenes: z.array(z.instanceof(File)).optional().default([]),
-  estado: EstadoHabitacionSchema.optional(),
-  notas: z.string().optional(),
+  estado: z.boolean().optional(),
+  descripcion: z.string().optional(),
 });
 
-export const UpdateHabitacionStatusSchema = z
-  .object({
-    estado: EstadoHabitacionSchema.optional(),
-    ulti_limpieza: z.string().optional(),
-  })
-  .refine((data) => data.estado !== undefined || data.ulti_limpieza !== undefined, {
-    message: "Debe proporcionar al menos un campo (estado o limpieza)",
-  });
+export const UpdateHabitacionStatusSchema = z.object({
+  estado: z.boolean({ message: "El estado debe ser un valor booleano" }),
+});
 
 export const SearchAvailableHabitacionesSchema = z
   .object({

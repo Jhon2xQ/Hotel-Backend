@@ -21,7 +21,7 @@ Documentación unificada del módulo `habitacion.routes.ts` (privado y público)
 4. **GET** habitación con precio (público): `GET /api/public/habitaciones/:id`
 5. **POST** crear (privado, `multipart/form-data` si hay imágenes)
 6. **PUT** actualizar (privado, `multipart/form-data` si hay imágenes)
-7. **PATCH** estado / limpieza (privado): `PATCH /api/private/habitaciones/:id/estado`
+7. **PATCH** estado (privado): `PATCH /api/private/habitaciones/:id/estado`
 8. **DELETE** (privado): `DELETE /api/private/habitaciones/:id`
 
 En las respuestas, el objeto anidado `tipo_habitacion` sigue el mismo contrato que **Tipo de habitación** (`TipoHabitacionDto`: incluye `id`, `nombre`, `descripcion`, `created_at`, `updated_at`).
@@ -34,18 +34,6 @@ En las respuestas, el objeto anidado `tipo_habitacion` sigue el mismo contrato q
 ## Imágenes (S3 / multipart)
 
 Creación y actualización aceptan `multipart/form-data` con campos de habitación y archivos de imagen; las URLs resultantes se guardan en `url_imagen`. Variables de entorno S3: `S3_REGION`, `S3_ENDPOINT`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_BUCKET_NAME`, `S3_FORCE_PATH_STYLE`.
-
-## Enums
-
-### EstadoHabitacion
-
-Estados operacionales de una habitación:
-
-- `DISPONIBLE`: Habitación disponible para reserva/ocupación
-- `RESERVADA`: Habitación reservada pero no ocupada
-- `OCUPADA`: Habitación actualmente ocupada por huéspedes
-- `LIMPIEZA`: Habitación en proceso de limpieza
-- `MANTENIMIENTO`: Habitación en mantenimiento, no disponible
 
 ## Endpoints
 
@@ -76,9 +64,8 @@ Obtiene la lista completa de habitaciones del hotel.
       "tiene_ducha": true,
       "tiene_banio": true,
       "url_imagen": ["https://example.com/rooms/101-1.jpg", "https://example.com/rooms/101-2.jpg"],
-      "estado": "DISPONIBLE",
-      "notas": null,
-      "ulti_limpieza": "2026-03-17T08:00:00.000Z",
+      "estado": true,
+      "descripcion": "Suite con balcón privado",
       "created_at": "2026-03-15T10:00:00.000Z",
       "updated_at": "2026-03-17T08:00:00.000Z"
     },
@@ -94,9 +81,8 @@ Obtiene la lista completa de habitaciones del hotel.
       "tiene_ducha": true,
       "tiene_banio": false,
       "url_imagen": null,
-      "estado": "OCUPADA",
-      "notas": "Solicitud de almohadas extra",
-      "ulti_limpieza": "2026-03-16T09:00:00.000Z",
+      "estado": false,
+      "descripcion": null,
       "created_at": "2026-03-15T10:05:00.000Z",
       "updated_at": "2026-03-17T14:30:00.000Z"
     }
@@ -109,7 +95,6 @@ Obtiene la lista completa de habitaciones del hotel.
 
 - Las habitaciones se devuelven ordenadas por número de habitación (ascendente)
 - Cada habitación incluye el tipo de habitación asociado
-- El campo `ulti_limpieza` puede ser `null` si nunca se ha limpiado
 - El campo `url_imagen` es un array de strings que puede contener múltiples URLs de imágenes
 
 ---
@@ -144,9 +129,8 @@ Obtiene los detalles de una habitación específica.
     "tiene_ducha": true,
     "tiene_banio": true,
     "url_imagen": ["https://example.com/rooms/101-1.jpg", "https://example.com/rooms/101-2.jpg"],
-    "estado": "DISPONIBLE",
-    "notas": null,
-    "ulti_limpieza": "2026-03-17T08:00:00.000Z",
+    "estado": true,
+    "descripcion": "Suite con balcón privado",
     "created_at": "2026-03-15T10:00:00.000Z",
     "updated_at": "2026-03-17T08:00:00.000Z"
   },
@@ -204,9 +188,8 @@ Crea una nueva habitación física en el sistema.
   "piso": 3,
   "tiene_ducha": true,
   "tiene_banio": true,
-  "url_imagen": ["https://example.com/rooms/301-1.jpg", "https://example.com/rooms/301-2.jpg"],
-  "estado": "DISPONIBLE",
-  "notas": "Habitación con vista al mar"
+  "estado": true,
+  "descripcion": "Habitación con vista al mar"
 }
 ```
 
@@ -218,8 +201,8 @@ Crea una nueva habitación física en el sistema.
 - `tiene_ducha` (boolean, opcional): Indica si la habitación tiene ducha (default: `false`)
 - `tiene_banio` (boolean, opcional): Indica si la habitación tiene baño completo (default: `false`)
 - `url_imagen` (array de strings, opcional): URLs de imágenes de la habitación (máx. 255 caracteres cada una)
-- `estado` (EstadoHabitacion, opcional): Estado operacional (default: `DISPONIBLE`)
-- `notas` (string, opcional): Notas adicionales para el personal
+- `estado` (boolean, opcional): Estado de la habitación, `true` = activa/disponible, `false` = inactiva (default: `false`)
+- `descripcion` (string, opcional): Descripción o notas adicionales
 
 **Respuesta exitosa (201):**
 
@@ -239,9 +222,8 @@ Crea una nueva habitación física en el sistema.
     "tiene_ducha": true,
     "tiene_banio": true,
     "url_imagen": ["https://example.com/rooms/301-1.jpg", "https://example.com/rooms/301-2.jpg"],
-    "estado": "DISPONIBLE",
-    "notas": "Habitación con vista al mar",
-    "ulti_limpieza": null,
+    "estado": false,
+    "descripcion": "Habitación con vista al mar",
     "created_at": "2026-03-17T15:00:00.000Z",
     "updated_at": "2026-03-17T15:00:00.000Z"
   },
@@ -329,9 +311,8 @@ Actualiza los datos completos de una habitación existente.
   "piso": 3,
   "tiene_ducha": true,
   "tiene_banio": false,
-  "url_imagen": ["https://example.com/rooms/301-a-1.jpg"],
-  "estado": "MANTENIMIENTO",
-  "notas": "Reparación de aire acondicionado programada"
+  "estado": false,
+  "descripcion": "Reparación de aire acondicionado programada"
 }
 ```
 
@@ -355,9 +336,8 @@ Actualiza los datos completos de una habitación existente.
     "tiene_ducha": true,
     "tiene_banio": false,
     "url_imagen": ["https://example.com/rooms/301-a-1.jpg"],
-    "estado": "MANTENIMIENTO",
-    "notas": "Reparación de aire acondicionado programada",
-    "ulti_limpieza": "2026-03-17T08:00:00.000Z",
+    "estado": false,
+    "descripcion": "Reparación de aire acondicionado programada",
     "created_at": "2026-03-15T10:00:00.000Z",
     "updated_at": "2026-03-17T16:00:00.000Z"
   },
@@ -396,13 +376,12 @@ Actualiza los datos completos de una habitación existente.
 
 - Solo se actualizan los campos proporcionados en el body
 - El campo `updated_at` se actualiza automáticamente
-- Si el estado cambia a `LIMPIEZA`, el campo `ulti_limpieza` se actualiza automáticamente con la fecha/hora actual
 
 ---
 
 ### 7. Actualizar Estado de Habitación
 
-Actualiza únicamente el estado operacional de una habitación. Este endpoint está disponible para todos los usuarios autenticados (no requiere rol ADMIN).
+Actualiza únicamente el estado booleano de una habitación.
 
 **Endpoint:** `PATCH /api/private/habitaciones/:id/estado`
 
@@ -416,16 +395,13 @@ Actualiza únicamente el estado operacional de una habitación. Este endpoint es
 
 ```json
 {
-  "estado": "OCUPADA",
-  "ulti_limpieza": "2026-03-17T17:00:00.000Z"
+  "estado": true
 }
 ```
 
 **Campos:**
 
-- `estado` (EstadoHabitacion, opcional): Nuevo estado operacional
-- `ulti_limpieza` (string ISO 8601, opcional): Fecha y hora de última limpieza
-- **Nota:** Debe proporcionar al menos uno de los dos campos
+- `estado` (boolean, requerido): Nuevo estado de la habitación (`true` = activa, `false` = inactiva)
 
 **Respuesta exitosa (200):**
 
@@ -445,9 +421,8 @@ Actualiza únicamente el estado operacional de una habitación. Este endpoint es
     "tiene_ducha": true,
     "tiene_banio": true,
     "url_imagen": ["https://example.com/rooms/301.jpg"],
-    "estado": "OCUPADA",
-    "notas": "Habitación con vista al mar",
-    "ulti_limpieza": "2026-03-17T17:00:00.000Z",
+    "estado": true,
+    "descripcion": "Habitación con vista al mar",
     "created_at": "2026-03-15T10:00:00.000Z",
     "updated_at": "2026-03-17T17:00:00.000Z"
   },
@@ -462,7 +437,7 @@ Actualiza únicamente el estado operacional de una habitación. Este endpoint es
 ```json
 {
   "success": false,
-  "message": "Debe proporcionar al menos un campo (estado o limpieza)",
+  "message": "El estado debe ser un valor booleano",
   "data": null,
   "timestamp": 1710694800000
 }
@@ -492,8 +467,8 @@ Actualiza únicamente el estado operacional de una habitación. Este endpoint es
 
 **Notas:**
 
-- Este endpoint NO requiere rol ADMIN, permitiendo al personal de limpieza y recepción actualizar estados
-- Solo actualiza los campos de estado, no modifica otros datos de la habitación
+- Este endpoint NO requiere rol ADMIN, permitiendo al personal de recepción actualizar estados
+- Solo actualiza el campo `estado`, no modifica otros datos de la habitación
 - El campo `updated_at` se actualiza automáticamente
 
 ---
@@ -615,23 +590,16 @@ Elimina una habitación del sistema.
 
 ### Campo `estado`
 
-- **Requerido**: No (default: `DISPONIBLE`)
-- **Tipo**: Enum EstadoHabitacion
-- **Valores**: `DISPONIBLE`, `RESERVADA`, `OCUPADA`, `LIMPIEZA`, `MANTENIMIENTO`
+- **Requerido**: No (default: `false`)
+- **Tipo**: Boolean
+- **Valores**: `true` (activa) o `false` (inactiva)
 
-### Campo `notas`
+### Campo `descripcion`
 
 - **Requerido**: No
 - **Tipo**: String
 - **Longitud máxima**: Sin límite
-- **Ejemplo**: "Solicitud de almohadas extra", "Aire acondicionado en reparación"
-
-### Campo `ulti_limpieza`
-
-- **Requerido**: No
-- **Tipo**: String (formato ISO 8601)
-- **Ejemplo**: "2026-03-17T17:00:00.000Z"
-- **Nota**: Se actualiza automáticamente cuando el estado cambia a `LIMPIEZA`
+- **Ejemplo**: "Suite con vista al mar", "Aire acondicionado en reparación"
 
 ---
 
@@ -640,7 +608,8 @@ Elimina una habitación del sistema.
 - Las habitaciones representan las unidades físicas del hotel con número y ubicación específicos
 - Cada habitación está asociada a un tipo de habitación que define sus características
 - Los campos `tiene_ducha` y `tiene_banio` permiten especificar las instalaciones sanitarias de cada habitación individual
-- El campo `ulti_limpieza` se actualiza automáticamente cuando el estado cambia a `LIMPIEZA` (vía PUT)
+- El campo `estado` es booleano: `true` indica habitación activa/disponible, `false` indica inactiva
+- El campo `descripcion` permite almacenar información adicional o notas del personal
 - El campo `url_imagen` es un array que permite almacenar múltiples imágenes de la habitación
 - Los campos `created_at` y `updated_at` se gestionan automáticamente por el sistema
 - No se puede eliminar una habitación si tiene estancias asociadas
@@ -678,35 +647,19 @@ curl -X POST https://api.hotel.com/api/private/habitaciones \
     "piso": 3,
     "tiene_ducha": true,
     "tiene_banio": true,
-    "url_imagen": [
-      "https://example.com/rooms/301-1.jpg",
-      "https://example.com/rooms/301-2.jpg",
-      "https://example.com/rooms/301-3.jpg"
-    ],
-    "estado": "DISPONIBLE",
-    "notas": "Habitación con vista al mar"
+    "estado": true,
+    "descripcion": "Habitación con vista al mar"
   }'
 ```
 
-### Actualizar estado operacional (recepción)
+### Actualizar estado (recepción)
 
 ```bash
 curl -X PATCH https://api.hotel.com/api/private/habitaciones/789e4567-e89b-12d3-a456-426614174000/estado \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <token>" \
   -d '{
-    "estado": "OCUPADA"
-  }'
-```
-
-### Actualizar fecha de limpieza
-
-```bash
-curl -X PATCH https://api.hotel.com/api/private/habitaciones/789e4567-e89b-12d3-a456-426614174000/estado \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <token>" \
-  -d '{
-    "ulti_limpieza": "2026-03-17T17:00:00.000Z"
+    "estado": true
   }'
 ```
 
@@ -721,8 +674,8 @@ curl -X PUT https://api.hotel.com/api/private/habitaciones/789e4567-e89b-12d3-a4
     "piso": 3,
     "tiene_ducha": true,
     "tiene_banio": false,
-    "estado": "MANTENIMIENTO",
-    "notas": "Reparación de aire acondicionado"
+    "estado": false,
+    "descripcion": "Reparación de aire acondicionado"
   }'
 ```
 

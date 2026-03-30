@@ -1,4 +1,4 @@
-import { Habitacion, EstadoHabitacion } from "../../domain/entities/habitacion.entity";
+import { Habitacion } from "../../domain/entities/habitacion.entity";
 import { mapTipoHabitacionFromPrisma, type TipoHabitacionPrismaRow } from "./tipo-habitacion.mapper";
 
 export type HabitacionPrismaRow = {
@@ -8,9 +8,8 @@ export type HabitacionPrismaRow = {
   tieneDucha: boolean;
   tieneBanio: boolean;
   urlImagen: string[] | null;
-  estado: string;
-  notas: string | null;
-  ultimaLimpieza: Date | null;
+  estado: boolean;
+  descripcion: string | null;
   createdAt: Date;
   updatedAt: Date;
   tipo: TipoHabitacionPrismaRow & Record<string, unknown>;
@@ -33,9 +32,8 @@ export function mapHabitacionFromPrisma(data: HabitacionPrismaRow): Habitacion {
     data.tieneDucha,
     data.tieneBanio,
     data.urlImagen,
-    data.estado as EstadoHabitacion,
-    data.notas,
-    data.ultimaLimpieza,
+    data.estado,
+    data.descripcion,
     data.createdAt,
     data.updatedAt,
   );

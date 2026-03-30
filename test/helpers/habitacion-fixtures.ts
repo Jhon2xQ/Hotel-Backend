@@ -1,4 +1,4 @@
-import { Habitacion, EstadoHabitacion } from "../../src/domain/entities/habitacion.entity";
+import { Habitacion } from "../../src/domain/entities/habitacion.entity";
 import { TipoHabitacion } from "../../src/domain/entities/tipo-habitacion.entity";
 
 const defaultTipo = new TipoHabitacion(
@@ -18,9 +18,8 @@ export function createMockHabitacion(overrides?: Partial<Habitacion>): Habitacio
     overrides?.tieneDucha ?? true,
     overrides?.tieneBanio ?? true,
     overrides?.urlImagen ?? ["https://example.com/room.jpg"],
-    overrides?.estado ?? EstadoHabitacion.DISPONIBLE,
-    overrides?.notas ?? null,
-    overrides?.ultiLimpieza ?? null,
+    overrides?.estado ?? false,
+    overrides?.descripcion ?? null,
     overrides?.createdAt ?? new Date(),
     overrides?.updatedAt ?? new Date(),
   );

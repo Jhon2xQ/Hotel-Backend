@@ -4,7 +4,6 @@ import type { ITipoHabitacionRepository } from "../../../domain/interfaces/tipo-
 import type { IMuebleRepository } from "../../../domain/interfaces/mueble.repository.interface";
 import { HabitacionException } from "../../../domain/exceptions/habitacion.exception";
 import { UpdateHabitacionDto, HabitacionDto, toHabitacionDto } from "../../dtos/habitacion.dto";
-import { EstadoHabitacion } from "../../../domain/entities/habitacion.entity";
 import { S3UploadService } from "../../../infrastructure/services/s3-upload.service";
 import { DI_TOKENS } from "../../../common/IoC/tokens";
 
@@ -18,13 +17,11 @@ export class UpdateHabitacionUseCase {
   ) {}
 
   async execute(id: string, input: UpdateHabitacionDto): Promise<HabitacionDto> {
-    // Validate Habitacion exists (Requirement 9.1, 9.10)
     const existing = await this.repository.findById(id);
     if (!existing) {
       throw HabitacionException.notFoundById();
     }
 
-    // If nroHabitacion is being changed, check uniqueness (Requirement 9.4, 9.5)
     if (input.nro_habitacion !== undefined && input.nro_habitacion !== existing.nroHabitacion) {
       const existingWithNumero = await this.repository.findByNumero(input.nro_habitacion);
       if (existingWithNumero) {
@@ -32,7 +29,6 @@ export class UpdateHabitacionUseCase {
       }
     }
 
-    // If tipoId is being changed, validate TipoHabitacion exists (Requirement 9.4)
     if (input.tipo_habitacion_id !== undefined) {
       const tipoHabitacion = await this.tipoHabitacionRepository.findById(input.tipo_habitacion_id);
       if (!tipoHabitacion) {
@@ -40,17 +36,9 @@ export class UpdateHabitacionUseCase {
       }
     }
 
-    // Upload images to S3 if provided
     let imageUrls: string[] | undefined = undefined;
     if (input.imagenes && input.imagenes.length > 0) {
       imageUrls = await S3UploadService.uploadImages(input.imagenes);
-    }
-
-    let ultiLimpieza: Date | null | undefined = undefined;
-    if (input.estado === EstadoHabitacion.LIMPIEZA) {
-      ultiLimpieza = new Date();
-    } else if (input.ulti_limpieza !== undefined) {
-      ultiLimpieza = input.ulti_limpieza ? new Date(input.ulti_limpieza) : null;
     }
 
     const updated = await this.repository.update(id, {
@@ -61,8 +49,7 @@ export class UpdateHabitacionUseCase {
       tieneBanio: input.tiene_banio,
       urlImagen: imageUrls,
       estado: input.estado,
-      notas: input.notas,
-      ultiLimpieza,
+      descripcion: input.descripcion,
     });
 
     return toHabitacionDto(updated);
