@@ -22,8 +22,8 @@ export class UpdateReservaUseCase {
       throw ReservaException.cannotModifyCompleted();
     }
 
-    if (input.fechaEntrada && input.fechaSalida) {
-      if (input.fechaSalida <= input.fechaEntrada) {
+    if (input.fechaInicio && input.fechaFin) {
+      if (input.fechaFin <= input.fechaInicio) {
         throw ReservaException.invalidDateRange();
       }
     }
@@ -34,15 +34,15 @@ export class UpdateReservaUseCase {
       throw ReservaException.invalidNinos();
     }
 
-    if (input.fechaEntrada || input.fechaSalida || input.habitacionId) {
-      const fechaEntrada = input.fechaEntrada || existing.fechaEntrada;
-      const fechaSalida = input.fechaSalida || existing.fechaSalida;
-      const habitacionId = input.habitacionId || existing.habitacion.id;
+    if (input.fechaInicio || input.fechaFin || input.habitacionId) {
+      const fechaInicio = input.fechaInicio || existing.fechaInicio;
+      const fechaFin = input.fechaFin || existing.fechaFin;
+      const habitacionId = input.habitacionId || existing.habitacionId;
 
       const conflicting = await this.reservaRepository.findConflictingReservations(
         habitacionId,
-        fechaEntrada,
-        fechaSalida,
+        fechaInicio,
+        fechaFin,
         id,
       );
       if (conflicting.length > 0) {

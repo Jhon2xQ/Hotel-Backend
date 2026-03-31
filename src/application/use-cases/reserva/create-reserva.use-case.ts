@@ -9,9 +9,9 @@ import { generateCodigoReserva } from "../../../common/utils/codigo-generator";
 import { DI_TOKENS } from "../../../common/IoC/tokens";
 import type { Reserva } from "../../../domain/entities/reserva.entity";
 
-function calculateNights(fechaEntrada: Date, fechaSalida: Date): number {
+function calculateNights(fechaInicio: Date, fechaFin: Date): number {
   const msPerDay = 1000 * 60 * 60 * 24;
-  return Math.round((fechaSalida.getTime() - fechaEntrada.getTime()) / msPerDay);
+  return Math.round((fechaFin.getTime() - fechaInicio.getTime()) / msPerDay);
 }
 
 @injectable()
@@ -24,7 +24,7 @@ export class CreateReservaUseCase {
   ) {}
 
   async execute(input: CreateReservaDto): Promise<Reserva> {
-    if (input.fechaSalida <= input.fechaEntrada) {
+    if (input.fechaFin <= input.fechaInicio) {
       throw ReservaException.invalidDateRange();
     }
     if (input.adultos < 1) {
@@ -36,8 +36,8 @@ export class CreateReservaUseCase {
 
     const conflicting = await this.reservaRepository.findConflictingReservations(
       input.habitacionId,
-      input.fechaEntrada,
-      input.fechaSalida,
+      input.fechaInicio,
+      input.fechaFin,
     );
     if (conflicting.length > 0) {
       throw ReservaException.dateRangeConflict();
@@ -77,7 +77,7 @@ export class CreateReservaUseCase {
       throw ReservaException.tarifaNotFound();
     }
 
-    const nights = calculateNights(input.fechaEntrada, input.fechaSalida);
+    const nights = calculateNights(input.fechaInicio, input.fechaFin);
     const precioNoche = tarifa.precioNoche;
     const IVA = tarifa.IVA ?? 0;
     const cargoServicios = tarifa.cargoServicios ?? 0;
@@ -89,8 +89,8 @@ export class CreateReservaUseCase {
       huespedId: input.huespedId,
       habitacionId: input.habitacionId,
       tarifaId: input.tarifaId,
-      fechaEntrada: input.fechaEntrada,
-      fechaSalida: input.fechaSalida,
+      fechaInicio: input.fechaInicio,
+      fechaFin: input.fechaFin,
       adultos: input.adultos,
       ninos: input.ninos,
       nombreHuesped: `${huesped.nombres} ${huesped.apellidos}`,

@@ -1,14 +1,14 @@
 import { Reserva, EstadoReserva } from "../../domain/entities/reserva.entity";
-import { mapHabitacionFromPrisma, type HabitacionPrismaRow } from "./habitacion.mapper";
-import { mapHuespedFromPrisma, type HuespedPrismaRow } from "./huesped.mapper";
-import { mapTarifaFromPrisma, type TarifaPrismaRow } from "./tarifa.mapper";
-import { mapPagoFromPrisma, type PagoPrismaRow } from "./pago.mapper";
 
 export type ReservaPrismaRow = {
   id: string;
   codigo: string;
-  fechaEntrada: Date;
-  fechaSalida: Date;
+  huespedId: string;
+  habitacionId: string;
+  tarifaId: string;
+  pagoId: string | null;
+  fechaInicio: Date;
+  fechaFin: Date;
   adultos: number;
   ninos: number;
   nombreHuesped: string;
@@ -25,24 +25,18 @@ export type ReservaPrismaRow = {
   canceladoEn: Date | null;
   createdAt: Date;
   updatedAt: Date;
-  huesped: HuespedPrismaRow;
-  habitacion: HabitacionPrismaRow;
-  tarifa: TarifaPrismaRow;
-  pago: (PagoPrismaRow & { recibidoPor?: PagoPrismaRow["recibidoPor"] }) | null;
 };
 
 export function mapReservaFromPrisma(data: ReservaPrismaRow): Reserva {
-  const pago = data.pago ? mapPagoFromPrisma(data.pago) : null;
-
   return new Reserva(
     data.id,
     data.codigo,
-    mapHuespedFromPrisma(data.huesped),
-    mapHabitacionFromPrisma(data.habitacion),
-    mapTarifaFromPrisma(data.tarifa),
-    pago,
-    data.fechaEntrada,
-    data.fechaSalida,
+    data.huespedId,
+    data.habitacionId,
+    data.tarifaId,
+    data.pagoId,
+    data.fechaInicio,
+    data.fechaFin,
     data.adultos,
     data.ninos,
     data.nombreHuesped,

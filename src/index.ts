@@ -36,7 +36,7 @@ publicApi.route("/tipos-habitacion", createTipoHabitacionPublicRoutes());
 
 //RUTAS-PRIVADAS______________________________________________________
 const privateApi = new Hono();
-//privateApi.use("*", authMiddleware);
+privateApi.use("*", authMiddleware);
 privateApi.route("/habitaciones", createHabitacionRoutes());
 privateApi.route("/categorias-mueble", createCategoriaMuebleRoutes());
 privateApi.route("/muebles", createMuebleRoutes());

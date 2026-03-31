@@ -410,8 +410,8 @@ model Reserva {
   pagoId       String? @unique @db.Uuid
 
   // Fechas
-  fechaEntrada DateTime @db.Date
-  fechaSalida  DateTime @db.Date
+  fechaInicio DateTime @db.Date
+  fechaFin    DateTime @db.Date
 
   // Ocupación
   adultos Int @default(1) @db.SmallInt
@@ -450,8 +450,8 @@ model Reserva {
   @@index([huespedId])
   @@index([habitacionId])
   @@index([tarifaId])
-  @@index([fechaEntrada])
-  @@index([fechaSalida])
+  @@index([fechaInicio])
+  @@index([fechaFin])
   @@index([estado])
   @@map("reservas")
 }

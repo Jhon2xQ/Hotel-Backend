@@ -1,8 +1,3 @@
-import type { Huesped } from "./huesped.entity";
-import type { Habitacion } from "./habitacion.entity";
-import type { Tarifa } from "./tarifa.entity";
-import type { Pago } from "./pago.entity";
-
 export enum EstadoReserva {
   TENTATIVA = "TENTATIVA",
   CONFIRMADA = "CONFIRMADA",
@@ -16,12 +11,12 @@ export class Reserva {
   constructor(
     public readonly id: string,
     public readonly codigo: string,
-    public readonly huesped: Huesped,
-    public readonly habitacion: Habitacion,
-    public readonly tarifa: Tarifa,
-    public readonly pago: Pago | null,
-    public readonly fechaEntrada: Date,
-    public readonly fechaSalida: Date,
+    public readonly huespedId: string,
+    public readonly habitacionId: string,
+    public readonly tarifaId: string,
+    public readonly pagoId: string | null,
+    public readonly fechaInicio: Date,
+    public readonly fechaFin: Date,
     public readonly adultos: number,
     public readonly ninos: number,
     public readonly nombreHuesped: string,
