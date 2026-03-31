@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { HabitacionController } from "../../src/presentation/controllers/habitacion.controller";
 import { CreateHabitacionUseCase } from "../../src/application/use-cases/habitacion/create-habitacion.use-case";
 import { ListHabitacionUseCase } from "../../src/application/use-cases/habitacion/list-habitacion.use-case";
+import { ListHabitacionPaginatedUseCase } from "../../src/application/use-cases/habitacion/list-habitacion-paginated.use-case";
 import { FindHabitacionByIdUseCase } from "../../src/application/use-cases/habitacion/find-habitacion-by-id.use-case";
 import { UpdateHabitacionUseCase } from "../../src/application/use-cases/habitacion/update-habitacion.use-case";
 import { UpdateHabitacionStatusUseCase } from "../../src/application/use-cases/habitacion/update-habitacion-status.use-case";
@@ -13,7 +14,9 @@ describe("HabitacionController", () => {
   let controller: HabitacionController;
   let mockCreateUseCase: any;
   let mockListUseCase: any;
+  let mockListPaginatedUseCase: any;
   let mockFindByIdUseCase: any;
+  let mockFindByIdConFechasReservaUseCase: any;
   let mockUpdateUseCase: any;
   let mockUpdateStatusUseCase: any;
   let mockDeleteUseCase: any;
@@ -23,7 +26,9 @@ describe("HabitacionController", () => {
   beforeEach(() => {
     mockCreateUseCase = { execute: vi.fn() };
     mockListUseCase = { execute: vi.fn() };
+    mockListPaginatedUseCase = { execute: vi.fn() };
     mockFindByIdUseCase = { execute: vi.fn() };
+    mockFindByIdConFechasReservaUseCase = { execute: vi.fn() };
     mockUpdateUseCase = { execute: vi.fn() };
     mockUpdateStatusUseCase = { execute: vi.fn() };
     mockDeleteUseCase = { execute: vi.fn() };
@@ -33,7 +38,9 @@ describe("HabitacionController", () => {
     controller = new HabitacionController(
       mockCreateUseCase,
       mockListUseCase,
+      mockListPaginatedUseCase,
       mockFindByIdUseCase,
+      mockFindByIdConFechasReservaUseCase,
       mockUpdateUseCase,
       mockUpdateStatusUseCase,
       mockDeleteUseCase,
@@ -119,24 +126,30 @@ describe("HabitacionController", () => {
     it("should find habitacion by id and return 200", async () => {
       const mockContext = createMockContext();
       mockContext.req.param = vi.fn().mockReturnValue({ id: "test-id" });
+      mockContext.get = vi.fn().mockReturnValue({ tipo_reserva: ["TENTATIVA", "CONFIRMADA", "EN_CASA"] });
 
       const mockOutput = {
-        id: "test-id",
-        nro_habitacion: "301",
-        tipo_habitacion: { id: "tipo-id", nombre: "Suite Deluxe", descripcion: "Suite de lujo", created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-        piso: 3,
-        url_imagen: null,
-        estado: false,
-        descripcion: null,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+        habitacion: {
+          id: "test-id",
+          nro_habitacion: "301",
+          tipo_habitacion: { id: "tipo-id", nombre: "Suite Deluxe", descripcion: "Suite de lujo", created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+          piso: 3,
+          tiene_ducha: false,
+          tiene_banio: false,
+          url_imagen: null,
+          estado: false,
+          descripcion: null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        },
+        fechas_reserva: [],
       };
 
-      mockFindByIdUseCase.execute.mockResolvedValue(mockOutput);
+      mockFindByIdConFechasReservaUseCase.execute.mockResolvedValue(mockOutput);
 
       await controller.findById(mockContext);
 
-      expect(mockFindByIdUseCase.execute).toHaveBeenCalledWith("test-id");
+      expect(mockFindByIdConFechasReservaUseCase.execute).toHaveBeenCalledWith("test-id", ["TENTATIVA", "CONFIRMADA", "EN_CASA"]);
       expect(mockContext.json).toHaveBeenCalledWith(
         expect.objectContaining({
           success: true,

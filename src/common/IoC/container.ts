@@ -22,7 +22,9 @@ import { DeleteMuebleUseCase } from "../../application/use-cases/mueble/delete-m
 
 import { CreateHabitacionUseCase } from "../../application/use-cases/habitacion/create-habitacion.use-case";
 import { ListHabitacionUseCase } from "../../application/use-cases/habitacion/list-habitacion.use-case";
+import { ListHabitacionPaginatedUseCase } from "../../application/use-cases/habitacion/list-habitacion-paginated.use-case";
 import { FindHabitacionByIdUseCase } from "../../application/use-cases/habitacion/find-habitacion-by-id.use-case";
+import { FindHabitacionConFechasReservaUseCase } from "../../application/use-cases/habitacion/find-habitacion-con-fechas-reserva.use-case";
 import { UpdateHabitacionUseCase } from "../../application/use-cases/habitacion/update-habitacion.use-case";
 import { UpdateHabitacionStatusUseCase } from "../../application/use-cases/habitacion/update-habitacion-status.use-case";
 import { DeleteHabitacionUseCase } from "../../application/use-cases/habitacion/delete-habitacion.use-case";
@@ -113,7 +115,9 @@ const useCaseAndControllerClasses: Array<new (...args: never[]) => unknown> = [
   DeleteMuebleUseCase,
   CreateHabitacionUseCase,
   ListHabitacionUseCase,
+  ListHabitacionPaginatedUseCase,
   FindHabitacionByIdUseCase,
+  FindHabitacionConFechasReservaUseCase,
   UpdateHabitacionUseCase,
   UpdateHabitacionStatusUseCase,
   DeleteHabitacionUseCase,

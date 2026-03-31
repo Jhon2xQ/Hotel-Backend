@@ -1,12 +1,15 @@
 import { inject, injectable } from "tsyringe";
 import { PrismaClient } from "../../../generated/prisma/client";
 import { Habitacion } from "../../domain/entities/habitacion.entity";
+import type { EstadoReserva } from "../../domain/entities/reserva.entity";
 import type {
   IHabitacionRepository,
   CreateHabitacionParams,
   UpdateHabitacionParams,
   UpdateHabitacionStatusParams,
+  HabitacionPaginationParams,
 } from "../../domain/interfaces/habitacion.repository.interface";
+import type { PaginatedResult } from "../../application/paginations/api.pagination";
 import { mapHabitacionFromPrisma } from "../mappers/habitacion.mapper";
 import { DI_TOKENS } from "../../common/IoC/tokens";
 
@@ -39,12 +42,74 @@ export class HabitacionRepository implements IHabitacionRepository {
     return results.map((r) => mapHabitacionFromPrisma(r));
   }
 
+  async findAllPaginated(params: HabitacionPaginationParams): Promise<PaginatedResult<Habitacion>> {
+    const { page, limit, tipo } = params;
+    const skip = (page - 1) * limit;
+
+    const where: Record<string, unknown> = {};
+    if (tipo) {
+      where.tipo = { nombre: { contains: tipo, mode: "insensitive" } };
+    }
+
+    const [habitaciones, total] = await Promise.all([
+      this.prisma.habitacion.findMany({
+        where,
+        include: { tipo: true },
+        take: limit,
+        skip,
+        orderBy: { nroHabitacion: "asc" },
+      }),
+      this.prisma.habitacion.count({ where }),
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
+    return {
+      list: habitaciones.map((h) => mapHabitacionFromPrisma(h)),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
+      },
+    };
+  }
+
   async findById(id: string): Promise<Habitacion | null> {
     const result = await this.prisma.habitacion.findUnique({
       where: { id },
       include: { tipo: true },
     });
     return result ? mapHabitacionFromPrisma(result) : null;
+  }
+
+  async findByIdWithReservas(
+    id: string,
+    estadosReserva: EstadoReserva[],
+  ): Promise<{ habitacion: Habitacion; reservas: Array<{ fechaInicio: Date; fechaFin: Date; estado: EstadoReserva }> } | null> {
+    const result = await this.prisma.habitacion.findUnique({
+      where: { id },
+      include: {
+        tipo: true,
+        reservas: {
+          where: { estado: { in: estadosReserva } },
+          select: { fechaInicio: true, fechaFin: true, estado: true },
+          orderBy: { fechaInicio: "asc" },
+        },
+      },
+    });
+
+    if (!result) return null;
+
+    return {
+      habitacion: mapHabitacionFromPrisma(result),
+      reservas: result.reservas.map((r) => ({
+        fechaInicio: r.fechaInicio,
+        fechaFin: r.fechaFin,
+        estado: r.estado as EstadoReserva,
+      })),
+    };
   }
 
   async findByNumero(numero: string): Promise<Habitacion | null> {

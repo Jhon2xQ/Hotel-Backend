@@ -1,4 +1,26 @@
 import { z } from "zod";
+import { PaginationQuerySchema } from "./pagination.schema";
+
+export const ListHabitacionQuerySchema = PaginationQuerySchema.extend({
+  tipo: z.string().optional(),
+});
+export type ListHabitacionQuery = z.infer<typeof ListHabitacionQuerySchema>;
+
+const ESTADOS_RESERVA = ["TENTATIVA", "CONFIRMADA", "EN_CASA", "COMPLETADA", "CANCELADA", "NO_LLEGO"] as const;
+const ESTADOS_RESERVA_DEFAULT: readonly string[] = ["TENTATIVA", "CONFIRMADA", "EN_CASA"];
+
+export const HabitacionDetailQuerySchema = z.object({
+  tipo_reserva: z
+    .string()
+    .optional()
+    .transform((val) => {
+      if (!val) return [...ESTADOS_RESERVA_DEFAULT];
+      const estados = val.split(",").map((s) => s.trim().toUpperCase());
+      const valid = estados.filter((e) => (ESTADOS_RESERVA as readonly string[]).includes(e));
+      return valid.length > 0 ? valid : [...ESTADOS_RESERVA_DEFAULT];
+    }),
+});
+export type HabitacionDetailQuery = z.infer<typeof HabitacionDetailQuerySchema>;
 
 export const EstadoLimpiezaSchema = z.enum(["LIMPIA", "SUCIA", "EN_LIMPIEZA", "INSPECCION"]);
 

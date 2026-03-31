@@ -35,6 +35,8 @@ describe("UpdateMuebleUseCase", () => {
       findByTipoWithDirectPrice: async () => [],
       findAvailableInDateRange: async () => [],
       findByIdWithDirectPrice: async () => null,
+      findAllPaginated: async () => ({ list: [], pagination: { page: 1, limit: 10, total: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false } }),
+      findByIdWithReservas: async () => null,
     };
 
     useCase = new UpdateMuebleUseCase(mockMuebleRepo, mockHabitacionRepo);

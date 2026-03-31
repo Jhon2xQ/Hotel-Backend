@@ -3,7 +3,9 @@ import { AppContext } from "../../common/types/app.types";
 import { ApiResponse } from "../api.response";
 import { CreateHabitacionUseCase } from "../../application/use-cases/habitacion/create-habitacion.use-case";
 import { ListHabitacionUseCase } from "../../application/use-cases/habitacion/list-habitacion.use-case";
+import { ListHabitacionPaginatedUseCase } from "../../application/use-cases/habitacion/list-habitacion-paginated.use-case";
 import { FindHabitacionByIdUseCase } from "../../application/use-cases/habitacion/find-habitacion-by-id.use-case";
+import { FindHabitacionConFechasReservaUseCase } from "../../application/use-cases/habitacion/find-habitacion-con-fechas-reserva.use-case";
 import { UpdateHabitacionUseCase } from "../../application/use-cases/habitacion/update-habitacion.use-case";
 import { UpdateHabitacionStatusUseCase } from "../../application/use-cases/habitacion/update-habitacion-status.use-case";
 import { DeleteHabitacionUseCase } from "../../application/use-cases/habitacion/delete-habitacion.use-case";
@@ -15,13 +17,18 @@ import {
   UpdateHabitacionStatusDto,
   SearchAvailableHabitacionesDto,
 } from "../../application/dtos/habitacion.dto";
+import type { ListHabitacionQuery } from "../schemas/habitacion.schema";
+import type { HabitacionDetailQuery } from "../schemas/habitacion.schema";
+import type { EstadoReserva } from "../../domain/entities/reserva.entity";
 
 @injectable()
 export class HabitacionController {
   constructor(
     private createUseCase: CreateHabitacionUseCase,
     private listUseCase: ListHabitacionUseCase,
+    private listPaginatedUseCase: ListHabitacionPaginatedUseCase,
     private findByIdUseCase: FindHabitacionByIdUseCase,
+    private findByIdConFechasReservaUseCase: FindHabitacionConFechasReservaUseCase,
     private updateUseCase: UpdateHabitacionUseCase,
     private updateStatusUseCase: UpdateHabitacionStatusUseCase,
     private deleteUseCase: DeleteHabitacionUseCase,
@@ -40,9 +47,16 @@ export class HabitacionController {
     return c.json(ApiResponse.success("Habitaciones obtenidas exitosamente", results), 200);
   }
 
+  async listPaginated(c: AppContext) {
+    const validData = c.get("validData") as ListHabitacionQuery;
+    const result = await this.listPaginatedUseCase.execute(validData);
+    return c.json(ApiResponse.success("Habitaciones obtenidas exitosamente", result), 200);
+  }
+
   async findById(c: AppContext) {
     const { id } = c.req.param();
-    const result = await this.findByIdUseCase.execute(id);
+    const validData = c.get("validData") as HabitacionDetailQuery;
+    const result = await this.findByIdConFechasReservaUseCase.execute(id, validData.tipo_reserva as EstadoReserva[]);
     return c.json(ApiResponse.success("Habitación encontrada", result), 200);
   }
 

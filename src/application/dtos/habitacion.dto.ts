@@ -54,6 +54,17 @@ export interface HabitacionWithPriceDto {
   precio_noche: number | null;
 }
 
+export interface FechaReservaDto {
+  fecha_inicio: string;
+  fecha_fin: string;
+  estado: string;
+}
+
+export interface HabitacionConFechasReservaDto {
+  habitacion: HabitacionDto;
+  fechas_reserva: FechaReservaDto[];
+}
+
 export function toHabitacionDto(h: Habitacion): HabitacionDto {
   return {
     id: h.id,
