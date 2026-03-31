@@ -69,7 +69,7 @@ export const UpdateEstadoReservaSchema = z.object({
 });
 
 export const ReservaQuerySchema = PaginationQuerySchema.extend({
-  name: z.string().optional(),
+  nombre: z.string().optional(),
   tipo: z.string().optional(),
 });
 

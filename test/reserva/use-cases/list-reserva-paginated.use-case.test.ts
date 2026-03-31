@@ -45,18 +45,18 @@ describe("ListReservaPaginatedUseCase", () => {
     expect(mockRepository.findAllPaginated).toHaveBeenCalledWith({ page: 1, limit: 10 });
   });
 
-  it("debe pasar el filtro name al repositorio", async () => {
+  it("debe pasar el filtro nombre al repositorio", async () => {
     mockRepository.findAllPaginated = vi.fn().mockResolvedValue({
       list: [],
       pagination: { page: 1, limit: 10, total: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false },
     });
 
-    await useCase.execute({ page: 1, limit: 10, name: "Juan" });
+    await useCase.execute({ page: 1, limit: 10, nombre: "Juan" });
 
     expect(mockRepository.findAllPaginated).toHaveBeenCalledWith({
       page: 1,
       limit: 10,
-      name: "Juan",
+      nombre: "Juan",
     });
   });
 
@@ -81,12 +81,12 @@ describe("ListReservaPaginatedUseCase", () => {
       pagination: { page: 1, limit: 10, total: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false },
     });
 
-    await useCase.execute({ page: 2, limit: 5, name: "García", tipo: "Doble" });
+    await useCase.execute({ page: 2, limit: 5, nombre: "García", tipo: "Doble" });
 
     expect(mockRepository.findAllPaginated).toHaveBeenCalledWith({
       page: 2,
       limit: 5,
-      name: "García",
+      nombre: "García",
       tipo: "Doble",
     });
   });

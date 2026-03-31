@@ -50,14 +50,14 @@ export class ReservaRepository implements IReservaRepository {
   }
 
   async findAllPaginated(params: ReservaPaginationParams): Promise<PaginatedResult<Reserva>> {
-    const { page, limit, name, tipo } = params;
+    const { page, limit, nombre, tipo } = params;
     const skip = (page - 1) * limit;
 
     const conditions: Record<string, unknown>[] = [];
 
-    if (name) {
+    if (nombre) {
       conditions.push({
-        nombreHuesped: { contains: name, mode: "insensitive" },
+        nombreHuesped: { contains: nombre, mode: "insensitive" },
       });
     }
 
@@ -94,27 +94,15 @@ export class ReservaRepository implements IReservaRepository {
     };
   }
 
-  async findConflictingReservations(
-    habitacionId: string,
-    fechaInicio: Date,
-    fechaFin: Date,
-    excludeReservaId?: string,
-  ): Promise<Reserva[]> {
-    const conflictingStates: PrismaEstadoReserva[] = [
-      PrismaEstadoReserva.TENTATIVA,
-      PrismaEstadoReserva.CONFIRMADA,
-      PrismaEstadoReserva.EN_CASA,
-    ];
+  async findConflictingReservations(habitacionId: string, fechaInicio: Date, fechaFin: Date, excludeReservaId?: string): Promise<Reserva[]> {
+    const conflictingStates: PrismaEstadoReserva[] = [PrismaEstadoReserva.TENTATIVA, PrismaEstadoReserva.CONFIRMADA, PrismaEstadoReserva.EN_CASA];
 
     const results = await this.prisma.reserva.findMany({
       where: {
         habitacionId,
         estado: { in: conflictingStates },
         NOT: excludeReservaId ? { id: excludeReservaId } : undefined,
-        AND: [
-          { fechaInicio: { lt: fechaFin } },
-          { fechaFin: { gt: fechaInicio } },
-        ],
+        AND: [{ fechaInicio: { lt: fechaFin } }, { fechaFin: { gt: fechaInicio } }],
       },
     });
 
