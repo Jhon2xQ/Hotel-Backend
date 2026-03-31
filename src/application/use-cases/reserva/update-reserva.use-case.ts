@@ -34,6 +34,22 @@ export class UpdateReservaUseCase {
       throw ReservaException.invalidNinos();
     }
 
+    if (input.fechaEntrada || input.fechaSalida || input.habitacionId) {
+      const fechaEntrada = input.fechaEntrada || existing.fechaEntrada;
+      const fechaSalida = input.fechaSalida || existing.fechaSalida;
+      const habitacionId = input.habitacionId || existing.habitacion.id;
+
+      const conflicting = await this.reservaRepository.findConflictingReservations(
+        habitacionId,
+        fechaEntrada,
+        fechaSalida,
+        id,
+      );
+      if (conflicting.length > 0) {
+        throw ReservaException.dateRangeConflict();
+      }
+    }
+
     const updated = await this.reservaRepository.update(id, input);
     if (!updated) {
       throw ReservaException.notFoundById();

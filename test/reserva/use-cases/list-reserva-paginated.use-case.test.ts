@@ -14,6 +14,7 @@ describe("ListReservaPaginatedUseCase", () => {
       findAllPaginated: vi.fn(),
       findById: vi.fn(),
       findByCodigo: vi.fn(),
+      findConflictingReservations: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
       cancel: vi.fn(),

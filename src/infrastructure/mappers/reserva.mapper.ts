@@ -16,11 +16,10 @@ export type ReservaPrismaRow = {
   nombreTipoHab: string;
   nombreCanal: string;
   precioNoche: unknown;
+  cantidadNoches: number;
   IVA: unknown;
   cargoServicios: unknown;
   montoTotal: unknown;
-  montoDescuento: unknown;
-  montoFinal: unknown | null;
   estado: string;
   motivoCancel: string | null;
   canceladoEn: Date | null;
@@ -51,11 +50,10 @@ export function mapReservaFromPrisma(data: ReservaPrismaRow): Reserva {
     data.nombreTipoHab,
     data.nombreCanal,
     Number(data.precioNoche),
+    data.cantidadNoches,
     Number(data.IVA),
     Number(data.cargoServicios),
     Number(data.montoTotal),
-    Number(data.montoDescuento),
-    data.montoFinal != null ? Number(data.montoFinal) : null,
     data.estado as EstadoReserva,
     data.motivoCancel,
     data.canceladoEn,

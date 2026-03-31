@@ -34,6 +34,15 @@ export class CreateReservaUseCase {
       throw ReservaException.invalidNinos();
     }
 
+    const conflicting = await this.reservaRepository.findConflictingReservations(
+      input.habitacionId,
+      input.fechaEntrada,
+      input.fechaSalida,
+    );
+    if (conflicting.length > 0) {
+      throw ReservaException.dateRangeConflict();
+    }
+
     let codigo: string | undefined;
     let attempts = 0;
     const maxAttempts = 10;
@@ -69,9 +78,11 @@ export class CreateReservaUseCase {
     }
 
     const nights = calculateNights(input.fechaEntrada, input.fechaSalida);
-    const montoTotal = tarifa.precioNoche * nights;
-    const montoDescuento = input.montoDescuento || 0;
-    const montoFinal = montoTotal - montoDescuento;
+    const precioNoche = tarifa.precioNoche;
+    const IVA = tarifa.IVA ?? 0;
+    const cargoServicios = tarifa.cargoServicios ?? 0;
+    const subtotalNoches = precioNoche * nights;
+    const montoTotal = subtotalNoches * (1 + IVA / 100 + cargoServicios / 100);
 
     return await this.reservaRepository.create({
       codigo: codigo!,
@@ -86,12 +97,11 @@ export class CreateReservaUseCase {
       nroHabitacion: habitacion.nroHabitacion,
       nombreTipoHab: tarifa.tipoHabitacion.nombre,
       nombreCanal: tarifa.canal.nombre,
-      precioNoche: tarifa.precioNoche,
-      IVA: tarifa.IVA ?? 0,
-      cargoServicios: tarifa.cargoServicios ?? 0,
-      montoTotal,
-      montoDescuento,
-      montoFinal,
+      precioNoche,
+      cantidadNoches: nights,
+      IVA,
+      cargoServicios,
+      montoTotal: Math.round(montoTotal * 100) / 100,
     });
   }
 }

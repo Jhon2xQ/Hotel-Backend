@@ -12,7 +12,6 @@ export const CreateReservaSchema = z
     fechaSalida: z.string().datetime("Fecha de salida inválida"),
     adultos: z.number().int().min(1, "Debe haber al menos 1 adulto"),
     ninos: z.number().int().min(0, "El número de niños no puede ser negativo").default(0),
-    montoDescuento: z.number().min(0, "El descuento no puede ser negativo").optional().default(0),
   })
   .refine((data) => new Date(data.fechaSalida) > new Date(data.fechaEntrada), {
     message: "La fecha de salida debe ser posterior a la fecha de entrada",
@@ -34,7 +33,6 @@ export const UpdateReservaSchema = z
     fechaSalida: z.string().datetime("Fecha de salida inválida").optional(),
     adultos: z.number().int().min(1, "Debe haber al menos 1 adulto").optional(),
     ninos: z.number().int().min(0, "El número de niños no puede ser negativo").optional(),
-    montoDescuento: z.number().min(0, "El descuento no puede ser negativo").optional(),
     estado: EstadoReservaEnum.optional(),
   })
   .refine(

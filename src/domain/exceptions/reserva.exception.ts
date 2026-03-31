@@ -68,4 +68,11 @@ export class ReservaException extends DomainException {
       400,
     );
   }
+
+  static dateRangeConflict(): ReservaException {
+    return new ReservaException(
+      "El intervalo de fechas entra en conflicto con una reserva existente para la misma habitación",
+      409,
+    );
+  }
 }

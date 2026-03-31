@@ -15,11 +15,10 @@ export interface CreateReservaPersistParams {
   nombreTipoHab: string;
   nombreCanal: string;
   precioNoche: number;
+  cantidadNoches: number;
   IVA: number;
   cargoServicios: number;
   montoTotal: number;
-  montoDescuento: number;
-  montoFinal: number | null;
 }
 
 export interface UpdateReservaParams {
@@ -31,7 +30,6 @@ export interface UpdateReservaParams {
   fechaSalida?: Date;
   adultos?: number;
   ninos?: number;
-  montoDescuento?: number;
   estado?: EstadoReserva;
   motivoCancel?: string | null;
   canceladoEn?: Date | null;
@@ -47,6 +45,12 @@ export interface IReservaRepository {
   findAllPaginated(params: ReservaPaginationParams): Promise<PaginatedResult<Reserva>>;
   findById(id: string): Promise<Reserva | null>;
   findByCodigo(codigo: string): Promise<Reserva | null>;
+  findConflictingReservations(
+    habitacionId: string,
+    fechaEntrada: Date,
+    fechaSalida: Date,
+    excludeReservaId?: string,
+  ): Promise<Reserva[]>;
   update(id: string, data: UpdateReservaParams): Promise<Reserva | null>;
   delete(id: string): Promise<void>;
   cancel(id: string, motivoCancel: string): Promise<Reserva>;

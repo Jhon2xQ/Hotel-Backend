@@ -13,7 +13,6 @@ export interface CreateReservaDto {
   fechaSalida: Date;
   adultos: number;
   ninos: number;
-  montoDescuento?: number;
 }
 
 export interface UpdateReservaDto {
@@ -25,7 +24,6 @@ export interface UpdateReservaDto {
   fechaSalida?: Date;
   adultos?: number;
   ninos?: number;
-  montoDescuento?: number;
   estado?: EstadoReserva;
 }
 
@@ -53,11 +51,10 @@ export interface ReservaDto {
   nombre_tipo_hab: string;
   nombre_canal: string;
   precio_noche: number;
+  cantidad_noches: number;
   iva: number;
   cargo_servicios: number;
   monto_total: number;
-  monto_descuento: number;
-  monto_final: number | null;
   estado: EstadoReserva;
   motivo_cancel: string | null;
   cancelado_en: string | null;
@@ -82,11 +79,10 @@ export function toReservaDto(r: Reserva): ReservaDto {
     nombre_tipo_hab: r.nombreTipoHab,
     nombre_canal: r.nombreCanal,
     precio_noche: r.precioNoche,
+    cantidad_noches: r.cantidadNoches,
     iva: r.IVA,
     cargo_servicios: r.cargoServicios,
     monto_total: r.montoTotal,
-    monto_descuento: r.montoDescuento,
-    monto_final: r.montoFinal,
     estado: r.estado,
     motivo_cancel: r.motivoCancel,
     cancelado_en: r.canceladoEn?.toISOString() ?? null,

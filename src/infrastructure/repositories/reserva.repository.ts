@@ -1,5 +1,5 @@
 import { inject, injectable } from "tsyringe";
-import { PrismaClient } from "../../../generated/prisma/client";
+import { PrismaClient, EstadoReserva as PrismaEstadoReserva } from "../../../generated/prisma/client";
 import { Reserva, EstadoReserva } from "../../domain/entities/reserva.entity";
 import type {
   IReservaRepository,
@@ -31,11 +31,10 @@ export class ReservaRepository implements IReservaRepository {
         nombreTipoHab: data.nombreTipoHab,
         nombreCanal: data.nombreCanal,
         precioNoche: data.precioNoche,
+        cantidadNoches: data.cantidadNoches,
         IVA: data.IVA,
         cargoServicios: data.cargoServicios,
         montoTotal: data.montoTotal,
-        montoDescuento: data.montoDescuento,
-        montoFinal: data.montoFinal,
         estado: EstadoReserva.TENTATIVA,
       },
       include: this.getIncludeRelations(),
@@ -96,6 +95,34 @@ export class ReservaRepository implements IReservaRepository {
         hasPreviousPage: page > 1,
       },
     };
+  }
+
+  async findConflictingReservations(
+    habitacionId: string,
+    fechaEntrada: Date,
+    fechaSalida: Date,
+    excludeReservaId?: string,
+  ): Promise<Reserva[]> {
+    const conflictingStates: PrismaEstadoReserva[] = [
+      PrismaEstadoReserva.TENTATIVA,
+      PrismaEstadoReserva.CONFIRMADA,
+      PrismaEstadoReserva.EN_CASA,
+    ];
+
+    const results = await this.prisma.reserva.findMany({
+      where: {
+        habitacionId,
+        estado: { in: conflictingStates },
+        NOT: excludeReservaId ? { id: excludeReservaId } : undefined,
+        AND: [
+          { fechaEntrada: { lt: fechaSalida } },
+          { fechaSalida: { gt: fechaEntrada } },
+        ],
+      },
+      include: this.getIncludeRelations(),
+    });
+
+    return results.map((r) => mapReservaFromPrisma(r));
   }
 
   async findById(id: string): Promise<Reserva | null> {
@@ -168,20 +195,19 @@ export class ReservaRepository implements IReservaRepository {
     if (data.motivoCancel !== undefined) updateData.motivoCancel = data.motivoCancel;
     if (data.canceladoEn !== undefined) updateData.canceladoEn = data.canceladoEn;
 
-    if (data.fechaEntrada || data.fechaSalida || data.tarifaId || data.montoDescuento !== undefined) {
+    if (data.fechaEntrada || data.fechaSalida || data.tarifaId) {
       const fechaEntrada = data.fechaEntrada || existing.fechaEntrada;
       const fechaSalida = data.fechaSalida || existing.fechaSalida;
       const precioNoche = (updateData.precioNoche as number) || Number(existing.precioNoche);
-      const montoDescuento =
-        data.montoDescuento !== undefined ? data.montoDescuento : Number(existing.montoDescuento);
+      const IVA = (updateData.IVA as number) || Number(existing.IVA);
+      const cargoServicios = (updateData.cargoServicios as number) || Number(existing.cargoServicios);
 
       const nights = this.calculateNights(fechaEntrada, fechaSalida);
-      const montoTotal = precioNoche * nights;
-      const montoFinal = montoTotal - montoDescuento;
+      const subtotalNoches = precioNoche * nights;
+      const montoTotal = subtotalNoches * (1 + IVA / 100 + cargoServicios / 100);
 
-      updateData.montoTotal = montoTotal;
-      updateData.montoDescuento = montoDescuento;
-      updateData.montoFinal = montoFinal;
+      updateData.cantidadNoches = nights;
+      updateData.montoTotal = Math.round(montoTotal * 100) / 100;
     }
 
     const result = await this.prisma.reserva.update({

@@ -149,11 +149,10 @@ GET /api/private/reservas?name=Garc&tipo=Doble&page=1&limit=10
         "nombre_tipo_hab": "Suite Deluxe",
         "nombre_canal": "Booking.com",
         "precio_noche": 150.0,
+        "cantidad_noches": 2,
         "iva": 18.0,
         "cargo_servicios": 10.0,
-        "monto_total": 300.0,
-        "monto_descuento": 0.0,
-        "monto_final": 300.0,
+        "monto_total": 420.0,
         "estado": "CONFIRMADA",
         "motivo_cancel": null,
         "cancelado_en": null,
@@ -229,11 +228,10 @@ Obtiene una reserva específica por su ID.
     "nombre_tipo_hab": "Suite Deluxe",
     "nombre_canal": "Booking.com",
     "precio_noche": 150.0,
+    "cantidad_noches": 2,
     "iva": 18.0,
     "cargo_servicios": 10.0,
-    "monto_total": 300.0,
-    "monto_descuento": 0.0,
-    "monto_final": 300.0,
+    "monto_total": 420.0,
     "estado": "TENTATIVA",
     "motivo_cancel": null,
     "cancelado_en": null,
@@ -275,8 +273,7 @@ Crea una nueva reserva. El código de reserva se genera automáticamente en form
   "fechaEntrada": "2024-03-25T14:00:00.000Z",
   "fechaSalida": "2024-03-27T12:00:00.000Z",
   "adultos": 2,
-  "ninos": 1,
-  "montoDescuento": 0
+  "ninos": 1
 }
 ```
 
@@ -289,7 +286,7 @@ Crea una nueva reserva. El código de reserva se genera automáticamente en form
 - `fechaSalida`: Requerida, formato datetime ISO, debe ser posterior a fechaEntrada
 - `adultos`: Requerido, mínimo 1
 - `ninos`: Opcional, mínimo 0, default 0
-- `montoDescuento`: Opcional, mínimo 0, default 0
+- No puede haber solapamiento de fechas con reservas existentes (TENTATIVA, CONFIRMADA, EN_CASA) en la misma habitación
 
 **Código de Reserva:**
 
@@ -348,7 +345,6 @@ Actualiza una reserva existente. Cualquier usuario autenticado puede actualizar 
   "fechaSalida": "2024-03-27T12:00:00.000Z",
   "adultos": 2,
   "ninos": 1,
-  "montoDescuento": 0,
   "estado": "CONFIRMADA"
 }
 ```
@@ -672,9 +668,10 @@ Los siguientes campos se sincronizan automáticamente desde las entidades relaci
 
 ### Cálculo de Montos
 
-- `monto_total` = `precio_noche` × número de noches
-- `monto_final` = `monto_total` - `monto_descuento`
-- Número de noches = diferencia en días entre `fecha_salida` y `fecha_entrada`
+- `cantidad_noches` = diferencia en días entre `fecha_salida` y `fecha_entrada`
+- `subtotal` = `precio_noche` × `cantidad_noches`
+- `monto_total` = `subtotal` × (1 + `iva`/100 + `cargo_servicios`/100)
+- Los campos `iva` y `cargo_servicios` se expresan como porcentajes (ej: 18.00 = 18%)
 
 ---
 
@@ -699,6 +696,7 @@ Mensajes posibles:
 - "La reserva ya está cancelada"
 - "Debe proporcionar un motivo de cancelación"
 - "Para cancelar una reserva use el endpoint PATCH /api/private/reservas/:id/cancel con el motivo de cancelación"
+- "El intervalo de fechas entra en conflicto con una reserva existente para la misma habitación"
 
 ### Errores de Permisos (403)
 
@@ -747,6 +745,17 @@ Mensajes posibles:
 }
 ```
 
+También se devuelve 409 cuando el intervalo de fechas entra en conflicto con una reserva existente para la misma habitación:
+
+```json
+{
+  "success": false,
+  "message": "El intervalo de fechas entra en conflicto con una reserva existente para la misma habitación",
+  "data": null,
+  "timestamp": 1711188000000
+}
+```
+
 ### Errores del Servidor (500)
 
 ```json
@@ -781,7 +790,9 @@ Mensajes posibles:
 
 3. **Sincronización Automática**: Los campos snapshot se actualizan automáticamente cuando cambian las relaciones, no es necesario enviarlos en el request.
 
-4. **Cálculo Automático**: Los montos totales y finales se calculan automáticamente basados en las fechas, precio de la tarifa y descuento.
+4. **Cálculo Automático**: Los montos totales se calculan automáticamente basados en las fechas, precio de la tarifa, IVA y cargo de servicios. La fórmula es: `monto_total = (precio_noche × cantidad_noches) × (1 + iva/100 + cargo_servicios/100)`.
+
+5. **Validación de Solapamiento**: Al crear o actualizar una reserva, se verifica que el intervalo de fechas no entre en conflicto con reservas existentes (estado TENTATIVA, CONFIRMADA o EN_CASA) para la misma habitación.
 
 5. **Cancelación vs Eliminación**:
    - Cancelar una reserva la marca como CANCELADA pero mantiene el registro

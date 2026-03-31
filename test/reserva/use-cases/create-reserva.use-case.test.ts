@@ -27,6 +27,7 @@ describe("CreateReservaUseCase", () => {
       findAll: async () => [],
       findById: async () => null,
       findByCodigo: async () => null,
+      findConflictingReservations: async () => [],
       update: async () => full,
       delete: async () => {},
       cancel: async () => full,
@@ -61,7 +62,6 @@ describe("CreateReservaUseCase", () => {
       fechaSalida: new Date("2024-03-27T12:00:00.000Z"),
       adultos: 2,
       ninos: 1,
-      montoDescuento: 0,
     };
 
     const mockReserva = createMockReserva();
@@ -112,6 +112,22 @@ describe("CreateReservaUseCase", () => {
       fechaSalida: new Date("2024-03-27T12:00:00.000Z"),
       adultos: 2,
       ninos: -1,
+    };
+
+    await expect(useCase.execute(input)).rejects.toThrow(ReservaException);
+  });
+
+  it("debe lanzar error si hay conflicto de fechas con otra reserva", async () => {
+    mockRepository.findConflictingReservations = async () => [createMockReserva()];
+
+    const input: CreateReservaDto = {
+      huespedId: "huesped-id",
+      habitacionId: "habitacion-id",
+      tarifaId: "tarifa-id",
+      fechaEntrada: new Date("2024-03-25T14:00:00.000Z"),
+      fechaSalida: new Date("2024-03-27T12:00:00.000Z"),
+      adultos: 2,
+      ninos: 1,
     };
 
     await expect(useCase.execute(input)).rejects.toThrow(ReservaException);
