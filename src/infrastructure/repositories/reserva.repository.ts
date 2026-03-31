@@ -1,5 +1,5 @@
 import { inject, injectable } from "tsyringe";
-import { PrismaClient } from "../../../generated/prisma/client";
+import { PrismaClient, EstadoReserva as PrismaEstadoReserva } from "../../../generated/prisma/client";
 import { Reserva, EstadoReserva } from "../../domain/entities/reserva.entity";
 import type {
   IReservaRepository,
@@ -22,8 +22,8 @@ export class ReservaRepository implements IReservaRepository {
         huespedId: data.huespedId,
         habitacionId: data.habitacionId,
         tarifaId: data.tarifaId,
-        fechaEntrada: data.fechaEntrada,
-        fechaSalida: data.fechaSalida,
+        fechaInicio: data.fechaInicio,
+        fechaFin: data.fechaFin,
         adultos: data.adultos,
         ninos: data.ninos,
         nombreHuesped: data.nombreHuesped,
@@ -31,14 +31,12 @@ export class ReservaRepository implements IReservaRepository {
         nombreTipoHab: data.nombreTipoHab,
         nombreCanal: data.nombreCanal,
         precioNoche: data.precioNoche,
+        cantidadNoches: data.cantidadNoches,
         IVA: data.IVA,
         cargoServicios: data.cargoServicios,
         montoTotal: data.montoTotal,
-        montoDescuento: data.montoDescuento,
-        montoFinal: data.montoFinal,
         estado: EstadoReserva.TENTATIVA,
       },
-      include: this.getIncludeRelations(),
     });
 
     return mapReservaFromPrisma(result);
@@ -46,21 +44,20 @@ export class ReservaRepository implements IReservaRepository {
 
   async findAll(): Promise<Reserva[]> {
     const results = await this.prisma.reserva.findMany({
-      include: this.getIncludeRelations(),
       orderBy: { createdAt: "desc" },
     });
     return results.map((r) => mapReservaFromPrisma(r));
   }
 
   async findAllPaginated(params: ReservaPaginationParams): Promise<PaginatedResult<Reserva>> {
-    const { page, limit, name, tipo } = params;
+    const { page, limit, nombre, tipo } = params;
     const skip = (page - 1) * limit;
 
     const conditions: Record<string, unknown>[] = [];
 
-    if (name) {
+    if (nombre) {
       conditions.push({
-        nombreHuesped: { contains: name, mode: "insensitive" },
+        nombreHuesped: { contains: nombre, mode: "insensitive" },
       });
     }
 
@@ -75,7 +72,6 @@ export class ReservaRepository implements IReservaRepository {
     const [reservas, total] = await Promise.all([
       this.prisma.reserva.findMany({
         where,
-        include: this.getIncludeRelations(),
         take: limit,
         skip,
         orderBy: { createdAt: "desc" },
@@ -98,10 +94,24 @@ export class ReservaRepository implements IReservaRepository {
     };
   }
 
+  async findConflictingReservations(habitacionId: string, fechaInicio: Date, fechaFin: Date, excludeReservaId?: string): Promise<Reserva[]> {
+    const conflictingStates: PrismaEstadoReserva[] = [PrismaEstadoReserva.TENTATIVA, PrismaEstadoReserva.CONFIRMADA, PrismaEstadoReserva.EN_CASA];
+
+    const results = await this.prisma.reserva.findMany({
+      where: {
+        habitacionId,
+        estado: { in: conflictingStates },
+        NOT: excludeReservaId ? { id: excludeReservaId } : undefined,
+        AND: [{ fechaInicio: { lt: fechaFin } }, { fechaFin: { gt: fechaInicio } }],
+      },
+    });
+
+    return results.map((r) => mapReservaFromPrisma(r));
+  }
+
   async findById(id: string): Promise<Reserva | null> {
     const result = await this.prisma.reserva.findUnique({
       where: { id },
-      include: this.getIncludeRelations(),
     });
     return result ? mapReservaFromPrisma(result) : null;
   }
@@ -109,7 +119,6 @@ export class ReservaRepository implements IReservaRepository {
   async findByCodigo(codigo: string): Promise<Reserva | null> {
     const result = await this.prisma.reserva.findUnique({
       where: { codigo },
-      include: this.getIncludeRelations(),
     });
     return result ? mapReservaFromPrisma(result) : null;
   }
@@ -160,34 +169,32 @@ export class ReservaRepository implements IReservaRepository {
     }
 
     if (data.pagoId !== undefined) updateData.pagoId = data.pagoId;
-    if (data.fechaEntrada) updateData.fechaEntrada = data.fechaEntrada;
-    if (data.fechaSalida) updateData.fechaSalida = data.fechaSalida;
+    if (data.fechaInicio) updateData.fechaInicio = data.fechaInicio;
+    if (data.fechaFin) updateData.fechaFin = data.fechaFin;
     if (data.adultos !== undefined) updateData.adultos = data.adultos;
     if (data.ninos !== undefined) updateData.ninos = data.ninos;
     if (data.estado) updateData.estado = data.estado;
     if (data.motivoCancel !== undefined) updateData.motivoCancel = data.motivoCancel;
     if (data.canceladoEn !== undefined) updateData.canceladoEn = data.canceladoEn;
 
-    if (data.fechaEntrada || data.fechaSalida || data.tarifaId || data.montoDescuento !== undefined) {
-      const fechaEntrada = data.fechaEntrada || existing.fechaEntrada;
-      const fechaSalida = data.fechaSalida || existing.fechaSalida;
+    if (data.fechaInicio || data.fechaFin || data.tarifaId) {
+      const fechaInicio = data.fechaInicio || existing.fechaInicio;
+      const fechaFin = data.fechaFin || existing.fechaFin;
       const precioNoche = (updateData.precioNoche as number) || Number(existing.precioNoche);
-      const montoDescuento =
-        data.montoDescuento !== undefined ? data.montoDescuento : Number(existing.montoDescuento);
+      const IVA = (updateData.IVA as number) || Number(existing.IVA);
+      const cargoServicios = (updateData.cargoServicios as number) || Number(existing.cargoServicios);
 
-      const nights = this.calculateNights(fechaEntrada, fechaSalida);
-      const montoTotal = precioNoche * nights;
-      const montoFinal = montoTotal - montoDescuento;
+      const nights = this.calculateNights(fechaInicio, fechaFin);
+      const subtotalNoches = precioNoche * nights;
+      const montoTotal = subtotalNoches * (1 + IVA / 100 + cargoServicios / 100);
 
-      updateData.montoTotal = montoTotal;
-      updateData.montoDescuento = montoDescuento;
-      updateData.montoFinal = montoFinal;
+      updateData.cantidadNoches = nights;
+      updateData.montoTotal = Math.round(montoTotal * 100) / 100;
     }
 
     const result = await this.prisma.reserva.update({
       where: { id },
       data: updateData,
-      include: this.getIncludeRelations(),
     });
 
     return mapReservaFromPrisma(result);
@@ -207,7 +214,6 @@ export class ReservaRepository implements IReservaRepository {
         motivoCancel,
         canceladoEn: new Date(),
       },
-      include: this.getIncludeRelations(),
     });
 
     return mapReservaFromPrisma(result);
@@ -255,26 +261,8 @@ export class ReservaRepository implements IReservaRepository {
     };
   }
 
-  private calculateNights(fechaEntrada: Date, fechaSalida: Date): number {
-    const diff = fechaSalida.getTime() - fechaEntrada.getTime();
-    return Math.ceil(diff / (1000 * 60 * 60 * 24));
-  }
-
-  private getIncludeRelations() {
-    return {
-      huesped: true,
-      habitacion: {
-        include: {
-          tipo: true,
-        },
-      },
-      tarifa: {
-        include: {
-          tipoHabitacion: true,
-          canal: true,
-        },
-      },
-      pago: true,
-    };
+  private calculateNights(fechaInicio: Date, fechaFin: Date): number {
+    const msPerDay = 1000 * 60 * 60 * 24;
+    return Math.round((fechaFin.getTime() - fechaInicio.getTime()) / msPerDay);
   }
 }

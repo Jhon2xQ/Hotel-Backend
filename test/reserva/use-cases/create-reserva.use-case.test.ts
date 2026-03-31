@@ -6,6 +6,9 @@ import type { IHabitacionRepository } from "../../../src/domain/interfaces/habit
 import type { ITarifaRepository } from "../../../src/domain/interfaces/tarifa.repository.interface";
 import { ReservaException } from "../../../src/domain/exceptions/reserva.exception";
 import { createMockReserva } from "../../helpers/reserva-fixtures";
+import { createMockHuesped } from "../../helpers/huesped-fixtures";
+import { createMockHabitacion } from "../../helpers/habitacion-fixtures";
+import { createMockTarifa } from "../../helpers/tarifa-fixtures";
 import type { CreateReservaDto } from "../../../src/application/dtos/reserva.dto";
 
 vi.mock("../../../src/common/utils/codigo-generator", () => ({
@@ -21,27 +24,31 @@ describe("CreateReservaUseCase", () => {
 
   beforeEach(() => {
     const full = createMockReserva();
+    const mockHuesped = createMockHuesped();
+    const mockHabitacion = createMockHabitacion();
+    const mockTarifa = createMockTarifa();
 
     mockRepository = {
       create: async () => full,
       findAll: async () => [],
       findById: async () => null,
       findByCodigo: async () => null,
+      findConflictingReservations: async () => [],
       update: async () => full,
       delete: async () => {},
       cancel: async () => full,
     } as unknown as IReservaRepository;
 
     mockHuespedRepository = {
-      findById: async () => full.huesped,
+      findById: async () => mockHuesped,
     } as unknown as IHuespedRepository;
 
     mockHabitacionRepository = {
-      findById: async () => full.habitacion,
+      findById: async () => mockHabitacion,
     } as unknown as IHabitacionRepository;
 
     mockTarifaRepository = {
-      findById: async () => full.tarifa,
+      findById: async () => mockTarifa,
     } as unknown as ITarifaRepository;
 
     useCase = new CreateReservaUseCase(
@@ -57,11 +64,10 @@ describe("CreateReservaUseCase", () => {
       huespedId: "huesped-id",
       habitacionId: "habitacion-id",
       tarifaId: "tarifa-id",
-      fechaEntrada: new Date("2024-03-25T14:00:00.000Z"),
-      fechaSalida: new Date("2024-03-27T12:00:00.000Z"),
+      fechaInicio: new Date("2024-03-25"),
+      fechaFin: new Date("2024-03-27"),
       adultos: 2,
       ninos: 1,
-      montoDescuento: 0,
     };
 
     const mockReserva = createMockReserva();
@@ -80,8 +86,8 @@ describe("CreateReservaUseCase", () => {
       huespedId: "huesped-id",
       habitacionId: "habitacion-id",
       tarifaId: "tarifa-id",
-      fechaEntrada: new Date("2024-03-27T14:00:00.000Z"),
-      fechaSalida: new Date("2024-03-25T12:00:00.000Z"),
+      fechaInicio: new Date("2024-03-27"),
+      fechaFin: new Date("2024-03-25"),
       adultos: 2,
       ninos: 1,
     };
@@ -94,8 +100,8 @@ describe("CreateReservaUseCase", () => {
       huespedId: "huesped-id",
       habitacionId: "habitacion-id",
       tarifaId: "tarifa-id",
-      fechaEntrada: new Date("2024-03-25T14:00:00.000Z"),
-      fechaSalida: new Date("2024-03-27T12:00:00.000Z"),
+      fechaInicio: new Date("2024-03-25"),
+      fechaFin: new Date("2024-03-27"),
       adultos: 0,
       ninos: 1,
     };
@@ -108,10 +114,26 @@ describe("CreateReservaUseCase", () => {
       huespedId: "huesped-id",
       habitacionId: "habitacion-id",
       tarifaId: "tarifa-id",
-      fechaEntrada: new Date("2024-03-25T14:00:00.000Z"),
-      fechaSalida: new Date("2024-03-27T12:00:00.000Z"),
+      fechaInicio: new Date("2024-03-25"),
+      fechaFin: new Date("2024-03-27"),
       adultos: 2,
       ninos: -1,
+    };
+
+    await expect(useCase.execute(input)).rejects.toThrow(ReservaException);
+  });
+
+  it("debe lanzar error si hay conflicto de fechas con otra reserva", async () => {
+    mockRepository.findConflictingReservations = async () => [createMockReserva()];
+
+    const input: CreateReservaDto = {
+      huespedId: "huesped-id",
+      habitacionId: "habitacion-id",
+      tarifaId: "tarifa-id",
+      fechaInicio: new Date("2024-03-25"),
+      fechaFin: new Date("2024-03-27"),
+      adultos: 2,
+      ninos: 1,
     };
 
     await expect(useCase.execute(input)).rejects.toThrow(ReservaException);

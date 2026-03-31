@@ -32,8 +32,8 @@ Obtiene una lista paginada de reservas con filtros opcionales.
 
 - `page` (number, opcional): Número de página (por defecto: 1, mínimo: 1)
 - `limit` (number, opcional): Cantidad de resultados por página (por defecto: 10, mínimo: 1, máximo: 100)
-- `name` (string, opcional): Filtrar por nombre del huésped (búsqueda parcial, case-insensitive)
-- `tipo` (string, opcional): Filtrar por tipo de habitación (búsqueda parcial, case-insensitive)
+- `nombre` (string, opcional): Filtrar por nombre del huésped en el campo desnormalizado `nombreHuesped` (búsqueda parcial, case-insensitive)
+- `tipo` (string, opcional): Filtrar por tipo de habitación en el campo desnormalizado `nombreTipoHab` (búsqueda parcial, case-insensitive)
 
 **Ejemplo de petición:**
 
@@ -45,13 +45,13 @@ GET /api/private/reservas
 GET /api/private/reservas?page=2&limit=20
 
 # Filtrar por nombre de huésped
-GET /api/private/reservas?name=Juan
+GET /api/private/reservas?nombre=Juan
 
 # Filtrar por tipo de habitación
 GET /api/private/reservas?tipo=Suite
 
 # Combinar filtros con paginación
-GET /api/private/reservas?name=Garc&tipo=Doble&page=1&limit=10
+GET /api/private/reservas?nombre=Garc&tipo=Doble&page=1&limit=10
 ```
 
 **Respuesta Exitosa (200):**
@@ -65,83 +65,12 @@ GET /api/private/reservas?name=Garc&tipo=Doble&page=1&limit=10
       {
         "id": "uuid",
         "codigo": "KOR-20260327-A7K9P2",
-        "huesped": {
-          "id": "uuid",
-          "tipo_doc": "DNI",
-          "nro_doc": "12345678",
-          "nombres": "Juan",
-          "apellidos": "Pérez",
-          "email": "juan@example.com",
-          "telefono": "+51999999999",
-          "nacionalidad": "PE",
-          "observacion": null,
-          "created_at": "2024-03-23T10:00:00.000Z",
-          "updated_at": "2024-03-23T10:00:00.000Z"
-        },
-        "habitacion": {
-          "id": "uuid",
-          "nro_habitacion": "101",
-          "tipo_habitacion": {
-            "id": "uuid",
-            "nombre": "Suite Deluxe",
-            "descripcion": "Suite con vista al mar",
-            "created_at": "2024-03-23T10:00:00.000Z",
-            "updated_at": "2024-03-23T10:00:00.000Z"
-          },
-          "piso": 1,
-          "tiene_ducha": true,
-          "tiene_banio": true,
-          "url_imagen": ["https://example.com/rooms/101-1.jpg"],
-          "estado": "RESERVADA",
-          "notas": null,
-          "ulti_limpieza": "2024-03-24T08:00:00.000Z",
-          "created_at": "2024-03-23T10:00:00.000Z",
-          "updated_at": "2024-03-23T10:00:00.000Z"
-        },
-        "tarifa": {
-          "id": "uuid",
-          "tipo_habitacion": {
-            "id": "uuid",
-            "nombre": "Suite Deluxe",
-            "descripcion": "Suite con vista al mar",
-            "created_at": "2024-03-23T10:00:00.000Z",
-            "updated_at": "2024-03-23T10:00:00.000Z"
-          },
-          "canal": {
-            "id": "uuid",
-            "nombre": "Booking.com",
-            "tipo": "OTA",
-            "activo": true,
-            "notas": null,
-            "created_at": "2024-03-23T10:00:00.000Z",
-            "updated_at": "2024-03-23T10:00:00.000Z"
-          },
-          "precio_noche": 150.0,
-          "iva": 18.0,
-          "cargo_servicios": 10.0,
-          "moneda": "USD",
-          "created_at": "2024-03-23T10:00:00.000Z",
-          "updated_at": "2024-03-23T10:00:00.000Z"
-        },
-        "pago": {
-          "id": "uuid",
-          "concepto": "RESERVA",
-          "estado": "CONFIRMADO",
-          "fecha_pago": "2024-03-23T10:00:00.000Z",
-          "monto": "300.00",
-          "moneda": "SOL",
-          "metodo": "VISA",
-          "recibido_por_id": "user-id",
-          "recibido_por": {
-            "id": "user-id",
-            "name": "María García",
-            "email": "maria@hotel.com"
-          },
-          "observacion": "Pago adelantado por reserva",
-          "created_at": "2024-03-23T10:00:00.000Z"
-        },
-        "fecha_entrada": "2024-03-25T14:00:00.000Z",
-        "fecha_salida": "2024-03-27T12:00:00.000Z",
+        "huespedId": "uuid",
+        "habitacionId": "uuid",
+        "tarifaId": "uuid",
+        "pagoId": null,
+        "fecha_inicio": "2024-03-25",
+        "fecha_fin": "2024-03-27",
         "adultos": 2,
         "ninos": 1,
         "nombre_huesped": "Juan Pérez",
@@ -149,11 +78,10 @@ GET /api/private/reservas?name=Garc&tipo=Doble&page=1&limit=10
         "nombre_tipo_hab": "Suite Deluxe",
         "nombre_canal": "Booking.com",
         "precio_noche": 150.0,
+        "cantidad_noches": 2,
         "iva": 18.0,
         "cargo_servicios": 10.0,
-        "monto_total": 300.0,
-        "monto_descuento": 0.0,
-        "monto_final": 300.0,
+        "monto_total": 420.0,
         "estado": "CONFIRMADA",
         "motivo_cancel": null,
         "cancelado_en": null,
@@ -210,18 +138,12 @@ Obtiene una reserva específica por su ID.
   "data": {
     "id": "uuid",
     "codigo": "KOR-20260327-A7K9P2",
-    "huesped": {
-      /* objeto completo */
-    },
-    "habitacion": {
-      /* objeto completo */
-    },
-    "tarifa": {
-      /* objeto completo */
-    },
-    "pago": null,
-    "fecha_entrada": "2024-03-25T14:00:00.000Z",
-    "fecha_salida": "2024-03-27T12:00:00.000Z",
+    "huespedId": "uuid",
+    "habitacionId": "uuid",
+    "tarifaId": "uuid",
+    "pagoId": null,
+    "fecha_inicio": "2024-03-25",
+    "fecha_fin": "2024-03-27",
     "adultos": 2,
     "ninos": 1,
     "nombre_huesped": "Juan Pérez",
@@ -229,11 +151,10 @@ Obtiene una reserva específica por su ID.
     "nombre_tipo_hab": "Suite Deluxe",
     "nombre_canal": "Booking.com",
     "precio_noche": 150.0,
+    "cantidad_noches": 2,
     "iva": 18.0,
     "cargo_servicios": 10.0,
-    "monto_total": 300.0,
-    "monto_descuento": 0.0,
-    "monto_final": 300.0,
+    "monto_total": 420.0,
     "estado": "TENTATIVA",
     "motivo_cancel": null,
     "cancelado_en": null,
@@ -272,11 +193,10 @@ Crea una nueva reserva. El código de reserva se genera automáticamente en form
   "huespedId": "uuid",
   "habitacionId": "uuid",
   "tarifaId": "uuid",
-  "fechaEntrada": "2024-03-25T14:00:00.000Z",
-  "fechaSalida": "2024-03-27T12:00:00.000Z",
+  "fechaInicio": "2024-03-25",
+  "fechaFin": "2024-03-27",
   "adultos": 2,
-  "ninos": 1,
-  "montoDescuento": 0
+  "ninos": 1
 }
 ```
 
@@ -285,11 +205,11 @@ Crea una nueva reserva. El código de reserva se genera automáticamente en form
 - `huespedId`: Requerido, UUID válido, debe existir
 - `habitacionId`: Requerido, UUID válido, debe existir
 - `tarifaId`: Requerido, UUID válido, debe existir
-- `fechaEntrada`: Requerida, formato datetime ISO
-- `fechaSalida`: Requerida, formato datetime ISO, debe ser posterior a fechaEntrada
+- `fechaInicio`: Requerida, formato date (YYYY-MM-DD)
+- `fechaFin`: Requerida, formato date (YYYY-MM-DD), debe ser posterior a fechaInicio
 - `adultos`: Requerido, mínimo 1
 - `ninos`: Opcional, mínimo 0, default 0
-- `montoDescuento`: Opcional, mínimo 0, default 0
+- No puede haber solapamiento de fechas con reservas existentes (TENTATIVA, CONFIRMADA, EN_CASA) en la misma habitación
 
 **Código de Reserva:**
 
@@ -344,11 +264,10 @@ Actualiza una reserva existente. Cualquier usuario autenticado puede actualizar 
   "habitacionId": "uuid",
   "tarifaId": "uuid",
   "pagoId": "uuid",
-  "fechaEntrada": "2024-03-25T14:00:00.000Z",
-  "fechaSalida": "2024-03-27T12:00:00.000Z",
+  "fechaInicio": "2024-03-25",
+  "fechaFin": "2024-03-27",
   "adultos": 2,
   "ninos": 1,
-  "montoDescuento": 0,
   "estado": "CONFIRMADA"
 }
 ```
@@ -672,9 +591,10 @@ Los siguientes campos se sincronizan automáticamente desde las entidades relaci
 
 ### Cálculo de Montos
 
-- `monto_total` = `precio_noche` × número de noches
-- `monto_final` = `monto_total` - `monto_descuento`
-- Número de noches = diferencia en días entre `fecha_salida` y `fecha_entrada`
+- `cantidad_noches` = diferencia en días entre `fecha_fin` y `fecha_inicio`
+- `subtotal` = `precio_noche` × `cantidad_noches`
+- `monto_total` = `subtotal` × (1 + `iva`/100 + `cargo_servicios`/100)
+- Los campos `iva` y `cargo_servicios` se expresan como porcentajes (ej: 18.00 = 18%)
 
 ---
 
@@ -685,7 +605,7 @@ Los siguientes campos se sincronizan automáticamente desde las entidades relaci
 ```json
 {
   "success": false,
-  "message": "La fecha de salida debe ser posterior a la fecha de entrada",
+  "message": "La fecha de fin debe ser posterior a la fecha de inicio",
   "data": null,
   "timestamp": 1711188000000
 }
@@ -693,12 +613,13 @@ Los siguientes campos se sincronizan automáticamente desde las entidades relaci
 
 Mensajes posibles:
 
-- "La fecha de salida debe ser posterior a la fecha de entrada"
+- "La fecha de fin debe ser posterior a la fecha de inicio"
 - "Debe haber al menos 1 adulto en la reserva"
 - "El número de niños no puede ser negativo"
 - "La reserva ya está cancelada"
 - "Debe proporcionar un motivo de cancelación"
 - "Para cancelar una reserva use el endpoint PATCH /api/private/reservas/:id/cancel con el motivo de cancelación"
+- "El intervalo de fechas entra en conflicto con una reserva existente para la misma habitación"
 
 ### Errores de Permisos (403)
 
@@ -747,6 +668,17 @@ Mensajes posibles:
 }
 ```
 
+También se devuelve 409 cuando el intervalo de fechas entra en conflicto con una reserva existente para la misma habitación:
+
+```json
+{
+  "success": false,
+  "message": "El intervalo de fechas entra en conflicto con una reserva existente para la misma habitación",
+  "data": null,
+  "timestamp": 1711188000000
+}
+```
+
 ### Errores del Servidor (500)
 
 ```json
@@ -781,18 +713,18 @@ Mensajes posibles:
 
 3. **Sincronización Automática**: Los campos snapshot se actualizan automáticamente cuando cambian las relaciones, no es necesario enviarlos en el request.
 
-4. **Cálculo Automático**: Los montos totales y finales se calculan automáticamente basados en las fechas, precio de la tarifa y descuento.
+4. **Cálculo Automático**: Los montos totales se calculan automáticamente basados en las fechas, precio de la tarifa, IVA y cargo de servicios. La fórmula es: `monto_total = (precio_noche × cantidad_noches) × (1 + iva/100 + cargo_servicios/100)`.
 
-5. **Cancelación vs Eliminación**:
+5. **Validación de Solapamiento**: Al crear o actualizar una reserva, se verifica que el intervalo de fechas no entre en conflicto con reservas existentes (estado TENTATIVA, CONFIRMADA o EN_CASA) para la misma habitación.
+
+6. **Cancelación vs Eliminación**:
    - Cancelar una reserva la marca como CANCELADA pero mantiene el registro
    - Eliminar una reserva la borra permanentemente del sistema
 
-6. **Historial**: Los campos snapshot permiten mantener un historial preciso incluso si las entidades relacionadas cambian posteriormente.
+7. **Historial**: Los campos snapshot permiten mantener un historial preciso incluso si las entidades relacionadas cambian posteriormente.
 
-7. **Permisos de Administrador**: Solo los administradores pueden actualizar el estado de una reserva mediante `PATCH /api/private/reservas/:id/estado`. Este endpoint permite cambiar desde cualquier estado (incluyendo COMPLETADA) a cualquier otro estado válido, excepto CANCELADA (que requiere usar el endpoint de cancelación).
+8. **Permisos de Administrador**: Solo los administradores pueden actualizar el estado de una reserva mediante `PATCH /api/private/reservas/:id/estado`. Este endpoint permite cambiar desde cualquier estado (incluyendo COMPLETADA) a cualquier otro estado válido, excepto CANCELADA (que requiere usar el endpoint de cancelación).
 
-8. **Relación con Pagos**:
-   - Una reserva puede tener un pago asociado opcionalmente mediante el campo `pagoId`
-   - El pago se incluye automáticamente en las respuestas cuando existe
-   - Para crear pagos, use la API de Pagos (`/api/pagos`)
-   - Para asociar/desasociar un pago, use el endpoint `PUT /api/private/reservas/:id` con el campo `pagoId`
+9. **Respuesta con IDs**: Lasrespuestas de reservas solo incluyen los IDs de relaciones (`huespedId`, `habitacionId`, `tarifaId`, `pagoId`) para mantener las respuestas ligeras. Use los endpoints específicos de cada recurso para obtener los detalles completos.
+
+10. **Campos de Fecha**: Los campos de fecha ahora se llaman `fecha_inicio` y `fecha_fin` en lugar de `fecha_entrada` y `fecha_salida`.

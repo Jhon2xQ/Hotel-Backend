@@ -1,19 +1,14 @@
 import type { Reserva } from "../../domain/entities/reserva.entity";
 import type { EstadoReserva } from "../../domain/entities/reserva.entity";
-import { toHuespedDto } from "./huesped.dto";
-import { toTarifaDto } from "./tarifa.dto";
-import { toPagoDto } from "./pago.dto";
-import { toHabitacionDto } from "./habitacion.dto";
 
 export interface CreateReservaDto {
   huespedId: string;
   habitacionId: string;
   tarifaId: string;
-  fechaEntrada: Date;
-  fechaSalida: Date;
+  fechaInicio: Date;
+  fechaFin: Date;
   adultos: number;
   ninos: number;
-  montoDescuento?: number;
 }
 
 export interface UpdateReservaDto {
@@ -21,11 +16,10 @@ export interface UpdateReservaDto {
   habitacionId?: string;
   tarifaId?: string;
   pagoId?: string | null;
-  fechaEntrada?: Date;
-  fechaSalida?: Date;
+  fechaInicio?: Date;
+  fechaFin?: Date;
   adultos?: number;
   ninos?: number;
-  montoDescuento?: number;
   estado?: EstadoReserva;
 }
 
@@ -40,12 +34,12 @@ export interface UpdateEstadoReservaDto {
 export interface ReservaDto {
   id: string;
   codigo: string;
-  huesped: ReturnType<typeof toHuespedDto>;
-  habitacion: ReturnType<typeof toHabitacionDto>;
-  tarifa: ReturnType<typeof toTarifaDto>;
-  pago: ReturnType<typeof toPagoDto> | null;
-  fecha_entrada: string;
-  fecha_salida: string;
+  huespedId: string;
+  habitacionId: string;
+  tarifaId: string;
+  pagoId: string | null;
+  fecha_inicio: string;
+  fecha_fin: string;
   adultos: number;
   ninos: number;
   nombre_huesped: string;
@@ -53,11 +47,10 @@ export interface ReservaDto {
   nombre_tipo_hab: string;
   nombre_canal: string;
   precio_noche: number;
+  cantidad_noches: number;
   iva: number;
   cargo_servicios: number;
   monto_total: number;
-  monto_descuento: number;
-  monto_final: number | null;
   estado: EstadoReserva;
   motivo_cancel: string | null;
   cancelado_en: string | null;
@@ -69,12 +62,12 @@ export function toReservaDto(r: Reserva): ReservaDto {
   return {
     id: r.id,
     codigo: r.codigo,
-    huesped: toHuespedDto(r.huesped),
-    habitacion: toHabitacionDto(r.habitacion),
-    tarifa: toTarifaDto(r.tarifa),
-    pago: r.pago ? toPagoDto(r.pago) : null,
-    fecha_entrada: r.fechaEntrada.toISOString(),
-    fecha_salida: r.fechaSalida.toISOString(),
+    huespedId: r.huespedId,
+    habitacionId: r.habitacionId,
+    tarifaId: r.tarifaId,
+    pagoId: r.pagoId,
+    fecha_inicio: r.fechaInicio.toISOString().slice(0, 10),
+    fecha_fin: r.fechaFin.toISOString().slice(0, 10),
     adultos: r.adultos,
     ninos: r.ninos,
     nombre_huesped: r.nombreHuesped,
@@ -82,11 +75,10 @@ export function toReservaDto(r: Reserva): ReservaDto {
     nombre_tipo_hab: r.nombreTipoHab,
     nombre_canal: r.nombreCanal,
     precio_noche: r.precioNoche,
+    cantidad_noches: r.cantidadNoches,
     iva: r.IVA,
     cargo_servicios: r.cargoServicios,
     monto_total: r.montoTotal,
-    monto_descuento: r.montoDescuento,
-    monto_final: r.montoFinal,
     estado: r.estado,
     motivo_cancel: r.motivoCancel,
     cancelado_en: r.canceladoEn?.toISOString() ?? null,

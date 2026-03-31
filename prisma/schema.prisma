@@ -410,8 +410,8 @@ model Reserva {
   pagoId       String? @unique @db.Uuid
 
   // Fechas
-  fechaEntrada DateTime @db.Timestamptz
-  fechaSalida  DateTime @db.Timestamptz
+  fechaInicio DateTime @db.Date
+  fechaFin    DateTime @db.Date
 
   // Ocupación
   adultos Int @default(1) @db.SmallInt
@@ -425,13 +425,12 @@ model Reserva {
 
   // Precios
   precioNoche    Decimal @db.Decimal(10, 2)
+  cantidadNoches Int     @db.SmallInt
   IVA            Decimal @default(0) @db.Decimal(4, 2)
   cargoServicios Decimal @default(0) @db.Decimal(4, 2)
 
   // Totales
-  montoTotal     Decimal  @db.Decimal(10, 2)
-  montoDescuento Decimal  @default(0) @db.Decimal(10, 2)
-  montoFinal     Decimal? @db.Decimal(10, 2)
+  montoTotal Decimal @db.Decimal(10, 2)
 
   // Estado
   estado       EstadoReserva @default(TENTATIVA)
@@ -451,8 +450,8 @@ model Reserva {
   @@index([huespedId])
   @@index([habitacionId])
   @@index([tarifaId])
-  @@index([fechaEntrada])
-  @@index([fechaSalida])
+  @@index([fechaInicio])
+  @@index([fechaFin])
   @@index([estado])
   @@map("reservas")
 }

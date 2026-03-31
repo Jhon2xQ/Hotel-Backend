@@ -16,6 +16,7 @@ describe("UpdateEstadoReservaUseCase", () => {
       findAll: async () => [],
       findById: async () => createMockReserva(),
       findByCodigo: async () => null,
+      findConflictingReservations: async () => [],
       update: async () => createMockReserva({ estado: EstadoReserva.CONFIRMADA }),
       delete: async () => {},
       cancel: async () => createMockReserva(),

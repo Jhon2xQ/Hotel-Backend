@@ -9,9 +9,9 @@ import { generateCodigoReserva } from "../../../common/utils/codigo-generator";
 import { DI_TOKENS } from "../../../common/IoC/tokens";
 import type { Reserva } from "../../../domain/entities/reserva.entity";
 
-function calculateNights(fechaEntrada: Date, fechaSalida: Date): number {
-  const diff = fechaSalida.getTime() - fechaEntrada.getTime();
-  return Math.ceil(diff / (1000 * 60 * 60 * 24));
+function calculateNights(fechaInicio: Date, fechaFin: Date): number {
+  const msPerDay = 1000 * 60 * 60 * 24;
+  return Math.round((fechaFin.getTime() - fechaInicio.getTime()) / msPerDay);
 }
 
 @injectable()
@@ -24,7 +24,7 @@ export class CreateReservaUseCase {
   ) {}
 
   async execute(input: CreateReservaDto): Promise<Reserva> {
-    if (input.fechaSalida <= input.fechaEntrada) {
+    if (input.fechaFin <= input.fechaInicio) {
       throw ReservaException.invalidDateRange();
     }
     if (input.adultos < 1) {
@@ -32,6 +32,15 @@ export class CreateReservaUseCase {
     }
     if (input.ninos < 0) {
       throw ReservaException.invalidNinos();
+    }
+
+    const conflicting = await this.reservaRepository.findConflictingReservations(
+      input.habitacionId,
+      input.fechaInicio,
+      input.fechaFin,
+    );
+    if (conflicting.length > 0) {
+      throw ReservaException.dateRangeConflict();
     }
 
     let codigo: string | undefined;
@@ -68,30 +77,31 @@ export class CreateReservaUseCase {
       throw ReservaException.tarifaNotFound();
     }
 
-    const nights = calculateNights(input.fechaEntrada, input.fechaSalida);
-    const montoTotal = tarifa.precioNoche * nights;
-    const montoDescuento = input.montoDescuento || 0;
-    const montoFinal = montoTotal - montoDescuento;
+    const nights = calculateNights(input.fechaInicio, input.fechaFin);
+    const precioNoche = tarifa.precioNoche;
+    const IVA = tarifa.IVA ?? 0;
+    const cargoServicios = tarifa.cargoServicios ?? 0;
+    const subtotalNoches = precioNoche * nights;
+    const montoTotal = subtotalNoches * (1 + IVA / 100 + cargoServicios / 100);
 
     return await this.reservaRepository.create({
       codigo: codigo!,
       huespedId: input.huespedId,
       habitacionId: input.habitacionId,
       tarifaId: input.tarifaId,
-      fechaEntrada: input.fechaEntrada,
-      fechaSalida: input.fechaSalida,
+      fechaInicio: input.fechaInicio,
+      fechaFin: input.fechaFin,
       adultos: input.adultos,
       ninos: input.ninos,
       nombreHuesped: `${huesped.nombres} ${huesped.apellidos}`,
       nroHabitacion: habitacion.nroHabitacion,
       nombreTipoHab: tarifa.tipoHabitacion.nombre,
       nombreCanal: tarifa.canal.nombre,
-      precioNoche: tarifa.precioNoche,
-      IVA: tarifa.IVA ?? 0,
-      cargoServicios: tarifa.cargoServicios ?? 0,
-      montoTotal,
-      montoDescuento,
-      montoFinal,
+      precioNoche,
+      cantidadNoches: nights,
+      IVA,
+      cargoServicios,
+      montoTotal: Math.round(montoTotal * 100) / 100,
     });
   }
 }

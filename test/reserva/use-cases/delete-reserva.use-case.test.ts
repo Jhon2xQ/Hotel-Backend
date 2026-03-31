@@ -14,6 +14,7 @@ describe("DeleteReservaUseCase", () => {
       findAll: async () => [],
       findById: async (_id: string) => null,
       findByCodigo: async (_codigo: string) => null,
+      findConflictingReservations: async () => [],
       update: async (_id: string, _data: any) => createMockReserva(),
       delete: async (_id: string) => {},
       cancel: async (_id: string, _motivo: string) => createMockReserva(),
