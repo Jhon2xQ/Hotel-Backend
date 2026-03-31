@@ -1,4 +1,10 @@
 import type { Habitacion } from "../entities/habitacion.entity";
+import type { EstadoReserva } from "../entities/reserva.entity";
+import type { PaginatedResult, PaginationParams } from "../../application/paginations/api.pagination";
+
+export interface HabitacionPaginationParams extends PaginationParams {
+  tipo?: string;
+}
 
 export interface CreateHabitacionParams {
   nroHabitacion: string;
@@ -29,7 +35,12 @@ export interface UpdateHabitacionStatusParams {
 export interface IHabitacionRepository {
   create(data: CreateHabitacionParams): Promise<Habitacion>;
   findAll(): Promise<Habitacion[]>;
+  findAllPaginated(params: HabitacionPaginationParams): Promise<PaginatedResult<Habitacion>>;
   findById(id: string): Promise<Habitacion | null>;
+  findByIdWithReservas(
+    id: string,
+    estadosReserva: EstadoReserva[],
+  ): Promise<{ habitacion: Habitacion; reservas: Array<{ fechaInicio: Date; fechaFin: Date; estado: EstadoReserva }> } | null>;
   findByNumero(numero: string): Promise<Habitacion | null>;
   update(id: string, data: UpdateHabitacionParams): Promise<Habitacion>;
   updateStatus(id: string, data: UpdateHabitacionStatusParams): Promise<Habitacion>;

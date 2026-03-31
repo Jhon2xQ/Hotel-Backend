@@ -10,14 +10,16 @@ import {
   UpdateHabitacionSchema,
   UpdateHabitacionStatusSchema,
   SearchAvailableHabitacionesSchema,
+  ListHabitacionQuerySchema,
+  HabitacionDetailQuerySchema,
 } from "../presentation/schemas/habitacion.schema";
 
 export function createHabitacionRoutes(): AppHono {
   const ctrl = container.resolve(HabitacionController);
   const router = new Hono<{ Variables: AppVariables }>();
 
-  router.get("/", (c) => ctrl.list(c));
-  router.get("/:id", validParams(UUIDParamSchema), (c) => ctrl.findById(c));
+  router.get("/", validQuery(ListHabitacionQuerySchema), (c) => ctrl.listPaginated(c));
+  router.get("/:id", validParams(UUIDParamSchema), validQuery(HabitacionDetailQuerySchema), (c) => ctrl.findById(c));
   router.post("/", parseFormDataMiddleware, validSchema(CreateHabitacionSchema), (c) => ctrl.create(c));
   router.put("/:id", validParams(UUIDParamSchema), parseFormDataMiddleware, validSchema(UpdateHabitacionSchema), (c) => ctrl.update(c));
   router.patch("/:id/estado", validParams(UUIDParamSchema), validSchema(UpdateHabitacionStatusSchema), (c) => ctrl.updateStatus(c));
