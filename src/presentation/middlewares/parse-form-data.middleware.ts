@@ -3,6 +3,7 @@ import { AppContext } from "../../common/types/app.types";
 
 export async function parseFormDataMiddleware(c: AppContext, next: Next) {
   const contentType = c.req.header("content-type");
+  const FIELDS_TO_STRING = ["nro_habitacion"];
 
   if (contentType?.includes("multipart/form-data")) {
     const formData = await c.req.formData();
@@ -17,16 +18,23 @@ export async function parseFormDataMiddleware(c: AppContext, next: Next) {
       } else {
         // Handle regular form fields
         // Try to parse JSON values
+        let parsedValue: unknown;
         try {
-          parsedData[key] = JSON.parse(value as string);
+          parsedValue = JSON.parse(value as string);
         } catch {
           // If not JSON, keep as string
-          parsedData[key] = value;
+          parsedValue = value;
+        }
+
+        // Convert specific fields to string
+        if (FIELDS_TO_STRING.includes(key) && parsedValue !== null && parsedValue !== undefined) {
+          parsedData[key] = String(parsedValue);
+        } else {
+          parsedData[key] = parsedValue;
         }
       }
     }
 
-    // Store parsed data in context for validation middleware
     c.set("rawFormData", parsedData);
   }
 
