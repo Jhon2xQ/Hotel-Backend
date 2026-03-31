@@ -10,8 +10,8 @@ import { DI_TOKENS } from "../../../common/IoC/tokens";
 import type { Reserva } from "../../../domain/entities/reserva.entity";
 
 function calculateNights(fechaEntrada: Date, fechaSalida: Date): number {
-  const diff = fechaSalida.getTime() - fechaEntrada.getTime();
-  return Math.ceil(diff / (1000 * 60 * 60 * 24));
+  const msPerDay = 1000 * 60 * 60 * 24;
+  return Math.round((fechaSalida.getTime() - fechaEntrada.getTime()) / msPerDay);
 }
 
 @injectable()

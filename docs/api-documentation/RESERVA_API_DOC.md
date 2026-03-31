@@ -140,8 +140,8 @@ GET /api/private/reservas?name=Garc&tipo=Doble&page=1&limit=10
           "observacion": "Pago adelantado por reserva",
           "created_at": "2024-03-23T10:00:00.000Z"
         },
-        "fecha_entrada": "2024-03-25T14:00:00.000Z",
-        "fecha_salida": "2024-03-27T12:00:00.000Z",
+        "fecha_entrada": "2024-03-25",
+        "fecha_salida": "2024-03-27",
         "adultos": 2,
         "ninos": 1,
         "nombre_huesped": "Juan Pérez",
@@ -219,8 +219,8 @@ Obtiene una reserva específica por su ID.
       /* objeto completo */
     },
     "pago": null,
-    "fecha_entrada": "2024-03-25T14:00:00.000Z",
-    "fecha_salida": "2024-03-27T12:00:00.000Z",
+    "fecha_entrada": "2024-03-25",
+    "fecha_salida": "2024-03-27",
     "adultos": 2,
     "ninos": 1,
     "nombre_huesped": "Juan Pérez",
@@ -270,8 +270,8 @@ Crea una nueva reserva. El código de reserva se genera automáticamente en form
   "huespedId": "uuid",
   "habitacionId": "uuid",
   "tarifaId": "uuid",
-  "fechaEntrada": "2024-03-25T14:00:00.000Z",
-  "fechaSalida": "2024-03-27T12:00:00.000Z",
+  "fechaEntrada": "2024-03-25",
+  "fechaSalida": "2024-03-27",
   "adultos": 2,
   "ninos": 1
 }
@@ -282,8 +282,8 @@ Crea una nueva reserva. El código de reserva se genera automáticamente en form
 - `huespedId`: Requerido, UUID válido, debe existir
 - `habitacionId`: Requerido, UUID válido, debe existir
 - `tarifaId`: Requerido, UUID válido, debe existir
-- `fechaEntrada`: Requerida, formato datetime ISO
-- `fechaSalida`: Requerida, formato datetime ISO, debe ser posterior a fechaEntrada
+- `fechaEntrada`: Requerida, formato date (YYYY-MM-DD)
+- `fechaSalida`: Requerida, formato date (YYYY-MM-DD), debe ser posterior a fechaEntrada
 - `adultos`: Requerido, mínimo 1
 - `ninos`: Opcional, mínimo 0, default 0
 - No puede haber solapamiento de fechas con reservas existentes (TENTATIVA, CONFIRMADA, EN_CASA) en la misma habitación
@@ -341,8 +341,8 @@ Actualiza una reserva existente. Cualquier usuario autenticado puede actualizar 
   "habitacionId": "uuid",
   "tarifaId": "uuid",
   "pagoId": "uuid",
-  "fechaEntrada": "2024-03-25T14:00:00.000Z",
-  "fechaSalida": "2024-03-27T12:00:00.000Z",
+  "fechaEntrada": "2024-03-25",
+  "fechaSalida": "2024-03-27",
   "adultos": 2,
   "ninos": 1,
   "estado": "CONFIRMADA"

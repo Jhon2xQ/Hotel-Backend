@@ -3,24 +3,29 @@ import { PaginationQuerySchema } from "./pagination.schema";
 
 const EstadoReservaEnum = z.enum(["TENTATIVA", "CONFIRMADA", "EN_CASA", "COMPLETADA", "CANCELADA", "NO_LLEGO"]);
 
+function parseDate(s: string): Date {
+  const [y, m, d] = s.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d));
+}
+
 export const CreateReservaSchema = z
   .object({
     huespedId: z.uuid("ID de huésped inválido"),
     habitacionId: z.uuid("ID de habitación inválido"),
     tarifaId: z.uuid("ID de tarifa inválido"),
-    fechaEntrada: z.string().datetime("Fecha de entrada inválida"),
-    fechaSalida: z.string().datetime("Fecha de salida inválida"),
+    fechaEntrada: z.string().date("Fecha de entrada inválida"),
+    fechaSalida: z.string().date("Fecha de salida inválida"),
     adultos: z.number().int().min(1, "Debe haber al menos 1 adulto"),
     ninos: z.number().int().min(0, "El número de niños no puede ser negativo").default(0),
   })
-  .refine((data) => new Date(data.fechaSalida) > new Date(data.fechaEntrada), {
+  .refine((data) => data.fechaSalida > data.fechaEntrada, {
     message: "La fecha de salida debe ser posterior a la fecha de entrada",
     path: ["fechaSalida"],
   })
   .transform((data) => ({
     ...data,
-    fechaEntrada: new Date(data.fechaEntrada),
-    fechaSalida: new Date(data.fechaSalida),
+    fechaEntrada: parseDate(data.fechaEntrada),
+    fechaSalida: parseDate(data.fechaSalida),
   }));
 
 export const UpdateReservaSchema = z
@@ -29,8 +34,8 @@ export const UpdateReservaSchema = z
     habitacionId: z.uuid("ID de habitación inválido").optional(),
     tarifaId: z.uuid("ID de tarifa inválido").optional(),
     pagoId: z.uuid("ID de pago inválido").nullable().optional(),
-    fechaEntrada: z.string().datetime("Fecha de entrada inválida").optional(),
-    fechaSalida: z.string().datetime("Fecha de salida inválida").optional(),
+    fechaEntrada: z.string().date("Fecha de entrada inválida").optional(),
+    fechaSalida: z.string().date("Fecha de salida inválida").optional(),
     adultos: z.number().int().min(1, "Debe haber al menos 1 adulto").optional(),
     ninos: z.number().int().min(0, "El número de niños no puede ser negativo").optional(),
     estado: EstadoReservaEnum.optional(),
@@ -38,7 +43,7 @@ export const UpdateReservaSchema = z
   .refine(
     (data) => {
       if (data.fechaEntrada && data.fechaSalida) {
-        return new Date(data.fechaSalida) > new Date(data.fechaEntrada);
+        return data.fechaSalida > data.fechaEntrada;
       }
       return true;
     },
@@ -49,8 +54,8 @@ export const UpdateReservaSchema = z
   )
   .transform((data) => ({
     ...data,
-    fechaEntrada: data.fechaEntrada ? new Date(data.fechaEntrada) : undefined,
-    fechaSalida: data.fechaSalida ? new Date(data.fechaSalida) : undefined,
+    fechaEntrada: data.fechaEntrada ? parseDate(data.fechaEntrada) : undefined,
+    fechaSalida: data.fechaSalida ? parseDate(data.fechaSalida) : undefined,
   }));
 
 export const CancelReservaSchema = z.object({

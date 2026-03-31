@@ -410,8 +410,8 @@ model Reserva {
   pagoId       String? @unique @db.Uuid
 
   // Fechas
-  fechaEntrada DateTime @db.Timestamptz
-  fechaSalida  DateTime @db.Timestamptz
+  fechaEntrada DateTime @db.Date
+  fechaSalida  DateTime @db.Date
 
   // Ocupación
   adultos Int @default(1) @db.SmallInt

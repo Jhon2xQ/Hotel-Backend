@@ -282,8 +282,8 @@ export class ReservaRepository implements IReservaRepository {
   }
 
   private calculateNights(fechaEntrada: Date, fechaSalida: Date): number {
-    const diff = fechaSalida.getTime() - fechaEntrada.getTime();
-    return Math.ceil(diff / (1000 * 60 * 60 * 24));
+    const msPerDay = 1000 * 60 * 60 * 24;
+    return Math.round((fechaSalida.getTime() - fechaEntrada.getTime()) / msPerDay);
   }
 
   private getIncludeRelations() {
