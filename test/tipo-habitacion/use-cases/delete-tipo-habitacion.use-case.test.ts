@@ -17,6 +17,7 @@ describe("DeleteTipoHabitacionUseCase", () => {
       update: async () => createMockTipoHabitacion(),
       delete: async () => {},
       hasRelatedRecords: async () => false,
+      findAllWithSampleHabitacion: async () => [],
     };
 
     useCase = new DeleteTipoHabitacionUseCase(mockRepository);

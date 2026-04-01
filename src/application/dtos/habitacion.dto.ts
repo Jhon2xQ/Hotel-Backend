@@ -65,6 +65,18 @@ export interface HabitacionConFechasReservaDto {
   fechas_reserva: FechaReservaDto[];
 }
 
+export interface PublicHabitacionDto {
+  id: string;
+  nro_habitacion: string;
+  tipo_habitacion_id: string;
+  piso: number;
+  tiene_ducha: boolean;
+  tiene_banio: boolean;
+  url_imagen: string[] | null;
+  estado: boolean;
+  descripcion: string | null;
+}
+
 export function toHabitacionDto(h: Habitacion): HabitacionDto {
   return {
     id: h.id,
@@ -78,5 +90,19 @@ export function toHabitacionDto(h: Habitacion): HabitacionDto {
     descripcion: h.descripcion,
     created_at: h.createdAt.toISOString(),
     updated_at: h.updatedAt.toISOString(),
+  };
+}
+
+export function toPublicHabitacionDto(h: Habitacion): PublicHabitacionDto {
+  return {
+    id: h.id,
+    nro_habitacion: h.nroHabitacion,
+    tipo_habitacion_id: h.tipoHabitacion.id,
+    piso: h.piso,
+    tiene_ducha: h.tieneDucha,
+    tiene_banio: h.tieneBanio,
+    url_imagen: h.urlImagen,
+    estado: h.estado,
+    descripcion: h.descripcion,
   };
 }

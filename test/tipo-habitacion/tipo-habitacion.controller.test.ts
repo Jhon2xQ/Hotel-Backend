@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { TipoHabitacionController } from "../../src/presentation/controllers/tipo-habitacion.controller";
 import { CreateTipoHabitacionUseCase } from "../../src/application/use-cases/tipo-habitacion/create-tipo-habitacion.use-case";
 import { ListTipoHabitacionUseCase } from "../../src/application/use-cases/tipo-habitacion/list-tipo-habitacion.use-case";
+import { ListPublicTipoHabitacionUseCase } from "../../src/application/use-cases/tipo-habitacion/list-public-tipo-habitacion.use-case";
 import { FindTipoHabitacionByIdUseCase } from "../../src/application/use-cases/tipo-habitacion/find-tipo-habitacion-by-id.use-case";
 import { UpdateTipoHabitacionUseCase } from "../../src/application/use-cases/tipo-habitacion/update-tipo-habitacion.use-case";
 import { DeleteTipoHabitacionUseCase } from "../../src/application/use-cases/tipo-habitacion/delete-tipo-habitacion.use-case";
@@ -11,6 +12,7 @@ describe("TipoHabitacionController", () => {
   let controller: TipoHabitacionController;
   let mockCreateUseCase: any;
   let mockListUseCase: any;
+  let mockListPublicUseCase: any;
   let mockFindByIdUseCase: any;
   let mockUpdateUseCase: any;
   let mockDeleteUseCase: any;
@@ -18,6 +20,7 @@ describe("TipoHabitacionController", () => {
   beforeEach(() => {
     mockCreateUseCase = { execute: vi.fn() };
     mockListUseCase = { execute: vi.fn() };
+    mockListPublicUseCase = { execute: vi.fn() };
     mockFindByIdUseCase = { execute: vi.fn() };
     mockUpdateUseCase = { execute: vi.fn() };
     mockDeleteUseCase = { execute: vi.fn() };
@@ -25,6 +28,7 @@ describe("TipoHabitacionController", () => {
     controller = new TipoHabitacionController(
       mockCreateUseCase,
       mockListUseCase,
+      mockListPublicUseCase,
       mockFindByIdUseCase,
       mockUpdateUseCase,
       mockDeleteUseCase,

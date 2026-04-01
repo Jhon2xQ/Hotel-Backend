@@ -18,23 +18,96 @@ Documentación de los endpoints para gestionar los tipos de habitación del hote
 
 ## Orden de endpoints
 
-1. `GET /` — listar
-2. `GET /:id` — por id
-3. `POST /` — crear (solo privado)
-4. `PUT /:id` — actualizar (solo privado)
-5. `DELETE /:id` — eliminar (solo privado)
+1. `GET /` — listar (público)
+2. `GET /` — listar (privado)
+3. `GET /:id` — por id
+4. `POST /` — crear (solo privado)
+5. `PUT /:id` — actualizar (solo privado)
+6. `DELETE /:id` — eliminar (solo privado)
 
 ## Endpoints
 
-### 1. Listar Tipos de Habitación
+### 1. Listar Tipos de Habitación (Público)
 
-Obtiene la lista completa de tipos de habitación.
+Obtiene la lista completa de tipos de habitación. No incluye timestamps.
 
-**Endpoint:** `GET /api/private/tipos-habitacion` (o `/api/public/tipos-habitacion`)
+**Endpoint:** `GET /api/public/tipos-habitacion`
 
-**Permisos:** 
-- Público: No requiere autenticación
-- Privado: Usuario autenticado
+**Permisos:** No requiere autenticación
+
+**Query params:**
+
+| Parámetro | Tipo | Requerido | Descripción |
+|-----------|------|-----------|-------------|
+| `habitacion` | `boolean` | No | Si es `true`, cada tipo incluye una habitación de ejemplo (muestra) |
+
+**Respuesta exitosa (200) — sin query params:**
+
+```json
+{
+  "success": true,
+  "message": "Tipos de habitación obtenidos exitosamente",
+  "data": [
+    {
+      "id": "123e4567-e89b-12d3-a456-426614174000",
+      "nombre": "Suite Deluxe",
+      "descripcion": "Suite de lujo con vista panorámica al mar"
+    },
+    {
+      "id": "123e4567-e89b-12d3-a456-426614174001",
+      "nombre": "Habitación Estándar",
+      "descripcion": "Habitación cómoda con todas las comodidades básicas"
+    }
+  ],
+  "timestamp": 1710669600000
+}
+```
+
+**Respuesta exitosa (200) — con `?habitacion=true`:**
+
+Cada tipo de habitación incluye una habitación de ejemplo (solo una por tipo). Si el tipo no tiene habitaciones, el campo `habitacion` será `null`. La habitación usa `tipo_habitacion_id` en lugar del objeto completo del tipo.
+
+```json
+{
+  "success": true,
+  "message": "Tipos de habitación obtenidos exitosamente",
+  "data": [
+    {
+      "id": "123e4567-e89b-12d3-a456-426614174000",
+      "nombre": "Suite Deluxe",
+      "descripcion": "Suite de lujo con vista panorámica al mar",
+      "habitacion": {
+        "id": "456e7890-e89b-12d3-a456-426614174000",
+        "nro_habitacion": "101",
+        "tipo_habitacion_id": "123e4567-e89b-12d3-a456-426614174000",
+        "piso": 1,
+        "tiene_ducha": true,
+        "tiene_banio": true,
+        "url_imagen": ["https://ejemplo.com/img1.jpg"],
+        "estado": true,
+        "descripcion": "Suite con vista al mar"
+      }
+    },
+    {
+      "id": "123e4567-e89b-12d3-a456-426614174001",
+      "nombre": "Habitación Estándar",
+      "descripcion": "Habitación cómoda con todas las comodidades básicas",
+      "habitacion": null
+    }
+  ],
+  "timestamp": 1710669600000
+}
+```
+
+---
+
+### 2. Listar Tipos de Habitación (Privado)
+
+Obtiene la lista completa de tipos de habitación con timestamps.
+
+**Endpoint:** `GET /api/private/tipos-habitacion`
+
+**Permisos:** Usuario autenticado
 
 **Respuesta exitosa (200):**
 
@@ -64,7 +137,7 @@ Obtiene la lista completa de tipos de habitación.
 
 ---
 
-### 2. Obtener Tipo de Habitación por ID
+### 4. Obtener Tipo de Habitación por ID
 
 Obtiene los detalles de un tipo de habitación específico.
 
@@ -101,7 +174,7 @@ Obtiene los detalles de un tipo de habitación específico.
 
 ---
 
-### 3. Crear Tipo de Habitación
+### 5. Crear Tipo de Habitación
 
 Crea un nuevo tipo de habitación en el sistema.
 
@@ -148,7 +221,7 @@ Crea un nuevo tipo de habitación en el sistema.
 
 ---
 
-### 4. Actualizar Tipo de Habitación
+### 6. Actualizar Tipo de Habitación
 
 Actualiza los datos de un tipo de habitación existente.
 
@@ -203,7 +276,7 @@ Actualiza los datos de un tipo de habitación existente.
 
 ---
 
-### 5. Eliminar Tipo de Habitación
+### 7. Eliminar Tipo de Habitación
 
 Elimina un tipo de habitación del sistema.
 
@@ -265,6 +338,40 @@ Elimina un tipo de habitación del sistema.
 
 ## Estructura de Datos
 
+### Público (sin timestamps)
+
+```typescript
+// PublicTipoHabitacionDto
+{
+  id: string;              // UUID
+  nombre: string;          // máx. 100 caracteres, único
+  descripcion: string | null;
+}
+
+// PublicTipoHabitacionWithHabitacionDto (?habitacion=true)
+{
+  id: string;
+  nombre: string;
+  descripcion: string | null;
+  habitacion: PublicHabitacionDto | null;
+}
+
+// PublicHabitacionDto
+{
+  id: string;                    // UUID
+  nro_habitacion: string;
+  tipo_habitacion_id: string;    // UUID del tipo (no el objeto completo)
+  piso: number;
+  tiene_ducha: boolean;
+  tiene_banio: boolean;
+  url_imagen: string[] | null;
+  estado: boolean;
+  descripcion: string | null;
+}
+```
+
+### Privado (con timestamps)
+
 ```typescript
 {
   id: string;              // UUID
@@ -283,6 +390,12 @@ Elimina un tipo de habitación del sistema.
 
 ```bash
 curl -X GET https://api.hotel.com/api/public/tipos-habitacion
+```
+
+### Listar tipos de habitación con habitación de ejemplo (público)
+
+```bash
+curl -X GET "https://api.hotel.com/api/public/tipos-habitacion?habitacion=true"
 ```
 
 ### Listar tipos de habitación (privado)

@@ -40,6 +40,7 @@ describe("UpdateHabitacionUseCase", () => {
       update: async () => createMockTipoHabitacion(),
       delete: async () => {},
       hasRelatedRecords: async () => false,
+      findAllWithSampleHabitacion: async () => [],
     };
 
     mockFurnitureRepo = {
