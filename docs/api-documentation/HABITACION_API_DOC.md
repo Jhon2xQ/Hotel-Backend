@@ -1,9 +1,5 @@
 # API de Habitaciones
 
-
-> **Autorización:** Las rutas que restrigen por rol usan `requireRoles(...)` (`src/presentation/middlewares/roles.middleware.ts`) con valores en `src/common/constants/roles.ts` (p. ej. `admin`, `recepcionista`). Cualquier mención a "ADMIN" u otros roles aquí es orientativa; la fuente de verdad es el `*.routes.ts` correspondiente.
-
-
 Documentación unificada del módulo `habitacion.routes.ts` (privado y público): CRUD, estado, búsqueda de disponibles e imágenes (`multipart/form-data`).
 
 ## Bases URL
@@ -19,8 +15,8 @@ Documentación unificada del módulo `habitacion.routes.ts` (privado y público)
 2. **GET** por id (privado): `GET /api/private/habitaciones/:id`
 3. **GET** búsqueda / disponibles (público, query opcional): `GET /api/public/habitaciones`
 4. **GET** habitación con precio (público): `GET /api/public/habitaciones/:id`
-5. **POST** crear (privado, `multipart/form-data` si hay imágenes)
-6. **PUT** actualizar (privado, `multipart/form-data` si hay imágenes)
+5. **POST** crear (privado, `multipart/form-data`)
+6. **PUT** actualizar (privado, `multipart/form-data`)
 7. **PATCH** estado (privado): `PATCH /api/private/habitaciones/:id/estado`
 8. **DELETE** (privado): `DELETE /api/private/habitaciones/:id`
 
@@ -208,56 +204,213 @@ Valores válidos para `tipo_reserva`: `TENTATIVA`, `CONFIRMADA`, `EN_CASA`, `COM
 
 ---
 
-### 3. Búsqueda de habitaciones (público)
+### 3. Búsqueda de habitaciones disponibles (público)
+
+Obtiene las habitaciones disponibles con precio de tarifa del canal **DIRECTO**, con filtros opcionales por tipo, rango de fechas y orden de precio.
 
 **Endpoint:** `GET /api/public/habitaciones`
 
-**Autenticación:** no requerida.
+**Permisos:** Sin autenticación
 
-**Query (opcional):** `tipo`, `fecha_inicio`, `fecha_fin` (ISO 8601), `orden_precio` (`asc` | `desc`). Si se envían fechas, `fecha_inicio` &lt; `fecha_fin`. Respuesta: listado con precio de tarifa del canal **DIRECTO** (`precio_noche`).
+**Query (opcional):**
+
+| Parámetro      | Tipo   | Default | Descripción                                                                      |
+| -------------- | ------ | ------- | -------------------------------------------------------------------------------- |
+| `tipo`         | string | —       | Filtra por nombre de tipo de habitación                                          |
+| `fecha_inicio` | string | —       | Fecha de inicio del rango (ISO 8601, ej. `2026-04-01T00:00:00.000Z`)            |
+| `fecha_fin`    | string | —       | Fecha de fin del rango (ISO 8601, ej. `2026-04-05T00:00:00.000Z`)              |
+| `orden_precio` | string | —       | Ordenar por precio: `asc` (menor a mayor) o `desc` (mayor a menor)              |
+
+**Validaciones:**
+
+- Si se envían ambas fechas, `fecha_inicio` debe ser anterior a `fecha_fin`
+- Las fechas son opcionales individualmente, pero si se envía una sin la otra se ignora el filtro de fechas
+
+**Comportamiento según parámetros:**
+
+- Sin fechas ni tipo: devuelve todas las habitaciones con precio DIRECTO
+- Solo tipo: filtra por tipo con precio DIRECTO
+- Con fechas (y opcionalmente tipo): busca habitaciones disponibles en ese rango de fechas
+
+**Ejemplos:**
+
+- `GET /api/public/habitaciones` — todas las habitaciones con precio
+- `GET /api/public/habitaciones?tipo=suite` — solo suites con precio
+- `GET /api/public/habitaciones?fecha_inicio=2026-04-01T00:00:00.000Z&fecha_fin=2026-04-05T00:00:00.000Z` — disponibles en esas fechas
+- `GET /api/public/habitaciones?fecha_inicio=2026-04-01T00:00:00.000Z&fecha_fin=2026-04-05T00:00:00.000Z&tipo=suite&orden_precio=asc` — suites disponibles, ordenadas por precio ascendente
+
+**Respuesta exitosa (200):**
+
+```json
+{
+  "success": true,
+  "message": "Habitaciones disponibles obtenidas exitosamente",
+  "data": [
+    {
+      "habitacion": {
+        "id": "789e4567-e89b-12d3-a456-426614174000",
+        "nro_habitacion": "101",
+        "tipo_habitacion": {
+          "id": "123e4567-e89b-12d3-a456-426614174000",
+          "nombre": "Suite Deluxe",
+          "descripcion": "Suite de lujo con vista panorámica al mar"
+        },
+        "piso": 1,
+        "tiene_ducha": true,
+        "tiene_banio": true,
+        "url_imagen": ["https://example.com/rooms/101-1.jpg"],
+        "estado": true,
+        "descripcion": "Suite con balcón privado",
+        "created_at": "2026-03-15T10:00:00.000Z",
+        "updated_at": "2026-03-17T08:00:00.000Z"
+      },
+      "precio_noche": 150.00
+    },
+    {
+      "habitacion": {
+        "id": "789e4567-e89b-12d3-a456-426614174001",
+        "nro_habitacion": "102",
+        "tipo_habitacion": {
+          "id": "123e4567-e89b-12d3-a456-426614174001",
+          "nombre": "Habitación Estándar",
+          "descripcion": "Habitación cómoda con todas las comodidades básicas"
+        },
+        "piso": 1,
+        "tiene_ducha": true,
+        "tiene_banio": false,
+        "url_imagen": null,
+        "estado": true,
+        "descripcion": null,
+        "created_at": "2026-03-15T10:05:00.000Z",
+        "updated_at": "2026-03-17T14:30:00.000Z"
+      },
+      "precio_noche": 80.00
+    }
+  ],
+  "timestamp": 1710684600000
+}
+```
+
+**Notas:**
+
+- `precio_noche` proviene de la tarifa del canal **DIRECTO**; puede ser `null` si no existe tarifa configurada
+- Si no hay habitaciones que coincidan, se devuelve un array vacío
+- Al ordenar con `orden_precio`, las habitaciones sin precio (`null`) se ubican al final
+
+**Errores:**
+
+- `400`: Parámetros de query inválidos
+
+```json
+{
+  "success": false,
+  "message": "Error de validación en query: fecha_inicio: fecha_inicio debe ser una fecha ISO válida",
+  "data": null,
+  "timestamp": 1710684600000
+}
+```
+
+---
 
 ### 4. Habitación por ID con precio (público)
 
+Obtiene los detalles de una habitación junto con el precio de la tarifa del canal **DIRECTO**.
+
 **Endpoint:** `GET /api/public/habitaciones/:id`
 
-**Autenticación:** no requerida.
+**Permisos:** Sin autenticación
 
-Devuelve la habitación con `precio_noche` desde la tarifa del canal DIRECTO.
+**Parámetros de ruta:**
+
+- `id` (UUID, requerido): ID de la habitación
+
+**Ejemplo:** `GET /api/public/habitaciones/789e4567-e89b-12d3-a456-426614174000`
+
+**Respuesta exitosa (200):**
+
+```json
+{
+  "success": true,
+  "message": "Habitación con precio obtenida exitosamente",
+  "data": {
+    "habitacion": {
+      "id": "789e4567-e89b-12d3-a456-426614174000",
+      "nro_habitacion": "101",
+      "tipo_habitacion": {
+        "id": "123e4567-e89b-12d3-a456-426614174000",
+        "nombre": "Suite Deluxe",
+        "descripcion": "Suite de lujo con vista panorámica al mar"
+      },
+      "piso": 1,
+      "tiene_ducha": true,
+      "tiene_banio": true,
+      "url_imagen": ["https://example.com/rooms/101-1.jpg", "https://example.com/rooms/101-2.jpg"],
+      "estado": true,
+      "descripcion": "Suite con balcón privado",
+      "created_at": "2026-03-15T10:00:00.000Z",
+      "updated_at": "2026-03-17T08:00:00.000Z"
+    },
+    "precio_noche": 150.00
+  },
+  "timestamp": 1710684600000
+}
+```
+
+**Notas:**
+
+- `precio_noche` proviene de la tarifa del canal **DIRECTO**; puede ser `null` si no existe tarifa configurada
+
+**Errores:**
+
+- `400`: ID no es un UUID válido
+- `404`: Habitación no encontrada
+
+```json
+{
+  "success": false,
+  "message": "Habitación no encontrada",
+  "data": null,
+  "timestamp": 1710684600000
+}
+```
 
 ---
 
 ### 5. Crear Habitación
 
-Crea una nueva habitación física en el sistema.
+Crea una nueva habitación física en el sistema. Acepta `multipart/form-data` para permitir la subida de imágenes.
 
 **Endpoint:** `POST /api/private/habitaciones`
 
-**Permisos:** ADMIN
+**Permisos:** Usuario autenticado
 
-**Body (JSON):**
+**Body (`multipart/form-data`):**
 
-```json
-{
-  "nro_habitacion": "301",
-  "tipo_habitacion_id": "123e4567-e89b-12d3-a456-426614174000",
-  "piso": 3,
-  "tiene_ducha": true,
-  "tiene_banio": true,
-  "estado": true,
-  "descripcion": "Habitación con vista al mar"
-}
+| Campo                | Tipo             | Requerido | Descripción                                                    |
+| -------------------- | ---------------- | --------- | -------------------------------------------------------------- |
+| `nro_habitacion`     | string           | Sí        | Número único de habitación (máx. 10 caracteres)               |
+| `tipo_habitacion_id` | UUID             | Sí        | ID del tipo de habitación                                      |
+| `piso`               | number           | Sí        | Número de piso (entero positivo)                               |
+| `tiene_ducha`        | boolean          | No        | Si la habitación tiene ducha (default: `false`)                |
+| `tiene_banio`        | boolean          | No        | Si la habitación tiene baño completo (default: `false`)        |
+| `estado`             | boolean          | No        | Estado de la habitación (`true` = activa, `false` = inactiva; default: `false`) |
+| `descripcion`        | string           | No        | Descripción o notas adicionales                                |
+| `imagenes[]`         | archivos         | No        | Archivos de imagen a subir a S3                                |
+
+**Ejemplo (curl):**
+
+```bash
+curl -X POST https://api.hotel.com/api/private/habitaciones \
+  -H "Authorization: Bearer <token>" \
+  -F "nro_habitacion=301" \
+  -F "tipo_habitacion_id=123e4567-e89b-12d3-a456-426614174000" \
+  -F "piso=3" \
+  -F "tiene_ducha=true" \
+  -F "tiene_banio=true" \
+  -F "estado=true" \
+  -F "descripcion=Habitación con vista al mar" \
+  -F "imagenes[]=@/path/to/room-photo.jpg"
 ```
-
-**Campos:**
-
-- `nro_habitacion` (string, requerido): Número único de habitación (máx. 10 caracteres)
-- `tipo_habitacion_id` (UUID, requerido): ID del tipo de habitación
-- `piso` (number, requerido): Número de piso (entero positivo)
-- `tiene_ducha` (boolean, opcional): Indica si la habitación tiene ducha (default: `false`)
-- `tiene_banio` (boolean, opcional): Indica si la habitación tiene baño completo (default: `false`)
-- `url_imagen` (array de strings, opcional): URLs de imágenes de la habitación (máx. 255 caracteres cada una)
-- `estado` (boolean, opcional): Estado de la habitación, `true` = activa/disponible, `false` = inactiva (default: `false`)
-- `descripcion` (string, opcional): Descripción o notas adicionales
 
 **Respuesta exitosa (201):**
 
@@ -277,7 +430,7 @@ Crea una nueva habitación física en el sistema.
     "tiene_ducha": true,
     "tiene_banio": true,
     "url_imagen": ["https://example.com/rooms/301-1.jpg", "https://example.com/rooms/301-2.jpg"],
-    "estado": false,
+    "estado": true,
     "descripcion": "Habitación con vista al mar",
     "created_at": "2026-03-17T15:00:00.000Z",
     "updated_at": "2026-03-17T15:00:00.000Z"
@@ -293,7 +446,7 @@ Crea una nueva habitación física en el sistema.
 ```json
 {
   "success": false,
-  "message": "El número de habitación es requerido",
+  "message": "Error de validacion en cuerpo: nro_habitacion",
   "data": null,
   "timestamp": 1710687600000
 }
@@ -305,17 +458,6 @@ Crea una nueva habitación física en el sistema.
 {
   "success": false,
   "message": "No autorizado",
-  "data": null,
-  "timestamp": 1710687600000
-}
-```
-
-- `403`: No autorizado (requiere rol ADMIN)
-
-```json
-{
-  "success": false,
-  "message": "Acceso denegado. Se requiere rol de administrador",
   "data": null,
   "timestamp": 1710687600000
 }
@@ -351,7 +493,7 @@ Actualiza los datos completos de una habitación existente. Soporta gestión de 
 
 **Endpoint:** `PUT /api/private/habitaciones/:id`
 
-**Permisos:** ADMIN
+**Permisos:** Usuario autenticado
 
 **Parámetros de ruta:**
 
@@ -429,7 +571,6 @@ curl -X PUT https://api.hotel.com/api/private/habitaciones/789e4567-e89b-12d3-a4
 
 - `400`: Datos de entrada inválidos
 - `401`: No autenticado
-- `403`: No autorizado (requiere rol ADMIN)
 - `404`: Habitación o tipo de habitación no encontrado
 
 ```json
@@ -466,7 +607,7 @@ Actualiza únicamente el estado booleano de una habitación.
 
 **Endpoint:** `PATCH /api/private/habitaciones/:id/estado`
 
-**Permisos:** Usuario autenticado (cualquier rol)
+**Permisos:** Usuario autenticado
 
 **Parámetros de ruta:**
 
@@ -518,7 +659,7 @@ Actualiza únicamente el estado booleano de una habitación.
 ```json
 {
   "success": false,
-  "message": "El estado debe ser un valor booleano",
+  "message": "Error de validacion en cuerpo: estado",
   "data": null,
   "timestamp": 1710694800000
 }
@@ -548,7 +689,6 @@ Actualiza únicamente el estado booleano de una habitación.
 
 **Notas:**
 
-- Este endpoint NO requiere rol ADMIN, permitiendo al personal de recepción actualizar estados
 - Solo actualiza el campo `estado`, no modifica otros datos de la habitación
 - El campo `updated_at` se actualiza automáticamente
 
@@ -560,7 +700,7 @@ Elimina una habitación del sistema.
 
 **Endpoint:** `DELETE /api/private/habitaciones/:id`
 
-**Permisos:** ADMIN
+**Permisos:** Usuario autenticado
 
 **Parámetros de ruta:**
 
@@ -580,7 +720,6 @@ Elimina una habitación del sistema.
 **Errores:**
 
 - `401`: No autenticado
-- `403`: No autorizado (requiere rol ADMIN)
 - `404`: Habitación no encontrada
 
 ```json
@@ -605,7 +744,7 @@ Elimina una habitación del sistema.
 
 **Notas:**
 
-- No se puede eliminar una habitación si tiene estancias asociadas
+- No se puede eliminar una habitación si tiene registros relacionados (estancias, reservas, etc.)
 - Esta validación protege la integridad referencial de los datos
 
 ---
@@ -616,7 +755,6 @@ Elimina una habitación del sistema.
 | ------ | ----------------------------------------------------------- |
 | 400    | Datos de entrada inválidos (validación de Zod)              |
 | 401    | No autenticado (sesión inválida o inexistente)              |
-| 403    | No autorizado (requiere rol ADMIN)                          |
 | 404    | Habitación o tipo de habitación no encontrado               |
 | 409    | Conflicto (número duplicado o tiene registros relacionados) |
 | 500    | Error interno del servidor                                  |
@@ -665,9 +803,8 @@ Elimina una habitación del sistema.
 ### Campo `url_imagen`
 
 - **Requerido**: No
-- **Tipo**: Array de strings
-- **Longitud máxima por URL**: 255 caracteres
-- **Ejemplo**: `["https://example.com/rooms/301-1.jpg", "https://example.com/rooms/301-2.jpg"]`
+- **Tipo**: Array de strings o `null`
+- **Descripción**: URLs de imágenes subidas a S3; se gestiona mediante `multipart/form-data` en creación/actualización
 
 ### Campo `estado`
 
@@ -692,72 +829,41 @@ Elimina una habitación del sistema.
 - El campo `estado` es booleano: `true` indica habitación activa/disponible, `false` indica inactiva
 - El campo `descripcion` permite almacenar información adicional o notas del personal
 - El campo `url_imagen` es un array que permite almacenar múltiples imágenes de la habitación
-- En la actualización (PUT), las imágenes se gestionan mediante `multipart/form-data`: se envían las URLs existentes a conservar en `imagenes_existentes[]` y los archivos nuevos en `imagenes[]`. Las URLs no incluidas se eliminan de S3 automáticamente.
+- Creación (POST) y actualización (PUT) aceptan `multipart/form-data`: en la actualización, se envían las URLs existentes a conservar en `imagenes_existentes[]` y los archivos nuevos en `imagenes[]`. Las URLs no incluidas se eliminan de S3 automáticamente.
 - Los campos `created_at` y `updated_at` se gestionan automáticamente por el sistema
-- No se puede eliminar una habitación si tiene estancias asociadas
-- El endpoint PATCH `/habitaciones/:id/estado` está disponible para todos los usuarios autenticados, permitiendo al personal actualizar estados sin necesidad de permisos de administrador
-- El endpoint PUT `/habitaciones/:id` requiere rol ADMIN para actualizaciones completas y acepta `multipart/form-data` para gestión de imágenes
+- No se puede eliminar una habitación si tiene registros relacionados
+- Todas las rutas privadas requieren autenticación mediante sesión Better Auth (no hay restricción por rol)
 
 ---
 
 ## Ejemplos de Uso
 
-### Crear una habitación básica
+### Crear una habitación con imágenes
 
 ```bash
 curl -X POST https://api.hotel.com/api/private/habitaciones \
-  -H "Content-Type: application/json" \
   -H "Authorization: Bearer <token>" \
-  -d '{
-    "nro_habitacion": "101",
-    "tipo_habitacion_id": "123e4567-e89b-12d3-a456-426614174000",
-    "piso": 1,
-    "tiene_ducha": true,
-    "tiene_banio": false
-  }'
-```
-
-### Crear una habitación completa con imágenes
-
-```bash
-curl -X POST https://api.hotel.com/api/private/habitaciones \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <token>" \
-  -d '{
-    "nro_habitacion": "301",
-    "tipo_habitacion_id": "123e4567-e89b-12d3-a456-426614174000",
-    "piso": 3,
-    "tiene_ducha": true,
-    "tiene_banio": true,
-    "estado": true,
-    "descripcion": "Habitación con vista al mar"
-  }'
-```
-
-### Actualizar estado (recepción)
-
-```bash
-curl -X PATCH https://api.hotel.com/api/private/habitaciones/789e4567-e89b-12d3-a456-426614174000/estado \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <token>" \
-  -d '{
-    "estado": true
-  }'
-```
-
-### Actualización completa de habitación (ADMIN)
-
-```bash
-curl -X PUT https://api.hotel.com/api/private/habitaciones/789e4567-e89b-12d3-a456-426614174000 \
-  -H "Authorization: Bearer <token>" \
-  -F "nro_habitacion=301-A" \
+  -F "nro_habitacion=301" \
+  -F "tipo_habitacion_id=123e4567-e89b-12d3-a456-426614174000" \
   -F "piso=3" \
   -F "tiene_ducha=true" \
-  -F "tiene_banio=false" \
-  -F "estado=false" \
-  -F "descripcion=Reparación de aire acondicionado" \
-  -F "imagenes_existentes[]=https://example.com/rooms/301-1.jpg" \
-  -F "imagenes[]=@/path/to/new-image.jpg"
+  -F "tiene_banio=true" \
+  -F "estado=true" \
+  -F "descripcion=Habitación con vista al mar" \
+  -F "imagenes[]=@/path/to/room1.jpg" \
+  -F "imagenes[]=@/path/to/room2.jpg"
+```
+
+### Crear una habitación sin imágenes
+
+```bash
+curl -X POST https://api.hotel.com/api/private/habitaciones \
+  -H "Authorization: Bearer <token>" \
+  -F "nro_habitacion=101" \
+  -F "tipo_habitacion_id=123e4567-e89b-12d3-a456-426614174000" \
+  -F "piso=1" \
+  -F "tiene_ducha=true" \
+  -F "tiene_banio=false"
 ```
 
 ### Listar todas las habitaciones (paginado)
@@ -786,6 +892,44 @@ curl -X GET "https://api.hotel.com/api/private/habitaciones/789e4567-e89b-12d3-a
 ```bash
 curl -X GET "https://api.hotel.com/api/private/habitaciones/789e4567-e89b-12d3-a456-426614174000?tipo_reserva=TENTATIVA,CONFIRMADA" \
   -H "Authorization: Bearer <token>"
+```
+
+### Actualizar estado (recepción)
+
+```bash
+curl -X PATCH https://api.hotel.com/api/private/habitaciones/789e4567-e89b-12d3-a456-426614174000/estado \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <token>" \
+  -d '{
+    "estado": true
+  }'
+```
+
+### Actualización completa de habitación
+
+```bash
+curl -X PUT https://api.hotel.com/api/private/habitaciones/789e4567-e89b-12d3-a456-426614174000 \
+  -H "Authorization: Bearer <token>" \
+  -F "nro_habitacion=301-A" \
+  -F "piso=3" \
+  -F "tiene_ducha=true" \
+  -F "tiene_banio=false" \
+  -F "estado=false" \
+  -F "descripcion=Reparación de aire acondicionado" \
+  -F "imagenes_existentes[]=https://example.com/rooms/301-1.jpg" \
+  -F "imagenes[]=@/path/to/new-image.jpg"
+```
+
+### Buscar habitaciones disponibles (público)
+
+```bash
+curl -X GET "https://api.hotel.com/api/public/habitaciones?fecha_inicio=2026-04-01T00:00:00.000Z&fecha_fin=2026-04-05T00:00:00.000Z&orden_precio=asc"
+```
+
+### Obtener habitación con precio (público)
+
+```bash
+curl -X GET "https://api.hotel.com/api/public/habitaciones/789e4567-e89b-12d3-a456-426614174000"
 ```
 
 ### Eliminar una habitación
