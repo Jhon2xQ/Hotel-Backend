@@ -1,12 +1,14 @@
 import { inject, injectable } from "tsyringe";
 import { PrismaClient } from "../../../generated/prisma/client";
 import { TipoHabitacion } from "../../domain/entities/tipo-habitacion.entity";
+import type { Habitacion } from "../../domain/entities/habitacion.entity";
 import type {
   ITipoHabitacionRepository,
   CreateTipoHabitacionParams,
   UpdateTipoHabitacionParams,
 } from "../../domain/interfaces/tipo-habitacion.repository.interface";
 import { mapTipoHabitacionFromPrisma } from "../mappers/tipo-habitacion.mapper";
+import { mapHabitacionFromPrisma } from "../mappers/habitacion.mapper";
 import { DI_TOKENS } from "../../common/IoC/tokens";
 
 @injectable()
@@ -28,6 +30,23 @@ export class TipoHabitacionRepository implements ITipoHabitacionRepository {
       orderBy: { createdAt: "desc" },
     });
     return results.map((r) => mapTipoHabitacionFromPrisma(r));
+  }
+
+  async findAllWithSampleHabitacion(): Promise<Array<{ tipoHabitacion: TipoHabitacion; habitacion: Habitacion | null }>> {
+    const results = await this.prisma.tipoHabitacion.findMany({
+      include: {
+        habitaciones: {
+          take: 1,
+          include: { tipo: true },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    return results.map((r) => ({
+      tipoHabitacion: mapTipoHabitacionFromPrisma(r),
+      habitacion: r.habitaciones[0] ? mapHabitacionFromPrisma(r.habitaciones[0]) : null,
+    }));
   }
 
   async findById(id: string): Promise<TipoHabitacion | null> {

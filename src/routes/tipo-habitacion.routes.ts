@@ -22,7 +22,7 @@ export function createTipoHabitacionPublicRoutes(): AppHono {
   const ctrl = container.resolve(TipoHabitacionController);
   const router = new Hono<{ Variables: AppVariables }>();
 
-  router.get("/", (c) => ctrl.list(c));
+  router.get("/", (c) => ctrl.listPublic(c));
   router.get("/:id", validParams(UUIDParamSchema), (c) => ctrl.findById(c));
 
   return router;

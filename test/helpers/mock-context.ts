@@ -6,6 +6,7 @@ export function createMockContext(overrides?: Partial<AppContext>): AppContext {
     req: {
       param: vi.fn(),
       json: vi.fn(),
+      query: vi.fn(),
     },
     json: vi.fn(),
     get: vi.fn(),

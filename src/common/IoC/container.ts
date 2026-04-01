@@ -33,6 +33,7 @@ import { FindHabitacionByIdWithPriceUseCase } from "../../application/use-cases/
 
 import { CreateTipoHabitacionUseCase } from "../../application/use-cases/tipo-habitacion/create-tipo-habitacion.use-case";
 import { ListTipoHabitacionUseCase } from "../../application/use-cases/tipo-habitacion/list-tipo-habitacion.use-case";
+import { ListPublicTipoHabitacionUseCase } from "../../application/use-cases/tipo-habitacion/list-public-tipo-habitacion.use-case";
 import { FindTipoHabitacionByIdUseCase } from "../../application/use-cases/tipo-habitacion/find-tipo-habitacion-by-id.use-case";
 import { UpdateTipoHabitacionUseCase } from "../../application/use-cases/tipo-habitacion/update-tipo-habitacion.use-case";
 import { DeleteTipoHabitacionUseCase } from "../../application/use-cases/tipo-habitacion/delete-tipo-habitacion.use-case";
@@ -125,6 +126,7 @@ const useCaseAndControllerClasses: Array<new (...args: never[]) => unknown> = [
   FindHabitacionByIdWithPriceUseCase,
   CreateTipoHabitacionUseCase,
   ListTipoHabitacionUseCase,
+  ListPublicTipoHabitacionUseCase,
   FindTipoHabitacionByIdUseCase,
   UpdateTipoHabitacionUseCase,
   DeleteTipoHabitacionUseCase,
