@@ -1,4 +1,4 @@
-import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { s3Client } from "../../common/libraries/s3";
 import { S3_BUCKET_NAME, S3_ENDPOINT } from "../../common/configs/env.config";
 
@@ -26,5 +26,17 @@ export class S3UploadService {
   static async uploadImages(files: File[]): Promise<string[]> {
     const uploadPromises = files.map((file) => this.uploadImage(file));
     return Promise.all(uploadPromises);
+  }
+
+  static async deleteImages(urls: string[]): Promise<void> {
+    const deletePromises = urls.map((url) => {
+      const key = url.split("/").pop()!;
+      const command = new DeleteObjectCommand({
+        Bucket: S3_BUCKET_NAME,
+        Key: key,
+      });
+      return s3Client.send(command);
+    });
+    await Promise.all(deletePromises);
   }
 }

@@ -33,7 +33,7 @@ En las respuestas, el objeto anidado `tipo_habitacion` sigue el mismo contrato q
 
 ## Imágenes (S3 / multipart)
 
-Creación y actualización aceptan `multipart/form-data` con campos de habitación y archivos de imagen; las URLs resultantes se guardan en `url_imagen`. Variables de entorno S3: `S3_REGION`, `S3_ENDPOINT`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_BUCKET_NAME`, `S3_FORCE_PATH_STYLE`.
+Creación y actualización aceptan `multipart/form-data` con campos de habitación y archivos de imagen; las URLs resultantes se guardan en `url_imagen`. En la actualización, el cliente envía `imagenes_existentes[]` con las URLs a conservar y `imagenes[]` con los archivos nuevos; las URLs no incluidas se eliminan de S3 automáticamente. Variables de entorno S3: `S3_REGION`, `S3_ENDPOINT`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_BUCKET_NAME`, `S3_FORCE_PATH_STYLE`.
 
 ## Endpoints
 
@@ -347,7 +347,7 @@ Crea una nueva habitación física en el sistema.
 
 ### 6. Actualizar Habitación (Completo)
 
-Actualiza los datos completos de una habitación existente.
+Actualiza los datos completos de una habitación existente. Soporta gestión de imágenes mediante `multipart/form-data`.
 
 **Endpoint:** `PUT /api/private/habitaciones/:id`
 
@@ -357,21 +357,43 @@ Actualiza los datos completos de una habitación existente.
 
 - `id` (UUID, requerido): ID de la habitación
 
-**Body (JSON):**
+**Body (`multipart/form-data`):**
 
-```json
-{
-  "nro_habitacion": "301-A",
-  "tipo_habitacion_id": "123e4567-e89b-12d3-a456-426614174000",
-  "piso": 3,
-  "tiene_ducha": true,
-  "tiene_banio": false,
-  "estado": false,
-  "descripcion": "Reparación de aire acondicionado programada"
-}
+| Campo                  | Tipo             | Requerido | Descripción                                                                   |
+| ---------------------- | ---------------- | --------- | ----------------------------------------------------------------------------- |
+| `nro_habitacion`       | string           | No        | Número de habitación (máx. 10 caracteres)                                     |
+| `tipo_habitacion_id`   | UUID             | No        | ID del tipo de habitación                                                     |
+| `piso`                 | number           | No        | Número de piso (entero positivo)                                              |
+| `tiene_ducha`          | boolean          | No        | Si la habitación tiene ducha                                                  |
+| `tiene_banio`          | boolean          | No        | Si la habitación tiene baño                                                   |
+| `estado`               | boolean          | No        | Estado de la habitación (`true` = activa, `false` = inactiva)                 |
+| `descripcion`          | string           | No        | Descripción o notas adicionales                                               |
+| `imagenes_existentes[]` | array de strings | No        | URLs de imágenes actuales que se desean **conservar**                         |
+| `imagenes[]`           | archivos         | No        | Archivos de imagen **nuevos** a subir                                         |
+
+**Gestión de imágenes:**
+
+- El backend obtiene las URLs actuales de la base de datos y las compara con `imagenes_existentes[]`.
+- Las URLs que estaban en la DB pero **no** aparecen en `imagenes_existentes[]` se eliminan de S3.
+- Los archivos enviados en `imagenes[]` se suben a S3 y se agregan al resultado.
+- `url_imagen` final = `[...imagenes_existentes[], ...urls_nuevas]`.
+- Si no se envía `imagenes_existentes[]`, se asume array vacío (se borran todas las imágenes anteriores de S3).
+- Si no se envía `imagenes[]`, no se sube nada nuevo.
+
+**Ejemplo (curl):**
+
+```bash
+curl -X PUT https://api.hotel.com/api/private/habitaciones/789e4567-e89b-12d3-a456-426614174000 \
+  -H "Authorization: Bearer <token>" \
+  -F "nro_habitacion=301-A" \
+  -F "piso=3" \
+  -F "tiene_ducha=true" \
+  -F "tiene_banio=false" \
+  -F "estado=false" \
+  -F "descripcion=Reparación de aire acondicionado" \
+  -F "imagenes_existentes[]=https://example.com/rooms/301-1.jpg" \
+  -F "imagenes[]=@/path/to/new-photo.jpg"
 ```
-
-**Campos:** Todos opcionales, mismas validaciones que en crear
 
 **Respuesta exitosa (200):**
 
@@ -390,7 +412,10 @@ Actualiza los datos completos de una habitación existente.
     "piso": 3,
     "tiene_ducha": true,
     "tiene_banio": false,
-    "url_imagen": ["https://example.com/rooms/301-a-1.jpg"],
+    "url_imagen": [
+      "https://example.com/rooms/301-1.jpg",
+      "https://example.com/rooms/a1b2c3d4-e5f6-7890-abcd-ef1234567890.jpg"
+    ],
     "estado": false,
     "descripcion": "Reparación de aire acondicionado programada",
     "created_at": "2026-03-15T10:00:00.000Z",
@@ -431,6 +456,7 @@ Actualiza los datos completos de una habitación existente.
 
 - Solo se actualizan los campos proporcionados en el body
 - El campo `updated_at` se actualiza automáticamente
+- Las imágenes eliminadas de la DB se eliminan automáticamente de S3
 
 ---
 
@@ -666,10 +692,11 @@ Elimina una habitación del sistema.
 - El campo `estado` es booleano: `true` indica habitación activa/disponible, `false` indica inactiva
 - El campo `descripcion` permite almacenar información adicional o notas del personal
 - El campo `url_imagen` es un array que permite almacenar múltiples imágenes de la habitación
+- En la actualización (PUT), las imágenes se gestionan mediante `multipart/form-data`: se envían las URLs existentes a conservar en `imagenes_existentes[]` y los archivos nuevos en `imagenes[]`. Las URLs no incluidas se eliminan de S3 automáticamente.
 - Los campos `created_at` y `updated_at` se gestionan automáticamente por el sistema
 - No se puede eliminar una habitación si tiene estancias asociadas
 - El endpoint PATCH `/habitaciones/:id/estado` está disponible para todos los usuarios autenticados, permitiendo al personal actualizar estados sin necesidad de permisos de administrador
-- El endpoint PUT `/habitaciones/:id` requiere rol ADMIN para actualizaciones completas
+- El endpoint PUT `/habitaciones/:id` requiere rol ADMIN para actualizaciones completas y acepta `multipart/form-data` para gestión de imágenes
 
 ---
 
@@ -722,16 +749,15 @@ curl -X PATCH https://api.hotel.com/api/private/habitaciones/789e4567-e89b-12d3-
 
 ```bash
 curl -X PUT https://api.hotel.com/api/private/habitaciones/789e4567-e89b-12d3-a456-426614174000 \
-  -H "Content-Type: application/json" \
   -H "Authorization: Bearer <token>" \
-  -d '{
-    "nro_habitacion": "301-A",
-    "piso": 3,
-    "tiene_ducha": true,
-    "tiene_banio": false,
-    "estado": false,
-    "descripcion": "Reparación de aire acondicionado"
-  }'
+  -F "nro_habitacion=301-A" \
+  -F "piso=3" \
+  -F "tiene_ducha=true" \
+  -F "tiene_banio=false" \
+  -F "estado=false" \
+  -F "descripcion=Reparación de aire acondicionado" \
+  -F "imagenes_existentes[]=https://example.com/rooms/301-1.jpg" \
+  -F "imagenes[]=@/path/to/new-image.jpg"
 ```
 
 ### Listar todas las habitaciones (paginado)

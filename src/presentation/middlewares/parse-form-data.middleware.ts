@@ -28,7 +28,16 @@ export async function parseFormDataMiddleware(c: AppContext, next: Next) {
 
         // Convert specific fields to string
         if (FIELDS_TO_STRING.includes(key) && parsedValue !== null && parsedValue !== undefined) {
-          parsedData[key] = String(parsedValue);
+          parsedValue = String(parsedValue);
+        }
+
+        // Accumulate multiple values with the same key into an array
+        if (key in parsedData) {
+          if (Array.isArray(parsedData[key])) {
+            parsedData[key].push(parsedValue);
+          } else {
+            parsedData[key] = [parsedData[key], parsedValue];
+          }
         } else {
           parsedData[key] = parsedValue;
         }

@@ -19,6 +19,7 @@ export interface UpdateHabitacionDto {
   piso?: number;
   tiene_ducha?: boolean;
   tiene_banio?: boolean;
+  imagenes_existentes?: string[];
   imagenes?: File[];
   estado?: boolean;
   descripcion?: string;
