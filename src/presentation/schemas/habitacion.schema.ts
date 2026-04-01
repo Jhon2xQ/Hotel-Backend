@@ -48,6 +48,7 @@ export const UpdateHabitacionSchema = z.object({
   piso: z.number().int().positive("El piso debe ser un número positivo").optional(),
   tiene_ducha: z.boolean().optional(),
   tiene_banio: z.boolean().optional(),
+  imagenes_existentes: z.array(z.string().url()).optional().default([]),
   imagenes: z.array(z.instanceof(File)).optional().default([]),
   estado: z.boolean().optional(),
   descripcion: z.string().optional(),

@@ -37,8 +37,22 @@ export class UpdateHabitacionUseCase {
     }
 
     let imageUrls: string[] | undefined = undefined;
-    if (input.imagenes && input.imagenes.length > 0) {
-      imageUrls = await S3UploadService.uploadImages(input.imagenes);
+    const imagenesExistentes = input.imagenes_existentes ?? [];
+
+    if (input.imagenes !== undefined || input.imagenes_existentes !== undefined) {
+      const currentUrls = existing.urlImagen ?? [];
+
+      const urlsToDelete = currentUrls.filter((url) => !imagenesExistentes.includes(url));
+      if (urlsToDelete.length > 0) {
+        await S3UploadService.deleteImages(urlsToDelete);
+      }
+
+      let newUrls: string[] = [];
+      if (input.imagenes && input.imagenes.length > 0) {
+        newUrls = await S3UploadService.uploadImages(input.imagenes);
+      }
+
+      imageUrls = [...imagenesExistentes, ...newUrls];
     }
 
     const updated = await this.repository.update(id, {
