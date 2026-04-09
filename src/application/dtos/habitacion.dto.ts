@@ -1,6 +1,8 @@
 import type { Habitacion } from "../../domain/entities/habitacion.entity";
 import type { TipoHabitacionDto } from "./tipo-habitacion.dto";
 import { toTipoHabitacionDto } from "./tipo-habitacion.dto";
+import type { MuebleDto, PublicMuebleDto } from "./mueble.dto";
+import { toMuebleDto, toPublicMuebleDto } from "./mueble.dto";
 
 export interface CreateHabitacionDto {
   nro_habitacion: string;
@@ -46,6 +48,7 @@ export interface HabitacionDto {
   url_imagen: string[] | null;
   estado: boolean;
   descripcion: string | null;
+  muebles: MuebleDto[];
   created_at: string;
   updated_at: string;
 }
@@ -76,6 +79,7 @@ export interface PublicHabitacionDto {
   url_imagen: string[] | null;
   estado: boolean;
   descripcion: string | null;
+  muebles: PublicMuebleDto[];
 }
 
 export function toHabitacionDto(h: Habitacion): HabitacionDto {
@@ -89,6 +93,7 @@ export function toHabitacionDto(h: Habitacion): HabitacionDto {
     url_imagen: h.urlImagen,
     estado: h.estado,
     descripcion: h.descripcion,
+    muebles: h.muebles.map(toMuebleDto),
     created_at: h.createdAt.toISOString(),
     updated_at: h.updatedAt.toISOString(),
   };
@@ -105,5 +110,6 @@ export function toPublicHabitacionDto(h: Habitacion): PublicHabitacionDto {
     url_imagen: h.urlImagen,
     estado: h.estado,
     descripcion: h.descripcion,
+    muebles: h.muebles.map(toPublicMuebleDto),
   };
 }

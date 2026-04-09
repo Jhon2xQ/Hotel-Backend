@@ -31,23 +31,24 @@ describe("HabitacionRepository", () => {
         urlImagen: ["https://example.com/301.jpg"],
       };
 
-      const mockResult = {
+const mockResult = {
         id: "test-id",
         nroHabitacion: "301",
         tipoHabitacionId: "tipo-id",
         piso: 3,
         tieneDucha: true,
         tieneBanio: true,
-        urlImagen: ["https://example.com/301.jpg"],
+        urlImagen: null,
         estado: false,
         descripcion: null,
         tipo: {
-          id: "tipo-id",
-          nombre: "Suite",
-          descripcion: null,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
+            id: "tipo-id",
+            nombre: "Suite",
+            descripcion: null,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        muebles: [],
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -168,7 +169,7 @@ describe("HabitacionRepository", () => {
       expect(result?.id).toBe("test-id");
       expect(mockPrisma.habitacion.findUnique).toHaveBeenCalledWith({
         where: { id: "test-id" },
-        include: { tipo: true },
+        include: { tipo: true, muebles: { include: { categoria: true } } },
       });
     });
 

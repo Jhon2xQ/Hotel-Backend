@@ -79,7 +79,7 @@ export class HabitacionRepository implements IHabitacionRepository {
   async findById(id: string): Promise<Habitacion | null> {
     const result = await this.prisma.habitacion.findUnique({
       where: { id },
-      include: { tipo: true },
+      include: { tipo: true, muebles: { include: { categoria: true } } },
     });
     return result ? mapHabitacionFromPrisma(result) : null;
   }
@@ -286,6 +286,7 @@ export class HabitacionRepository implements IHabitacionRepository {
             },
           },
         },
+        muebles: { include: { categoria: true } },
       },
     });
 
