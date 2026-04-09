@@ -3,6 +3,7 @@ import type { TipoHabitacionDto } from "./tipo-habitacion.dto";
 import { toTipoHabitacionDto } from "./tipo-habitacion.dto";
 import type { MuebleDto, PublicMuebleDto } from "./mueble.dto";
 import { toMuebleDto, toPublicMuebleDto } from "./mueble.dto";
+import type { Mueble } from "../../domain/entities/mueble.entity";
 
 export interface CreateHabitacionDto {
   nro_habitacion: string;
@@ -48,9 +49,12 @@ export interface HabitacionDto {
   url_imagen: string[] | null;
   estado: boolean;
   descripcion: string | null;
-  muebles: MuebleDto[];
   created_at: string;
   updated_at: string;
+}
+
+export interface HabitacionWithMueblesDto extends HabitacionDto {
+  muebles: MuebleDto[];
 }
 
 export interface HabitacionWithPriceDto {
@@ -69,6 +73,11 @@ export interface HabitacionConFechasReservaDto {
   fechas_reserva: FechaReservaDto[];
 }
 
+export interface HabitacionConFechasReservaAndMueblesDto {
+  habitacion: HabitacionWithMueblesDto;
+  fechas_reserva: FechaReservaDto[];
+}
+
 export interface PublicHabitacionDto {
   id: string;
   nro_habitacion: string;
@@ -79,10 +88,13 @@ export interface PublicHabitacionDto {
   url_imagen: string[] | null;
   estado: boolean;
   descripcion: string | null;
+}
+
+export interface PublicHabitacionWithMueblesDto extends PublicHabitacionDto {
   muebles: PublicMuebleDto[];
 }
 
-export function toHabitacionDto(h: Habitacion): HabitacionDto {
+export function toHabitacionDto(h: Habitacion, muebles: Mueble[] = []): HabitacionDto {
   return {
     id: h.id,
     nro_habitacion: h.nroHabitacion,
@@ -93,9 +105,15 @@ export function toHabitacionDto(h: Habitacion): HabitacionDto {
     url_imagen: h.urlImagen,
     estado: h.estado,
     descripcion: h.descripcion,
-    muebles: h.muebles.map(toMuebleDto),
     created_at: h.createdAt.toISOString(),
     updated_at: h.updatedAt.toISOString(),
+  };
+}
+
+export function toHabitacionWithMueblesDto(h: Habitacion, muebles: Mueble[]): HabitacionWithMueblesDto {
+  return {
+    ...toHabitacionDto(h, muebles),
+    muebles: muebles.map(toMuebleDto),
   };
 }
 
@@ -110,6 +128,12 @@ export function toPublicHabitacionDto(h: Habitacion): PublicHabitacionDto {
     url_imagen: h.urlImagen,
     estado: h.estado,
     descripcion: h.descripcion,
-    muebles: h.muebles.map(toPublicMuebleDto),
+  };
+}
+
+export function toPublicHabitacionWithMueblesDto(h: Habitacion, muebles: Mueble[]): PublicHabitacionWithMueblesDto {
+  return {
+    ...toPublicHabitacionDto(h),
+    muebles: muebles.map(toPublicMuebleDto),
   };
 }

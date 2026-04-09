@@ -1,6 +1,7 @@
 import { inject, injectable } from "tsyringe";
 import { PrismaClient } from "../../../generated/prisma/client";
 import { Habitacion } from "../../domain/entities/habitacion.entity";
+import type { Mueble } from "../../domain/entities/mueble.entity";
 import type { EstadoReserva } from "../../domain/entities/reserva.entity";
 import type {
   IHabitacionRepository,
@@ -11,6 +12,7 @@ import type {
 } from "../../domain/interfaces/habitacion.repository.interface";
 import type { PaginatedResult } from "../../application/paginations/api.pagination";
 import { mapHabitacionFromPrisma } from "../mappers/habitacion.mapper";
+import { mapMuebleFromPrisma } from "../mappers/mueble.mapper";
 import { DI_TOKENS } from "../../common/IoC/tokens";
 
 @injectable()
@@ -79,9 +81,23 @@ export class HabitacionRepository implements IHabitacionRepository {
   async findById(id: string): Promise<Habitacion | null> {
     const result = await this.prisma.habitacion.findUnique({
       where: { id },
-      include: { tipo: true, muebles: { include: { categoria: true } } },
+      include: { tipo: true },
     });
     return result ? mapHabitacionFromPrisma(result) : null;
+  }
+
+  async findByIdWithMuebles(id: string): Promise<{ habitacion: Habitacion; muebles: Mueble[] } | null> {
+    const result = await this.prisma.habitacion.findUnique({
+      where: { id },
+      include: { tipo: true, muebles: { include: { categoria: true } } },
+    });
+    if (!result) return null;
+
+    const muebles = result.muebles.map((m) => mapMuebleFromPrisma(m));
+    return {
+      habitacion: mapHabitacionFromPrisma(result),
+      muebles,
+    };
   }
 
   async findByIdWithReservas(
@@ -104,6 +120,37 @@ export class HabitacionRepository implements IHabitacionRepository {
 
     return {
       habitacion: mapHabitacionFromPrisma(result),
+      reservas: result.reservas.map((r) => ({
+        fechaInicio: r.fechaInicio,
+        fechaFin: r.fechaFin,
+        estado: r.estado as EstadoReserva,
+      })),
+    };
+  }
+
+  async findByIdWithReservasAndMuebles(
+    id: string,
+    estadosReserva: EstadoReserva[],
+  ): Promise<{ habitacion: Habitacion; muebles: Mueble[]; reservas: Array<{ fechaInicio: Date; fechaFin: Date; estado: EstadoReserva }> } | null> {
+    const result = await this.prisma.habitacion.findUnique({
+      where: { id },
+      include: {
+        tipo: true,
+        muebles: { include: { categoria: true } },
+        reservas: {
+          where: { estado: { in: estadosReserva } },
+          select: { fechaInicio: true, fechaFin: true, estado: true },
+          orderBy: { fechaInicio: "asc" },
+        },
+      },
+    });
+
+    if (!result) return null;
+
+    const muebles = result.muebles.map((m) => mapMuebleFromPrisma(m));
+    return {
+      habitacion: mapHabitacionFromPrisma(result),
+      muebles,
       reservas: result.reservas.map((r) => ({
         fechaInicio: r.fechaInicio,
         fechaFin: r.fechaFin,
@@ -286,7 +333,6 @@ export class HabitacionRepository implements IHabitacionRepository {
             },
           },
         },
-        muebles: { include: { categoria: true } },
       },
     });
 
@@ -296,6 +342,34 @@ export class HabitacionRepository implements IHabitacionRepository {
 
     return {
       habitacion: mapHabitacionFromPrisma(result),
+      precioNoche: result.tipo?.tarifas?.[0]?.precioNoche ? Number(result.tipo.tarifas[0].precioNoche) : null,
+    };
+  }
+
+  async findByIdWithDirectPriceAndMuebles(id: string): Promise<{ habitacion: Habitacion; muebles: Mueble[]; precioNoche: number | null } | null> {
+    const result = await this.prisma.habitacion.findUnique({
+      where: { id },
+      include: {
+        tipo: {
+          include: {
+            tarifas: {
+              where: { canal: { tipo: "DIRECTO" } },
+              take: 1,
+            },
+          },
+        },
+        muebles: { include: { categoria: true } },
+      },
+    });
+
+    if (!result) {
+      return null;
+    }
+
+    const muebles = result.muebles.map((m) => mapMuebleFromPrisma(m));
+    return {
+      habitacion: mapHabitacionFromPrisma(result),
+      muebles,
       precioNoche: result.tipo?.tarifas?.[0]?.precioNoche ? Number(result.tipo.tarifas[0].precioNoche) : null,
     };
   }

@@ -1,5 +1,4 @@
 import { Habitacion } from "../../domain/entities/habitacion.entity";
-import { mapMuebleFromPrisma, type MueblePrismaRow } from "./mueble.mapper";
 import { mapTipoHabitacionFromPrisma, type TipoHabitacionPrismaRow } from "./tipo-habitacion.mapper";
 
 export type HabitacionPrismaRow = {
@@ -14,7 +13,6 @@ export type HabitacionPrismaRow = {
   createdAt: Date;
   updatedAt: Date;
   tipo: TipoHabitacionPrismaRow & Record<string, unknown>;
-  muebles?: MueblePrismaRow[];
 };
 
 export function mapHabitacionFromPrisma(data: HabitacionPrismaRow): Habitacion {
@@ -25,8 +23,6 @@ export function mapHabitacionFromPrisma(data: HabitacionPrismaRow): Habitacion {
     createdAt: data.tipo.createdAt,
     updatedAt: data.tipo.updatedAt,
   });
-
-  const muebles = data.muebles?.map(mapMuebleFromPrisma) ?? [];
 
   return new Habitacion(
     data.id,
@@ -40,6 +36,5 @@ export function mapHabitacionFromPrisma(data: HabitacionPrismaRow): Habitacion {
     data.descripcion,
     data.createdAt,
     data.updatedAt,
-    muebles,
   );
 }

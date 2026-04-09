@@ -1,5 +1,6 @@
 import type { Habitacion } from "../entities/habitacion.entity";
 import type { EstadoReserva } from "../entities/reserva.entity";
+import type { Mueble } from "../entities/mueble.entity";
 import type { PaginatedResult, PaginationParams } from "../../application/paginations/api.pagination";
 
 export interface HabitacionPaginationParams extends PaginationParams {
@@ -37,6 +38,7 @@ export interface IHabitacionRepository {
   findAll(): Promise<Habitacion[]>;
   findAllPaginated(params: HabitacionPaginationParams): Promise<PaginatedResult<Habitacion>>;
   findById(id: string): Promise<Habitacion | null>;
+  findByIdWithMuebles(id: string): Promise<{ habitacion: Habitacion; muebles: Mueble[] } | null>;
   findByIdWithReservas(
     id: string,
     estadosReserva: EstadoReserva[],
@@ -54,4 +56,9 @@ export interface IHabitacionRepository {
     tipoNombre?: string,
   ): Promise<Array<{ habitacion: Habitacion; precioNoche: number | null }>>;
   findByIdWithDirectPrice(id: string): Promise<{ habitacion: Habitacion; precioNoche: number | null } | null>;
+  findByIdWithDirectPriceAndMuebles(id: string): Promise<{ habitacion: Habitacion; muebles: Mueble[]; precioNoche: number | null } | null>;
+  findByIdWithReservasAndMuebles(
+    id: string,
+    estadosReserva: EstadoReserva[],
+  ): Promise<{ habitacion: Habitacion; muebles: Mueble[]; reservas: Array<{ fechaInicio: Date; fechaFin: Date; estado: EstadoReserva }> } | null>;
 }

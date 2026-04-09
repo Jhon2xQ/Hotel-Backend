@@ -1,4 +1,3 @@
-import type { Mueble } from "./mueble.entity";
 import type { TipoHabitacion } from "./tipo-habitacion.entity";
 
 export class Habitacion {
@@ -14,6 +13,5 @@ export class Habitacion {
     public readonly descripcion: string | null,
     public readonly createdAt: Date,
     public readonly updatedAt: Date,
-    public readonly muebles: Mueble[] = [],
   ) {}
 }

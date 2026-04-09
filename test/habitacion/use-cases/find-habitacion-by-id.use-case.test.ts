@@ -22,8 +22,11 @@ describe("FindHabitacionByIdUseCase", () => {
       findByTipoWithDirectPrice: async () => [],
       findAvailableInDateRange: async () => [],
       findByIdWithDirectPrice: async () => null,
+      findByIdWithMuebles: async () => null,
+      findByIdWithDirectPriceAndMuebles: async () => null,
       findAllPaginated: async () => ({ list: [], pagination: { page: 1, limit: 10, total: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false } }),
       findByIdWithReservas: async () => null,
+      findByIdWithReservasAndMuebles: async () => null,
     };
 
     useCase = new FindHabitacionByIdUseCase(mockRepository);
@@ -31,8 +34,8 @@ describe("FindHabitacionByIdUseCase", () => {
 
   it("should return habitacion when found", async () => {
     const mockHabitacion = createMockHabitacion({ id: "test-id", nroHabitacion: "101" });
-    mockRepository.findById = async (id: string) => {
-      if (id === "test-id") return mockHabitacion;
+    mockRepository.findByIdWithMuebles = async (id: string) => {
+      if (id === "test-id") return { habitacion: mockHabitacion, muebles: [] };
       return null;
     };
 
@@ -44,7 +47,7 @@ describe("FindHabitacionByIdUseCase", () => {
   });
 
   it("should throw error when habitacion not found", async () => {
-    mockRepository.findById = async () => null;
+    mockRepository.findByIdWithMuebles = async () => null;
 
     await expect(useCase.execute("non-existent-id")).rejects.toThrow(HabitacionException);
   });

@@ -27,6 +27,7 @@ describe("CreateMuebleUseCase", () => {
       create: async () => createMockHabitacion(),
       findAll: async () => [],
       findById: async () => createMockHabitacion(),
+      findByIdWithMuebles: async () => null,
       findByNumero: async () => null,
       update: async () => createMockHabitacion(),
       updateStatus: async () => createMockHabitacion(),
@@ -36,8 +37,10 @@ describe("CreateMuebleUseCase", () => {
       findByTipoWithDirectPrice: async () => [],
       findAvailableInDateRange: async () => [],
       findByIdWithDirectPrice: async () => null,
+      findByIdWithDirectPriceAndMuebles: async () => null,
       findAllPaginated: async () => ({ list: [], pagination: { page: 1, limit: 10, total: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false } }),
       findByIdWithReservas: async () => null,
+      findByIdWithReservasAndMuebles: async () => null,
     };
 
     mockCategoriaRepo = {

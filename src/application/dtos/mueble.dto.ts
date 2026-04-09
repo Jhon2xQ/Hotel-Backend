@@ -65,8 +65,6 @@ export interface PublicMuebleDto {
   descripcion: string | null;
   url_imagen: string | null;
   condicion: string;
-  created_at: string;
-  updated_at: string;
 }
 
 export function toPublicMuebleDto(m: Mueble): PublicMuebleDto {
@@ -77,7 +75,5 @@ export function toPublicMuebleDto(m: Mueble): PublicMuebleDto {
     descripcion: m.descripcion,
     url_imagen: m.urlImagen,
     condicion: m.condicion,
-    created_at: m.createdAt.toISOString(),
-    updated_at: m.updatedAt.toISOString(),
   };
 }

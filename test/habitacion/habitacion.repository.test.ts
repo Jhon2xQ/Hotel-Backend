@@ -169,7 +169,7 @@ const mockResult = {
       expect(result?.id).toBe("test-id");
       expect(mockPrisma.habitacion.findUnique).toHaveBeenCalledWith({
         where: { id: "test-id" },
-        include: { tipo: true, muebles: { include: { categoria: true } } },
+        include: { tipo: true },
       });
     });
 
