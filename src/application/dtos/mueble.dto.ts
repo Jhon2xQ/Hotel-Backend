@@ -57,3 +57,23 @@ export function toMuebleDto(m: Mueble): MuebleDto {
     updated_at: m.updatedAt.toISOString(),
   };
 }
+
+export interface PublicMuebleDto {
+  id: string;
+  codigo: string;
+  nombre: string;
+  descripcion: string | null;
+  url_imagen: string | null;
+  condicion: string;
+}
+
+export function toPublicMuebleDto(m: Mueble): PublicMuebleDto {
+  return {
+    id: m.id,
+    codigo: m.codigo,
+    nombre: m.nombre,
+    descripcion: m.descripcion,
+    url_imagen: m.urlImagen,
+    condicion: m.condicion,
+  };
+}

@@ -163,6 +163,50 @@ Valores válidos para `tipo_reserva`: `TENTATIVA`, `CONFIRMADA`, `EN_CASA`, `COM
       "url_imagen": ["https://example.com/rooms/101-1.jpg", "https://example.com/rooms/101-2.jpg"],
       "estado": true,
       "descripcion": "Suite con balcón privado",
+      "muebles": [
+        {
+          "id": "mueble-uuid-1",
+          "codigo": "CAMA-001",
+          "nombre": "Cama King Size",
+          "descripcion": "Cama matrimonial con colchon ortopedico",
+          "categoria": {
+            "id": "cat-uuid-1",
+            "nombre": "Camas",
+            "descripcion": "Categoria de camas",
+            "activo": true,
+            "created_at": "2026-01-01T00:00:00.000Z",
+            "updated_at": "2026-01-01T00:00:00.000Z"
+          },
+          "url_imagen": "https://example.com/camas/king-size.jpg",
+          "condicion": "BUENO",
+          "fecha_adquisicion": "2025-01-15",
+          "ultima_revision": "2026-03-01",
+          "habitacion_id": "789e4567-e89b-12d3-a456-426614174000",
+          "created_at": "2025-01-15T10:00:00.000Z",
+          "updated_at": "2026-03-01T10:00:00.000Z"
+        },
+        {
+          "id": "mueble-uuid-2",
+          "codigo": "MES-001",
+          "nombre": "Mesa de Noche",
+          "descripcion": "Mesa de noche con cajon",
+          "categoria": {
+            "id": "cat-uuid-2",
+            "nombre": "Mesas",
+            "descripcion": "Categoria de mesas",
+            "activo": true,
+            "created_at": "2026-01-01T00:00:00.000Z",
+            "updated_at": "2026-01-01T00:00:00.000Z"
+          },
+          "url_imagen": null,
+          "condicion": "BUENO",
+          "fecha_adquisicion": "2025-01-15",
+          "ultima_revision": "2026-03-01",
+          "habitacion_id": "789e4567-e89b-12d3-a456-426614174000",
+          "created_at": "2025-01-15T10:00:00.000Z",
+          "updated_at": "2026-03-01T10:00:00.000Z"
+        }
+      ],
       "created_at": "2026-03-15T10:00:00.000Z",
       "updated_at": "2026-03-17T08:00:00.000Z"
     },
@@ -185,9 +229,11 @@ Valores válidos para `tipo_reserva`: `TENTATIVA`, `CONFIRMADA`, `EN_CASA`, `COM
 
 **Notas:**
 
+- `habitacion.muebles` contiene el listado de muebles asociados a la habitación (cada mueble incluye `categoria`, `fecha_adquisicion`, `ultima_revision`, `habitacion_id`, `created_at`, `updated_at`)
 - `fechas_reserva` contiene las reservas de la habitación cuyo estado coincida con los filtros, ordenadas por `fecha_inicio` ascendente
 - Cada entrada incluye `fecha_inicio`, `fecha_fin` (en formato ISO 8601) y `estado` de la reserva
 - Si no hay reservas que coincidan, `fechas_reserva` será un array vacío
+- Si no hay muebles asociados, `muebles` será un array vacío
 
 **Errores:**
 
@@ -314,7 +360,7 @@ Obtiene las habitaciones disponibles con precio de tarifa del canal **DIRECTO**,
 
 ### 4. Habitación por ID con precio (público)
 
-Obtiene los detalles de una habitación junto con el precio de la tarifa del canal **DIRECTO**.
+Obtiene los detalles de una habitación junto con el precio de la tarifa del canal **DIRECTO** y el listado de muebles asociados.
 
 **Endpoint:** `GET /api/public/habitaciones/:id`
 
@@ -333,24 +379,33 @@ Obtiene los detalles de una habitación junto con el precio de la tarifa del can
   "success": true,
   "message": "Habitación con precio obtenida exitosamente",
   "data": {
-    "habitacion": {
-      "id": "789e4567-e89b-12d3-a456-426614174000",
-      "nro_habitacion": "101",
-      "tipo_habitacion": {
-        "id": "123e4567-e89b-12d3-a456-426614174000",
-        "nombre": "Suite Deluxe",
-        "descripcion": "Suite de lujo con vista panorámica al mar"
+    "id": "789e4567-e89b-12d3-a456-426614174000",
+    "nro_habitacion": "101",
+    "tipo_habitacion_id": "123e4567-e89b-12d3-a456-426614174000",
+    "piso": 1,
+    "tiene_ducha": true,
+    "tiene_banio": true,
+    "url_imagen": ["https://example.com/rooms/101-1.jpg", "https://example.com/rooms/101-2.jpg"],
+    "estado": true,
+    "descripcion": "Suite con balcón privado",
+    "muebles": [
+      {
+        "id": "mueble-uuid-1",
+        "codigo": "CAMA-001",
+        "nombre": "Cama King Size",
+        "descripcion": "Cama matrimonial con colchon ortopedico",
+        "url_imagen": "https://example.com/camas/king-size.jpg",
+        "condicion": "BUENO"
       },
-      "piso": 1,
-      "tiene_ducha": true,
-      "tiene_banio": true,
-      "url_imagen": ["https://example.com/rooms/101-1.jpg", "https://example.com/rooms/101-2.jpg"],
-      "estado": true,
-      "descripcion": "Suite con balcón privado",
-      "created_at": "2026-03-15T10:00:00.000Z",
-      "updated_at": "2026-03-17T08:00:00.000Z"
-    },
-    "precio_noche": 150.00
+      {
+        "id": "mueble-uuid-2",
+        "codigo": "MES-001",
+        "nombre": "Mesa de Noche",
+        "descripcion": "Mesa de noche con cajon",
+        "url_imagen": null,
+        "condicion": "BUENO"
+      }
+    ]
   },
   "timestamp": 1710684600000
 }
@@ -358,7 +413,9 @@ Obtiene los detalles de una habitación junto con el precio de la tarifa del can
 
 **Notas:**
 
-- `precio_noche` proviene de la tarifa del canal **DIRECTO**; puede ser `null` si no existe tarifa configurada
+- `precio_noche` fue removido del contrato público; ahora la respuesta devuelve directamente los datos de la habitación
+- El campo `muebles` contiene el listado de muebles asociados con datos públicos (`id`, `codigo`, `nombre`, `descripcion`, `url_imagen`, `condicion`)
+- Si no hay muebles asociados, `muebles` será un array vacío
 
 **Errores:**
 
@@ -833,6 +890,7 @@ Elimina una habitación del sistema.
 - Los campos `created_at` y `updated_at` se gestionan automáticamente por el sistema
 - No se puede eliminar una habitación si tiene registros relacionados
 - Todas las rutas privadas requieren autenticación mediante sesión Better Auth (no hay restricción por rol)
+- Los endpoints de detalle por ID (`GET /api/private/habitaciones/:id` y `GET /api/public/habitaciones/:id`) incluyen el array `muebles` con los muebles asociados a la habitación
 
 ---
 

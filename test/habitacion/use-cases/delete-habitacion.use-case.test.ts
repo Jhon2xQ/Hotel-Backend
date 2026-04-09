@@ -22,8 +22,11 @@ describe("DeleteHabitacionUseCase", () => {
       findByTipoWithDirectPrice: async () => [],
       findAvailableInDateRange: async () => [],
       findByIdWithDirectPrice: async () => null,
+      findByIdWithMuebles: async () => null,
+      findByIdWithDirectPriceAndMuebles: async () => null,
       findAllPaginated: async () => ({ list: [], pagination: { page: 1, limit: 10, total: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false } }),
       findByIdWithReservas: async () => null,
+      findByIdWithReservasAndMuebles: async () => null,
     };
 
     useCase = new DeleteHabitacionUseCase(mockRepository);

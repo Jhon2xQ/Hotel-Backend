@@ -13,7 +13,7 @@ export function createMuebleRoutes(): AppHono {
   router.get("/", (c) => ctrl.list(c));
   router.get("/:id", validParams(UUIDParamSchema), (c) => ctrl.findById(c));
   router.post("/", parseFormDataMiddleware, validSchema(CreateMuebleSchema), (c) => ctrl.create(c));
-  router.put("/:id", validParams(UUIDParamSchema), validSchema(UpdateMuebleSchema), (c) => ctrl.update(c));
+  router.put("/:id", validParams(UUIDParamSchema), parseFormDataMiddleware, validSchema(UpdateMuebleSchema), (c) => ctrl.update(c));
   router.delete("/:id", validParams(UUIDParamSchema), (c) => ctrl.delete(c));
 
   return router;

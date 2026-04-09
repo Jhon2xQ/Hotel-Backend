@@ -3,7 +3,7 @@ import { AppContext } from "../../common/types/app.types";
 
 export async function parseFormDataMiddleware(c: AppContext, next: Next) {
   const contentType = c.req.header("content-type");
-  const FIELDS_TO_STRING = ["nro_habitacion"];
+  const FIELDS_TO_STRING = ["nro_habitacion", "codigo"];
 
   if (contentType?.includes("multipart/form-data")) {
     const formData = await c.req.formData();
