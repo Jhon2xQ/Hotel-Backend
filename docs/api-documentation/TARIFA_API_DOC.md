@@ -54,7 +54,7 @@ Obtiene la lista de todas las tarifas registradas con sus relaciones completas (
         "updated_at": "2024-03-21T10:00:00.000Z"
       },
       "precio": 150.0,
-      "unidad": "dia",
+      "unidad": "noches",
       "iva": 18.0,
       "cargo_servicios": 10.0,
       "moneda": "USD",
@@ -105,7 +105,7 @@ Obtiene los detalles de una tarifa específica con sus relaciones completas.
       "updated_at": "2024-03-21T10:00:00.000Z"
     },
     "precio": 150.0,
-    "unidad": "dia",
+    "unidad": "noches",
     "iva": 18.0,
     "cargo_servicios": 10.0,
     "moneda": "USD",
@@ -144,7 +144,7 @@ Crea una nueva tarifa para un tipo de habitación y canal específicos.
   "tipo_habitacion_id": "uuid",
   "canal_id": "uuid",
   "precio": 150.0,
-  "unidad": "dia",
+  "unidad": "noches",
   "iva": 18.0,
   "cargo_servicios": 10.0,
   "moneda": "USD"
@@ -156,7 +156,7 @@ Crea una nueva tarifa para un tipo de habitación y canal específicos.
 - `tipo_habitacion_id` (UUID, requerido): ID del tipo de habitación
 - `canal_id` (UUID, requerido): ID del canal de venta
 - `precio` (number, requerido): Precio de la tarifa (debe ser mayor a 0)
-- `unidad` (string, opcional): Unidad de cobro - "dia" o "hora". Default: `"dia"`
+- `unidad` (string, opcional): Unidad de cobro - "noches" o "horas". Default: `"noches"`
 - `iva` (number, opcional): Porcentaje de IVA (0-100)
 - `cargo_servicios` (number, opcional): Porcentaje de cargo por servicios (0-100)
 - `moneda` (string, opcional): Código de moneda de 3 caracteres. Default: `"USD"`
@@ -186,7 +186,7 @@ Crea una nueva tarifa para un tipo de habitación y canal específicos.
       "updated_at": "2024-03-21T10:00:00.000Z"
     },
     "precio": 150.0,
-    "unidad": "dia",
+    "unidad": "noches",
     "iva": 18.0,
     "cargo_servicios": 10.0,
     "moneda": "USD",
@@ -238,7 +238,7 @@ Actualiza los datos de una tarifa existente.
 ```json
 {
   "precio": 175.0,
-  "unidad": "hora",
+  "unidad": "horas",
   "iva": 18.0,
   "cargo_servicios": 12.0
 }
@@ -249,7 +249,7 @@ Actualiza los datos de una tarifa existente.
 - `tipo_habitacion_id` (UUID): ID del tipo de habitación
 - `canal_id` (UUID): ID del canal de venta
 - `precio` (number): Precio de la tarifa (debe ser mayor a 0)
-- `unidad` (string): Unidad de cobro - "dia" o "hora"
+- `unidad` (string): Unidad de cobro - "noches" o "horas"
 - `iva` (number): Porcentaje de IVA (0-100)
 - `cargo_servicios` (number): Porcentaje de cargo por servicios (0-100)
 - `moneda` (string): Código de moneda de 3 caracteres
@@ -279,7 +279,7 @@ Actualiza los datos de una tarifa existente.
       "updated_at": "2024-03-21T10:00:00.000Z"
     },
     "precio": 175.0,
-    "unidad": "hora",
+    "unidad": "horas",
     "iva": 18.0,
     "cargo_servicios": 12.0,
     "moneda": "USD",
@@ -365,7 +365,7 @@ Todas las respuestas que devuelven tarifas incluyen automáticamente las entidad
     "updated_at": "2024-03-21T10:00:00.000Z"
   },
   "precio": 150.0,
-  "unidad": "dia",
+  "unidad": "noches",
   "iva": 18.0,
   "cargo_servicios": 10.0,
   "moneda": "USD",
@@ -382,8 +382,8 @@ Todas las respuestas que devuelven tarifas incluyen automáticamente las entidad
 
 ### Unidad de Cobro
 
-- Debe ser un string de máximo 4 caracteres
-- Valores permitidos: "dia" o "hora"
+- Debe ser un string de máximo 6 caracteres
+- Valores permitidos: "noches" o "horas"
 - Es opcional, por defecto se establece como "dia"
 
 ### Precio por Noche

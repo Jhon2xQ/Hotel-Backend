@@ -24,7 +24,7 @@ export class TarifaRepository implements ITarifaRepository {
         tipoHabitacionId: data.tipoHabitacionId,
         canalId: data.canalId,
         precio: data.precio,
-        unidad: data.unidad ?? "dia",
+        unidad: data.unidad ?? "noches",
         IVA: data.IVA ?? null,
         cargoServicios: data.cargoServicios ?? null,
         moneda: data.moneda ?? "USD",

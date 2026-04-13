@@ -361,7 +361,7 @@ model Tarifa {
   tipoHabitacionId String   @db.Uuid
   canalId          String   @db.Uuid
   precio           Decimal  @db.Decimal(10, 2)
-  unidad           String   @default("dia") @db.VarChar(4)
+  unidad           String   @default("noches") @db.VarChar(6)
   IVA              Decimal? @db.Decimal(4, 2)
   cargoServicios   Decimal? @db.Decimal(4, 2)
   moneda           String   @default("USD") @db.Char(3)

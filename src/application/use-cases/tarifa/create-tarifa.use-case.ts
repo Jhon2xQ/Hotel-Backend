@@ -27,7 +27,7 @@ export class CreateTarifaUseCase {
       tipoHabitacionId: input.tipo_habitacion_id,
       canalId: input.canal_id,
       precio: input.precio,
-      unidad: input.unidad ?? "dia",
+      unidad: input.unidad ?? "noches",
       IVA: input.iva ?? null,
       cargoServicios: input.cargo_servicios ?? null,
       moneda: input.moneda ?? "USD",

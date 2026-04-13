@@ -16,7 +16,7 @@ export function createMockTarifa(overrides?: Partial<Tarifa>): Tarifa {
     tipoHabitacion,
     canal,
     overrides?.precio ?? 150.0,
-    overrides?.unidad ?? "dia",
+    overrides?.unidad ?? "noches",
     overrides?.IVA !== undefined ? overrides.IVA : 18.0,
     overrides?.cargoServicios !== undefined ? overrides.cargoServicios : 10.0,
     overrides?.moneda ?? "USD",
