@@ -77,8 +77,9 @@ GET /api/private/reservas?nombre=Garc&tipo=Doble&page=1&limit=10
         "nro_habitacion": "101",
         "nombre_tipo_hab": "Suite Deluxe",
         "nombre_canal": "Booking.com",
-        "precio_noche": 150.0,
-        "cantidad_noches": 2,
+        "precio_tarifa": 150.0,
+        "unidad_tarifa": "noches",
+        "cantidad_unidad": 2,
         "iva": 18.0,
         "cargo_servicios": 10.0,
         "monto_total": 420.0,
@@ -150,8 +151,9 @@ Obtiene una reserva específica por su ID.
     "nro_habitacion": "101",
     "nombre_tipo_hab": "Suite Deluxe",
     "nombre_canal": "Booking.com",
-    "precio_noche": 150.0,
-    "cantidad_noches": 2,
+    "precio_tarifa": 150.0,
+    "unidad_tarifa": "noches",
+    "cantidad_unidad": 2,
     "iva": 18.0,
     "cargo_servicios": 10.0,
     "monto_total": 420.0,
@@ -573,7 +575,8 @@ Los siguientes campos se sincronizan automáticamente desde las entidades relaci
 - `nro_habitacion`: Desde `habitacion.nroHabitacion`
 - `nombre_tipo_hab`: Desde `tarifa.tipoHabitacion.nombre`
 - `nombre_canal`: Desde `tarifa.canal.nombre`
-- `precio_noche`: Desde `tarifa.precioNoche`
+- `precio_tarifa`: Desde `tarifa.precio`
+- `unidad_tarifa`: Desde `tarifa.unidad`
 - `iva`: Desde `tarifa.IVA`
 - `cargo_servicios`: Desde `tarifa.cargoServicios`
 
@@ -591,8 +594,8 @@ Los siguientes campos se sincronizan automáticamente desde las entidades relaci
 
 ### Cálculo de Montos
 
-- `cantidad_noches` = diferencia en días entre `fecha_fin` y `fecha_inicio`
-- `subtotal` = `precio_noche` × `cantidad_noches`
+- `cantidad_unidad` = diferencia en días entre `fecha_fin` y `fecha_inicio`
+- `subtotal` = `precio_tarifa` × `cantidad_unidad`
 - `monto_total` = `subtotal` × (1 + `iva`/100 + `cargo_servicios`/100)
 - Los campos `iva` y `cargo_servicios` se expresan como porcentajes (ej: 18.00 = 18%)
 
@@ -713,7 +716,7 @@ También se devuelve 409 cuando el intervalo de fechas entra en conflicto con un
 
 3. **Sincronización Automática**: Los campos snapshot se actualizan automáticamente cuando cambian las relaciones, no es necesario enviarlos en el request.
 
-4. **Cálculo Automático**: Los montos totales se calculan automáticamente basados en las fechas, precio de la tarifa, IVA y cargo de servicios. La fórmula es: `monto_total = (precio_noche × cantidad_noches) × (1 + iva/100 + cargo_servicios/100)`.
+4. **Cálculo Automático**: Los montos totales se calculan automáticamente basados en las fechas, precio de la tarifa, IVA y cargo de servicios. La fórmula es: `monto_total = (precio_tarifa × cantidad_unidad) × (1 + iva/100 + cargo_servicios/100)`.
 
 5. **Validación de Solapamiento**: Al crear o actualizar una reserva, se verifica que el intervalo de fechas no entre en conflicto con reservas existentes (estado TENTATIVA, CONFIRMADA o EN_CASA) para la misma habitación.
 

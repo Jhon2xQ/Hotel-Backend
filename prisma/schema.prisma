@@ -425,8 +425,9 @@ model Reserva {
   nombreCanal   String @db.VarChar(50)
 
   // Precios
-  precioNoche    Decimal @db.Decimal(10, 2)
-  cantidadNoches Int     @db.SmallInt
+  precioTarifa    Decimal @db.Decimal(10, 2)
+  unidadTarifa    String  @db.VarChar(6)
+  cantidadUnidad  Int     @db.SmallInt
   IVA            Decimal @default(0) @db.Decimal(4, 2)
   cargoServicios Decimal @default(0) @db.Decimal(4, 2)
 

@@ -78,10 +78,11 @@ export class CreateReservaUseCase {
     }
 
     const nights = calculateNights(input.fechaInicio, input.fechaFin);
-    const precioNoche = tarifa.precio;
+    const precioTarifa = tarifa.precio;
+    const unidadTarifa = tarifa.unidad;
     const IVA = tarifa.IVA ?? 0;
     const cargoServicios = tarifa.cargoServicios ?? 0;
-    const subtotalNoches = precioNoche * nights;
+    const subtotalNoches = precioTarifa * nights;
     const montoTotal = subtotalNoches * (1 + IVA / 100 + cargoServicios / 100);
 
     return await this.reservaRepository.create({
@@ -97,8 +98,9 @@ export class CreateReservaUseCase {
       nroHabitacion: habitacion.nroHabitacion,
       nombreTipoHab: tarifa.tipoHabitacion.nombre,
       nombreCanal: tarifa.canal.nombre,
-      precioNoche,
-      cantidadNoches: nights,
+      precioTarifa,
+      unidadTarifa,
+      cantidadUnidad: nights,
       IVA,
       cargoServicios,
       montoTotal: Math.round(montoTotal * 100) / 100,
