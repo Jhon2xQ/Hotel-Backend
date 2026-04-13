@@ -255,7 +255,7 @@ export class ReservaRepository implements IReservaRepository {
       nroHabitacion: habitacion.nroHabitacion,
       nombreTipoHab: tarifa.tipoHabitacion.nombre,
       nombreCanal: tarifa.canal.nombre,
-      precioNoche: Number(tarifa.precioNoche),
+      precioNoche: Number(tarifa.precio),
       IVA: Number(tarifa.IVA || 0),
       cargoServicios: Number(tarifa.cargoServicios || 0),
     };

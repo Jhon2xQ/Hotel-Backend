@@ -4,7 +4,8 @@ import { mapTipoHabitacionFromPrisma, type TipoHabitacionPrismaRow } from "./tip
 
 export type TarifaPrismaRow = {
   id: string;
-  precioNoche: unknown;
+  precio: unknown;
+  unidad: string;
   IVA: unknown | null;
   cargoServicios: unknown | null;
   moneda: string;
@@ -19,7 +20,8 @@ export function mapTarifaFromPrisma(row: TarifaPrismaRow): Tarifa {
     row.id,
     mapTipoHabitacionFromPrisma(row.tipoHabitacion),
     mapCanalFromPrisma(row.canal),
-    Number(row.precioNoche),
+    Number(row.precio),
+    row.unidad,
     row.IVA != null ? Number(row.IVA) : null,
     row.cargoServicios != null ? Number(row.cargoServicios) : null,
     row.moneda,

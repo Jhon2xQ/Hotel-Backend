@@ -14,7 +14,7 @@ export class UpdateTarifaUseCase {
       throw TarifaException.notFoundById();
     }
 
-    if (input.precio_noche !== undefined && input.precio_noche <= 0) {
+    if (input.precio !== undefined && input.precio <= 0) {
       throw TarifaException.invalidPrecio();
     }
 
@@ -35,7 +35,8 @@ export class UpdateTarifaUseCase {
     const updated = await this.repository.update(id, {
       tipoHabitacionId: input.tipo_habitacion_id,
       canalId: input.canal_id,
-      precioNoche: input.precio_noche,
+      precio: input.precio,
+      unidad: input.unidad,
       IVA: input.iva,
       cargoServicios: input.cargo_servicios,
       moneda: input.moneda,

@@ -230,7 +230,7 @@ export class HabitacionRepository implements IHabitacionRepository {
 
     return results.map((r) => ({
       habitacion: mapHabitacionFromPrisma(r),
-      precioNoche: r.tipo?.tarifas?.[0]?.precioNoche ? Number(r.tipo.tarifas[0].precioNoche) : null,
+      precioNoche: r.tipo?.tarifas?.[0]?.precio ? Number(r.tipo.tarifas[0].precio) : null,
     }));
   }
 
@@ -258,7 +258,7 @@ export class HabitacionRepository implements IHabitacionRepository {
 
     return results.map((r) => ({
       habitacion: mapHabitacionFromPrisma(r),
-      precioNoche: r.tipo?.tarifas?.[0]?.precioNoche ? Number(r.tipo.tarifas[0].precioNoche) : null,
+      precioNoche: r.tipo?.tarifas?.[0]?.precio ? Number(r.tipo.tarifas[0].precio) : null,
     }));
   }
 
@@ -317,7 +317,7 @@ export class HabitacionRepository implements IHabitacionRepository {
 
     return results.map((r) => ({
       habitacion: mapHabitacionFromPrisma(r),
-      precioNoche: r.tipo?.tarifas?.[0]?.precioNoche ? Number(r.tipo.tarifas[0].precioNoche) : null,
+      precioNoche: r.tipo?.tarifas?.[0]?.precio ? Number(r.tipo.tarifas[0].precio) : null,
     }));
   }
 
@@ -342,7 +342,7 @@ export class HabitacionRepository implements IHabitacionRepository {
 
     return {
       habitacion: mapHabitacionFromPrisma(result),
-      precioNoche: result.tipo?.tarifas?.[0]?.precioNoche ? Number(result.tipo.tarifas[0].precioNoche) : null,
+      precioNoche: result.tipo?.tarifas?.[0]?.precio ? Number(result.tipo.tarifas[0].precio) : null,
     };
   }
 
@@ -370,7 +370,7 @@ export class HabitacionRepository implements IHabitacionRepository {
     return {
       habitacion: mapHabitacionFromPrisma(result),
       muebles,
-      precioNoche: result.tipo?.tarifas?.[0]?.precioNoche ? Number(result.tipo.tarifas[0].precioNoche) : null,
+      precioNoche: result.tipo?.tarifas?.[0]?.precio ? Number(result.tipo.tarifas[0].precio) : null,
     };
   }
 }

@@ -9,7 +9,7 @@ export class CreateTarifaUseCase {
   constructor(@inject(DI_TOKENS.ITarifaRepository) private repository: ITarifaRepository) {}
 
   async execute(input: CreateTarifaDto): Promise<TarifaDto> {
-    if (input.precio_noche <= 0) {
+    if (input.precio <= 0) {
       throw TarifaException.invalidPrecio();
     }
 
@@ -26,7 +26,8 @@ export class CreateTarifaUseCase {
     const tarifa = await this.repository.create({
       tipoHabitacionId: input.tipo_habitacion_id,
       canalId: input.canal_id,
-      precioNoche: input.precio_noche,
+      precio: input.precio,
+      unidad: input.unidad ?? "dia",
       IVA: input.iva ?? null,
       cargoServicios: input.cargo_servicios ?? null,
       moneda: input.moneda ?? "USD",

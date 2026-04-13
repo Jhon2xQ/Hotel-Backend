@@ -28,7 +28,7 @@ describe("CreateTarifaUseCase", () => {
 
   it("should create tarifa successfully", async () => {
     const mockTarifa = createMockTarifa({
-      precioNoche: 150.0,
+      precio: 150.0,
       IVA: 18.0,
       cargoServicios: 10.0,
     });
@@ -38,13 +38,13 @@ describe("CreateTarifaUseCase", () => {
     const result = await useCase.execute({
       tipo_habitacion_id: "tipo-id",
       canal_id: "canal-id",
-      precio_noche: 150.0,
+      precio: 150.0,
       iva: 18.0,
       cargo_servicios: 10.0,
     });
 
     expect(result).toBeDefined();
-    expect(result.precio_noche).toBe(150.0);
+    expect(result.precio).toBe(150.0);
     expect(result.iva).toBe(18.0);
     expect(result.cargo_servicios).toBe(10.0);
   });
@@ -55,7 +55,7 @@ describe("CreateTarifaUseCase", () => {
       return createMockTarifa({
         tipoHabitacion: new TipoHabitacion(data.tipoHabitacionId, "Suite", "desc", now, now),
         canal: new Canal(data.canalId, "Booking", "OTA", true, null, now, now),
-        precioNoche: data.precioNoche,
+        precio: data.precio,
         IVA: data.IVA ?? null,
         cargoServicios: data.cargoServicios ?? null,
         moneda: data.moneda ?? "USD",
@@ -65,20 +65,20 @@ describe("CreateTarifaUseCase", () => {
     const result = await useCase.execute({
       tipo_habitacion_id: "tipo-id",
       canal_id: "canal-id",
-      precio_noche: 100.0,
+      precio: 100.0,
     });
 
     expect(result).toBeDefined();
-    expect(result.precio_noche).toBe(100.0);
+    expect(result.precio).toBe(100.0);
     expect(result.moneda).toBe("USD");
   });
 
-  it("should throw error when precio_noche is zero or negative", async () => {
+  it("should throw error when precio is zero or negative", async () => {
     await expect(
       useCase.execute({
         tipo_habitacion_id: "tipo-id",
         canal_id: "canal-id",
-        precio_noche: 0,
+        precio: 0,
       }),
     ).rejects.toThrow(TarifaException);
 
@@ -86,7 +86,7 @@ describe("CreateTarifaUseCase", () => {
       useCase.execute({
         tipo_habitacion_id: "tipo-id",
         canal_id: "canal-id",
-        precio_noche: -50,
+        precio: -50,
       }),
     ).rejects.toThrow(TarifaException);
   });
@@ -101,7 +101,7 @@ describe("CreateTarifaUseCase", () => {
     const result = await useCase.execute({
       tipo_habitacion_id: "tipo-id",
       canal_id: "canal-id",
-      precio_noche: 150.0,
+      precio: 150.0,
       moneda: "EUR",
     });
 

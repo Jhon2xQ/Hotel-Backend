@@ -25,9 +25,9 @@ describe("ListTarifaUseCase", () => {
 
   it("should return list of tarifas", async () => {
     const mockTarifas = [
-      createMockTarifa({ id: "id-1", precioNoche: 100.0 }),
-      createMockTarifa({ id: "id-2", precioNoche: 150.0 }),
-      createMockTarifa({ id: "id-3", precioNoche: 200.0 }),
+      createMockTarifa({ id: "id-1", precio: 100.0 }),
+      createMockTarifa({ id: "id-2", precio: 150.0 }),
+      createMockTarifa({ id: "id-3", precio: 200.0 }),
     ];
 
     mockRepository.findAll = async () => mockTarifas;
@@ -35,9 +35,9 @@ describe("ListTarifaUseCase", () => {
     const result = await useCase.execute();
 
     expect(result).toHaveLength(3);
-    expect(result[0].precio_noche).toBe(100.0);
-    expect(result[1].precio_noche).toBe(150.0);
-    expect(result[2].precio_noche).toBe(200.0);
+    expect(result[0].precio).toBe(100.0);
+    expect(result[1].precio).toBe(150.0);
+    expect(result[2].precio).toBe(200.0);
   });
 
   it("should return empty array when no tarifas exist", async () => {
