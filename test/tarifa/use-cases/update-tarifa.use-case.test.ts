@@ -27,12 +27,12 @@ describe("UpdateTarifaUseCase", () => {
   it("should update tarifa successfully", async () => {
     const existingTarifa = createMockTarifa({
       id: "test-id",
-      precioNoche: 150.0,
+      precio: 150.0,
     });
 
     const updatedTarifa = createMockTarifa({
       id: "test-id",
-      precioNoche: 175.0,
+      precio: 175.0,
       IVA: 20.0,
     });
 
@@ -44,12 +44,12 @@ describe("UpdateTarifaUseCase", () => {
     mockRepository.update = async () => updatedTarifa;
 
     const result = await useCase.execute("test-id", {
-      precio_noche: 175.0,
+      precio: 175.0,
       iva: 20.0,
     });
 
     expect(result).toBeDefined();
-    expect(result.precio_noche).toBe(175.0);
+    expect(result.precio).toBe(175.0);
     expect(result.iva).toBe(20.0);
   });
 
@@ -58,24 +58,24 @@ describe("UpdateTarifaUseCase", () => {
 
     await expect(
       useCase.execute("non-existent-id", {
-        precio_noche: 200.0,
+        precio: 200.0,
       }),
     ).rejects.toThrow(TarifaException);
   });
 
-  it("should throw error when precio_noche is zero or negative", async () => {
+  it("should throw error when precio is zero or negative", async () => {
     const existingTarifa = createMockTarifa({ id: "test-id" });
     mockRepository.findById = async () => existingTarifa;
 
     await expect(
       useCase.execute("test-id", {
-        precio_noche: 0,
+        precio: 0,
       }),
     ).rejects.toThrow(TarifaException);
 
     await expect(
       useCase.execute("test-id", {
-        precio_noche: -100,
+        precio: -100,
       }),
     ).rejects.toThrow(TarifaException);
   });

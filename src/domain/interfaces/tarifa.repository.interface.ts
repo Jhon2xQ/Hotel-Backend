@@ -3,7 +3,8 @@ import type { Tarifa } from "../entities/tarifa.entity";
 export interface CreateTarifaParams {
   tipoHabitacionId: string;
   canalId: string;
-  precioNoche: number;
+  precio: number;
+  unidad?: string;
   IVA?: number | null;
   cargoServicios?: number | null;
   moneda?: string;
@@ -12,7 +13,8 @@ export interface CreateTarifaParams {
 export interface UpdateTarifaParams {
   tipoHabitacionId?: string;
   canalId?: string;
-  precioNoche?: number;
+  precio?: number;
+  unidad?: string;
   IVA?: number | null;
   cargoServicios?: number | null;
   moneda?: string;

@@ -23,7 +23,8 @@ export class TarifaRepository implements ITarifaRepository {
       data: {
         tipoHabitacionId: data.tipoHabitacionId,
         canalId: data.canalId,
-        precioNoche: data.precioNoche,
+        precio: data.precio,
+        unidad: data.unidad ?? "noches",
         IVA: data.IVA ?? null,
         cargoServicios: data.cargoServicios ?? null,
         moneda: data.moneda ?? "USD",
@@ -53,7 +54,8 @@ export class TarifaRepository implements ITarifaRepository {
     const updateData: Record<string, unknown> = {};
     if (data.tipoHabitacionId !== undefined) updateData.tipoHabitacionId = data.tipoHabitacionId;
     if (data.canalId !== undefined) updateData.canalId = data.canalId;
-    if (data.precioNoche !== undefined) updateData.precioNoche = data.precioNoche;
+    if (data.precio !== undefined) updateData.precio = data.precio;
+    if (data.unidad !== undefined) updateData.unidad = data.unidad;
     if (data.IVA !== undefined) updateData.IVA = data.IVA;
     if (data.cargoServicios !== undefined) updateData.cargoServicios = data.cargoServicios;
     if (data.moneda !== undefined) updateData.moneda = data.moneda;

@@ -27,7 +27,7 @@ describe("FindTarifaByIdUseCase", () => {
   it("should find tarifa by id successfully", async () => {
     const mockTarifa = createMockTarifa({
       id: "test-id",
-      precioNoche: 150.0,
+      precio: 150.0,
       IVA: 18.0,
     });
 
@@ -40,7 +40,7 @@ describe("FindTarifaByIdUseCase", () => {
 
     expect(result).toBeDefined();
     expect(result.id).toBe("test-id");
-    expect(result.precio_noche).toBe(150.0);
+    expect(result.precio).toBe(150.0);
     expect(result.iva).toBe(18.0);
   });
 
@@ -53,7 +53,7 @@ describe("FindTarifaByIdUseCase", () => {
   it("should return tarifa with all fields", async () => {
     const mockTarifa = createMockTarifa({
       id: "test-id",
-      precioNoche: 200.0,
+      precio: 200.0,
       IVA: 18.0,
       cargoServicios: 12.0,
       moneda: "EUR",
@@ -63,7 +63,7 @@ describe("FindTarifaByIdUseCase", () => {
 
     const result = await useCase.execute("test-id");
 
-    expect(result.precio_noche).toBe(200.0);
+    expect(result.precio).toBe(200.0);
     expect(result.iva).toBe(18.0);
     expect(result.cargo_servicios).toBe(12.0);
     expect(result.moneda).toBe("EUR");

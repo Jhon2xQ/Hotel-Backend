@@ -78,7 +78,7 @@ export class CreateReservaUseCase {
     }
 
     const nights = calculateNights(input.fechaInicio, input.fechaFin);
-    const precioNoche = tarifa.precioNoche;
+    const precioNoche = tarifa.precio;
     const IVA = tarifa.IVA ?? 0;
     const cargoServicios = tarifa.cargoServicios ?? 0;
     const subtotalNoches = precioNoche * nights;
