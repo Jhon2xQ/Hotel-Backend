@@ -384,9 +384,9 @@ Todas las respuestas que devuelven tarifas incluyen automáticamente las entidad
 
 - Debe ser un string de máximo 6 caracteres
 - Valores permitidos: "noches" o "horas"
-- Es opcional, por defecto se establece como "dia"
+- Es opcional, por defecto se establece como "noches"
 
-### Precio por Noche
+### Precio
 
 - Debe ser un número positivo mayor a 0
 - Se valida tanto en creación como en actualización
