@@ -183,14 +183,15 @@ export class ReservaRepository implements IReservaRepository {
       const fechaInicio = data.fechaInicio || existing.fechaInicio;
       const fechaFin = data.fechaFin || existing.fechaFin;
       const precioTarifa = (updateData.precioTarifa as number) || Number(existing.precioTarifa);
+      const unidadTarifa = (updateData.unidadTarifa as string) || existing.unidadTarifa;
       const IVA = (updateData.IVA as number) || Number(existing.IVA);
       const cargoServicios = (updateData.cargoServicios as number) || Number(existing.cargoServicios);
 
-      const nights = this.calculateNights(fechaInicio, fechaFin);
-      const subtotalNoches = precioTarifa * nights;
-      const montoTotal = subtotalNoches * (1 + IVA / 100 + cargoServicios / 100);
+      const units = this.calculateUnits(fechaInicio, fechaFin, unidadTarifa);
+      const subtotalUnidades = precioTarifa * units;
+      const montoTotal = subtotalUnidades * (1 + IVA / 100 + cargoServicios / 100);
 
-      updateData.cantidadUnidad = nights;
+      updateData.cantidadUnidad = units;
       updateData.montoTotal = Math.round(montoTotal * 100) / 100;
     }
 
@@ -265,8 +266,13 @@ export class ReservaRepository implements IReservaRepository {
     };
   }
 
-  private calculateNights(fechaInicio: Date, fechaFin: Date): number {
+  private calculateUnits(fechaInicio: Date, fechaFin: Date, unidad: string): number {
+    const msDiff = fechaFin.getTime() - fechaInicio.getTime();
+    if (unidad === "horas") {
+      const msPerHour = 1000 * 60 * 60;
+      return Math.round(msDiff / msPerHour);
+    }
     const msPerDay = 1000 * 60 * 60 * 24;
-    return Math.round((fechaFin.getTime() - fechaInicio.getTime()) / msPerDay);
+    return Math.round(msDiff / msPerDay);
   }
 }

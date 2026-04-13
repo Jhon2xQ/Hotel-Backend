@@ -9,9 +9,15 @@ import { generateCodigoReserva } from "../../../common/utils/codigo-generator";
 import { DI_TOKENS } from "../../../common/IoC/tokens";
 import type { Reserva } from "../../../domain/entities/reserva.entity";
 
-function calculateNights(fechaInicio: Date, fechaFin: Date): number {
+function calculateUnits(fechaInicio: Date, fechaFin: Date, unidad: string): number {
+  const msDiff = fechaFin.getTime() - fechaInicio.getTime();
+  if (unidad === "horas") {
+    const msPerHour = 1000 * 60 * 60;
+    return Math.round(msDiff / msPerHour);
+  }
+  // noches
   const msPerDay = 1000 * 60 * 60 * 24;
-  return Math.round((fechaFin.getTime() - fechaInicio.getTime()) / msPerDay);
+  return Math.round(msDiff / msPerDay);
 }
 
 @injectable()
@@ -77,13 +83,13 @@ export class CreateReservaUseCase {
       throw ReservaException.tarifaNotFound();
     }
 
-    const nights = calculateNights(input.fechaInicio, input.fechaFin);
+    const nights = calculateUnits(input.fechaInicio, input.fechaFin, tarifa.unidad);
     const precioTarifa = tarifa.precio;
     const unidadTarifa = tarifa.unidad;
     const IVA = tarifa.IVA ?? 0;
     const cargoServicios = tarifa.cargoServicios ?? 0;
-    const subtotalNoches = precioTarifa * nights;
-    const montoTotal = subtotalNoches * (1 + IVA / 100 + cargoServicios / 100);
+    const subtotalUnidades = precioTarifa * nights;
+    const montoTotal = subtotalUnidades * (1 + IVA / 100 + cargoServicios / 100);
 
     return await this.reservaRepository.create({
       codigo: codigo!,

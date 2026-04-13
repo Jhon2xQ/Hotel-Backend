@@ -594,7 +594,7 @@ Los siguientes campos se sincronizan automáticamente desde las entidades relaci
 
 ### Cálculo de Montos
 
-- `cantidad_unidad` = diferencia en días entre `fecha_fin` y `fecha_inicio`
+- `cantidad_unidad` = diferencia en días entre `fecha_fin` y `fecha_inicio` (formato ISO 8601, ej: `2024-03-25T15:00:00Z`)
 - `subtotal` = `precio_tarifa` × `cantidad_unidad`
 - `monto_total` = `subtotal` × (1 + `iva`/100 + `cargo_servicios`/100)
 - Los campos `iva` y `cargo_servicios` se expresan como porcentajes (ej: 18.00 = 18%)
