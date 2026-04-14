@@ -201,6 +201,13 @@ enum EstadoEstadia {
   @@map("estado_estadia")
 }
 
+enum TipoDescuento {
+  PORCENTAJE
+  MONTO_FIJO
+
+  @@map("tipo_descuento")
+}
+
 enum EstadoFolio {
   ABIERTO
   CERRADO
@@ -344,10 +351,11 @@ model Habitacion {
   createdAt        DateTime         @default(now()) @db.Timestamptz
   updatedAt        DateTime         @updatedAt @db.Timestamptz
 
-  muebles   Mueble[]
-  tipo      TipoHabitacion @relation(fields: [tipoHabitacionId], references: [id])
-  reservas  Reserva[]
-  estancias Estancia[]
+  muebles     Mueble[]
+  tipo        TipoHabitacion @relation(fields: [tipoHabitacionId], references: [id])
+  reservas    Reserva[]
+  estancias   Estancia[]
+  promociones Promocion[]
 
   @@map("habitaciones")
 }
@@ -606,4 +614,24 @@ model CategoriaMueble {
   muebles Mueble[]
 
   @@map("categoria_mueble")
+}
+
+// ------------------------------------------------------------
+// 20. PROMOCIONES
+// ------------------------------------------------------------
+
+model Promocion {
+  id               String         @id @default(uuid()) @db.Uuid
+  codigo           String         @unique @db.VarChar(50)
+  tipoDescuento    TipoDescuento
+  valorDescuento   Decimal        @db.Decimal(6, 2)
+  vigDesde         DateTime       @db.Timestamptz
+  vigHasta         DateTime       @db.Timestamptz
+  estado           Boolean        @default(true)
+  createdAt        DateTime       @default(now()) @db.Timestamptz
+  updatedAt        DateTime       @updatedAt @db.Timestamptz
+
+  habitaciones Habitacion[]
+
+  @@map("promociones")
 }
