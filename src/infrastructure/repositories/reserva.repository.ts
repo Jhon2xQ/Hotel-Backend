@@ -272,7 +272,8 @@ export class ReservaRepository implements IReservaRepository {
       const msPerHour = 1000 * 60 * 60;
       return Math.round(msDiff / msPerHour);
     }
+    // noches: diferencia en días + 1 (se cuentan las noches de inicio, intermedias y fin)
     const msPerDay = 1000 * 60 * 60 * 24;
-    return Math.round(msDiff / msPerDay);
+    return Math.round(msDiff / msPerDay) + 1;
   }
 }

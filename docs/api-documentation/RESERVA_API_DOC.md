@@ -79,7 +79,7 @@ GET /api/private/reservas?nombre=Garc&tipo=Doble&page=1&limit=10
         "nombre_canal": "Booking.com",
         "precio_tarifa": 150.0,
         "unidad_tarifa": "noches",
-        "cantidad_unidad": 2,
+        "cantidad_unidad": 3,
         "iva": 18.0,
         "cargo_servicios": 10.0,
         "monto_total": 420.0,
@@ -594,7 +594,7 @@ Los siguientes campos se sincronizan automáticamente desde las entidades relaci
 
 ### Cálculo de Montos
 
-- `cantidad_unidad` = diferencia en días entre `fecha_fin` y `fecha_inicio` (formato ISO 8601, ej: `2024-03-25T15:00:00Z`)
+- `cantidad_unidad` = si `unidad_tarifa` es "noches": diferencia en días entre `fecha_fin` y `fecha_inicio` + 1 (se cuentan las noches de inicio, intermedias y fin). Si es "horas": diferencia en horas exactas.
 - `subtotal` = `precio_tarifa` × `cantidad_unidad`
 - `monto_total` = `subtotal` × (1 + `iva`/100 + `cargo_servicios`/100)
 - Los campos `iva` y `cargo_servicios` se expresan como porcentajes (ej: 18.00 = 18%)
@@ -716,7 +716,7 @@ También se devuelve 409 cuando el intervalo de fechas entra en conflicto con un
 
 3. **Sincronización Automática**: Los campos snapshot se actualizan automáticamente cuando cambian las relaciones, no es necesario enviarlos en el request.
 
-4. **Cálculo Automático**: Los montos totales se calculan automáticamente basados en las fechas, precio de la tarifa, IVA y cargo de servicios. La fórmula es: `monto_total = (precio_tarifa × cantidad_unidad) × (1 + iva/100 + cargo_servicios/100)`.
+4. **Cálculo Automático**: Los montos totales se calculan automáticamente. Para "noches": `cantidad_unidad = (fecha_fin - fecha_inicio en días) + 1`. Para "horas": `cantidad_unidad = diferencia exacta en horas`. Fórmula: `monto_total = (precio_tarifa × cantidad_unidad) × (1 + iva/100 + cargo_servicios/100)`.
 
 5. **Validación de Solapamiento**: Al crear o actualizar una reserva, se verifica que el intervalo de fechas no entre en conflicto con reservas existentes (estado TENTATIVA, CONFIRMADA o EN_CASA) para la misma habitación.
 

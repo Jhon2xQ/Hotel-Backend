@@ -138,4 +138,29 @@ describe("CreateReservaUseCase", () => {
 
     await expect(useCase.execute(input)).rejects.toThrow(ReservaException);
   });
+
+  it("debe calcular correctamente la cantidad de unidades para noches (diferencia + 1)", async () => {
+    const mockReserva = createMockReserva();
+    let capturedData: any;
+
+    mockRepository.create = vi.fn(async (data) => {
+      capturedData = data;
+      return mockReserva;
+    });
+
+    const input: CreateReservaDto = {
+      huespedId: "huesped-id",
+      habitacionId: "habitacion-id",
+      tarifaId: "tarifa-id",
+      fechaInicio: new Date("2024-03-25"),
+      fechaFin: new Date("2024-03-27"),
+      adultos: 2,
+      ninos: 1,
+    };
+
+    await useCase.execute(input);
+
+    // 27 - 25 = 2 días de diferencia + 1 = 3 noches
+    expect(capturedData.cantidadUnidad).toBe(3);
+  });
 });
