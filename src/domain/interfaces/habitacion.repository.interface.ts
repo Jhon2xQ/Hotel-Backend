@@ -3,6 +3,10 @@ import type { EstadoReserva } from "../entities/reserva.entity";
 import type { Mueble } from "../entities/mueble.entity";
 import type { PaginatedResult, PaginationParams } from "../../application/paginations/api.pagination";
 
+export interface HabitacionConPromociones extends Habitacion {
+  promociones: string[];
+}
+
 export interface HabitacionPaginationParams extends PaginationParams {
   tipo?: string;
 }
@@ -36,7 +40,7 @@ export interface UpdateHabitacionStatusParams {
 export interface IHabitacionRepository {
   create(data: CreateHabitacionParams): Promise<Habitacion>;
   findAll(): Promise<Habitacion[]>;
-  findAllPaginated(params: HabitacionPaginationParams): Promise<PaginatedResult<Habitacion>>;
+  findAllPaginated(params: HabitacionPaginationParams): Promise<PaginatedResult<HabitacionConPromociones>>;
   findById(id: string): Promise<Habitacion | null>;
   findByIdWithMuebles(id: string): Promise<{ habitacion: Habitacion; muebles: Mueble[] } | null>;
   findByIdWithReservas(
@@ -60,5 +64,5 @@ export interface IHabitacionRepository {
   findByIdWithReservasAndMuebles(
     id: string,
     estadosReserva: EstadoReserva[],
-  ): Promise<{ habitacion: Habitacion; muebles: Mueble[]; reservas: Array<{ fechaInicio: Date; fechaFin: Date; estado: EstadoReserva }> } | null>;
+  ): Promise<{ habitacion: HabitacionConPromociones; muebles: Mueble[]; reservas: Array<{ fechaInicio: Date; fechaFin: Date; estado: EstadoReserva }> } | null>;
 }

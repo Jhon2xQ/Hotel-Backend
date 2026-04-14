@@ -17,7 +17,7 @@ export class FindHabitacionConFechasReservaUseCase {
     }
 
     return {
-      habitacion: toHabitacionWithMueblesDto(result.habitacion, result.muebles),
+      habitacion: toHabitacionWithMueblesDto(result.habitacion, result.muebles, result.habitacion.promociones),
       fechas_reserva: result.reservas.map((r) => ({
         fecha_inicio: r.fechaInicio.toISOString(),
         fecha_fin: r.fechaFin.toISOString(),
