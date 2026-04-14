@@ -1,12 +1,17 @@
 import { inject, injectable } from "tsyringe";
 import { PromocionException } from "../../../domain/exceptions/promocion.exception";
+import { HabitacionException } from "../../../domain/exceptions/habitacion.exception";
 import type { IPromocionRepository } from "../../../domain/interfaces/promocion.repository.interface";
+import type { IHabitacionRepository } from "../../../domain/interfaces/habitacion.repository.interface";
 import { UpdatePromocionDto, PromocionDto, toPromocionDto } from "../../dtos/promocion.dto";
 import { DI_TOKENS } from "../../../common/IoC/tokens";
 
 @injectable()
 export class UpdatePromocionUseCase {
-  constructor(@inject(DI_TOKENS.IPromocionRepository) private repository: IPromocionRepository) {}
+  constructor(
+    @inject(DI_TOKENS.IPromocionRepository) private repository: IPromocionRepository,
+    @inject(DI_TOKENS.IHabitacionRepository) private habitacionRepository: IHabitacionRepository,
+  ) {}
 
   async execute(id: string, input: UpdatePromocionDto): Promise<PromocionDto> {
     const existingPromocion = await this.repository.findById(id);
@@ -21,6 +26,15 @@ export class UpdatePromocionUseCase {
       }
     }
 
+    if (input.habitaciones && input.habitaciones.length > 0) {
+      for (const habitacionId of input.habitaciones) {
+        const habitacion = await this.habitacionRepository.findById(habitacionId);
+        if (!habitacion) {
+          throw HabitacionException.notFoundById();
+        }
+      }
+    }
+
     const promocion = await this.repository.update(id, {
       codigo: input.codigo,
       tipoDescuento: input.tipo_descuento,
@@ -28,9 +42,9 @@ export class UpdatePromocionUseCase {
       vigDesde: input.vig_desde,
       vigHasta: input.vig_hasta,
       estado: input.estado,
-      habitacionIds: input.habitacion_ids,
+      habitaciones: input.habitaciones,
     });
 
-    return toPromocionDto(promocion);
+    return toPromocionDto(promocion, promocion.habitaciones);
   }
 }

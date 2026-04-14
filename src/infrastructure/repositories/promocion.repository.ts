@@ -1,21 +1,36 @@
 import { inject, injectable } from "tsyringe";
 import { PrismaClient } from "../../../generated/prisma/client";
-import { Promocion } from "../../domain/entities/promocion.entity";
 import type {
   IPromocionRepository,
   CreatePromocionParams,
   UpdatePromocionParams,
-  PromocionPaginationParams,
+  PromocionWithHabitaciones,
 } from "../../domain/interfaces/promocion.repository.interface";
-import type { PaginatedResult } from "../../application/paginations/api.pagination";
-import { mapPromocionFromPrisma } from "../mappers/promocion.mapper";
 import { DI_TOKENS } from "../../common/IoC/tokens";
+
+function mapPromocionWithHabitaciones(data: Record<string, unknown>): PromocionWithHabitaciones {
+  const habitacionesRaw = data.habitaciones as Array<Record<string, unknown>> | undefined;
+  const habitaciones = (habitacionesRaw ?? []).map((h) => h.id as string);
+
+  return {
+    id: data.id as string,
+    codigo: data.codigo as string,
+    tipoDescuento: data.tipoDescuento as string,
+    valorDescuento: Number(data.valorDescuento),
+    vigDesde: data.vigDesde as Date,
+    vigHasta: data.vigHasta as Date,
+    estado: data.estado as boolean,
+    createdAt: data.createdAt as Date,
+    updatedAt: data.updatedAt as Date,
+    habitaciones,
+  };
+}
 
 @injectable()
 export class PromocionRepository implements IPromocionRepository {
   constructor(@inject(DI_TOKENS.PrismaClient) private readonly prisma: PrismaClient) {}
 
-  async create(data: CreatePromocionParams): Promise<Promocion> {
+  async create(data: CreatePromocionParams): Promise<PromocionWithHabitaciones> {
     const result = await this.prisma.promocion.create({
       data: {
         codigo: data.codigo,
@@ -24,53 +39,40 @@ export class PromocionRepository implements IPromocionRepository {
         vigDesde: data.vigDesde,
         vigHasta: data.vigHasta,
         estado: data.estado ?? true,
-        habitaciones: data.habitacionIds
-          ? { connect: data.habitacionIds.map((id) => ({ id })) }
+        habitaciones: data.habitaciones
+          ? { connect: data.habitaciones.map((id) => ({ id })) }
           : undefined,
       },
+      include: { habitaciones: { select: { id: true } } },
     });
-    return mapPromocionFromPrisma(result);
+    return mapPromocionWithHabitaciones(result as unknown as Record<string, unknown>);
   }
 
-  async findAll(params: PromocionPaginationParams): Promise<PaginatedResult<Promocion>> {
-    const { page, limit } = params;
-    const skip = (page - 1) * limit;
-
-    const [promociones, total] = await Promise.all([
-      this.prisma.promocion.findMany({
-        take: limit,
-        skip,
-        orderBy: { createdAt: "desc" },
-      }),
-      this.prisma.promocion.count(),
-    ]);
-
-    const totalPages = Math.ceil(total / limit);
-
-    return {
-      list: promociones.map((p) => mapPromocionFromPrisma(p)),
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages,
-        hasNextPage: page < totalPages,
-        hasPreviousPage: page > 1,
-      },
-    };
+  async findAll(): Promise<PromocionWithHabitaciones[]> {
+    const results = await this.prisma.promocion.findMany({
+      include: { habitaciones: { select: { id: true } } },
+      orderBy: { createdAt: "desc" },
+    });
+    return results.map((r) => mapPromocionWithHabitaciones(r as unknown as Record<string, unknown>));
   }
 
-  async findById(id: string): Promise<Promocion | null> {
-    const result = await this.prisma.promocion.findUnique({ where: { id } });
-    return result ? mapPromocionFromPrisma(result) : null;
+  async findById(id: string): Promise<PromocionWithHabitaciones | null> {
+    const result = await this.prisma.promocion.findUnique({
+      where: { id },
+      include: { habitaciones: { select: { id: true } } },
+    });
+    return result ? mapPromocionWithHabitaciones(result as unknown as Record<string, unknown>) : null;
   }
 
-  async findByCodigo(codigo: string): Promise<Promocion | null> {
-    const result = await this.prisma.promocion.findUnique({ where: { codigo } });
-    return result ? mapPromocionFromPrisma(result) : null;
+  async findByCodigo(codigo: string): Promise<PromocionWithHabitaciones | null> {
+    const result = await this.prisma.promocion.findUnique({
+      where: { codigo },
+      include: { habitaciones: { select: { id: true } } },
+    });
+    return result ? mapPromocionWithHabitaciones(result as unknown as Record<string, unknown>) : null;
   }
 
-  async update(id: string, data: UpdatePromocionParams): Promise<Promocion> {
+  async update(id: string, data: UpdatePromocionParams): Promise<PromocionWithHabitaciones> {
     const updateData: Record<string, unknown> = {};
     if (data.codigo !== undefined) updateData.codigo = data.codigo;
     if (data.tipoDescuento !== undefined) updateData.tipoDescuento = data.tipoDescuento;
@@ -79,17 +81,18 @@ export class PromocionRepository implements IPromocionRepository {
     if (data.vigHasta !== undefined) updateData.vigHasta = data.vigHasta;
     if (data.estado !== undefined) updateData.estado = data.estado;
 
-    if (data.habitacionIds !== undefined) {
+    if (data.habitaciones !== undefined) {
       updateData.habitaciones = {
-        set: data.habitacionIds.map((hid) => ({ id: hid })),
+        set: data.habitaciones.map((hid) => ({ id: hid })),
       };
     }
 
     const result = await this.prisma.promocion.update({
       where: { id },
       data: updateData,
+      include: { habitaciones: { select: { id: true } } },
     });
-    return mapPromocionFromPrisma(result);
+    return mapPromocionWithHabitaciones(result as unknown as Record<string, unknown>);
   }
 
   async delete(id: string): Promise<void> {

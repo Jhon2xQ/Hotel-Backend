@@ -7,7 +7,7 @@ export interface CreatePromocionDto {
   vig_desde: Date;
   vig_hasta: Date;
   estado?: boolean;
-  habitacion_ids?: string[];
+  habitaciones?: string[];
 }
 
 export interface UpdatePromocionDto {
@@ -17,7 +17,7 @@ export interface UpdatePromocionDto {
   vig_desde?: Date;
   vig_hasta?: Date;
   estado?: boolean;
-  habitacion_ids?: string[];
+  habitaciones?: string[];
 }
 
 export interface PromocionDto {
@@ -28,11 +28,12 @@ export interface PromocionDto {
   vig_desde: string;
   vig_hasta: string;
   estado: boolean;
+  habitaciones: string[];
   created_at: string;
   updated_at: string;
 }
 
-export function toPromocionDto(p: Promocion): PromocionDto {
+export function toPromocionDto(p: Promocion, habitaciones: string[] = []): PromocionDto {
   return {
     id: p.id,
     codigo: p.codigo,
@@ -41,6 +42,7 @@ export function toPromocionDto(p: Promocion): PromocionDto {
     vig_desde: p.vigDesde.toISOString(),
     vig_hasta: p.vigHasta.toISOString(),
     estado: p.estado,
+    habitaciones,
     created_at: p.createdAt.toISOString(),
     updated_at: p.updatedAt.toISOString(),
   };

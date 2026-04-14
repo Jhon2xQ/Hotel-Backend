@@ -25,9 +25,8 @@ export class PromocionController {
   }
 
   async list(c: AppContext) {
-    const validData = c.get("validData") as { page: number; limit: number };
-    const result = await this.listUseCase.execute(validData);
-    return c.json(ApiResponse.success("Promociones obtenidas exitosamente", result), 200);
+    const results = await this.listUseCase.execute();
+    return c.json(ApiResponse.success("Promociones obtenidas exitosamente", results), 200);
   }
 
   async findById(c: AppContext) {

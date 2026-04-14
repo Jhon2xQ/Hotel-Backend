@@ -18,7 +18,7 @@ export const CreatePromocionSchema = z
     vig_desde: z.string().datetime("Fecha de inicio inválida").or(z.string().date("Fecha de inicio inválida")),
     vig_hasta: z.string().datetime("Fecha de fin inválida").or(z.string().date("Fecha de fin inválida")),
     estado: z.boolean().optional(),
-    habitacion_ids: z.array(z.uuid("ID de habitación inválido")).optional(),
+    habitaciones: z.array(z.uuid("ID de habitación inválido")).optional(),
   })
   .refine((data) => new Date(data.vig_hasta) > new Date(data.vig_desde), {
     message: "La fecha de fin debe ser posterior a la fecha de inicio",
@@ -40,7 +40,7 @@ export const UpdatePromocionSchema = z
     vig_desde: z.string().datetime("Fecha de inicio inválida").or(z.string().date("Fecha de inicio inválida")).optional(),
     vig_hasta: z.string().datetime("Fecha de fin inválida").or(z.string().date("Fecha de fin inválida")).optional(),
     estado: z.boolean().optional(),
-    habitacion_ids: z.array(z.uuid("ID de habitación inválido")).optional(),
+    habitaciones: z.array(z.uuid("ID de habitación inválido")).optional(),
   })
   .refine(
     (data) => {

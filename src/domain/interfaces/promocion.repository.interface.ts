@@ -1,7 +1,4 @@
 import type { Promocion } from "../entities/promocion.entity";
-import type { PaginatedResult, PaginationParams } from "../../application/paginations/api.pagination";
-
-export interface PromocionPaginationParams extends PaginationParams {}
 
 export interface CreatePromocionParams {
   codigo: string;
@@ -10,7 +7,7 @@ export interface CreatePromocionParams {
   vigDesde: Date;
   vigHasta: Date;
   estado?: boolean;
-  habitacionIds?: string[];
+  habitaciones?: string[];
 }
 
 export interface UpdatePromocionParams {
@@ -20,14 +17,27 @@ export interface UpdatePromocionParams {
   vigDesde?: Date;
   vigHasta?: Date;
   estado?: boolean;
-  habitacionIds?: string[];
+  habitaciones?: string[];
+}
+
+export interface PromocionWithHabitaciones {
+  id: string;
+  codigo: string;
+  tipoDescuento: string;
+  valorDescuento: number;
+  vigDesde: Date;
+  vigHasta: Date;
+  estado: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  habitaciones: string[];
 }
 
 export interface IPromocionRepository {
-  create(data: CreatePromocionParams): Promise<Promocion>;
-  findAll(params: PromocionPaginationParams): Promise<PaginatedResult<Promocion>>;
-  findById(id: string): Promise<Promocion | null>;
+  create(data: CreatePromocionParams): Promise<PromocionWithHabitaciones>;
+  findAll(): Promise<PromocionWithHabitaciones[]>;
+  findById(id: string): Promise<PromocionWithHabitaciones | null>;
   findByCodigo(codigo: string): Promise<Promocion | null>;
-  update(id: string, data: UpdatePromocionParams): Promise<Promocion>;
+  update(id: string, data: UpdatePromocionParams): Promise<PromocionWithHabitaciones>;
   delete(id: string): Promise<void>;
 }

@@ -14,6 +14,6 @@ export class FindPromocionByIdUseCase {
       throw PromocionException.notFoundById();
     }
 
-    return toPromocionDto(promocion);
+    return toPromocionDto(promocion, promocion.habitaciones);
   }
 }
