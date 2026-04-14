@@ -69,8 +69,8 @@ GET /api/private/reservas?nombre=Garc&tipo=Doble&page=1&limit=10
         "habitacionId": "uuid",
         "tarifaId": "uuid",
         "pagoId": null,
-        "fecha_inicio": "2024-03-25",
-        "fecha_fin": "2024-03-27",
+        "fecha_inicio": "2024-03-25T00:00:00.000Z",
+        "fecha_fin": "2024-03-27T00:00:00.000Z",
         "adultos": 2,
         "ninos": 1,
         "nombre_huesped": "Juan Pérez",
@@ -143,8 +143,8 @@ Obtiene una reserva específica por su ID.
     "habitacionId": "uuid",
     "tarifaId": "uuid",
     "pagoId": null,
-    "fecha_inicio": "2024-03-25",
-    "fecha_fin": "2024-03-27",
+    "fecha_inicio": "2024-03-25T00:00:00.000Z",
+    "fecha_fin": "2024-03-27T00:00:00.000Z",
     "adultos": 2,
     "ninos": 1,
     "nombre_huesped": "Juan Pérez",
@@ -153,7 +153,7 @@ Obtiene una reserva específica por su ID.
     "nombre_canal": "Booking.com",
     "precio_tarifa": 150.0,
     "unidad_tarifa": "noches",
-    "cantidad_unidad": 2,
+    "cantidad_unidad": 3,
     "iva": 18.0,
     "cargo_servicios": 10.0,
     "monto_total": 420.0,
@@ -195,8 +195,8 @@ Crea una nueva reserva. El código de reserva se genera automáticamente en form
   "huespedId": "uuid",
   "habitacionId": "uuid",
   "tarifaId": "uuid",
-  "fechaInicio": "2024-03-25",
-  "fechaFin": "2024-03-27",
+  "fechaInicio": "2024-03-25T15:00:00Z",
+  "fechaFin": "2024-03-27T12:00:00Z",
   "adultos": 2,
   "ninos": 1
 }
@@ -207,8 +207,8 @@ Crea una nueva reserva. El código de reserva se genera automáticamente en form
 - `huespedId`: Requerido, UUID válido, debe existir
 - `habitacionId`: Requerido, UUID válido, debe existir
 - `tarifaId`: Requerido, UUID válido, debe existir
-- `fechaInicio`: Requerida, formato date (YYYY-MM-DD)
-- `fechaFin`: Requerida, formato date (YYYY-MM-DD), debe ser posterior a fechaInicio
+- `fechaInicio`: Requerida, formato ISO 8601 (`YYYY-MM-DDTHH:mm:ssZ`)
+- `fechaFin`: Requerida, formato ISO 8601, debe ser posterior a fechaInicio
 - `adultos`: Requerido, mínimo 1
 - `ninos`: Opcional, mínimo 0, default 0
 - No puede haber solapamiento de fechas con reservas existentes (TENTATIVA, CONFIRMADA, EN_CASA) en la misma habitación
@@ -266,8 +266,8 @@ Actualiza una reserva existente. Cualquier usuario autenticado puede actualizar 
   "habitacionId": "uuid",
   "tarifaId": "uuid",
   "pagoId": "uuid",
-  "fechaInicio": "2024-03-25",
-  "fechaFin": "2024-03-27",
+  "fechaInicio": "2024-03-25T15:00:00Z",
+  "fechaFin": "2024-03-27T12:00:00Z",
   "adultos": 2,
   "ninos": 1,
   "estado": "CONFIRMADA"
