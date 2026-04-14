@@ -14,6 +14,7 @@ import { createReservaRoutes } from "./routes/reserva.routes";
 import { createEstanciaRoutes } from "./routes/estancia.routes";
 import { createMuebleRoutes } from "./routes/mueble.routes";
 import { createCategoriaMuebleRoutes } from "./routes/categoria-mueble.routes";
+import { createPromocionRoutes } from "./routes/promocion.routes";
 import { errorHandler } from "./presentation/middlewares/exception.middleware";
 import { authMiddleware } from "./presentation/middlewares/auth.middleware";
 
@@ -47,6 +48,7 @@ privateApi.route("/estancias", createEstanciaRoutes());
 privateApi.route("/pagos", createPagoRoutes());
 privateApi.route("/canales", createCanalRoutes());
 privateApi.route("/tarifas", createTarifaRoutes());
+privateApi.route("/promociones", createPromocionRoutes());
 
 app.route("/api/public", publicApi);
 app.route("/api/private", privateApi);
