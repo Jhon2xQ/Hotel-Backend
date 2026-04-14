@@ -73,6 +73,7 @@ Obtiene la lista paginada de habitaciones del hotel, con opción de filtrar por 
         "url_imagen": ["https://example.com/rooms/101-1.jpg", "https://example.com/rooms/101-2.jpg"],
         "estado": true,
         "descripcion": "Suite con balcón privado",
+        "promociones": ["promo-uuid-1"],
         "created_at": "2026-03-15T10:00:00.000Z",
         "updated_at": "2026-03-17T08:00:00.000Z"
       },
@@ -90,6 +91,7 @@ Obtiene la lista paginada de habitaciones del hotel, con opción de filtrar por 
         "url_imagen": null,
         "estado": false,
         "descripcion": null,
+        "promociones": [],
         "created_at": "2026-03-15T10:05:00.000Z",
         "updated_at": "2026-03-17T14:30:00.000Z"
       }
@@ -163,6 +165,7 @@ Valores válidos para `tipo_reserva`: `TENTATIVA`, `CONFIRMADA`, `EN_CASA`, `COM
       "url_imagen": ["https://example.com/rooms/101-1.jpg", "https://example.com/rooms/101-2.jpg"],
       "estado": true,
       "descripcion": "Suite con balcón privado",
+      "promociones": ["promo-uuid-1", "promo-uuid-2"],
       "muebles": [
         {
           "id": "mueble-uuid-1",

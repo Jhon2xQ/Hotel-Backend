@@ -49,6 +49,7 @@ export interface HabitacionDto {
   url_imagen: string[] | null;
   estado: boolean;
   descripcion: string | null;
+  promociones: string[];
   created_at: string;
   updated_at: string;
 }
@@ -94,7 +95,7 @@ export interface PublicHabitacionWithMueblesDto extends PublicHabitacionDto {
   muebles: PublicMuebleDto[];
 }
 
-export function toHabitacionDto(h: Habitacion, muebles: Mueble[] = []): HabitacionDto {
+export function toHabitacionDto(h: Habitacion, muebles: Mueble[] = [], promociones: string[] = []): HabitacionDto {
   return {
     id: h.id,
     nro_habitacion: h.nroHabitacion,
@@ -105,14 +106,15 @@ export function toHabitacionDto(h: Habitacion, muebles: Mueble[] = []): Habitaci
     url_imagen: h.urlImagen,
     estado: h.estado,
     descripcion: h.descripcion,
+    promociones,
     created_at: h.createdAt.toISOString(),
     updated_at: h.updatedAt.toISOString(),
   };
 }
 
-export function toHabitacionWithMueblesDto(h: Habitacion, muebles: Mueble[]): HabitacionWithMueblesDto {
+export function toHabitacionWithMueblesDto(h: Habitacion, muebles: Mueble[], promociones: string[] = []): HabitacionWithMueblesDto {
   return {
-    ...toHabitacionDto(h, muebles),
+    ...toHabitacionDto(h, muebles, promociones),
     muebles: muebles.map(toMuebleDto),
   };
 }

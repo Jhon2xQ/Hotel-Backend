@@ -14,6 +14,7 @@ import type { PaginatedResult } from "../../application/paginations/api.paginati
 import { mapHabitacionFromPrisma } from "../mappers/habitacion.mapper";
 import { mapMuebleFromPrisma } from "../mappers/mueble.mapper";
 import { DI_TOKENS } from "../../common/IoC/tokens";
+import type { HabitacionConPromociones } from "../../domain/interfaces/habitacion.repository.interface";
 
 @injectable()
 export class HabitacionRepository implements IHabitacionRepository {
@@ -44,7 +45,7 @@ export class HabitacionRepository implements IHabitacionRepository {
     return results.map((r) => mapHabitacionFromPrisma(r));
   }
 
-  async findAllPaginated(params: HabitacionPaginationParams): Promise<PaginatedResult<Habitacion>> {
+  async findAllPaginated(params: HabitacionPaginationParams): Promise<PaginatedResult<HabitacionConPromociones>> {
     const { page, limit, tipo } = params;
     const skip = (page - 1) * limit;
 
@@ -56,7 +57,7 @@ export class HabitacionRepository implements IHabitacionRepository {
     const [habitaciones, total] = await Promise.all([
       this.prisma.habitacion.findMany({
         where,
-        include: { tipo: true },
+        include: { tipo: true, promociones: { select: { id: true } } },
         take: limit,
         skip,
         orderBy: { nroHabitacion: "asc" },
@@ -66,7 +67,12 @@ export class HabitacionRepository implements IHabitacionRepository {
 
     const totalPages = Math.ceil(total / limit);
     return {
-      list: habitaciones.map((h) => mapHabitacionFromPrisma(h)),
+      list: habitaciones.map((h) => {
+        const entity = mapHabitacionFromPrisma(h);
+        return Object.assign(entity, {
+          promociones: (h.promociones as Array<{ id: string }>).map((p) => p.id),
+        });
+      }),
       pagination: {
         page,
         limit,
@@ -131,12 +137,13 @@ export class HabitacionRepository implements IHabitacionRepository {
   async findByIdWithReservasAndMuebles(
     id: string,
     estadosReserva: EstadoReserva[],
-  ): Promise<{ habitacion: Habitacion; muebles: Mueble[]; reservas: Array<{ fechaInicio: Date; fechaFin: Date; estado: EstadoReserva }> } | null> {
+  ): Promise<{ habitacion: HabitacionConPromociones; muebles: Mueble[]; reservas: Array<{ fechaInicio: Date; fechaFin: Date; estado: EstadoReserva }> } | null> {
     const result = await this.prisma.habitacion.findUnique({
       where: { id },
       include: {
         tipo: true,
         muebles: { include: { categoria: true } },
+        promociones: { select: { id: true } },
         reservas: {
           where: { estado: { in: estadosReserva } },
           select: { fechaInicio: true, fechaFin: true, estado: true },
@@ -148,8 +155,13 @@ export class HabitacionRepository implements IHabitacionRepository {
     if (!result) return null;
 
     const muebles = result.muebles.map((m) => mapMuebleFromPrisma(m));
+    const habitacion = mapHabitacionFromPrisma(result);
+    const habitacionConPromociones = Object.assign(habitacion, {
+      promociones: (result.promociones as Array<{ id: string }>).map((p) => p.id),
+    });
+
     return {
-      habitacion: mapHabitacionFromPrisma(result),
+      habitacion: habitacionConPromociones,
       muebles,
       reservas: result.reservas.map((r) => ({
         fechaInicio: r.fechaInicio,
