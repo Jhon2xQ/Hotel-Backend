@@ -46,8 +46,9 @@ export interface ReservaDto {
   nro_habitacion: string;
   nombre_tipo_hab: string;
   nombre_canal: string;
-  precio_noche: number;
-  cantidad_noches: number;
+  precio_tarifa: number;
+  unidad_tarifa: string;
+  cantidad_unidad: number;
   iva: number;
   cargo_servicios: number;
   monto_total: number;
@@ -66,16 +67,17 @@ export function toReservaDto(r: Reserva): ReservaDto {
     habitacionId: r.habitacionId,
     tarifaId: r.tarifaId,
     pagoId: r.pagoId,
-    fecha_inicio: r.fechaInicio.toISOString().slice(0, 10),
-    fecha_fin: r.fechaFin.toISOString().slice(0, 10),
+    fecha_inicio: r.fechaInicio.toISOString(),
+    fecha_fin: r.fechaFin.toISOString(),
     adultos: r.adultos,
     ninos: r.ninos,
     nombre_huesped: r.nombreHuesped,
     nro_habitacion: r.nroHabitacion,
     nombre_tipo_hab: r.nombreTipoHab,
     nombre_canal: r.nombreCanal,
-    precio_noche: r.precioNoche,
-    cantidad_noches: r.cantidadNoches,
+    precio_tarifa: r.precioTarifa,
+    unidad_tarifa: r.unidadTarifa,
+    cantidad_unidad: r.cantidadUnidad,
     iva: r.IVA,
     cargo_servicios: r.cargoServicios,
     monto_total: r.montoTotal,

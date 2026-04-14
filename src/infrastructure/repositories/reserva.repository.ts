@@ -30,8 +30,9 @@ export class ReservaRepository implements IReservaRepository {
         nroHabitacion: data.nroHabitacion,
         nombreTipoHab: data.nombreTipoHab,
         nombreCanal: data.nombreCanal,
-        precioNoche: data.precioNoche,
-        cantidadNoches: data.cantidadNoches,
+        precioTarifa: data.precioTarifa,
+        unidadTarifa: data.unidadTarifa,
+        cantidadUnidad: data.cantidadUnidad,
         IVA: data.IVA,
         cargoServicios: data.cargoServicios,
         montoTotal: data.montoTotal,
@@ -162,7 +163,8 @@ export class ReservaRepository implements IReservaRepository {
         nroHabitacion: snapshotData.nroHabitacion,
         nombreTipoHab: snapshotData.nombreTipoHab,
         nombreCanal: snapshotData.nombreCanal,
-        precioNoche: snapshotData.precioNoche,
+        precioTarifa: snapshotData.precioTarifa,
+        unidadTarifa: snapshotData.unidadTarifa,
         IVA: snapshotData.IVA,
         cargoServicios: snapshotData.cargoServicios,
       });
@@ -180,15 +182,16 @@ export class ReservaRepository implements IReservaRepository {
     if (data.fechaInicio || data.fechaFin || data.tarifaId) {
       const fechaInicio = data.fechaInicio || existing.fechaInicio;
       const fechaFin = data.fechaFin || existing.fechaFin;
-      const precioNoche = (updateData.precioNoche as number) || Number(existing.precioNoche);
+      const precioTarifa = (updateData.precioTarifa as number) || Number(existing.precioTarifa);
+      const unidadTarifa = (updateData.unidadTarifa as string) || existing.unidadTarifa;
       const IVA = (updateData.IVA as number) || Number(existing.IVA);
       const cargoServicios = (updateData.cargoServicios as number) || Number(existing.cargoServicios);
 
-      const nights = this.calculateNights(fechaInicio, fechaFin);
-      const subtotalNoches = precioNoche * nights;
-      const montoTotal = subtotalNoches * (1 + IVA / 100 + cargoServicios / 100);
+      const units = this.calculateUnits(fechaInicio, fechaFin, unidadTarifa);
+      const subtotalUnidades = precioTarifa * units;
+      const montoTotal = subtotalUnidades * (1 + IVA / 100 + cargoServicios / 100);
 
-      updateData.cantidadNoches = nights;
+      updateData.cantidadUnidad = units;
       updateData.montoTotal = Math.round(montoTotal * 100) / 100;
     }
 
@@ -228,7 +231,8 @@ export class ReservaRepository implements IReservaRepository {
     nroHabitacion: string;
     nombreTipoHab: string;
     nombreCanal: string;
-    precioNoche: number;
+    precioTarifa: number;
+    unidadTarifa: string;
     IVA: number;
     cargoServicios: number;
   } | null> {
@@ -255,14 +259,21 @@ export class ReservaRepository implements IReservaRepository {
       nroHabitacion: habitacion.nroHabitacion,
       nombreTipoHab: tarifa.tipoHabitacion.nombre,
       nombreCanal: tarifa.canal.nombre,
-      precioNoche: Number(tarifa.precio),
+      precioTarifa: Number(tarifa.precio),
+      unidadTarifa: tarifa.unidad,
       IVA: Number(tarifa.IVA || 0),
       cargoServicios: Number(tarifa.cargoServicios || 0),
     };
   }
 
-  private calculateNights(fechaInicio: Date, fechaFin: Date): number {
+  private calculateUnits(fechaInicio: Date, fechaFin: Date, unidad: string): number {
+    const msDiff = fechaFin.getTime() - fechaInicio.getTime();
+    if (unidad === "horas") {
+      const msPerHour = 1000 * 60 * 60;
+      return Math.round(msDiff / msPerHour);
+    }
+    // noches: diferencia en días + 1 (se cuentan las noches de inicio, intermedias y fin)
     const msPerDay = 1000 * 60 * 60 * 24;
-    return Math.round((fechaFin.getTime() - fechaInicio.getTime()) / msPerDay);
+    return Math.round(msDiff / msPerDay) + 1;
   }
 }

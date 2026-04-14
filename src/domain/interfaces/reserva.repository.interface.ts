@@ -14,8 +14,9 @@ export interface CreateReservaPersistParams {
   nroHabitacion: string;
   nombreTipoHab: string;
   nombreCanal: string;
-  precioNoche: number;
-  cantidadNoches: number;
+  precioTarifa: number;
+  unidadTarifa: string;
+  cantidadUnidad: number;
   IVA: number;
   cargoServicios: number;
   montoTotal: number;

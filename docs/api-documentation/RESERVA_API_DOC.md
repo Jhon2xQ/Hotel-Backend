@@ -69,16 +69,17 @@ GET /api/private/reservas?nombre=Garc&tipo=Doble&page=1&limit=10
         "habitacionId": "uuid",
         "tarifaId": "uuid",
         "pagoId": null,
-        "fecha_inicio": "2024-03-25",
-        "fecha_fin": "2024-03-27",
+        "fecha_inicio": "2024-03-25T00:00:00.000Z",
+        "fecha_fin": "2024-03-27T00:00:00.000Z",
         "adultos": 2,
         "ninos": 1,
         "nombre_huesped": "Juan Pérez",
         "nro_habitacion": "101",
         "nombre_tipo_hab": "Suite Deluxe",
         "nombre_canal": "Booking.com",
-        "precio_noche": 150.0,
-        "cantidad_noches": 2,
+        "precio_tarifa": 150.0,
+        "unidad_tarifa": "noches",
+        "cantidad_unidad": 3,
         "iva": 18.0,
         "cargo_servicios": 10.0,
         "monto_total": 420.0,
@@ -142,16 +143,17 @@ Obtiene una reserva específica por su ID.
     "habitacionId": "uuid",
     "tarifaId": "uuid",
     "pagoId": null,
-    "fecha_inicio": "2024-03-25",
-    "fecha_fin": "2024-03-27",
+    "fecha_inicio": "2024-03-25T00:00:00.000Z",
+    "fecha_fin": "2024-03-27T00:00:00.000Z",
     "adultos": 2,
     "ninos": 1,
     "nombre_huesped": "Juan Pérez",
     "nro_habitacion": "101",
     "nombre_tipo_hab": "Suite Deluxe",
     "nombre_canal": "Booking.com",
-    "precio_noche": 150.0,
-    "cantidad_noches": 2,
+    "precio_tarifa": 150.0,
+    "unidad_tarifa": "noches",
+    "cantidad_unidad": 3,
     "iva": 18.0,
     "cargo_servicios": 10.0,
     "monto_total": 420.0,
@@ -193,8 +195,8 @@ Crea una nueva reserva. El código de reserva se genera automáticamente en form
   "huespedId": "uuid",
   "habitacionId": "uuid",
   "tarifaId": "uuid",
-  "fechaInicio": "2024-03-25",
-  "fechaFin": "2024-03-27",
+  "fechaInicio": "2024-03-25T15:00:00Z",
+  "fechaFin": "2024-03-27T12:00:00Z",
   "adultos": 2,
   "ninos": 1
 }
@@ -205,8 +207,8 @@ Crea una nueva reserva. El código de reserva se genera automáticamente en form
 - `huespedId`: Requerido, UUID válido, debe existir
 - `habitacionId`: Requerido, UUID válido, debe existir
 - `tarifaId`: Requerido, UUID válido, debe existir
-- `fechaInicio`: Requerida, formato date (YYYY-MM-DD)
-- `fechaFin`: Requerida, formato date (YYYY-MM-DD), debe ser posterior a fechaInicio
+- `fechaInicio`: Requerida, formato ISO 8601 (`YYYY-MM-DDTHH:mm:ssZ`)
+- `fechaFin`: Requerida, formato ISO 8601, debe ser posterior a fechaInicio
 - `adultos`: Requerido, mínimo 1
 - `ninos`: Opcional, mínimo 0, default 0
 - No puede haber solapamiento de fechas con reservas existentes (TENTATIVA, CONFIRMADA, EN_CASA) en la misma habitación
@@ -264,8 +266,8 @@ Actualiza una reserva existente. Cualquier usuario autenticado puede actualizar 
   "habitacionId": "uuid",
   "tarifaId": "uuid",
   "pagoId": "uuid",
-  "fechaInicio": "2024-03-25",
-  "fechaFin": "2024-03-27",
+  "fechaInicio": "2024-03-25T15:00:00Z",
+  "fechaFin": "2024-03-27T12:00:00Z",
   "adultos": 2,
   "ninos": 1,
   "estado": "CONFIRMADA"
@@ -573,7 +575,8 @@ Los siguientes campos se sincronizan automáticamente desde las entidades relaci
 - `nro_habitacion`: Desde `habitacion.nroHabitacion`
 - `nombre_tipo_hab`: Desde `tarifa.tipoHabitacion.nombre`
 - `nombre_canal`: Desde `tarifa.canal.nombre`
-- `precio_noche`: Desde `tarifa.precioNoche`
+- `precio_tarifa`: Desde `tarifa.precio`
+- `unidad_tarifa`: Desde `tarifa.unidad`
 - `iva`: Desde `tarifa.IVA`
 - `cargo_servicios`: Desde `tarifa.cargoServicios`
 
@@ -591,8 +594,8 @@ Los siguientes campos se sincronizan automáticamente desde las entidades relaci
 
 ### Cálculo de Montos
 
-- `cantidad_noches` = diferencia en días entre `fecha_fin` y `fecha_inicio`
-- `subtotal` = `precio_noche` × `cantidad_noches`
+- `cantidad_unidad` = si `unidad_tarifa` es "noches": diferencia en días entre `fecha_fin` y `fecha_inicio` + 1 (se cuentan las noches de inicio, intermedias y fin). Si es "horas": diferencia en horas exactas.
+- `subtotal` = `precio_tarifa` × `cantidad_unidad`
 - `monto_total` = `subtotal` × (1 + `iva`/100 + `cargo_servicios`/100)
 - Los campos `iva` y `cargo_servicios` se expresan como porcentajes (ej: 18.00 = 18%)
 
@@ -713,7 +716,7 @@ También se devuelve 409 cuando el intervalo de fechas entra en conflicto con un
 
 3. **Sincronización Automática**: Los campos snapshot se actualizan automáticamente cuando cambian las relaciones, no es necesario enviarlos en el request.
 
-4. **Cálculo Automático**: Los montos totales se calculan automáticamente basados en las fechas, precio de la tarifa, IVA y cargo de servicios. La fórmula es: `monto_total = (precio_noche × cantidad_noches) × (1 + iva/100 + cargo_servicios/100)`.
+4. **Cálculo Automático**: Los montos totales se calculan automáticamente. Para "noches": `cantidad_unidad = (fecha_fin - fecha_inicio en días) + 1`. Para "horas": `cantidad_unidad = diferencia exacta en horas`. Fórmula: `monto_total = (precio_tarifa × cantidad_unidad) × (1 + iva/100 + cargo_servicios/100)`.
 
 5. **Validación de Solapamiento**: Al crear o actualizar una reserva, se verifica que el intervalo de fechas no entre en conflicto con reservas existentes (estado TENTATIVA, CONFIRMADA o EN_CASA) para la misma habitación.
 

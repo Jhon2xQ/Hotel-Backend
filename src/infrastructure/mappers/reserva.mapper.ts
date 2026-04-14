@@ -15,8 +15,9 @@ export type ReservaPrismaRow = {
   nroHabitacion: string;
   nombreTipoHab: string;
   nombreCanal: string;
-  precioNoche: unknown;
-  cantidadNoches: number;
+  precioTarifa: unknown;
+  unidadTarifa: string;
+  cantidadUnidad: number;
   IVA: unknown;
   cargoServicios: unknown;
   montoTotal: unknown;
@@ -43,8 +44,9 @@ export function mapReservaFromPrisma(data: ReservaPrismaRow): Reserva {
     data.nroHabitacion,
     data.nombreTipoHab,
     data.nombreCanal,
-    Number(data.precioNoche),
-    data.cantidadNoches,
+    Number(data.precioTarifa),
+    data.unidadTarifa,
+    data.cantidadUnidad,
     Number(data.IVA),
     Number(data.cargoServicios),
     Number(data.montoTotal),
