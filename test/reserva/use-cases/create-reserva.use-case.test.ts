@@ -226,9 +226,9 @@ describe("CreateReservaUseCase", () => {
     await useCase.execute(input);
 
     // precioTarifa: 150, unidades: 3, subtotal: 450
+    // subtotalConImpuestos: 450 * 1.18 = 531
     // descuento: 450 * 10% = 45
-    // montoConDescuento: 450 - 45 = 405
-    // montoTotal: 405 * 1.18 = 477.9
+    // montoTotal: 531 - 45 = 486
     expect(capturedData.montoDescuento).toBe(45);
     expect(capturedData.promociones).toContain("PROMO-10");
   });
@@ -270,9 +270,9 @@ describe("CreateReservaUseCase", () => {
     await useCase.execute(input);
 
     // precioTarifa: 150, unidades: 3, subtotal: 450
+    // subtotalConImpuestos: 450 * 1.18 = 531
     // descuento: 50
-    // montoConDescuento: 450 - 50 = 400
-    // montoTotal: 400 * 1.18 = 472
+    // montoTotal: 531 - 50 = 481
     expect(capturedData.montoDescuento).toBe(50);
     expect(capturedData.promociones).toContain("PROMO-50");
   });

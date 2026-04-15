@@ -603,19 +603,39 @@ Los siguientes campos se sincronizan automáticamente desde las entidades relaci
 
 - `cantidad_unidad` = si `unidad_tarifa` es "noches": diferencia en días entre `fecha_fin` y `fecha_inicio` + 1 (se cuentan las noches de inicio, intermedias y fin). Si es "horas": diferencia en horas exactas.
 - `subtotal` = `precio_tarifa` × `cantidad_unidad`
-- **Descuentos por Promociones**: Si se envían IDs de promociones en la creación, se calculan los descuentos activos y vigentes:
+- `subtotal_con_impuestos` = `subtotal` × (1 + `iva`/100 + `cargo_servicios`/100)
+- **Descuentos por Promociones**: Si se envían IDs de promociones en la creación, se calculan los descuentos:
   - `PORCENTAJE`: descuento = `subtotal` × (`valor_descuento` / 100)
   - `MONTO_FIJO`: descuento = `valor_descuento`
 - `monto_descuento` = suma de todos los descuentos aplicables
-- `subtotal_con_descuento` = `subtotal` - `monto_descuento`
-- `monto_total` = `subtotal_con_descuento` × (1 + `iva`/100 + `cargo_servicios`/100)
+- `monto_total` = `subtotal_con_impuestos` - `monto_descuento`
 - Los campos `iva` y `cargo_servicios` se expresan como porcentajes (ej: 18.00 = 18%)
 - `promociones` = array con los códigos de las promociones aplicadas
 
+**Ejemplo de cálculo**:
+
+- `precio_tarifa`: 150, `cantidad_unidad`: 2, `iva`: 18%, `cargo_servicios`: 10%, promoción: 15% PORCENTAJE
+- `subtotal` = 150 × 2 = 300
+- `subtotal_con_impuestos` = 300 × 1.28 = 384
+- `monto_descuento` = 300 × 0.15 = 45
+- `monto_total` = 384 - 45 = 339
+
 **Promociones**:
 
-- Solo se aplican promociones que estén activas (`estado: true`) y vigentes (`vig_desde <= fecha_actual <= vig_hasta`)
-- El campo `promociones` en la respuesta contiene los códigos de las promociones aplicadas
+Las promociones deben cumplir las siguientes validaciones:
+
+1. **Existencia**: El ID de promoción debe existir en la base de datos
+2. **Estado**: La promoción debe estar activa (`estado: true`)
+3. **Vigencia**: La fecha de inicio de la reserva debe estar dentro del período de vigencia
+   - Si `vig_hasta < fecha_inicio` → promoción expirada
+   - Si `vig_desde > fecha_inicio` → promoción aún no vigente
+
+Errores posibles con promociones:
+
+- "Una o más promociones no fueron encontradas" (404)
+- "Una o más promociones están inactivas" (400)
+- "Una o más promociones han expirado" (400)
+- "Una o más promociones aún no están vigentes" (400)
 
 ---
 
