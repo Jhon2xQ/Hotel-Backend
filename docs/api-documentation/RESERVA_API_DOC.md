@@ -83,6 +83,8 @@ GET /api/private/reservas?nombre=Garc&tipo=Doble&page=1&limit=10
         "iva": 18.0,
         "cargo_servicios": 10.0,
         "monto_total": 420.0,
+        "monto_descuento": 50.0,
+        "promociones": ["PROMO-VERANO"],
         "estado": "CONFIRMADA",
         "motivo_cancel": null,
         "cancelado_en": null,
@@ -157,6 +159,8 @@ Obtiene una reserva específica por su ID.
     "iva": 18.0,
     "cargo_servicios": 10.0,
     "monto_total": 420.0,
+    "monto_descuento": 50.0,
+    "promociones": ["PROMO-VERANO"],
     "estado": "TENTATIVA",
     "motivo_cancel": null,
     "cancelado_en": null,
@@ -198,7 +202,8 @@ Crea una nueva reserva. El código de reserva se genera automáticamente en form
   "fechaInicio": "2024-03-25T15:00:00Z",
   "fechaFin": "2024-03-27T12:00:00Z",
   "adultos": 2,
-  "ninos": 1
+  "ninos": 1,
+  "promociones": ["uuid-promocion-1", "uuid-promocion-2"]
 }
 ```
 
@@ -211,6 +216,7 @@ Crea una nueva reserva. El código de reserva se genera automáticamente en form
 - `fechaFin`: Requerida, formato ISO 8601, debe ser posterior a fechaInicio
 - `adultos`: Requerido, mínimo 1
 - `ninos`: Opcional, mínimo 0, default 0
+- `promociones`: Opcional, array de UUIDs de promociones a aplicar. Solo se aplicarán las promociones activas y vigentes.
 - No puede haber solapamiento de fechas con reservas existentes (TENTATIVA, CONFIRMADA, EN_CASA) en la misma habitación
 
 **Código de Reserva:**
@@ -241,7 +247,8 @@ Ejemplo: `KOR-20260327-A7K9P2`
 **Respuestas de Error:**
 
 - `400`: Validación fallida (fechas inválidas, adultos < 1, etc.)
-- `404`: Huésped, habitación o tarifa no encontrados
+- `400`: Promoción expirada o inactiva
+- `404`: Huésped, habitación, tarifa o promoción no encontrados
 - `500`: Error al generar código único (muy raro, después de 10 intentos)
 
 ---
@@ -596,8 +603,39 @@ Los siguientes campos se sincronizan automáticamente desde las entidades relaci
 
 - `cantidad_unidad` = si `unidad_tarifa` es "noches": diferencia en días entre `fecha_fin` y `fecha_inicio` + 1 (se cuentan las noches de inicio, intermedias y fin). Si es "horas": diferencia en horas exactas.
 - `subtotal` = `precio_tarifa` × `cantidad_unidad`
-- `monto_total` = `subtotal` × (1 + `iva`/100 + `cargo_servicios`/100)
+- `subtotal_con_impuestos` = `subtotal` × (1 + `iva`/100 + `cargo_servicios`/100)
+- **Descuentos por Promociones**: Si se envían IDs de promociones en la creación, se calculan los descuentos:
+  - `PORCENTAJE`: descuento = `subtotal` × (`valor_descuento` / 100)
+  - `MONTO_FIJO`: descuento = `valor_descuento`
+- `monto_descuento` = suma de todos los descuentos aplicables
+- `monto_total` = `subtotal_con_impuestos` - `monto_descuento`
 - Los campos `iva` y `cargo_servicios` se expresan como porcentajes (ej: 18.00 = 18%)
+- `promociones` = array con los códigos de las promociones aplicadas
+
+**Ejemplo de cálculo**:
+
+- `precio_tarifa`: 150, `cantidad_unidad`: 2, `iva`: 18%, `cargo_servicios`: 10%, promoción: 15% PORCENTAJE
+- `subtotal` = 150 × 2 = 300
+- `subtotal_con_impuestos` = 300 × 1.28 = 384
+- `monto_descuento` = 300 × 0.15 = 45
+- `monto_total` = 384 - 45 = 339
+
+**Promociones**:
+
+Las promociones deben cumplir las siguientes validaciones:
+
+1. **Existencia**: El ID de promoción debe existir en la base de datos
+2. **Estado**: La promoción debe estar activa (`estado: true`)
+3. **Vigencia**: La fecha de inicio de la reserva debe estar dentro del período de vigencia
+   - Si `vig_hasta < fecha_inicio` → promoción expirada
+   - Si `vig_desde > fecha_inicio` → promoción aún no vigente
+
+Errores posibles con promociones:
+
+- "Una o más promociones no fueron encontradas" (404)
+- "Una o más promociones están inactivas" (400)
+- "Una o más promociones han expirado" (400)
+- "Una o más promociones aún no están vigentes" (400)
 
 ---
 

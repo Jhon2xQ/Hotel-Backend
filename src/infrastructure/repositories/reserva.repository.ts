@@ -8,7 +8,7 @@ import type {
   ReservaPaginationParams,
 } from "../../domain/interfaces/reserva.repository.interface";
 import type { PaginatedResult } from "../../application/paginations/api.pagination";
-import { mapReservaFromPrisma } from "../mappers/reserva.mapper";
+import { mapReservaFromPrisma, type ReservaPrismaRow } from "../mappers/reserva.mapper";
 import { DI_TOKENS } from "../../common/IoC/tokens";
 
 @injectable()
@@ -35,19 +35,21 @@ export class ReservaRepository implements IReservaRepository {
         cantidadUnidad: data.cantidadUnidad,
         IVA: data.IVA,
         cargoServicios: data.cargoServicios,
+        montoDescuento: data.montoDescuento,
         montoTotal: data.montoTotal,
+        promociones: data.promociones,
         estado: EstadoReserva.TENTATIVA,
       },
     });
 
-    return mapReservaFromPrisma(result);
+    return mapReservaFromPrisma(result as unknown as ReservaPrismaRow);
   }
 
   async findAll(): Promise<Reserva[]> {
     const results = await this.prisma.reserva.findMany({
       orderBy: { createdAt: "desc" },
     });
-    return results.map((r) => mapReservaFromPrisma(r));
+    return results.map((r) => mapReservaFromPrisma(r as unknown as ReservaPrismaRow));
   }
 
   async findAllPaginated(params: ReservaPaginationParams): Promise<PaginatedResult<Reserva>> {
@@ -83,7 +85,7 @@ export class ReservaRepository implements IReservaRepository {
     const totalPages = Math.ceil(total / limit);
 
     return {
-      list: reservas.map((r) => mapReservaFromPrisma(r)),
+      list: reservas.map((r) => mapReservaFromPrisma(r as unknown as ReservaPrismaRow)),
       pagination: {
         page,
         limit,
@@ -107,21 +109,21 @@ export class ReservaRepository implements IReservaRepository {
       },
     });
 
-    return results.map((r) => mapReservaFromPrisma(r));
+    return results.map((r) => mapReservaFromPrisma(r as unknown as ReservaPrismaRow));
   }
 
   async findById(id: string): Promise<Reserva | null> {
     const result = await this.prisma.reserva.findUnique({
       where: { id },
     });
-    return result ? mapReservaFromPrisma(result) : null;
+    return result ? mapReservaFromPrisma(result as unknown as ReservaPrismaRow) : null;
   }
 
   async findByCodigo(codigo: string): Promise<Reserva | null> {
     const result = await this.prisma.reserva.findUnique({
       where: { codigo },
     });
-    return result ? mapReservaFromPrisma(result) : null;
+    return result ? mapReservaFromPrisma(result as unknown as ReservaPrismaRow) : null;
   }
 
   async update(id: string, data: UpdateReservaParams): Promise<Reserva | null> {
@@ -200,7 +202,7 @@ export class ReservaRepository implements IReservaRepository {
       data: updateData,
     });
 
-    return mapReservaFromPrisma(result);
+    return mapReservaFromPrisma(result as unknown as ReservaPrismaRow);
   }
 
   async delete(id: string): Promise<void> {
@@ -219,7 +221,7 @@ export class ReservaRepository implements IReservaRepository {
       },
     });
 
-    return mapReservaFromPrisma(result);
+    return mapReservaFromPrisma(result as unknown as ReservaPrismaRow);
   }
 
   private async fetchSnapshotData(

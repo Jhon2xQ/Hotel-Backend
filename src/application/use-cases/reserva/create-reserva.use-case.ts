@@ -3,7 +3,9 @@ import type { IReservaRepository } from "../../../domain/interfaces/reserva.repo
 import type { IHuespedRepository } from "../../../domain/interfaces/huesped.repository.interface";
 import type { IHabitacionRepository } from "../../../domain/interfaces/habitacion.repository.interface";
 import type { ITarifaRepository } from "../../../domain/interfaces/tarifa.repository.interface";
+import type { IPromocionRepository } from "../../../domain/interfaces/promocion.repository.interface";
 import { ReservaException } from "../../../domain/exceptions/reserva.exception";
+import { PromocionException } from "../../../domain/exceptions/promocion.exception";
 import { CreateReservaDto } from "../../dtos/reserva.dto";
 import { generateCodigoReserva } from "../../../common/utils/codigo-generator";
 import { DI_TOKENS } from "../../../common/IoC/tokens";
@@ -16,6 +18,7 @@ export class CreateReservaUseCase {
     @inject(DI_TOKENS.IHuespedRepository) private huespedRepository: IHuespedRepository,
     @inject(DI_TOKENS.IHabitacionRepository) private habitacionRepository: IHabitacionRepository,
     @inject(DI_TOKENS.ITarifaRepository) private tarifaRepository: ITarifaRepository,
+    @inject(DI_TOKENS.IPromocionRepository) private promocionRepository: IPromocionRepository,
   ) {}
 
   private calculateUnits(fechaInicio: Date, fechaFin: Date, unidad: string): number {
@@ -26,6 +29,20 @@ export class CreateReservaUseCase {
     }
     const msPerDay = 1000 * 60 * 60 * 24;
     return Math.round(msDiff / msPerDay) + 1;
+  }
+
+  private calculateDiscount(promociones: Awaited<ReturnType<IPromocionRepository['findByIds']>>, subtotal: number): number {
+    let totalDescuento = 0;
+
+    for (const promo of promociones) {
+      if (promo.tipoDescuento === "PORCENTAJE") {
+        totalDescuento += subtotal * (promo.valorDescuento / 100);
+      } else {
+        totalDescuento += promo.valorDescuento;
+      }
+    }
+
+    return Math.round(totalDescuento * 100) / 100;
   }
 
   async execute(input: CreateReservaDto): Promise<Reserva> {
@@ -78,13 +95,47 @@ export class CreateReservaUseCase {
       throw ReservaException.tarifaNotFound();
     }
 
-    const units = this.calculateUnits(input.fechaInicio, input.fechaFin, tarifa.unidad);
+    const unidades = this.calculateUnits(input.fechaInicio, input.fechaFin, tarifa.unidad);
     const precioTarifa = tarifa.precio;
     const unidadTarifa = tarifa.unidad;
     const IVA = tarifa.IVA ?? 0;
     const cargoServicios = tarifa.cargoServicios ?? 0;
-    const subtotalUnidades = precioTarifa * units;
-    const montoTotal = subtotalUnidades * (1 + IVA / 100 + cargoServicios / 100);
+    const subtotalUnidades = precioTarifa * unidades;
+
+    let promocionesActivas: any[] = [];
+    let codigosPromociones: string[] = [];
+    let montoDescuento = 0;
+
+    if (input.promociones && input.promociones.length > 0) {
+      const promociones = await this.promocionRepository.findByIds(input.promociones);
+      
+      if (promociones.length !== input.promociones.length) {
+        throw PromocionException.notFound();
+      }
+
+      const fechaReserva = input.fechaInicio;
+      const inactivas = promociones.filter((p) => !p.estado);
+      const expiradas = promociones.filter((p) => p.estado && p.vigHasta < fechaReserva);
+      const noVigentes = promociones.filter((p) => p.estado && p.vigDesde > fechaReserva);
+
+      if (inactivas.length > 0) {
+        throw PromocionException.inactive();
+      }
+
+      if (expiradas.length > 0) {
+        throw PromocionException.expired();
+      }
+
+      if (noVigentes.length > 0) {
+        throw PromocionException.notYetValid();
+      }
+
+      codigosPromociones = promociones.map((p) => p.codigo);
+      montoDescuento = this.calculateDiscount(promociones, subtotalUnidades);
+    }
+
+    const subtotalConImpuestos = subtotalUnidades * (1 + IVA / 100 + cargoServicios / 100);
+    const montoTotal = subtotalConImpuestos - montoDescuento;
 
     return await this.reservaRepository.create({
       codigo: codigo!,
@@ -101,10 +152,12 @@ export class CreateReservaUseCase {
       nombreCanal: tarifa.canal.nombre,
       precioTarifa,
       unidadTarifa,
-      cantidadUnidad: units,
+      cantidadUnidad: unidades,
       IVA,
       cargoServicios,
+      montoDescuento,
       montoTotal: Math.round(montoTotal * 100) / 100,
+      promociones: codigosPromociones,
     });
   }
 }

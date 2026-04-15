@@ -14,6 +14,8 @@ describe("FindPromocionByIdUseCase", () => {
       findAll: async () => [],
       findById: async () => null,
       findByCodigo: async () => null,
+      findByCodigos: async () => [],
+      findByIds: async () => [],
       update: async () => createMockPromocionWithHabitaciones(),
       delete: async () => {},
     };

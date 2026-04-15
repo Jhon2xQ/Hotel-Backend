@@ -38,6 +38,8 @@ export interface IPromocionRepository {
   findAll(): Promise<PromocionWithHabitaciones[]>;
   findById(id: string): Promise<PromocionWithHabitaciones | null>;
   findByCodigo(codigo: string): Promise<Promocion | null>;
+  findByCodigos(codigos: string[]): Promise<Promocion[]>;
+  findByIds(ids: string[]): Promise<Promocion[]>;
   update(id: string, data: UpdatePromocionParams): Promise<PromocionWithHabitaciones>;
   delete(id: string): Promise<void>;
 }

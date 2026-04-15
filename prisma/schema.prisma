@@ -440,7 +440,9 @@ model Reserva {
   cargoServicios Decimal @default(0) @db.Decimal(4, 2)
 
   // Totales
-  montoTotal Decimal @db.Decimal(10, 2)
+  montoTotal   Decimal  @db.Decimal(10, 2)
+  montoDescuento Decimal @default(0) @db.Decimal(10, 2)
+  promociones String[] @db.VarChar(50)
 
   // Estado
   estado       EstadoReserva @default(TENTATIVA)

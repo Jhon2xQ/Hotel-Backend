@@ -22,6 +22,8 @@ export function createMockReserva(overrides?: Partial<Reserva>): Reserva {
     overrides?.IVA ?? 18.0,
     overrides?.cargoServicios ?? 10.0,
     overrides?.montoTotal ?? 420.0,
+    overrides?.montoDescuento ?? 0,
+    overrides?.promociones ?? [],
     overrides?.estado ?? EstadoReserva.TENTATIVA,
     overrides?.motivoCancel ?? null,
     overrides?.canceladoEn ?? null,

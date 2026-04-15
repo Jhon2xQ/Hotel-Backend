@@ -4,7 +4,9 @@ import type { IReservaRepository } from "../../../src/domain/interfaces/reserva.
 import type { IHuespedRepository } from "../../../src/domain/interfaces/huesped.repository.interface";
 import type { IHabitacionRepository } from "../../../src/domain/interfaces/habitacion.repository.interface";
 import type { ITarifaRepository } from "../../../src/domain/interfaces/tarifa.repository.interface";
+import type { IPromocionRepository } from "../../../src/domain/interfaces/promocion.repository.interface";
 import { ReservaException } from "../../../src/domain/exceptions/reserva.exception";
+import { PromocionException } from "../../../src/domain/exceptions/promocion.exception";
 import { createMockReserva } from "../../helpers/reserva-fixtures";
 import { createMockHuesped } from "../../helpers/huesped-fixtures";
 import { createMockHabitacion } from "../../helpers/habitacion-fixtures";
@@ -21,6 +23,7 @@ describe("CreateReservaUseCase", () => {
   let mockHuespedRepository: IHuespedRepository;
   let mockHabitacionRepository: IHabitacionRepository;
   let mockTarifaRepository: ITarifaRepository;
+  let mockPromocionRepository: IPromocionRepository;
 
   beforeEach(() => {
     const full = createMockReserva();
@@ -51,11 +54,16 @@ describe("CreateReservaUseCase", () => {
       findById: async () => mockTarifa,
     } as unknown as ITarifaRepository;
 
+    mockPromocionRepository = {
+      findByIds: async () => [],
+    } as unknown as IPromocionRepository;
+
     useCase = new CreateReservaUseCase(
       mockRepository,
       mockHuespedRepository,
       mockHabitacionRepository,
       mockTarifaRepository,
+      mockPromocionRepository,
     );
   });
 
@@ -162,5 +170,197 @@ describe("CreateReservaUseCase", () => {
 
     // 27 - 25 = 2 días de diferencia + 1 = 3 noches
     expect(capturedData.cantidadUnidad).toBe(3);
+  });
+
+  it("debe lanzar excepción cuando promoción no existe", async () => {
+    mockPromocionRepository.findByIds = async (ids: string[]) => [];
+
+    const input: CreateReservaDto = {
+      huespedId: "huesped-id",
+      habitacionId: "habitacion-id",
+      tarifaId: "tarifa-id",
+      fechaInicio: new Date("2024-03-25"),
+      fechaFin: new Date("2024-03-27"),
+      adultos: 2,
+      ninos: 1,
+      promociones: ["promo-no-existe"],
+    };
+
+    await expect(useCase.execute(input)).rejects.toThrow(PromocionException);
+  });
+
+  it("debe aplicar descuento porcentual de promociones activas y vigentes", async () => {
+    const mockPromo = {
+      id: "promo-id",
+      codigo: "PROMO-10",
+      tipoDescuento: "PORCENTAJE",
+      valorDescuento: 10,
+      vigDesde: new Date("2020-01-01"),
+      vigHasta: new Date("2030-12-31"),
+      estado: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    mockPromocionRepository.findByIds = async (ids: string[]) => [mockPromo];
+
+    const mockReserva = createMockReserva();
+    let capturedData: any;
+
+    mockRepository.create = vi.fn(async (data) => {
+      capturedData = data;
+      return mockReserva;
+    });
+
+    const input: CreateReservaDto = {
+      huespedId: "huesped-id",
+      habitacionId: "habitacion-id",
+      tarifaId: "tarifa-id",
+      fechaInicio: new Date("2024-03-25"),
+      fechaFin: new Date("2024-03-27"),
+      adultos: 2,
+      ninos: 1,
+      promociones: ["promo-id"],
+    };
+
+    await useCase.execute(input);
+
+    // precioTarifa: 150, unidades: 3, subtotal: 450
+    // subtotalConImpuestos: 450 * 1.18 = 531
+    // descuento: 450 * 10% = 45
+    // montoTotal: 531 - 45 = 486
+    expect(capturedData.montoDescuento).toBe(45);
+    expect(capturedData.promociones).toContain("PROMO-10");
+  });
+
+  it("debe aplicar descuento de monto fijo de promociones activas y vigentes", async () => {
+    const mockPromo = {
+      id: "promo-id",
+      codigo: "PROMO-50",
+      tipoDescuento: "MONTO_FIJO",
+      valorDescuento: 50,
+      vigDesde: new Date("2020-01-01"),
+      vigHasta: new Date("2030-12-31"),
+      estado: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    mockPromocionRepository.findByIds = async (ids: string[]) => [mockPromo];
+
+    const mockReserva = createMockReserva();
+    let capturedData: any;
+
+    mockRepository.create = vi.fn(async (data) => {
+      capturedData = data;
+      return mockReserva;
+    });
+
+    const input: CreateReservaDto = {
+      huespedId: "huesped-id",
+      habitacionId: "habitacion-id",
+      tarifaId: "tarifa-id",
+      fechaInicio: new Date("2024-03-25"),
+      fechaFin: new Date("2024-03-27"),
+      adultos: 2,
+      ninos: 1,
+      promociones: ["promo-id"],
+    };
+
+    await useCase.execute(input);
+
+    // precioTarifa: 150, unidades: 3, subtotal: 450
+    // subtotalConImpuestos: 450 * 1.18 = 531
+    // descuento: 50
+    // montoTotal: 531 - 50 = 481
+    expect(capturedData.montoDescuento).toBe(50);
+    expect(capturedData.promociones).toContain("PROMO-50");
+  });
+
+  it("debe lanzar excepción cuando promoción está inactiva", async () => {
+    const mockPromo = {
+      id: "promo-id",
+      codigo: "PROMO-INACTIVA",
+      tipoDescuento: "PORCENTAJE",
+      valorDescuento: 20,
+      vigDesde: new Date("2020-01-01"),
+      vigHasta: new Date("2030-12-31"),
+      estado: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    mockPromocionRepository.findByIds = async (ids: string[]) => [mockPromo];
+
+    const input: CreateReservaDto = {
+      huespedId: "huesped-id",
+      habitacionId: "habitacion-id",
+      tarifaId: "tarifa-id",
+      fechaInicio: new Date("2024-03-25"),
+      fechaFin: new Date("2024-03-27"),
+      adultos: 2,
+      ninos: 1,
+      promociones: ["promo-id"],
+    };
+
+    await expect(useCase.execute(input)).rejects.toThrow("Una o más promociones están inactivas");
+  });
+
+  it("debe lanzar excepción cuando promoción está vencida", async () => {
+    const mockPromo = {
+      id: "promo-id",
+      codigo: "PROMO-VENCIDA",
+      tipoDescuento: "PORCENTAJE",
+      valorDescuento: 20,
+      vigDesde: new Date("2020-01-01"),
+      vigHasta: new Date("2021-12-31"),
+      estado: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    mockPromocionRepository.findByIds = async (ids: string[]) => [mockPromo];
+
+    const input: CreateReservaDto = {
+      huespedId: "huesped-id",
+      habitacionId: "habitacion-id",
+      tarifaId: "tarifa-id",
+      fechaInicio: new Date("2024-03-25"),
+      fechaFin: new Date("2024-03-27"),
+      adultos: 2,
+      ninos: 1,
+      promociones: ["promo-id"],
+    };
+
+    await expect(useCase.execute(input)).rejects.toThrow("Una o más promociones han expirado");
+  });
+
+  it("debe lanzar excepción cuando promoción aún no está vigente", async () => {
+    const mockPromo = {
+      id: "promo-id",
+      codigo: "PROMO-FUTURA",
+      tipoDescuento: "PORCENTAJE",
+      valorDescuento: 20,
+      vigDesde: new Date("2025-01-01"),
+      vigHasta: new Date("2025-12-31"),
+      estado: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    mockPromocionRepository.findByIds = async (ids: string[]) => [mockPromo];
+
+    const input: CreateReservaDto = {
+      huespedId: "huesped-id",
+      habitacionId: "habitacion-id",
+      tarifaId: "tarifa-id",
+      fechaInicio: new Date("2024-03-25"),
+      fechaFin: new Date("2024-03-27"),
+      adultos: 2,
+      ninos: 1,
+      promociones: ["promo-id"],
+    };
+
+    await expect(useCase.execute(input)).rejects.toThrow("Una o más promociones aún no están vigentes");
   });
 });

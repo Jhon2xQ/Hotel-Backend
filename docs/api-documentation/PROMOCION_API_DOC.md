@@ -395,6 +395,53 @@ Tanto `GET /` como `GET /:id` devuelven el campo `habitaciones` como un array de
 
 ---
 
+## Aplicación en Reservas
+
+Las promociones pueden aplicarse a reservas enviando los IDs de las promociones en el campo `promociones` al crear una reserva:
+
+```json
+{
+  "huespedId": "uuid",
+  "habitacionId": "uuid",
+  "tarifaId": "uuid",
+  "fechaInicio": "2024-03-25T15:00:00Z",
+  "fechaFin": "2024-03-27T12:00:00Z",
+  "adultos": 2,
+  "ninos": 1,
+  "promociones": ["uuid-promocion-1", "uuid-promocion-2"]
+}
+```
+
+### Validación de Promociones
+
+Solo se aplicarán las promociones que cumplan todas las condiciones:
+
+1. **Activa**: `estado: true`
+2. **Vigente**: La fecha actual debe estar dentro del rango `[vig_desde, vig_hasta]`
+
+### Cálculo de Descuentos
+
+- **PORCENTAJE**: `descuento = subtotal × (valor_descuento / 100)`
+- **MONTO_FIJO**: `descuento = valor_descuento`
+
+El descuento total es la suma de todas las promociones aplicables. El monto final de la reserva se calcula aplicando el descuento al subtotal antes de agregar IVA y cargo por servicios.
+
+### Respuesta con Promociones
+
+La respuesta de la reserva creada incluirá los códigos de las promociones aplicadas:
+
+```json
+{
+  "id": "uuid-reserva",
+  "codigo": "KOR-20240325-ABC123",
+  "monto_total": 420.0,
+  "monto_descuento": 50.0,
+  "promociones": ["PROMO-VERANO", "PROMO-DESCUENTO"]
+}
+```
+
+---
+
 ## Códigos de Estado HTTP
 
 - `200 OK`: Operación exitosa

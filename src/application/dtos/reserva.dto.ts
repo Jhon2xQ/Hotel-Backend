@@ -9,6 +9,7 @@ export interface CreateReservaDto {
   fechaFin: Date;
   adultos: number;
   ninos: number;
+  promociones?: string[];
 }
 
 export interface UpdateReservaDto {
@@ -52,6 +53,8 @@ export interface ReservaDto {
   iva: number;
   cargo_servicios: number;
   monto_total: number;
+  monto_descuento: number;
+  promociones: string[];
   estado: EstadoReserva;
   motivo_cancel: string | null;
   cancelado_en: string | null;
@@ -81,6 +84,8 @@ export function toReservaDto(r: Reserva): ReservaDto {
     iva: r.IVA,
     cargo_servicios: r.cargoServicios,
     monto_total: r.montoTotal,
+    monto_descuento: r.montoDescuento,
+    promociones: r.promociones,
     estado: r.estado,
     motivo_cancel: r.motivoCancel,
     cancelado_en: r.canceladoEn?.toISOString() ?? null,
