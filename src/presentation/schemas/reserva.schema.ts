@@ -16,6 +16,7 @@ export const CreateReservaSchema = z
     fechaFin: z.string().datetime("Fecha de fin inválida").or(z.string().date("Fecha de fin inválida")),
     adultos: z.number().int().min(1, "Debe haber al menos 1 adulto"),
     ninos: z.number().int().min(0, "El número de niños no puede ser negativo").default(0),
+    promociones: z.array(z.uuid("ID de promoción inválido")).optional(),
   })
   .refine((data) => new Date(data.fechaFin) > new Date(data.fechaInicio), {
     message: "La fecha de fin debe ser posterior a la fecha de inicio",

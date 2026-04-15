@@ -29,6 +29,8 @@ export class Reserva {
     public readonly IVA: number,
     public readonly cargoServicios: number,
     public readonly montoTotal: number,
+    public readonly montoDescuento: number,
+    public readonly promociones: string[],
     public readonly estado: EstadoReserva,
     public readonly motivoCancel: string | null,
     public readonly canceladoEn: Date | null,

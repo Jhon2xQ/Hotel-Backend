@@ -19,7 +19,9 @@ export interface CreateReservaPersistParams {
   cantidadUnidad: number;
   IVA: number;
   cargoServicios: number;
+  montoDescuento: number;
   montoTotal: number;
+  promociones: string[];
 }
 
 export interface UpdateReservaParams {

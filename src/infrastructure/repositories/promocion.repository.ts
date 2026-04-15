@@ -1,5 +1,6 @@
 import { inject, injectable } from "tsyringe";
 import { PrismaClient } from "../../../generated/prisma/client";
+import { Promocion } from "../../domain/entities/promocion.entity";
 import type {
   IPromocionRepository,
   CreatePromocionParams,
@@ -70,6 +71,22 @@ export class PromocionRepository implements IPromocionRepository {
       include: { habitaciones: { select: { id: true } } },
     });
     return result ? mapPromocionWithHabitaciones(result as unknown as Record<string, unknown>) : null;
+  }
+
+  async findByCodigos(codigos: string[]): Promise<Promocion[]> {
+    if (codigos.length === 0) return [];
+    const results = await this.prisma.promocion.findMany({
+      where: { codigo: { in: codigos } },
+    });
+    return results.map((r) => new Promocion(r.id, r.codigo, r.tipoDescuento, Number(r.valorDescuento), r.vigDesde, r.vigHasta, r.estado, r.createdAt, r.updatedAt));
+  }
+
+  async findByIds(ids: string[]): Promise<Promocion[]> {
+    if (ids.length === 0) return [];
+    const results = await this.prisma.promocion.findMany({
+      where: { id: { in: ids } },
+    });
+    return results.map((r) => new Promocion(r.id, r.codigo, r.tipoDescuento, Number(r.valorDescuento), r.vigDesde, r.vigHasta, r.estado, r.createdAt, r.updatedAt));
   }
 
   async update(id: string, data: UpdatePromocionParams): Promise<PromocionWithHabitaciones> {

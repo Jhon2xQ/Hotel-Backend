@@ -7,6 +7,8 @@ export function createMockPromocionRepository(): IPromocionRepository {
     findAll: vi.fn(),
     findById: vi.fn(),
     findByCodigo: vi.fn(),
+    findByCodigos: vi.fn(),
+    findByIds: vi.fn(),
     update: vi.fn(),
     delete: vi.fn(),
   } as unknown as IPromocionRepository;

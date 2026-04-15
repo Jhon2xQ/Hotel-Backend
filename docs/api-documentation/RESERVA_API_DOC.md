@@ -83,6 +83,8 @@ GET /api/private/reservas?nombre=Garc&tipo=Doble&page=1&limit=10
         "iva": 18.0,
         "cargo_servicios": 10.0,
         "monto_total": 420.0,
+        "monto_descuento": 50.0,
+        "promociones": ["PROMO-VERANO"],
         "estado": "CONFIRMADA",
         "motivo_cancel": null,
         "cancelado_en": null,
@@ -157,6 +159,8 @@ Obtiene una reserva específica por su ID.
     "iva": 18.0,
     "cargo_servicios": 10.0,
     "monto_total": 420.0,
+    "monto_descuento": 50.0,
+    "promociones": ["PROMO-VERANO"],
     "estado": "TENTATIVA",
     "motivo_cancel": null,
     "cancelado_en": null,
@@ -198,7 +202,8 @@ Crea una nueva reserva. El código de reserva se genera automáticamente en form
   "fechaInicio": "2024-03-25T15:00:00Z",
   "fechaFin": "2024-03-27T12:00:00Z",
   "adultos": 2,
-  "ninos": 1
+  "ninos": 1,
+  "promociones": ["uuid-promocion-1", "uuid-promocion-2"]
 }
 ```
 
@@ -211,6 +216,7 @@ Crea una nueva reserva. El código de reserva se genera automáticamente en form
 - `fechaFin`: Requerida, formato ISO 8601, debe ser posterior a fechaInicio
 - `adultos`: Requerido, mínimo 1
 - `ninos`: Opcional, mínimo 0, default 0
+- `promociones`: Opcional, array de UUIDs de promociones a aplicar. Solo se aplicarán las promociones activas y vigentes.
 - No puede haber solapamiento de fechas con reservas existentes (TENTATIVA, CONFIRMADA, EN_CASA) en la misma habitación
 
 **Código de Reserva:**
@@ -596,8 +602,19 @@ Los siguientes campos se sincronizan automáticamente desde las entidades relaci
 
 - `cantidad_unidad` = si `unidad_tarifa` es "noches": diferencia en días entre `fecha_fin` y `fecha_inicio` + 1 (se cuentan las noches de inicio, intermedias y fin). Si es "horas": diferencia en horas exactas.
 - `subtotal` = `precio_tarifa` × `cantidad_unidad`
-- `monto_total` = `subtotal` × (1 + `iva`/100 + `cargo_servicios`/100)
+- **Descuentos por Promociones**: Si se envían IDs de promociones en la creación, se calculan los descuentos activos y vigentes:
+  - `PORCENTAJE`: descuento = `subtotal` × (`valor_descuento` / 100)
+  - `MONTO_FIJO`: descuento = `valor_descuento`
+- `monto_descuento` = suma de todos los descuentos aplicables
+- `subtotal_con_descuento` = `subtotal` - `monto_descuento`
+- `monto_total` = `subtotal_con_descuento` × (1 + `iva`/100 + `cargo_servicios`/100)
 - Los campos `iva` y `cargo_servicios` se expresan como porcentajes (ej: 18.00 = 18%)
+- `promociones` = array con los códigos de las promociones aplicadas
+
+**Promociones**:
+
+- Solo se aplican promociones que estén activas (`estado: true`) y vigentes (`vig_desde <= fecha_actual <= vig_hasta`)
+- El campo `promociones` en la respuesta contiene los códigos de las promociones aplicadas
 
 ---
 
