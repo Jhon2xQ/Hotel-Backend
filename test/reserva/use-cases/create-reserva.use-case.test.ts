@@ -6,6 +6,7 @@ import type { IHabitacionRepository } from "../../../src/domain/interfaces/habit
 import type { ITarifaRepository } from "../../../src/domain/interfaces/tarifa.repository.interface";
 import type { IPromocionRepository } from "../../../src/domain/interfaces/promocion.repository.interface";
 import { ReservaException } from "../../../src/domain/exceptions/reserva.exception";
+import { PromocionException } from "../../../src/domain/exceptions/promocion.exception";
 import { createMockReserva } from "../../helpers/reserva-fixtures";
 import { createMockHuesped } from "../../helpers/huesped-fixtures";
 import { createMockHabitacion } from "../../helpers/habitacion-fixtures";
@@ -171,6 +172,23 @@ describe("CreateReservaUseCase", () => {
     expect(capturedData.cantidadUnidad).toBe(3);
   });
 
+  it("debe lanzar excepción cuando promoción no existe", async () => {
+    mockPromocionRepository.findByIds = async (ids: string[]) => [];
+
+    const input: CreateReservaDto = {
+      huespedId: "huesped-id",
+      habitacionId: "habitacion-id",
+      tarifaId: "tarifa-id",
+      fechaInicio: new Date("2024-03-25"),
+      fechaFin: new Date("2024-03-27"),
+      adultos: 2,
+      ninos: 1,
+      promociones: ["promo-no-existe"],
+    };
+
+    await expect(useCase.execute(input)).rejects.toThrow(PromocionException);
+  });
+
   it("debe aplicar descuento porcentual de promociones activas y vigentes", async () => {
     const mockPromo = {
       id: "promo-id",
@@ -259,7 +277,7 @@ describe("CreateReservaUseCase", () => {
     expect(capturedData.promociones).toContain("PROMO-50");
   });
 
-  it("no debe aplicar promociones inactivas", async () => {
+  it("debe lanzar excepción cuando promoción está inactiva", async () => {
     const mockPromo = {
       id: "promo-id",
       codigo: "PROMO-INACTIVA",
@@ -274,14 +292,6 @@ describe("CreateReservaUseCase", () => {
 
     mockPromocionRepository.findByIds = async (ids: string[]) => [mockPromo];
 
-    const mockReserva = createMockReserva();
-    let capturedData: any;
-
-    mockRepository.create = vi.fn(async (data) => {
-      capturedData = data;
-      return mockReserva;
-    });
-
     const input: CreateReservaDto = {
       huespedId: "huesped-id",
       habitacionId: "habitacion-id",
@@ -293,13 +303,10 @@ describe("CreateReservaUseCase", () => {
       promociones: ["promo-id"],
     };
 
-    await useCase.execute(input);
-
-    expect(capturedData.montoDescuento).toBe(0);
-    expect(capturedData.promociones).toHaveLength(0);
+    await expect(useCase.execute(input)).rejects.toThrow("Una o más promociones están inactivas");
   });
 
-  it("no debe aplicar promociones vencidas", async () => {
+  it("debe lanzar excepción cuando promoción está vencida", async () => {
     const mockPromo = {
       id: "promo-id",
       codigo: "PROMO-VENCIDA",
@@ -314,13 +321,34 @@ describe("CreateReservaUseCase", () => {
 
     mockPromocionRepository.findByIds = async (ids: string[]) => [mockPromo];
 
-    const mockReserva = createMockReserva();
-    let capturedData: any;
+    const input: CreateReservaDto = {
+      huespedId: "huesped-id",
+      habitacionId: "habitacion-id",
+      tarifaId: "tarifa-id",
+      fechaInicio: new Date("2024-03-25"),
+      fechaFin: new Date("2024-03-27"),
+      adultos: 2,
+      ninos: 1,
+      promociones: ["promo-id"],
+    };
 
-    mockRepository.create = vi.fn(async (data) => {
-      capturedData = data;
-      return mockReserva;
-    });
+    await expect(useCase.execute(input)).rejects.toThrow("Una o más promociones han expirado");
+  });
+
+  it("debe lanzar excepción cuando promoción aún no está vigente", async () => {
+    const mockPromo = {
+      id: "promo-id",
+      codigo: "PROMO-FUTURA",
+      tipoDescuento: "PORCENTAJE",
+      valorDescuento: 20,
+      vigDesde: new Date("2025-01-01"),
+      vigHasta: new Date("2025-12-31"),
+      estado: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    mockPromocionRepository.findByIds = async (ids: string[]) => [mockPromo];
 
     const input: CreateReservaDto = {
       huespedId: "huesped-id",
@@ -333,9 +361,6 @@ describe("CreateReservaUseCase", () => {
       promociones: ["promo-id"],
     };
 
-    await useCase.execute(input);
-
-    expect(capturedData.montoDescuento).toBe(0);
-    expect(capturedData.promociones).toHaveLength(0);
+    await expect(useCase.execute(input)).rejects.toThrow("Una o más promociones aún no están vigentes");
   });
 });

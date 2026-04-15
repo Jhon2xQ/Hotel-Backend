@@ -247,7 +247,8 @@ Ejemplo: `KOR-20260327-A7K9P2`
 **Respuestas de Error:**
 
 - `400`: Validación fallida (fechas inválidas, adultos < 1, etc.)
-- `404`: Huésped, habitación o tarifa no encontrados
+- `400`: Promoción expirada o inactiva
+- `404`: Huésped, habitación, tarifa o promoción no encontrados
 - `500`: Error al generar código único (muy raro, después de 10 intentos)
 
 ---

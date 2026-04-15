@@ -16,4 +16,20 @@ export class PromocionException extends DomainException {
   static invalidValorDescuento(): PromocionException {
     return new PromocionException("El valor de descuento debe ser mayor a cero", 400);
   }
+
+  static notFound(): PromocionException {
+    return new PromocionException("Una o más promociones no fueron encontradas", 404);
+  }
+
+  static expired(): PromocionException {
+    return new PromocionException("Una o más promociones han expirado", 400);
+  }
+
+  static inactive(): PromocionException {
+    return new PromocionException("Una o más promociones están inactivas", 400);
+  }
+
+  static notYetValid(): PromocionException {
+    return new PromocionException("Una o más promociones aún no están vigentes", 400);
+  }
 }

@@ -5,6 +5,7 @@ import type { IHabitacionRepository } from "../../../domain/interfaces/habitacio
 import type { ITarifaRepository } from "../../../domain/interfaces/tarifa.repository.interface";
 import type { IPromocionRepository } from "../../../domain/interfaces/promocion.repository.interface";
 import { ReservaException } from "../../../domain/exceptions/reserva.exception";
+import { PromocionException } from "../../../domain/exceptions/promocion.exception";
 import { CreateReservaDto } from "../../dtos/reserva.dto";
 import { generateCodigoReserva } from "../../../common/utils/codigo-generator";
 import { DI_TOKENS } from "../../../common/IoC/tokens";
@@ -31,14 +32,9 @@ export class CreateReservaUseCase {
   }
 
   private calculateDiscount(promociones: Awaited<ReturnType<IPromocionRepository['findByIds']>>, subtotal: number): number {
-    const now = new Date();
     let totalDescuento = 0;
 
     for (const promo of promociones) {
-      if (!promo.estado || promo.vigHasta < now || promo.vigDesde > now) {
-        continue;
-      }
-
       if (promo.tipoDescuento === "PORCENTAJE") {
         totalDescuento += subtotal * (promo.valorDescuento / 100);
       } else {
@@ -112,13 +108,34 @@ export class CreateReservaUseCase {
 
     if (input.promociones && input.promociones.length > 0) {
       const promociones = await this.promocionRepository.findByIds(input.promociones);
-      promocionesActivas = promociones.filter((p) => p.estado && p.vigDesde <= new Date() && p.vigHasta >= new Date());
-      codigosPromociones = promocionesActivas.map((p) => p.codigo);
-      montoDescuento = this.calculateDiscount(promocionesActivas, subtotalUnidades);
+      
+      if (promociones.length !== input.promociones.length) {
+        throw PromocionException.notFound();
+      }
+
+      const fechaReserva = input.fechaInicio;
+      const inactivas = promociones.filter((p) => !p.estado);
+      const expiradas = promociones.filter((p) => p.estado && p.vigHasta < fechaReserva);
+      const noVigentes = promociones.filter((p) => p.estado && p.vigDesde > fechaReserva);
+
+      if (inactivas.length > 0) {
+        throw PromocionException.inactive();
+      }
+
+      if (expiradas.length > 0) {
+        throw PromocionException.expired();
+      }
+
+      if (noVigentes.length > 0) {
+        throw PromocionException.notYetValid();
+      }
+
+      codigosPromociones = promociones.map((p) => p.codigo);
+      montoDescuento = this.calculateDiscount(promociones, subtotalUnidades);
     }
 
-    const montoConDescuento = subtotalUnidades - montoDescuento;
-    const montoTotal = montoConDescuento * (1 + IVA / 100 + cargoServicios / 100);
+    const subtotalConImpuestos = subtotalUnidades * (1 + IVA / 100 + cargoServicios / 100);
+    const montoTotal = subtotalConImpuestos - montoDescuento;
 
     return await this.reservaRepository.create({
       codigo: codigo!,
