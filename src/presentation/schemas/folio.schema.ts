@@ -1,8 +1,15 @@
 import { z } from "zod";
+import { PaginationQuerySchema } from "./pagination.schema";
 
 export const UUIDParamSchema = z.object({
   id: z.uuid("El ID debe ser un UUID válido"),
 });
+
+export const ListFolioQuerySchema = PaginationQuerySchema.extend({
+  reserva_id: z.uuid("El ID de la reserva debe ser un UUID válido").optional(),
+  estado: z.boolean().optional(),
+});
+export type ListFolioQuery = z.infer<typeof ListFolioQuerySchema>;
 
 export const CreateFolioSchema = z
   .object({

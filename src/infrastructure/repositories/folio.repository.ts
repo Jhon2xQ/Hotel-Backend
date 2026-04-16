@@ -5,6 +5,7 @@ import type {
   CreateFolioParams,
   UpdateFolioParams,
   FolioWithPromociones,
+  FolioPaginationParams,
 } from "../../domain/interfaces/folio.repository.interface";
 import { DI_TOKENS } from "../../common/IoC/tokens";
 
@@ -50,6 +51,41 @@ export class FolioRepository implements IFolioRepository {
       orderBy: { createdAt: "desc" },
     });
     return results.map((r) => mapFolioWithPromociones(r as unknown as Record<string, unknown>));
+  }
+
+  async findAllPaginated(params: FolioPaginationParams): Promise<{ list: FolioWithPromociones[]; pagination: { page: number; limit: number; total: number; totalPages: number; hasNextPage: boolean; hasPreviousPage: boolean } }> {
+    const { page = 1, limit = 10, reservaId, estado } = params;
+    const skip = (page - 1) * limit;
+
+    const where: Record<string, unknown> = {};
+    if (reservaId) where.reservaId = reservaId;
+    if (estado !== undefined) where.estado = estado;
+
+    const [results, total] = await Promise.all([
+      this.prisma.folio.findMany({
+        where,
+        include: { promociones: { select: { codigo: true } } },
+        orderBy: { createdAt: "desc" },
+        skip,
+        take: limit,
+      }),
+      this.prisma.folio.count({ where }),
+    ]);
+
+    const list = results.map((r) => mapFolioWithPromociones(r as unknown as Record<string, unknown>));
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      list,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
+      },
+    };
   }
 
   async findById(id: string): Promise<FolioWithPromociones | null> {

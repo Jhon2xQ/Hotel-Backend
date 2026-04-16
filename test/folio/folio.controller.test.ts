@@ -5,7 +5,7 @@ import { createMockContext } from "../helpers/mock-context";
 describe("FolioController", () => {
   let controller: FolioController;
   let mockCreateUseCase: any;
-  let mockListUseCase: any;
+  let mockListPaginatedUseCase: any;
   let mockFindByIdUseCase: any;
   let mockUpdateUseCase: any;
   let mockDeleteUseCase: any;
@@ -13,7 +13,7 @@ describe("FolioController", () => {
 
   beforeEach(() => {
     mockCreateUseCase = { execute: vi.fn() };
-    mockListUseCase = { execute: vi.fn() };
+    mockListPaginatedUseCase = { execute: vi.fn() };
     mockFindByIdUseCase = { execute: vi.fn() };
     mockUpdateUseCase = { execute: vi.fn() };
     mockDeleteUseCase = { execute: vi.fn() };
@@ -21,7 +21,7 @@ describe("FolioController", () => {
 
     controller = new FolioController(
       mockCreateUseCase,
-      mockListUseCase,
+      mockListPaginatedUseCase,
       mockFindByIdUseCase,
       mockUpdateUseCase,
       mockDeleteUseCase,
@@ -103,16 +103,20 @@ describe("FolioController", () => {
   describe("list", () => {
     it("should list all folios and return 200", async () => {
       const mockContext = createMockContext();
-      const mockResult = [
-        { id: "folio-1", nro_folio: 1, estado: true, promociones: ["PROMO-1"] },
-        { id: "folio-2", nro_folio: 2, estado: false, promociones: [] },
-      ];
+      const mockResult = {
+        list: [
+          { id: "folio-1", nro_folio: 1, estado: true, promociones: ["PROMO-1"], reserva_id: "reserva-1", observacion: null, cerrado_en: null, created_at: "", updated_at: "" },
+          { id: "folio-2", nro_folio: 2, estado: false, promociones: [], reserva_id: "reserva-1", observacion: null, cerrado_en: null, created_at: "", updated_at: "" },
+        ],
+        pagination: { page: 1, limit: 10, total: 2, totalPages: 1, hasNextPage: false, hasPreviousPage: false },
+      };
 
-      mockListUseCase.execute.mockResolvedValue(mockResult);
+      mockContext.get = vi.fn().mockReturnValue(undefined);
+      mockListPaginatedUseCase.execute.mockResolvedValue(mockResult);
 
-      await controller.list(mockContext);
+      await controller.listPaginated(mockContext);
 
-      expect(mockListUseCase.execute).toHaveBeenCalledWith();
+      expect(mockListPaginatedUseCase.execute).toHaveBeenCalledWith(undefined);
       expect(mockContext.json).toHaveBeenCalledWith(
         expect.objectContaining({
           success: true,
@@ -120,6 +124,22 @@ describe("FolioController", () => {
         }),
         200,
       );
+    });
+
+    it("should list folios with pagination and filters", async () => {
+      const mockContext = createMockContext();
+      const queryData = { page: 2, limit: 5, reserva_id: "reserva-1", estado: true };
+      const mockResult = {
+        list: [],
+        pagination: { page: 2, limit: 5, total: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: true },
+      };
+
+      mockContext.get = vi.fn().mockReturnValue(queryData);
+      mockListPaginatedUseCase.execute.mockResolvedValue(mockResult);
+
+      await controller.listPaginated(mockContext);
+
+      expect(mockListPaginatedUseCase.execute).toHaveBeenCalledWith(queryData);
     });
   });
 
@@ -138,7 +158,7 @@ describe("FolioController", () => {
         updated_at: new Date().toISOString(),
       };
 
-      mockContext.req.param = vi.fn().mockReturnValue("folio-123");
+      mockContext.req.param = vi.fn().mockReturnValue({ id: "folio-123" });
       mockFindByIdUseCase.execute.mockResolvedValue(mockOutput);
 
       await controller.findById(mockContext);
@@ -175,7 +195,7 @@ describe("FolioController", () => {
       };
 
       mockContext.get = vi.fn().mockReturnValue(input);
-      mockContext.req.param = vi.fn().mockReturnValue("folio-1");
+      mockContext.req.param = vi.fn().mockReturnValue({ id: "folio-1" });
       mockUpdateUseCase.execute.mockResolvedValue(mockOutput);
 
       await controller.update(mockContext);
@@ -209,7 +229,7 @@ describe("FolioController", () => {
       };
 
       mockContext.get = vi.fn().mockReturnValue(input);
-      mockContext.req.param = vi.fn().mockReturnValue("folio-1");
+      mockContext.req.param = vi.fn().mockReturnValue({ id: "folio-1" });
       mockUpdateUseCase.execute.mockResolvedValue(mockOutput);
 
       await controller.update(mockContext);
@@ -229,7 +249,7 @@ describe("FolioController", () => {
     it("should delete folio and return 200", async () => {
       const mockContext = createMockContext();
 
-      mockContext.req.param = vi.fn().mockReturnValue("folio-to-delete");
+      mockContext.req.param = vi.fn().mockReturnValue({ id: "folio-to-delete" });
       mockDeleteUseCase.execute.mockResolvedValue(undefined);
 
       await controller.delete(mockContext);
@@ -265,7 +285,7 @@ describe("FolioController", () => {
       };
 
       mockContext.get = vi.fn().mockReturnValue(input);
-      mockContext.req.param = vi.fn().mockReturnValue("folio-1");
+      mockContext.req.param = vi.fn().mockReturnValue({ id: "folio-1" });
       mockCloseUseCase.execute.mockResolvedValue(mockOutput);
 
       await controller.close(mockContext);
@@ -297,7 +317,7 @@ describe("FolioController", () => {
       };
 
       mockContext.get = vi.fn().mockReturnValue(input);
-      mockContext.req.param = vi.fn().mockReturnValue("folio-1");
+      mockContext.req.param = vi.fn().mockReturnValue({ id: "folio-1" });
       mockCloseUseCase.execute.mockResolvedValue(mockOutput);
 
       await controller.close(mockContext);

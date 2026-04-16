@@ -99,7 +99,7 @@ import { UpdateProductoUseCase } from "../../application/use-cases/producto/upda
 import { DeleteProductoUseCase } from "../../application/use-cases/producto/delete-producto.use-case";
 
 import { CreateFolioUseCase } from "../../application/use-cases/folio/create-folio.use-case";
-import { ListFolioUseCase } from "../../application/use-cases/folio/list-folio.use-case";
+import { ListFolioPaginatedUseCase } from "../../application/use-cases/folio/list-folio-paginated.use-case";
 import { FindFolioByIdUseCase } from "../../application/use-cases/folio/find-folio-by-id.use-case";
 import { UpdateFolioUseCase } from "../../application/use-cases/folio/update-folio.use-case";
 import { DeleteFolioUseCase } from "../../application/use-cases/folio/delete-folio.use-case";
@@ -220,7 +220,7 @@ const useCaseAndControllerClasses: Array<new (...args: never[]) => unknown> = [
   ProductoController,
   FolioController,
   CreateFolioUseCase,
-  ListFolioUseCase,
+  ListFolioPaginatedUseCase,
   FindFolioByIdUseCase,
   UpdateFolioUseCase,
   DeleteFolioUseCase,
