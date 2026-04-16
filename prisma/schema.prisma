@@ -90,6 +90,58 @@ model Verification {
 //======================================================================================
 
 // ============================================================
+// INVENTARIO ENUMS
+// ============================================================
+
+enum UnidadInsumo {
+  UNIDAD
+  LITRO
+  KG
+  GR
+  BOTELLA
+  CAJA
+  FCO
+  SACO
+  TUBO
+  BLISTER
+  PAQUETE
+
+  @@map("unidad_insumo")
+}
+
+enum TipoMovimiento {
+  ENTRADA
+  SALIDA
+
+  @@map("tipo_movimiento")
+}
+
+enum MotivoEntrada {
+  COMPRA
+  DONACION
+  AJUSTE
+  REPOSICION
+
+  @@map("motivo_entrada")
+}
+
+enum MotivoSalida {
+  CONSUMO
+  DESECHO
+  AJUSTE
+  STOCK_MINIMO
+
+  @@map("motivo_salida")
+}
+
+enum AreaInventario {
+  BAR
+  COCINA
+
+  @@map("area_inventario")
+}
+
+// ============================================================
 // ENUMS
 // Valores en español para coincidir con el SQL de la BD.
 // createdAt / updatedAt siempre en inglés (convención Prisma).
@@ -579,4 +631,80 @@ model Producto {
   folioProductos FolioProducto[]
 
   @@map("productos")
+}
+
+// ============================================================
+// INVENTARIO BAR
+// ============================================================
+
+model InsumoBar {
+  id            String      @id @default(uuid()) @db.Uuid
+  codigo        String     @unique @db.VarChar(30)
+  nombre        String     @db.VarChar(150)
+  unidad       UnidadInsumo
+  stockActual  Decimal    @default(0) @db.Decimal(10, 3)
+  stockMinimo  Decimal    @default(0) @db.Decimal(10, 3)
+  activo      Boolean    @default(true)
+  notas        String?    @db.Text
+  createdAt    DateTime   @default(now()) @db.Timestamptz
+  updatedAt    DateTime   @updatedAt @db.Timestamptz
+
+  movimientos MovimientoBar[]
+
+  @@map("insumos_bar")
+}
+
+model MovimientoBar {
+  id          String          @id @default(uuid()) @db.Uuid
+  insumoId    String          @db.Uuid
+  tipo        TipoMovimiento
+  cantidad   Decimal        @db.Decimal(10, 3)
+  motivoEntrada MotivoEntrada?
+  motivoSalida  MotivoSalida?
+  notas       String?        @db.Text
+  createdAt   DateTime       @default(now()) @db.Timestamptz
+
+  insumo     InsumoBar @relation(fields: [insumoId], references: [id], onDelete: Cascade)
+
+  @@index([insumoId])
+  @@index([createdAt])
+  @@map("movimientos_bar")
+}
+
+// ============================================================
+// INVENTARIO COCINA
+// ============================================================
+
+model InsumoCocina {
+  id            String      @id @default(uuid()) @db.Uuid
+  codigo        String     @unique @db.VarChar(30)
+  nombre        String     @db.VarChar(150)
+  unidad       UnidadInsumo
+  stockActual  Decimal    @default(0) @db.Decimal(10, 3)
+  stockMinimo  Decimal    @default(0) @db.Decimal(10, 3)
+  activo      Boolean    @default(true)
+  notas        String?    @db.Text
+  createdAt    DateTime   @default(now()) @db.Timestamptz
+  updatedAt    DateTime   @updatedAt @db.Timestamptz
+
+  movimientos MovimientoCocina[]
+
+  @@map("insumos_cocina")
+}
+
+model MovimientoCocina {
+  id          String          @id @default(uuid()) @db.Uuid
+  insumoId    String          @db.Uuid
+  tipo        TipoMovimiento
+  cantidad   Decimal        @db.Decimal(10, 3)
+  motivoEntrada MotivoEntrada?
+  motivoSalida  MotivoSalida?
+  notas       String?        @db.Text
+  createdAt   DateTime       @default(now()) @db.Timestamptz
+
+  insumo     InsumoCocina @relation(fields: [insumoId], references: [id], onDelete: Cascade)
+
+  @@index([insumoId])
+  @@index([createdAt])
+  @@map("movimientos_cocina")
 }

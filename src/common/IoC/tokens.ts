@@ -17,4 +17,6 @@ export const DI_TOKENS = {
   IPromocionRepository: Symbol.for("IPromocionRepository"),
   IProductoRepository: Symbol.for("IProductoRepository"),
   IFolioRepository: Symbol.for("IFolioRepository"),
+  IInsumoBarRepository: Symbol.for("IInsumoBarRepository"),
+  IInsumoCocinaRepository: Symbol.for("IInsumoCocinaRepository"),
 } as const;
