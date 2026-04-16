@@ -9,6 +9,8 @@ export interface CreatePagoDto {
   metodo: MetodoPago;
   recibido_por_id?: string;
   observacion?: string;
+  reservaId?: string;
+  folioId?: string;
 }
 
 export interface UpdatePagoDto {

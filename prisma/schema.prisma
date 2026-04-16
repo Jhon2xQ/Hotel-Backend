@@ -397,7 +397,6 @@ model Reserva {
   tarifa     Tarifa     @relation(fields: [tarifaId], references: [id])
   pago       Pago?      @relation("PagoReserva", fields: [pagoId], references: [id])
   estancias  Estancia[]
-  folios     Folio[]
 
   @@index([huespedId])
   @@index([habitacionId])
@@ -426,6 +425,7 @@ model Pago {
   updatedAt     DateTime     @updatedAt @db.Timestamptz
 
   reserva     Reserva? @relation("PagoReserva")
+  folio       Folio?   @relation("PagoFolio")
 
   @@map("pagos")
 }
@@ -451,6 +451,7 @@ model Estancia {
   reserva    Reserva    @relation(fields: [reservaId], references: [id])
   habitacion Habitacion @relation(fields: [habitacionId], references: [id])
   huesped    Huesped    @relation(fields: [huespedId], references: [id])
+  folios     Folio[]
 
   @@map("estancias")
 }
@@ -460,21 +461,67 @@ model Estancia {
 // ------------------------------------------------------------
 
 model Folio {
-  id          String      @id @default(uuid()) @db.Uuid
-  nroFolio    Int         @unique @default(autoincrement())
-  reservaId   String      @db.Uuid
-  estado      Boolean     @default(true)
-  observacion String?     @db.Text
-  cerradoEn   DateTime?   @db.Timestamptz
-  createdAt   DateTime    @default(now()) @db.Timestamptz
-  updatedAt   DateTime    @updatedAt @db.Timestamptz
+  id           String          @id @default(uuid()) @db.Uuid
+  codigo       String          @unique @db.VarChar(20)
+  estanciaId  String           @db.Uuid
+  pagoId       String?         @unique @db.Uuid
+  estado       Boolean         @default(true)
+  observacion String?          @db.Text
+  cerradoEn    DateTime?       @db.Timestamptz
+  createdAt    DateTime        @default(now()) @db.Timestamptz
+  updatedAt    DateTime        @updatedAt @db.Timestamptz
 
-  reserva     Reserva    @relation(fields: [reservaId], references: [id])
-  promociones Promocion[]
+  estancia       Estancia       @relation(fields: [estanciaId], references: [id])
+  pago           Pago?          @relation("PagoFolio", fields: [pagoId], references: [id])
+  folioProductos FolioProducto[]
+  folioServicios FolioServicio[]
+  promociones    Promocion[]
 
-  @@index([reservaId])
+  @@index([estanciaId])
   @@index([estado])
   @@map("folios")
+}
+
+// ------------------------------------------------------------
+// 18. FOLIO PRODUCTOS
+// ------------------------------------------------------------
+
+model FolioProducto {
+  id         String   @id @default(uuid()) @db.Uuid
+  folioId    String    @db.Uuid
+  productoId String    @db.Uuid
+  cantidad   Int       @default(1) @db.Integer
+  precioUnit Decimal   @db.Decimal(6, 2)
+  total      Decimal   @db.Decimal(10, 2)
+  createdAt  DateTime  @default(now()) @db.Timestamptz
+  updatedAt  DateTime  @updatedAt @db.Timestamptz
+
+  folio    Folio    @relation(fields: [folioId], references: [id], onDelete: Cascade)
+  producto Producto @relation(fields: [productoId], references: [id])
+
+  @@index([folioId])
+  @@index([productoId])
+  @@map("folio_productos")
+}
+
+// ------------------------------------------------------------
+// 19. FOLIO SERVICIOS
+// ------------------------------------------------------------
+
+model FolioServicio {
+  id         String   @id @default(uuid()) @db.Uuid
+  folioId    String   @db.Uuid
+  concepto   String   @db.VarChar(150)
+  cantidad   Int      @default(1) @db.Integer
+  precioUnit Decimal  @db.Decimal(6, 2)
+  total      Decimal  @db.Decimal(10, 2)
+  createdAt  DateTime @default(now()) @db.Timestamptz
+  updatedAt  DateTime @updatedAt @db.Timestamptz
+
+  folio Folio @relation(fields: [folioId], references: [id], onDelete: Cascade)
+
+  @@index([folioId])
+  @@map("folio_servicios")
 }
 
 // ------------------------------------------------------------
@@ -520,14 +567,16 @@ model Promocion {
 // ------------------------------------------------------------
 
 model Producto {
-  id            String    @id @default(uuid()) @db.Uuid
-  codigo        String    @unique @db.VarChar(30)
-  nombre        String    @db.VarChar(150)
-  descripcion   String?   @db.Text
-  precioUnitario Decimal  @db.Decimal(6, 2)
-  stock         Int       @default(0) @db.Integer
-  createdAt     DateTime  @default(now()) @db.Timestamptz
-  updatedAt     DateTime  @updatedAt @db.Timestamptz
+  id            String          @id @default(uuid()) @db.Uuid
+  codigo        String          @unique @db.VarChar(30)
+  nombre        String          @db.VarChar(150)
+  descripcion   String?         @db.Text
+  precioUnitario Decimal       @db.Decimal(6, 2)
+  stock         Int             @default(0) @db.Integer
+  createdAt     DateTime        @default(now()) @db.Timestamptz
+  updatedAt     DateTime        @updatedAt @db.Timestamptz
+
+  folioProductos FolioProducto[]
 
   @@map("productos")
 }

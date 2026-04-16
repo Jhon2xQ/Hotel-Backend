@@ -6,8 +6,10 @@ import { ListFolioPaginatedUseCase } from "../../application/use-cases/folio/lis
 import { FindFolioByIdUseCase } from "../../application/use-cases/folio/find-folio-by-id.use-case";
 import { UpdateFolioUseCase } from "../../application/use-cases/folio/update-folio.use-case";
 import { DeleteFolioUseCase } from "../../application/use-cases/folio/delete-folio.use-case";
-import { CloseFolioUseCase } from "../../application/use-cases/folio/close-folio.use-case";
-import type { CreateFolioDto, UpdateFolioDto } from "../../application/dtos/folio.dto";
+import { AddProductoFolioUseCase } from "../../application/use-cases/folio/add-producto-folio.use-case";
+import { AddServicioFolioUseCase } from "../../application/use-cases/folio/add-servicio-folio.use-case";
+import { GetConsumosFolioUseCase } from "../../application/use-cases/folio/get-consumos-folio.use-case";
+import type { CreateFolioDto, UpdateFolioDto, CreateFolioProductoDto, CreateFolioServicioDto } from "../../application/dtos/folio.dto";
 import type { ListFolioQuery } from "../../presentation/schemas/folio.schema";
 
 @injectable()
@@ -18,7 +20,9 @@ export class FolioController {
     private readonly findByIdUseCase: FindFolioByIdUseCase,
     private readonly updateUseCase: UpdateFolioUseCase,
     private readonly deleteUseCase: DeleteFolioUseCase,
-    private readonly closeUseCase: CloseFolioUseCase,
+    private readonly addProductoUseCase: AddProductoFolioUseCase,
+    private readonly addServicioUseCase: AddServicioFolioUseCase,
+    private readonly getConsumosUseCase: GetConsumosFolioUseCase,
   ) {}
 
   async create(c: AppContext) {
@@ -52,10 +56,23 @@ export class FolioController {
     return c.json(ApiResponse.success("Folio eliminado exitosamente"), 200);
   }
 
-  async close(c: AppContext) {
+  async addProducto(c: AppContext) {
     const { id } = c.req.param();
-    const input = c.get("validData") as { observacion?: string };
-    const result = await this.closeUseCase.execute(id, input.observacion);
-    return c.json(ApiResponse.success("Folio cerrado exitosamente", result), 200);
+    const input = c.get("validData") as CreateFolioProductoDto;
+    const result = await this.addProductoUseCase.execute(id, input);
+    return c.json(ApiResponse.success("Producto agregado al folio", result), 201);
+  }
+
+  async addServicio(c: AppContext) {
+    const { id } = c.req.param();
+    const input = c.get("validData") as CreateFolioServicioDto;
+    const result = await this.addServicioUseCase.execute(id, input);
+    return c.json(ApiResponse.success("Servicio agregado al folio", result), 201);
+  }
+
+  async getConsumos(c: AppContext) {
+    const { id } = c.req.param();
+    const result = await this.getConsumosUseCase.execute(id);
+    return c.json(ApiResponse.success("Consumos obtenidos", result), 200);
   }
 }

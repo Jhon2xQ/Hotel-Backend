@@ -14,7 +14,11 @@ export class DeleteFolioUseCase {
     }
 
     if (existingFolio.estado === false) {
-      throw FolioException.cannotModifyClosed();
+      throw FolioException.cannotDeleteClosed();
+    }
+
+    if (existingFolio.pagoId) {
+      throw FolioException.cannotDeleteWithPago();
     }
 
     await this.repository.delete(id);

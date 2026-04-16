@@ -103,7 +103,9 @@ import { ListFolioPaginatedUseCase } from "../../application/use-cases/folio/lis
 import { FindFolioByIdUseCase } from "../../application/use-cases/folio/find-folio-by-id.use-case";
 import { UpdateFolioUseCase } from "../../application/use-cases/folio/update-folio.use-case";
 import { DeleteFolioUseCase } from "../../application/use-cases/folio/delete-folio.use-case";
-import { CloseFolioUseCase } from "../../application/use-cases/folio/close-folio.use-case";
+import { AddProductoFolioUseCase } from "../../application/use-cases/folio/add-producto-folio.use-case";
+import { AddServicioFolioUseCase } from "../../application/use-cases/folio/add-servicio-folio.use-case";
+import { GetConsumosFolioUseCase } from "../../application/use-cases/folio/get-consumos-folio.use-case";
 
 import { MuebleController } from "../../presentation/controllers/mueble.controller";
 import { HabitacionController } from "../../presentation/controllers/habitacion.controller";
@@ -224,7 +226,9 @@ const useCaseAndControllerClasses: Array<new (...args: never[]) => unknown> = [
   FindFolioByIdUseCase,
   UpdateFolioUseCase,
   DeleteFolioUseCase,
-  CloseFolioUseCase,
+  AddProductoFolioUseCase,
+  AddServicioFolioUseCase,
+  GetConsumosFolioUseCase,
 ];
 
 /**

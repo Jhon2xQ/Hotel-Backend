@@ -10,6 +10,42 @@ export class PagoRepository implements IPagoRepository {
   constructor(@inject(DI_TOKENS.PrismaClient) private prisma: PrismaClient) {}
 
   async create(data: CreatePagoParams): Promise<Pago> {
+    if (data.folioId) {
+      const result = await this.prisma.pago.create({
+        data: {
+          concepto: data.concepto,
+          estado: data.estado ?? EstadoPago.CONFIRMADO,
+          fechaPago: data.fechaPago ?? new Date(),
+          monto: new Prisma.Decimal(data.monto),
+          moneda: data.moneda ?? "SOL",
+          metodo: data.metodo,
+          recibidoPorId: data.recibidoPorId ?? null,
+          observacion: data.observacion ?? null,
+          folio: { connect: { id: data.folioId } },
+        },
+        include: { folio: true },
+      });
+      return mapPagoFromPrisma(result);
+    }
+
+    if (data.reservaId) {
+      const result = await this.prisma.pago.create({
+        data: {
+          concepto: data.concepto,
+          estado: data.estado ?? EstadoPago.CONFIRMADO,
+          fechaPago: data.fechaPago ?? new Date(),
+          monto: new Prisma.Decimal(data.monto),
+          moneda: data.moneda ?? "SOL",
+          metodo: data.metodo,
+          recibidoPorId: data.recibidoPorId ?? null,
+          observacion: data.observacion ?? null,
+          reserva: { connect: { id: data.reservaId } },
+        },
+        include: { reserva: true },
+      });
+      return mapPagoFromPrisma(result);
+    }
+
     const result = await this.prisma.pago.create({
       data: {
         concepto: data.concepto,
@@ -33,7 +69,24 @@ export class PagoRepository implements IPagoRepository {
   }
 
   async findById(id: string): Promise<Pago | null> {
-    const result = await this.prisma.pago.findUnique({ where: { id } });
+    const result = await this.prisma.pago.findUnique({
+      where: { id },
+      include: { folio: true, reserva: true },
+    });
+    return result ? mapPagoFromPrisma(result) : null;
+  }
+
+  async findByReservaId(reservaId: string): Promise<Pago | null> {
+    const result = await this.prisma.pago.findFirst({
+      where: { reserva: { id: reservaId } },
+    });
+    return result ? mapPagoFromPrisma(result) : null;
+  }
+
+  async findByFolioId(folioId: string): Promise<Pago | null> {
+    const result = await this.prisma.pago.findFirst({
+      where: { folio: { id: folioId } },
+    });
     return result ? mapPagoFromPrisma(result) : null;
   }
 
@@ -50,6 +103,7 @@ export class PagoRepository implements IPagoRepository {
     const result = await this.prisma.pago.update({
       where: { id },
       data: updateData,
+      include: { folio: true, reserva: true },
     });
     return mapPagoFromPrisma(result);
   }

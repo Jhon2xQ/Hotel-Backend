@@ -6,19 +6,19 @@ export const UUIDParamSchema = z.object({
 });
 
 export const ListFolioQuerySchema = PaginationQuerySchema.extend({
-  reserva_id: z.uuid("El ID de la reserva debe ser un UUID válido").optional(),
+  estancia_id: z.uuid("El ID de la estancia debe ser un UUID válido").optional(),
   estado: z.boolean().optional(),
 });
 export type ListFolioQuery = z.infer<typeof ListFolioQuerySchema>;
 
 export const CreateFolioSchema = z
   .object({
-    reserva_id: z.uuid("El ID de la reserva es requerido y debe ser un UUID válido"),
+    estancia_id: z.uuid("El ID de la estancia es requerido y debe ser un UUID válido"),
     observacion: z.string().optional(),
     promocion_ids: z.array(z.uuid("ID de promoción inválido")).optional(),
   })
   .transform((data) => ({
-    reservaId: data.reserva_id,
+    estanciaId: data.estancia_id,
     observacion: data.observacion,
     promocionIds: data.promocion_ids,
   }));
@@ -33,10 +33,26 @@ export const UpdateFolioSchema = z
     ...data,
   }));
 
-export const CloseFolioSchema = z
+export const AddProductoSchema = z
   .object({
-    observacion: z.string().optional(),
+    producto_id: z.uuid("El ID del producto es requerido y debe ser un UUID válido"),
+    cantidad: z.number().int().positive("La cantidad debe ser un número entero positivo"),
+    precio_unit: z.number().positive("El precio unitario debe ser positivo"),
   })
   .transform((data) => ({
-    observacion: data.observacion,
+    productoId: data.producto_id,
+    cantidad: data.cantidad,
+    precioUnit: data.precio_unit,
+  }));
+
+export const AddServicioSchema = z
+  .object({
+    concepto: z.string().min(1, "El concepto es requerido"),
+    cantidad: z.number().int().positive("La cantidad debe ser un número entero positivo"),
+    precio_unit: z.number().positive("El precio unitario debe ser positivo"),
+  })
+  .transform((data) => ({
+    concepto: data.concepto,
+    cantidad: data.cantidad,
+    precioUnit: data.precio_unit,
   }));

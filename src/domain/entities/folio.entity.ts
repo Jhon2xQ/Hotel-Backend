@@ -1,8 +1,9 @@
 export class Folio {
   constructor(
     public readonly id: string,
-    public readonly nroFolio: number,
-    public readonly reservaId: string,
+    public readonly codigo: string,
+    public readonly estanciaId: string,
+    public readonly pagoId: string | null,
     public readonly estado: boolean,
     public readonly observacion: string | null,
     public readonly cerradoEn: Date | null,
@@ -16,5 +17,9 @@ export class Folio {
 
   isCerrado(): boolean {
     return this.estado === false;
+  }
+
+  hasPago(): boolean {
+    return this.pagoId !== null;
   }
 }
