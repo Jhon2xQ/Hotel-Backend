@@ -22,8 +22,8 @@ export class UpdateFolioUseCase {
       throw FolioException.alreadyClosed();
     }
 
-    if (input.promocion_ids && input.promocion_ids.length > 0) {
-      for (const promocionId of input.promocion_ids) {
+    if (input.promocionIds && input.promocionIds.length > 0) {
+      for (const promocionId of input.promocionIds) {
         const promocion = await this.promocionRepository.findById(promocionId);
         if (!promocion) {
           throw FolioException.promocionNotFound();
@@ -34,7 +34,7 @@ export class UpdateFolioUseCase {
     const folio = await this.repository.update(id, {
       estado: input.estado,
       observacion: input.observacion,
-      promocionIds: input.promocion_ids,
+      promocionIds: input.promocionIds,
     });
 
     return toFolioDto(folio);

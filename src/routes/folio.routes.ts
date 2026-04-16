@@ -12,8 +12,7 @@ export function createFolioRoutes(): AppHono {
   const ctrl = container.resolve(FolioController);
   const router = new Hono<{ Variables: AppVariables }>();
 
-  router.use("*", authMiddleware);
-  router.use("*", requireRoles(ROLES.ADMIN, ROLES.RECEPCIONISTA));
+  //router.use("*", requireRoles(ROLES.ADMIN, ROLES.RECEPCIONISTA));
 
   router.get("/", (c) => ctrl.list(c));
   router.get("/:id", validParams(UUIDParamSchema), (c) => ctrl.findById(c));

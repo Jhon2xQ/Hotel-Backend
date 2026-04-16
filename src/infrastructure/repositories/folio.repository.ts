@@ -9,11 +9,8 @@ import type {
 import { DI_TOKENS } from "../../common/IoC/tokens";
 
 function mapFolioWithPromociones(data: Record<string, unknown>): FolioWithPromociones {
-  const promocionRaw = data.promocion as Array<Record<string, unknown>> | undefined;
-  const promociones = (promocionRaw ?? []).map((pf) => {
-    const promo = pf.promocion as Record<string, unknown> | undefined;
-    return (promo?.codigo as string) ?? "";
-  }).filter((c) => c !== "");
+  const promocionesRaw = data.promociones as Array<Record<string, unknown>> | undefined;
+  const promociones = (promocionesRaw ?? []).map((p) => p.codigo as string);
 
   return {
     id: data.id as string,
@@ -38,20 +35,18 @@ export class FolioRepository implements IFolioRepository {
         reservaId: data.reservaId,
         estado: data.estado ?? true,
         observacion: data.observacion ?? null,
-        promocion: data.promocionIds
-          ? {
-              create: data.promocionIds.map((promocionId) => ({ promocionId })),
-            }
+        promociones: data.promocionIds
+          ? { connect: data.promocionIds.map((id) => ({ id })) }
           : undefined,
       },
-      include: { promocion: { include: { promocion: { select: { codigo: true } } } } },
+      include: { promociones: { select: { codigo: true } } },
     });
     return mapFolioWithPromociones(result as unknown as Record<string, unknown>);
   }
 
   async findAll(): Promise<FolioWithPromociones[]> {
     const results = await this.prisma.folio.findMany({
-      include: { promocion: { include: { promocion: { select: { codigo: true } } } } },
+      include: { promociones: { select: { codigo: true } } },
       orderBy: { createdAt: "desc" },
     });
     return results.map((r) => mapFolioWithPromociones(r as unknown as Record<string, unknown>));
@@ -60,7 +55,7 @@ export class FolioRepository implements IFolioRepository {
   async findById(id: string): Promise<FolioWithPromociones | null> {
     const result = await this.prisma.folio.findUnique({
       where: { id },
-      include: { promocion: { include: { promocion: { select: { codigo: true } } } } },
+      include: { promociones: { select: { codigo: true } } },
     });
     return result ? mapFolioWithPromociones(result as unknown as Record<string, unknown>) : null;
   }
@@ -68,7 +63,7 @@ export class FolioRepository implements IFolioRepository {
   async findByReservaId(reservaId: string): Promise<FolioWithPromociones[]> {
     const results = await this.prisma.folio.findMany({
       where: { reservaId },
-      include: { promocion: { include: { promocion: { select: { codigo: true } } } } },
+      include: { promociones: { select: { codigo: true } } },
       orderBy: { nroFolio: "asc" },
     });
     return results.map((r) => mapFolioWithPromociones(r as unknown as Record<string, unknown>));
@@ -80,16 +75,15 @@ export class FolioRepository implements IFolioRepository {
     if (data.estado !== undefined) updateData.estado = data.estado;
     if (data.observacion !== undefined) updateData.observacion = data.observacion;
     if (data.promocionIds !== undefined) {
-      updateData.promocion = {
-        deleteMany: {},
-        create: data.promocionIds.map((promocionId) => ({ promocionId })),
+      updateData.promociones = {
+        set: data.promocionIds.map((id) => ({ id })),
       };
     }
 
     const result = await this.prisma.folio.update({
       where: { id },
       data: updateData,
-      include: { promocion: { include: { promocion: { select: { codigo: true } } } } },
+      include: { promociones: { select: { codigo: true } } },
     });
     return mapFolioWithPromociones(result as unknown as Record<string, unknown>);
   }
@@ -105,7 +99,7 @@ export class FolioRepository implements IFolioRepository {
         estado: false,
         cerradoEn: new Date(),
       },
-      include: { promocion: { include: { promocion: { select: { codigo: true } } } } },
+      include: { promociones: { select: { codigo: true } } },
     });
     return mapFolioWithPromociones(result as unknown as Record<string, unknown>);
   }

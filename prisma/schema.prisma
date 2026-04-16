@@ -208,45 +208,6 @@ enum TipoDescuento {
   @@map("tipo_descuento")
 }
 
-enum EstadoFolio {
-  ABIERTO
-  CERRADO
-  TRANSFERIDO
-
-  @@map("estado_folio")
-}
-
-enum CategoriaServicio {
-  HABITACION
-  ALIMENTO
-  BEBIDA
-  SPA
-  TOUR
-  LAVANDERIA
-  TRANSPORTE
-  MINIBAR
-  OTRO
-
-  @@map("categoria_servicio")
-}
-
-enum TipoComprobante {
-  BOLETA
-  FACTURA
-  NOTA_CREDITO
-
-  @@map("tipo_comprobante")
-}
-
-enum EstadoSunat {
-  PENDIENTE
-  ACEPTADO
-  RECHAZADO
-  ANULADO
-
-  @@map("estado_sunat")
-}
-
 
 // ============================================================
 // MODELOS
@@ -384,29 +345,7 @@ model Tarifa {
 }
 
 // ------------------------------------------------------------
-// 13. SERVICIOS / CATÁLOGO COBRABLE
-// ------------------------------------------------------------
-
-model Servicio {
-  id             String            @id @default(uuid()) @db.Uuid
-  codigo         String            @unique @db.VarChar(30)
-  nombre         String            @db.VarChar(150)
-  categoria      CategoriaServicio
-  precioUnitario Decimal           @db.Decimal(10, 2)
-  moneda         String            @default("USD") @db.Char(3)
-  igvPct         Decimal           @default(18.00) @db.Decimal(5, 2)
-  activo         Boolean           @default(true)
-  descripcion    String?           @db.Text
-  createdAt      DateTime          @default(now()) @db.Timestamptz
-  updatedAt      DateTime          @updatedAt @db.Timestamptz
-
-  cargos CargoFolio[]
-
-  @@map("servicios")
-}
-
-// ------------------------------------------------------------
-// 14. RESERVAS
+// 7. TARIFAS
 // ------------------------------------------------------------
 
 model Reserva {
@@ -524,16 +463,14 @@ model Folio {
   id          String      @id @default(uuid()) @db.Uuid
   nroFolio    Int         @unique @default(autoincrement())
   reservaId   String      @db.Uuid
-  estado      Boolean     @default(true) // true = abierto, false = cerrado
+  estado      Boolean     @default(true)
   observacion String?     @db.Text
   cerradoEn   DateTime?   @db.Timestamptz
   createdAt   DateTime    @default(now()) @db.Timestamptz
   updatedAt   DateTime    @updatedAt @db.Timestamptz
 
-  reserva      Reserva       @relation(fields: [reservaId], references: [id])
-  promocion    PromocionFolio[]
-  cargos       CargoFolio[]
-  comprobantes Comprobante[]
+  reserva     Reserva    @relation(fields: [reservaId], references: [id])
+  promociones Promocion[]
 
   @@index([reservaId])
   @@index([estado])
@@ -541,79 +478,7 @@ model Folio {
 }
 
 // ------------------------------------------------------------
-// 17.1 FOLIO - PROMOCION (many-to-many)
-// ------------------------------------------------------------
-
-model PromocionFolio {
-  folioId     String @db.Uuid
-  promocionId String @db.Uuid
-
-  folio     Folio     @relation(fields: [folioId], references: [id], onDelete: Cascade)
-  promocion Promocion @relation(fields: [promocionId], references: [id], onDelete: Cascade)
-
-  @@id([folioId, promocionId])
-  @@map("promocion_folio")
-}
-
-// ------------------------------------------------------------
-// 18. CARGOS AL FOLIO
-// ------------------------------------------------------------
-
-model CargoFolio {
-  id         String @id @default(uuid()) @db.Uuid
-  folioId    String @db.Uuid
-  servicioId String @db.Uuid
-
-  fechaCargo      DateTime @default(now()) @db.Date
-  cantidad        Decimal  @default(1) @db.Decimal(8, 2)
-  precioUnit      Decimal  @db.Decimal(10, 2)
-  // subtotal, montoIgv, total: calculados en BD, solo lectura
-  subtotal        Decimal? @db.Decimal(12, 2)
-  igvPct          Decimal  @default(18.00) @db.Decimal(5, 2)
-  montoIgv        Decimal? @db.Decimal(12, 2)
-  total           Decimal? @db.Decimal(12, 2)
-  descripcion     String?  @db.Text
-  registradoPorId String?  @db.Uuid
-  anulado         Boolean  @default(false)
-  motivoAnul      String?  @db.Text
-  createdAt       DateTime @default(now()) @db.Timestamptz
-
-  folio         Folio     @relation(fields: [folioId], references: [id])
-  servicio      Servicio  @relation(fields: [servicioId], references: [id])
-
-  @@map("cargos_folio")
-}
-
-// ------------------------------------------------------------
-// 19. COMPROBANTES SUNAT
-// ------------------------------------------------------------
-
-model Comprobante {
-  id              String          @id @default(uuid()) @db.Uuid
-  folioId         String          @db.Uuid
-  tipo            TipoComprobante
-  serie           String          @db.VarChar(5)
-  numero          Int
-  fechaEmision    DateTime        @default(now()) @db.Date
-  tipoDocReceptor String?         @db.VarChar(10)
-  nroDocReceptor  String?         @db.VarChar(11)
-  nombreReceptor  String?         @db.VarChar(200)
-  dirReceptor     String?         @db.Text
-  subtotal        Decimal         @db.Decimal(12, 2)
-  igv             Decimal         @db.Decimal(10, 2)
-  total           Decimal         @db.Decimal(12, 2)
-  estadoSunat     EstadoSunat     @default(PENDIENTE)
-  codigoSunat     String?         @db.VarChar(50)
-  createdAt       DateTime        @default(now()) @db.Timestamptz
-
-  folio Folio @relation(fields: [folioId], references: [id])
-
-  @@unique([serie, numero])
-  @@map("comprobantes")
-}
-
-// ------------------------------------------------------------
-// 19. CATEGORIA MUEBLE
+// 18. CATEGORIA MUEBLE
 // ------------------------------------------------------------
 
 model CategoriaMueble {
@@ -630,7 +495,7 @@ model CategoriaMueble {
 }
 
 // ------------------------------------------------------------
-// 20. PROMOCIONES
+// 19. PROMOCIONES
 // ------------------------------------------------------------
 
 model Promocion {
@@ -645,7 +510,7 @@ model Promocion {
   updatedAt        DateTime       @updatedAt @db.Timestamptz
 
   habitaciones Habitacion[]
-  folios       PromocionFolio[]
+  folios       Folio[]
 
   @@map("promociones")
 }

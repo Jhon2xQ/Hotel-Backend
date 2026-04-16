@@ -16,13 +16,13 @@ export class CreateFolioUseCase {
   ) {}
 
   async execute(input: CreateFolioDto): Promise<FolioDto> {
-    const reserva = await this.reservaRepository.findById(input.reserva_id);
+    const reserva = await this.reservaRepository.findById(input.reservaId);
     if (!reserva) {
-      throw ReservaException.notFoundById(input.reserva_id);
+      throw ReservaException.notFoundById(input.reservaId);
     }
 
-    if (input.promocion_ids && input.promocion_ids.length > 0) {
-      for (const promocionId of input.promocion_ids) {
+    if (input.promocionIds && input.promocionIds.length > 0) {
+      for (const promocionId of input.promocionIds) {
         const promocion = await this.promocionRepository.findById(promocionId);
         if (!promocion) {
           throw FolioException.promocionNotFound();
@@ -31,9 +31,9 @@ export class CreateFolioUseCase {
     }
 
     const folio = await this.repository.create({
-      reservaId: input.reserva_id,
+      reservaId: input.reservaId,
       observacion: input.observacion,
-      promocionIds: input.promocion_ids,
+      promocionIds: input.promocionIds,
     });
 
     return toFolioDto(folio);

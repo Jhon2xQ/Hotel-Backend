@@ -1,15 +1,15 @@
 import type { FolioWithPromociones } from "../../domain/interfaces/folio.repository.interface";
 
 export interface CreateFolioDto {
-  reserva_id: string;
+  reservaId: string;
   observacion?: string;
-  promocion_ids?: string[];
+  promocionIds?: string[];
 }
 
 export interface UpdateFolioDto {
   estado?: boolean;
   observacion?: string;
-  promocion_ids?: string[];
+  promocionIds?: string[];
 }
 
 export interface FolioDto {
