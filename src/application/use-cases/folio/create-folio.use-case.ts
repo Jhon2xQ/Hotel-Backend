@@ -1,0 +1,45 @@
+import { inject, injectable } from "tsyringe";
+import { FolioException } from "../../../domain/exceptions/folio.exception";
+import type { IFolioRepository } from "../../../domain/interfaces/folio.repository.interface";
+import type { IEstanciaRepository } from "../../../domain/interfaces/estancia.repository.interface";
+import type { IPromocionRepository } from "../../../domain/interfaces/promocion.repository.interface";
+import { CreateFolioDto, FolioDto, toFolioDto } from "../../dtos/folio.dto";
+import { DI_TOKENS } from "../../../common/IoC/tokens";
+
+@injectable()
+export class CreateFolioUseCase {
+  constructor(
+    @inject(DI_TOKENS.IFolioRepository) private repository: IFolioRepository,
+    @inject(DI_TOKENS.IEstanciaRepository) private estanciaRepository: IEstanciaRepository,
+    @inject(DI_TOKENS.IPromocionRepository) private promocionRepository: IPromocionRepository,
+  ) {}
+
+  async execute(input: CreateFolioDto): Promise<FolioDto> {
+    const estancia = await this.estanciaRepository.findById(input.estanciaId);
+    if (!estancia) {
+      throw FolioException.estanciaNotFound();
+    }
+
+    const existingOpenFolio = await this.repository.findOpenByEstanciaId(input.estanciaId);
+    if (existingOpenFolio) {
+      throw FolioException.estanciaHasOpenFolio();
+    }
+
+    if (input.promocionIds && input.promocionIds.length > 0) {
+      for (const promocionId of input.promocionIds) {
+        const promocion = await this.promocionRepository.findById(promocionId);
+        if (!promocion) {
+          throw FolioException.promocionNotFound();
+        }
+      }
+    }
+
+    const folio = await this.repository.create({
+      estanciaId: input.estanciaId,
+      observacion: input.observacion,
+      promocionIds: input.promocionIds,
+    });
+
+    return toFolioDto(folio);
+  }
+}

@@ -1,6 +1,7 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { CreatePagoUseCase } from "../../../src/application/use-cases/pago/create-pago.use-case";
 import { IPagoRepository } from "../../../src/domain/interfaces/pago.repository.interface";
+import { IFolioRepository } from "../../../src/domain/interfaces/folio.repository.interface";
 import { IUserRepository } from "../../../src/domain/interfaces/user.repository.interface";
 import { PagoException } from "../../../src/domain/exceptions/pago.exception";
 import { createMockPago, createMockUser } from "../../helpers/pago-fixtures";
@@ -8,28 +9,48 @@ import { ConceptoPago, MetodoPago } from "../../../src/domain/entities/pago.enti
 
 describe("CreatePagoUseCase", () => {
   let useCase: CreatePagoUseCase;
-  let mockRepository: IPagoRepository;
+  let mockPagoRepository: IPagoRepository;
+  let mockFolioRepository: IFolioRepository;
   let mockUserRepository: IUserRepository;
 
   beforeEach(() => {
-    mockRepository = {
+    mockPagoRepository = {
       create: async () => createMockPago(),
       findAll: async () => [],
       findById: async () => null,
+      findByReservaId: async () => null,
+      findByFolioId: async () => null,
       update: async () => createMockPago(),
       delete: async () => {},
+    };
+
+    mockFolioRepository = {
+      create: async () => ({ id: "folio-1" } as any),
+      findAll: async () => [],
+      findAllPaginated: async () => ({ list: [], pagination: { page: 1, limit: 10, total: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false } }),
+      findById: async () => null,
+      findByEstanciaId: async () => [],
+      findByCodigo: async () => null,
+      findOpenByEstanciaId: async () => null,
+      update: async () => ({ id: "folio-1" } as any),
+      delete: async () => {},
+      addProducto: async () => ({ id: "fp-1" } as any),
+      addServicio: async () => ({ id: "fs-1" } as any),
+      getConsumos: async () => ({ productos: [], servicios: [] }),
+      getTotal: async () => 100,
+      closeWithPago: vi.fn().mockResolvedValue({ id: "folio-1", estado: false }),
     };
 
     mockUserRepository = {
       findById: async () => null,
     };
 
-    useCase = new CreatePagoUseCase(mockRepository, mockUserRepository);
+    useCase = new CreatePagoUseCase(mockPagoRepository, mockFolioRepository, mockUserRepository);
   });
 
   it("should create a pago successfully", async () => {
     const mockPago = createMockPago();
-    mockRepository.create = async () => mockPago;
+    mockPagoRepository.create = async () => mockPago;
 
     const result = await useCase.execute({
       concepto: ConceptoPago.RESERVA,
@@ -64,7 +85,7 @@ describe("CreatePagoUseCase", () => {
   it("should create pago with recibido_por_id", async () => {
     const mockUser = createMockUser({ id: "user-123" });
     const mockPago = createMockPago({ recibidoPorId: "user-123" });
-    mockRepository.create = async () => mockPago;
+    mockPagoRepository.create = async () => mockPago;
     mockUserRepository.findById = async (id: string) => {
       if (id === "user-123") return mockUser;
       return null;
@@ -94,43 +115,62 @@ describe("CreatePagoUseCase", () => {
     ).rejects.toThrow(PagoException);
   });
 
-  it("should create pago with custom fecha_pago", async () => {
-    const customDate = new Date("2026-03-20T10:00:00.000Z");
-    const mockPago = createMockPago({ fechaPago: customDate });
-    mockRepository.create = async () => mockPago;
+  it("should create pago for folio and close it", async () => {
+    const mockPago = createMockPago({ id: "pago-1" });
+    const mockFolio = {
+      id: "folio-1",
+      estado: true,
+    };
+
+    mockFolioRepository.findById = async () => mockFolio as any;
+    mockFolioRepository.getTotal = async () => 100;
+    mockPagoRepository.create = async () => mockPago;
+
+    let closeCalledWith: any = null;
+    mockFolioRepository.closeWithPago = async (folioId: string, pagoId: string) => {
+      closeCalledWith = { folioId, pagoId };
+      return { ...mockFolio, estado: false } as any;
+    };
 
     const result = await useCase.execute({
       concepto: ConceptoPago.CONSUMO,
-      monto: 200.0,
-      metodo: MetodoPago.VISA,
-      fecha_pago: customDate,
+      monto: 100,
+      metodo: MetodoPago.EFECTIVO,
+      folioId: "folio-1",
     });
 
-    expect(result.fecha_pago).toBe(customDate.toISOString());
+    expect(result).toBeDefined();
+    expect(closeCalledWith).toEqual({ folioId: "folio-1", pagoId: "pago-1" });
   });
 
-  it("should create pago with all optional fields", async () => {
-    const mockUser = createMockUser();
-    const mockPago = createMockPago({
-      concepto: ConceptoPago.CONSUMO,
-      monto: 300.0,
-      moneda: "PEN",
-      metodo: MetodoPago.TRANSFERENCIA,
-      observacion: "Pago por servicios adicionales",
-    });
-    mockRepository.create = async () => mockPago;
-    mockUserRepository.findById = async () => mockUser;
+  it("should throw error if folio not found", async () => {
+    mockFolioRepository.findById = async () => null;
 
-    const result = await useCase.execute({
-      concepto: ConceptoPago.CONSUMO,
-      monto: 300.0,
-      moneda: "PEN",
-      metodo: MetodoPago.TRANSFERENCIA,
-      recibido_por_id: "user-123",
-      observacion: "Pago por servicios adicionales",
-    });
+    await expect(
+      useCase.execute({
+        concepto: ConceptoPago.CONSUMO,
+        monto: 100,
+        metodo: MetodoPago.EFECTIVO,
+        folioId: "non-existent-folio",
+      }),
+    ).rejects.toThrow();
+  });
 
-    expect(result.moneda).toBe("PEN");
-    expect(result.observacion).toBe("Pago por servicios adicionales");
+  it("should throw error if folio is already closed", async () => {
+    const closedFolio = {
+      id: "folio-1",
+      estado: false,
+    };
+
+    mockFolioRepository.findById = async () => closedFolio as any;
+
+    await expect(
+      useCase.execute({
+        concepto: ConceptoPago.CONSUMO,
+        monto: 100,
+        metodo: MetodoPago.EFECTIVO,
+        folioId: "folio-1",
+      }),
+    ).rejects.toThrow();
   });
 });

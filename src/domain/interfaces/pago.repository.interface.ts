@@ -9,6 +9,8 @@ export interface CreatePagoParams {
   metodo: MetodoPago;
   recibidoPorId?: string | null;
   observacion?: string | null;
+  reservaId?: string;
+  folioId?: string;
 }
 
 export interface UpdatePagoParams {
@@ -25,6 +27,8 @@ export interface IPagoRepository {
   create(data: CreatePagoParams): Promise<Pago>;
   findAll(): Promise<Pago[]>;
   findById(id: string): Promise<Pago | null>;
+  findByReservaId(reservaId: string): Promise<Pago | null>;
+  findByFolioId(folioId: string): Promise<Pago | null>;
   update(id: string, data: UpdatePagoParams): Promise<Pago>;
   delete(id: string): Promise<void>;
 }

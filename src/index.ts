@@ -15,6 +15,8 @@ import { createEstanciaRoutes } from "./routes/estancia.routes";
 import { createMuebleRoutes } from "./routes/mueble.routes";
 import { createCategoriaMuebleRoutes } from "./routes/categoria-mueble.routes";
 import { createPromocionRoutes } from "./routes/promocion.routes";
+import { createProductoRoutes } from "./routes/producto.routes";
+import { createFolioRoutes } from "./routes/folio.routes";
 import { errorHandler } from "./presentation/middlewares/exception.middleware";
 import { authMiddleware } from "./presentation/middlewares/auth.middleware";
 
@@ -37,7 +39,7 @@ publicApi.route("/tipos-habitacion", createTipoHabitacionPublicRoutes());
 
 //RUTAS-PRIVADAS______________________________________________________
 const privateApi = new Hono();
-//privateApi.use("*", authMiddleware);
+privateApi.use("*", authMiddleware);
 privateApi.route("/habitaciones", createHabitacionRoutes());
 privateApi.route("/categorias-mueble", createCategoriaMuebleRoutes());
 privateApi.route("/muebles", createMuebleRoutes());
@@ -49,6 +51,8 @@ privateApi.route("/pagos", createPagoRoutes());
 privateApi.route("/canales", createCanalRoutes());
 privateApi.route("/tarifas", createTarifaRoutes());
 privateApi.route("/promociones", createPromocionRoutes());
+privateApi.route("/productos", createProductoRoutes());
+privateApi.route("/folios", createFolioRoutes());
 
 app.route("/api/public", publicApi);
 app.route("/api/private", privateApi);

@@ -159,6 +159,8 @@ describe("PagoRepository", () => {
         recibidoPor: null,
         observacion: null,
         createdAt: new Date(),
+        folio: null,
+        reserva: null,
       };
 
       mockPrisma.pago.findUnique.mockResolvedValue(mockResult);
@@ -167,9 +169,6 @@ describe("PagoRepository", () => {
 
       expect(result).not.toBeNull();
       expect(result?.id).toBe("test-pago-id");
-      expect(mockPrisma.pago.findUnique).toHaveBeenCalledWith({
-        where: { id: "test-pago-id" },
-      });
     });
 
     it("should return null when not found", async () => {

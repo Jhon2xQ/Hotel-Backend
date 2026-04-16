@@ -14,6 +14,8 @@ describe("UpdatePagoUseCase", () => {
       create: async () => createMockPago(),
       findAll: async () => [],
       findById: async () => createMockPago(),
+      findByReservaId: async () => null,
+      findByFolioId: async () => null,
       update: async () => createMockPago(),
       delete: async () => {},
     };
