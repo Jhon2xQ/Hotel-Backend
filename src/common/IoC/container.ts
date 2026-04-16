@@ -16,6 +16,8 @@ import { CategoriaMuebleRepository } from "../../infrastructure/repositories/cat
 import { PromocionRepository } from "../../infrastructure/repositories/promocion.repository";
 import { ProductoRepository } from "../../infrastructure/repositories/producto.repository";
 import { FolioRepository } from "../../infrastructure/repositories/folio.repository";
+import { InsumoBarRepository } from "../../infrastructure/repositories/insumo-bar.repository";
+import { InsumoCocinaRepository } from "../../infrastructure/repositories/insumo-cocina.repository";
 
 import { CreateMuebleUseCase } from "../../application/use-cases/mueble/create-mueble.use-case";
 import { ListMueblesUseCase } from "../../application/use-cases/mueble/list-mueble.use-case";
@@ -107,6 +109,22 @@ import { AddProductoFolioUseCase } from "../../application/use-cases/folio/add-p
 import { AddServicioFolioUseCase } from "../../application/use-cases/folio/add-servicio-folio.use-case";
 import { GetConsumosFolioUseCase } from "../../application/use-cases/folio/get-consumos-folio.use-case";
 
+import { CreateInsumoBarUseCase } from "../../application/use-cases/insumo-bar/create-insumo-bar.use-case";
+import { ListInsumoBarUseCase } from "../../application/use-cases/insumo-bar/list-insumo-bar.use-case";
+import { FindInsumoBarByIdUseCase } from "../../application/use-cases/insumo-bar/find-insumo-bar-by-id.use-case";
+import { UpdateInsumoBarUseCase } from "../../application/use-cases/insumo-bar/update-insumo-bar.use-case";
+import { DeleteInsumoBarUseCase } from "../../application/use-cases/insumo-bar/delete-insumo-bar.use-case";
+import { RegisterMovimientoBarUseCase } from "../../application/use-cases/insumo-bar/register-movimiento-bar.use-case";
+import { ListMovimientosBarUseCase } from "../../application/use-cases/insumo-bar/list-movimientos-bar.use-case";
+
+import { CreateInsumoCocinaUseCase } from "../../application/use-cases/insumo-cocina/create-insumo-cocina.use-case";
+import { ListInsumoCocinaUseCase } from "../../application/use-cases/insumo-cocina/list-insumo-cocina.use-case";
+import { FindInsumoCocinaByIdUseCase } from "../../application/use-cases/insumo-cocina/find-insumo-cocina-by-id.use-case";
+import { UpdateInsumoCocinaUseCase } from "../../application/use-cases/insumo-cocina/update-insumo-cocina.use-case";
+import { DeleteInsumoCocinaUseCase } from "../../application/use-cases/insumo-cocina/delete-insumo-cocina.use-case";
+import { RegisterMovimientoCocinaUseCase } from "../../application/use-cases/insumo-cocina/register-movimiento-cocina.use-case";
+import { ListMovimientosCocinaUseCase } from "../../application/use-cases/insumo-cocina/list-movimientos-cocina.use-case";
+
 import { MuebleController } from "../../presentation/controllers/mueble.controller";
 import { HabitacionController } from "../../presentation/controllers/habitacion.controller";
 import { TipoHabitacionController } from "../../presentation/controllers/tipo-habitacion.controller";
@@ -120,6 +138,8 @@ import { CategoriaMuebleController } from "../../presentation/controllers/catego
 import { PromocionController } from "../../presentation/controllers/promocion.controller";
 import { ProductoController } from "../../presentation/controllers/producto.controller";
 import { FolioController } from "../../presentation/controllers/folio.controller";
+import { InsumoBarController } from "../../presentation/controllers/insumo-bar.controller";
+import { InsumoCocinaController } from "../../presentation/controllers/insumo-cocina.controller";
 
 const repositoryBindings: Array<[symbol, new (...args: never[]) => unknown]> = [
   [DI_TOKENS.IMuebleRepository, MuebleRepository],
@@ -136,6 +156,8 @@ const repositoryBindings: Array<[symbol, new (...args: never[]) => unknown]> = [
   [DI_TOKENS.IPromocionRepository, PromocionRepository],
   [DI_TOKENS.IProductoRepository, ProductoRepository],
   [DI_TOKENS.IFolioRepository, FolioRepository],
+  [DI_TOKENS.IInsumoBarRepository, InsumoBarRepository],
+  [DI_TOKENS.IInsumoCocinaRepository, InsumoCocinaRepository],
 ];
 
 const useCaseAndControllerClasses: Array<new (...args: never[]) => unknown> = [
@@ -220,7 +242,7 @@ const useCaseAndControllerClasses: Array<new (...args: never[]) => unknown> = [
   CategoriaMuebleController,
   PromocionController,
   ProductoController,
-  FolioController,
+FolioController,
   CreateFolioUseCase,
   ListFolioPaginatedUseCase,
   FindFolioByIdUseCase,
@@ -229,6 +251,8 @@ const useCaseAndControllerClasses: Array<new (...args: never[]) => unknown> = [
   AddProductoFolioUseCase,
   AddServicioFolioUseCase,
   GetConsumosFolioUseCase,
+  InsumoBarController,
+  InsumoCocinaController,
 ];
 
 /**
