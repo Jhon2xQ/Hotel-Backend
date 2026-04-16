@@ -2,7 +2,7 @@
 
 > **Autorización:** Las rutas que restrigen por rol usan `requireRoles(...)` (`src/presentation/middlewares/roles.middleware.ts`) con valores en `src/common/constants/roles.ts` (p. ej. `admin`, `recepcionista`). Cualquier mención a "ADMIN" u otros roles aquí es orientativa; la fuente de verdad es el `*.routes.ts` correspondiente.
 
-Documentación de los endpoints para la gestión de folios de reservas.
+Documentación de los endpoints para la gestión de folios de consumos en estancias.
 
 ## Base URL
 
@@ -20,11 +20,18 @@ Todos los endpoints requieren autenticación mediante Better Auth. Se requiere r
 
 ### 1. Listar Folios
 
-Obtiene la lista completa de todos los folios registrados. Cada folio incluye el array de códigos de promociones asociadas.
+Obtiene la lista paginada de folios con filtros opcionales.
 
 **Endpoint:** `GET /api/private/folios`
 
 **Autenticación:** Requerida
+
+**Query Parameters:**
+
+- `page` (número, opcional): Número de página (default: 1)
+- `limit` (número, opcional): Elementos por página (default: 10)
+- `estancia_id` (UUID, opcional): Filtrar por ID de estancia
+- `estado` (boolean, opcional): Filtrar por estado (true = abierto, false = cerrado)
 
 **Respuesta Exitosa (200):**
 
@@ -32,30 +39,30 @@ Obtiene la lista completa de todos los folios registrados. Cada folio incluye el
 {
   "success": true,
   "message": "Folios obtenidos exitosamente",
-  "data": [
-    {
-      "id": "uuid",
-      "nro_folio": 1,
-      "reserva_id": "uuid-reserva-1",
-      "estado": true,
-      "observacion": null,
-      "cerrado_en": null,
-      "promociones": ["PROMO-VERANO", "PROMO-DESCUENTO"],
-      "created_at": "2026-04-14T10:00:00.000Z",
-      "updated_at": "2026-04-14T10:00:00.000Z"
-    },
-    {
-      "id": "uuid",
-      "nro_folio": 2,
-      "reserva_id": "uuid-reserva-2",
-      "estado": false,
-      "observacion": "Folio cerrado por checkout",
-      "cerrado_en": "2026-04-15T14:30:00.000Z",
-      "promociones": [],
-      "created_at": "2026-04-14T11:00:00.000Z",
-      "updated_at": "2026-04-15T14:30:00.000Z"
+  "data": {
+    "list": [
+      {
+        "id": "uuid",
+        "codigo": "FOL-260416-1",
+        "estancia_id": "uuid-estancia-1",
+        "pago_id": null,
+        "estado": true,
+        "observacion": null,
+        "cerrado_en": null,
+        "promociones": ["PROMO-VERANO"],
+        "created_at": "2026-04-16T10:00:00.000Z",
+        "updated_at": "2026-04-16T10:00:00.000Z"
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 10,
+      "total": 1,
+      "totalPages": 1,
+      "hasNextPage": false,
+      "hasPreviousPage": false
     }
-  ],
+  },
   "timestamp": 1234567890
 }
 ```
@@ -64,7 +71,7 @@ Obtiene la lista completa de todos los folios registrados. Cada folio incluye el
 
 ### 2. Obtener Folio por ID
 
-Obtiene los detalles de un folio específico, incluyendo el array de códigos de promociones asociadas.
+Obtiene los detalles de un folio específico.
 
 **Endpoint:** `GET /api/private/folios/:id`
 
@@ -82,14 +89,15 @@ Obtiene los detalles de un folio específico, incluyendo el array de códigos de
   "message": "Folio encontrado",
   "data": {
     "id": "uuid",
-    "nro_folio": 1,
-    "reserva_id": "uuid-reserva-1",
+    "codigo": "FOL-260416-1",
+    "estancia_id": "uuid-estancia-1",
+    "pago_id": null,
     "estado": true,
     "observacion": "Folio de ejemplo",
     "cerrado_en": null,
     "promociones": ["PROMO-VERANO"],
-    "created_at": "2026-04-14T10:00:00.000Z",
-    "updated_at": "2026-04-14T10:00:00.000Z"
+    "created_at": "2026-04-16T10:00:00.000Z",
+    "updated_at": "2026-04-16T10:00:00.000Z"
   },
   "timestamp": 1234567890
 }
@@ -110,7 +118,7 @@ Obtiene los detalles de un folio específico, incluyendo el array de códigos de
 
 ### 3. Crear Folio
 
-Crea un nuevo folio asociado a una reserva. Opcionalmente se pueden asociar promociones.
+Crea un nuevo folio asociado a una estancia. Solo se puede crear un folio abierto por estancia.
 
 **Endpoint:** `POST /api/private/folios`
 
@@ -120,17 +128,17 @@ Crea un nuevo folio asociado a una reserva. Opcionalmente se pueden asociar prom
 
 ```json
 {
-  "reserva_id": "uuid-reserva-1",
-  "observacion": "Folio de ejemplo",
-  "promocion_ids": ["uuid-promo-1", "uuid-promo-2"]
+  "estancia_id": "uuid-estancia-1",
+  "observacion": "Folio de consumos",
+  "promocion_ids": ["uuid-promo-1"]
 }
 ```
 
 **Campos:**
 
-- `reserva_id` (UUID, requerido): ID de la reserva a la que pertenece el folio
+- `estancia_id` (UUID, requerido): ID de la estancia a la que pertenece el folio
 - `observacion` (string, opcional): Observación o nota del folio
-- `promocion_ids` (array de UUID, opcional): IDs de promociones a asociar al folio. Cada ID será validado; si alguno no existe, se rechaza la petición.
+- `promocion_ids` (array de UUID, opcional): IDs de promociones a asociar al folio
 
 **Respuesta Exitosa (201):**
 
@@ -140,14 +148,15 @@ Crea un nuevo folio asociado a una reserva. Opcionalmente se pueden asociar prom
   "message": "Folio creado exitosamente",
   "data": {
     "id": "uuid",
-    "nro_folio": 1,
-    "reserva_id": "uuid-reserva-1",
+    "codigo": "FOL-260416-1",
+    "estancia_id": "uuid-estancia-1",
+    "pago_id": null,
     "estado": true,
-    "observacion": "Folio de ejemplo",
+    "observacion": "Folio de consumos",
     "cerrado_en": null,
-    "promociones": ["PROMO-VERANO", "PROMO-DESCUENTO"],
-    "created_at": "2026-04-14T10:00:00.000Z",
-    "updated_at": "2026-04-14T10:00:00.000Z"
+    "promociones": ["PROMO-VERANO"],
+    "created_at": "2026-04-16T10:00:00.000Z",
+    "updated_at": "2026-04-16T10:00:00.000Z"
   },
   "timestamp": 1234567890
 }
@@ -158,16 +167,18 @@ Crea un nuevo folio asociado a una reserva. Opcionalmente se pueden asociar prom
 ```json
 {
   "success": false,
-  "message": "Reserva no encontrada",
+  "message": "La estancia especificada no existe",
   "data": null,
   "timestamp": 1234567890
 }
 ```
 
+**Respuesta de Error (400):**
+
 ```json
 {
   "success": false,
-  "message": "Una o más promociones especificadas no existen",
+  "message": "La estancia ya tiene un folio abierto",
   "data": null,
   "timestamp": 1234567890
 }
@@ -177,7 +188,7 @@ Crea un nuevo folio asociado a una reserva. Opcionalmente se pueden asociar prom
 
 ### 4. Actualizar Folio
 
-Actualiza los datos de un folio existente, incluyendo la relación con promociones.
+Actualiza los datos de un folio existente.
 
 **Endpoint:** `PUT /api/private/folios/:id`
 
@@ -191,17 +202,15 @@ Actualiza los datos de un folio existente, incluyendo la relación con promocion
 
 ```json
 {
-  "estado": false,
   "observacion": "Observación actualizada",
-  "promocion_ids": ["uuid-promo-nueva-1", "uuid-promo-nueva-2"]
+  "promocion_ids": ["uuid-promo-nueva-1"]
 }
 ```
 
 **Campos (todos opcionales):**
 
-- `estado` (boolean): Estado del folio (`true` = abierto, `false` = cerrado). Intentar reopening un folio cerrado generará error.
 - `observacion` (string): Observación o nota del folio
-- `promocion_ids` (array de UUID): IDs de promociones a asociar al folio. Al enviar este campo, se **reemplazan** todas las relaciones existentes con las nuevas promociones proporcionadas.
+- `promocion_ids` (array de UUID):IDs de promociones. Al enviar, se **reemplazan** las existentes.
 
 **Respuesta Exitosa (200):**
 
@@ -209,38 +218,17 @@ Actualiza los datos de un folio existente, incluyendo la relación con promocion
 {
   "success": true,
   "message": "Folio actualizado exitosamente",
-  "data": {
-    "id": "uuid",
-    "nro_folio": 1,
-    "reserva_id": "uuid-reserva-1",
-    "estado": false,
-    "observacion": "Observación actualizada",
-    "cerrado_en": "2026-04-15T15:00:00.000Z",
-    "promociones": ["PROMO-NUEVA-1", "PROMO-NUEVA-2"],
-    "created_at": "2026-04-14T10:00:00.000Z",
-    "updated_at": "2026-04-15T15:00:00.000Z"
-  },
+  "data": { ... },
   "timestamp": 1234567890
 }
 ```
 
-**Respuesta de Error (404):**
+**Respuesta de Error (403):**
 
 ```json
 {
   "success": false,
-  "message": "Folio no encontrado",
-  "data": null,
-  "timestamp": 1234567890
-}
-```
-
-**Respuesta de Error (400):**
-
-```json
-{
-  "success": false,
-  "message": "El folio ya está cerrado",
+  "message": "No se puede modificar un folio cerrado",
   "data": null,
   "timestamp": 1234567890
 }
@@ -250,7 +238,7 @@ Actualiza los datos de un folio existente, incluyendo la relación con promocion
 
 ### 5. Eliminar Folio
 
-Elimina un folio del sistema. Solo se pueden eliminar folios abiertos (estado = true).
+Elimina un folio. Solo folios abiertos y sin pago asociado.
 
 **Endpoint:** `DELETE /api/private/folios/:id`
 
@@ -271,13 +259,72 @@ Elimina un folio del sistema. Solo se pueden eliminar folios abiertos (estado = 
 }
 ```
 
-**Respuesta de Error (404):**
+**Respuesta de Error (403):**
 
 ```json
 {
   "success": false,
-  "message": "Folio no encontrado",
+  "message": "No se puede eliminar un folio cerrado",
   "data": null,
+  "timestamp": 1234567890
+}
+```
+
+```json
+{
+  "success": false,
+  "message": "No se puede eliminar un folio que tiene un pago asociado",
+  "data": null,
+  "timestamp": 1234567890
+}
+```
+
+---
+
+### 6. Agregar Producto al Folio
+
+Agrega un producto al folio y descuenta del stock del producto.
+
+**Endpoint:** `POST /api/private/folios/:id/productos`
+
+**Autenticación:** Requerida (rol ADMIN o RECEPCIONISTA)
+
+**Parámetros de URL:**
+
+- `id` (UUID, requerido): ID del folio
+
+**Body:**
+
+```json
+{
+  "producto_id": "uuid-producto-1",
+  "cantidad": 2
+}
+```
+
+**Campos:**
+
+- `producto_id` (UUID, requerido): ID del producto
+- `cantidad` (número, requerido): Cantidad consumida (entero positivo)
+
+**Nota:** El `precio_unit` se obtiene automáticamente del producto.
+
+**Respuesta Exitosa (201):**
+
+```json
+{
+  "success": true,
+  "message": "Producto agregado al folio",
+  "data": {
+    "id": "uuid-folio-producto",
+    "folio_id": "uuid-folio-1",
+    "producto_id": "uuid-producto-1",
+    "cantidad": 2,
+    "precio_unit": 10,
+    "total": 20,
+    "created_at": "2026-04-16T11:00:00.000Z",
+    "updated_at": "2026-04-16T11:00:00.000Z"
+  },
   "timestamp": 1234567890
 }
 ```
@@ -295,11 +342,11 @@ Elimina un folio del sistema. Solo se pueden eliminar folios abiertos (estado = 
 
 ---
 
-### 6. Cerrar Folio
+### 7. Agregar Servicio al Folio
 
-Cierra un folio establecido el estado en `false` y registrando la fecha de cierre en `cerradoEn`.
+Agrega un servicio (concepto libre) al folio.
 
-**Endpoint:** `POST /api/private/folios/:id/close`
+**Endpoint:** `POST /api/private/folios/:id/servicios`
 
 **Autenticación:** Requerida (rol ADMIN o RECEPCIONISTA)
 
@@ -311,56 +358,117 @@ Cierra un folio establecido el estado en `false` y registrando la fecha de cierr
 
 ```json
 {
-  "observacion": "Cierre de folio por checkout"
+  "concepto": "Masaje spa",
+  "cantidad": 1,
+  "precio_unit": 50.00
 }
 ```
 
 **Campos:**
 
-- `observacion` (string, opcional): Observación de cierre
+- `concepto` (string, requerido): Descripción del servicio
+- `cantidad` (número, requerido): Cantidad de servicios (entero positivo)
+- `precio_unit` (número, requerido): Precio unitario del servicio
+
+**Respuesta Exitosa (201):**
+
+```json
+{
+  "success": true,
+  "message": "Servicio agregado al folio",
+  "data": {
+    "id": "uuid-folio-servicio",
+    "folio_id": "uuid-folio-1",
+    "concepto": "Masaje spa",
+    "cantidad": 1,
+    "precio_unit": 50,
+    "total": 50,
+    "created_at": "2026-04-16T11:30:00.000Z",
+    "updated_at": "2026-04-16T11:30:00.000Z"
+  },
+  "timestamp": 1234567890
+}
+```
+
+---
+
+### 8. Obtener Consumos del Folio
+
+Obtiene todos los productos y servicios consumidos en un folio, además del total.
+
+**Endpoint:** `GET /api/private/folios/:id/consumos`
+
+**Autenticación:** Requerida
+
+**Parámetros de URL:**
+
+- `id` (UUID, requerido): ID del folio
 
 **Respuesta Exitosa (200):**
 
 ```json
 {
   "success": true,
-  "message": "Folio cerrado exitosamente",
+  "message": "Consumos obtenidos",
   "data": {
-    "id": "uuid",
-    "nro_folio": 1,
-    "reserva_id": "uuid-reserva-1",
-    "estado": false,
-    "observacion": "Cierre de folio por checkout",
-    "cerrado_en": "2026-04-15T14:30:00.000Z",
-    "promociones": ["PROMO-VERANO"],
-    "created_at": "2026-04-14T10:00:00.000Z",
-    "updated_at": "2026-04-15T14:30:00.000Z"
+    "folio": {
+      "id": "uuid-folio-1",
+      "codigo": "FOL-260416-1",
+      "estancia_id": "uuid-estancia-1",
+      "pago_id": null,
+      "estado": true,
+      "observacion": null,
+      "cerrado_en": null,
+      "promociones": [],
+      "created_at": "2026-04-16T10:00:00.000Z",
+      "updated_at": "2026-04-16T10:00:00.000Z"
+    },
+    "productos": [
+      {
+        "id": "uuid-fp-1",
+        "folio_id": "uuid-folio-1",
+        "producto_id": "uuid-producto-1",
+        "cantidad": 2,
+        "precio_unit": 10,
+        "total": 20,
+        "created_at": "2026-04-16T11:00:00.000Z",
+        "updated_at": "2026-04-16T11:00:00.000Z"
+      }
+    ],
+    "servicios": [
+      {
+        "id": "uuid-fs-1",
+        "folio_id": "uuid-folio-1",
+        "concepto": "Masaje spa",
+        "cantidad": 1,
+        "precio_unit": 50,
+        "total": 50,
+        "created_at": "2026-04-16T11:30:00.000Z",
+        "updated_at": "2026-04-16T11:30:00.000Z"
+      }
+    ],
+    "total": 70
   },
   "timestamp": 1234567890
 }
 ```
 
-**Respuesta de Error (404):**
+---
 
-```json
-{
-  "success": false,
-  "message": "Folio no encontrado",
-  "data": null,
-  "timestamp": 1234567890
-}
+## Generación de Código de Folio
+
+Los folios tienen un código alfanumérico generado automáticamente con el formato:
+
+```
+FOL-YYMMDD-N
 ```
 
-**Respuesta de Error (400):**
+- `YY`: Año (últimos 2 dígitos)
+- `MM`: Mes (01-12)
+- `DD`: Día (01-31)
+- `N`: Número secuencial del día (comienza en 1 y se reinicia cada día)
 
-```json
-{
-  "success": false,
-  "message": "El folio ya está cerrado",
-  "data": null,
-  "timestamp": 1234567890
-}
-```
+**Ejemplo:** `FOL-260416-1` (primer folio del 16 de abril de 2026)
 
 ---
 
@@ -373,64 +481,41 @@ Cierra un folio establecido el estado en `false` y registrando la fecha de cierr
 
 ---
 
-## Relación Muchos a Muchos con Promociones
+## Relación con Estancia
 
-Los folios tienen una relación muchos a muchos con las promociones:
+Un folio pertenece a una estancia (relación uno a muchos):
 
-- Un **folio** puede tener **múltiples promociones**
-- Una **promoción** puede aplicarse a **múltiples folios**
-
-Esta relación se gestiona mediante el campo `promocion_ids` en los endpoints de creación (`POST`) y actualización (`PUT`).
-
-### Ejemplo: Crear folio con promociones
-
-```json
-{
-  "reserva_id": "reserva-uuid",
-  "observacion": "Folio de ejemplo",
-  "promocion_ids": ["promo-uuid-1", "promo-uuid-2"]
-}
-```
-
-### Ejemplo: Actualizar relación de promociones
-
-```json
-{
-  "promocion_ids": ["promo-nueva-uuid-1", "promo-nueva-uuid-2"]
-}
-```
-
-Este request reemplaza todas las relaciones existentes con las dos nuevas promociones.
-
-### Respuesta con promociones
-
-Tanto `GET /` como `GET /:id` devuelven el campo `promociones` como un array de códigos de promociones:
-
-```json
-{
-  "id": "folio-uuid",
-  "nro_folio": 1,
-  "promociones": ["PROMO-VERANO", "PROMO-INVIERNO"]
-}
-```
+- Una **estancia** puede tener **múltiples folios** (pero solo uno abierto a la vez)
+- Un **folio** solo puede tener **una estancia**
 
 ---
 
-## Relación con Reserva
+## Integración con Pagos
 
-Un folio pertenece a una reserva (relación uno a muchos):
+Para cobrar un folio, usar el endpoint `POST /api/private/pagos` con el campo `folio_id`:
 
-- Una **reserva** puede tener **múltiples folios**
-- Un **folio** solo puede tener **una reserva**
+```json
+{
+  "concepto": "CONSUMO",
+  "metodo": "EFECTIVO",
+  "folio_id": "uuid-folio-1"
+}
+```
+
+Al crear un pago con `folio_id`:
+1. Se obtiene el total de consumos del folio
+2. Se crea el pago con monto = total de consumos
+3. Se asocia el pago al folio (`pago_id`)
+4. Se cierra el folio automáticamente (`estado = false`)
 
 ---
 
 ## Códigos de Estado HTTP
 
 - `200 OK`: Operación exitosa
-- `201 Created`: Folio creado exitosamente
+- `201 Created`: Recurso creado exitosamente
 - `400 Bad Request`: Datos de entrada inválidos o folio ya cerrado
 - `401 Unauthorized`: No autenticado
-- `403 Forbidden`: Sin permisos suficientes o folio cerrado no modificable
-- `404 Not Found`: Folio, reserva o promoción no encontrada
+- `403 Forbidden`: Sin permisos suficientes o folio cerrado
+- `404 Not Found`: Folio, estancia o promoción no encontrada
 - `500 Internal Server Error`: Error del servidor

@@ -80,7 +80,6 @@ export function toFolioPaginatedDto(
 export interface CreateFolioProductoDto {
   productoId: string;
   cantidad: number;
-  precioUnit: number;
 }
 
 export interface FolioProductoDto {

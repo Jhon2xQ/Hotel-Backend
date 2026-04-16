@@ -27,11 +27,13 @@ export class AddProductoFolioUseCase {
       throw FolioException.productoNotFound();
     }
 
+    const precioUnit = Number(producto.precioUnitario);
+
     const folioProducto = await this.repository.addProducto({
       folioId,
       productoId: input.productoId,
       cantidad: input.cantidad,
-      precioUnit: input.precioUnit,
+      precioUnit,
     });
 
     return toFolioProductoDto(folioProducto);

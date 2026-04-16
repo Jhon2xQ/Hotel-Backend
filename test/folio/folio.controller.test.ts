@@ -9,7 +9,9 @@ describe("FolioController", () => {
   let mockFindByIdUseCase: any;
   let mockUpdateUseCase: any;
   let mockDeleteUseCase: any;
-  let mockCloseUseCase: any;
+  let mockAddProductoUseCase: any;
+  let mockAddServicioUseCase: any;
+  let mockGetConsumosUseCase: any;
 
   beforeEach(() => {
     mockCreateUseCase = { execute: vi.fn() };
@@ -17,7 +19,9 @@ describe("FolioController", () => {
     mockFindByIdUseCase = { execute: vi.fn() };
     mockUpdateUseCase = { execute: vi.fn() };
     mockDeleteUseCase = { execute: vi.fn() };
-    mockCloseUseCase = { execute: vi.fn() };
+    mockAddProductoUseCase = { execute: vi.fn() };
+    mockAddServicioUseCase = { execute: vi.fn() };
+    mockGetConsumosUseCase = { execute: vi.fn() };
 
     controller = new FolioController(
       mockCreateUseCase,
@@ -25,7 +29,9 @@ describe("FolioController", () => {
       mockFindByIdUseCase,
       mockUpdateUseCase,
       mockDeleteUseCase,
-      mockCloseUseCase,
+      mockAddProductoUseCase,
+      mockAddServicioUseCase,
+      mockGetConsumosUseCase,
     );
   });
 
@@ -33,21 +39,22 @@ describe("FolioController", () => {
     it("should create folio and return 201", async () => {
       const mockContext = createMockContext();
       const input = {
-        reservaId: "reserva-123",
+        estanciaId: "estancia-123",
         observacion: "Folio de prueba",
         promocionIds: ["promo-1", "promo-2"],
       };
 
       const mockOutput = {
         id: "folio-1",
-        nro_folio: 1,
-        reserva_id: "reserva-123",
+        codigo: "FOL-260416-1",
+        estanciaId: "estancia-123",
+        pagoId: null,
         estado: true,
         observacion: "Folio de prueba",
-        cerrado_en: null,
+        cerradoEn: null,
         promociones: ["PROMO-VERANO", "PROMO-DESCUENTO"],
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       };
 
       mockContext.get = vi.fn().mockReturnValue(input);
@@ -69,19 +76,20 @@ describe("FolioController", () => {
     it("should create folio without promociones", async () => {
       const mockContext = createMockContext();
       const input = {
-        reservaId: "reserva-123",
+        estanciaId: "estancia-123",
       };
 
       const mockOutput = {
         id: "folio-1",
-        nro_folio: 1,
-        reserva_id: "reserva-123",
+        codigo: "FOL-260416-1",
+        estanciaId: "estancia-123",
+        pagoId: null,
         estado: true,
         observacion: null,
-        cerrado_en: null,
+        cerradoEn: null,
         promociones: [],
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       };
 
       mockContext.get = vi.fn().mockReturnValue(input);
@@ -105,8 +113,8 @@ describe("FolioController", () => {
       const mockContext = createMockContext();
       const mockResult = {
         list: [
-          { id: "folio-1", nro_folio: 1, estado: true, promociones: ["PROMO-1"], reserva_id: "reserva-1", observacion: null, cerrado_en: null, created_at: "", updated_at: "" },
-          { id: "folio-2", nro_folio: 2, estado: false, promociones: [], reserva_id: "reserva-1", observacion: null, cerrado_en: null, created_at: "", updated_at: "" },
+          { id: "folio-1", codigo: "FOL-260416-1", estado: true, promociones: ["PROMO-1"], estanciaId: "estancia-1", pagoId: null, observacion: null, cerradoEn: null, createdAt: "", updatedAt: "" },
+          { id: "folio-2", codigo: "FOL-260416-2", estado: false, promociones: [], estanciaId: "estancia-1", pagoId: null, observacion: null, cerradoEn: null, createdAt: "", updatedAt: "" },
         ],
         pagination: { page: 1, limit: 10, total: 2, totalPages: 1, hasNextPage: false, hasPreviousPage: false },
       };
@@ -128,7 +136,7 @@ describe("FolioController", () => {
 
     it("should list folios with pagination and filters", async () => {
       const mockContext = createMockContext();
-      const queryData = { page: 2, limit: 5, reserva_id: "reserva-1", estado: true };
+      const queryData = { page: 2, limit: 5, estanciaId: "estancia-1", estado: true };
       const mockResult = {
         list: [],
         pagination: { page: 2, limit: 5, total: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: true },
@@ -148,14 +156,15 @@ describe("FolioController", () => {
       const mockContext = createMockContext();
       const mockOutput = {
         id: "folio-123",
-        nro_folio: 5,
-        reserva_id: "reserva-1",
+        codigo: "FOL-260416-5",
+        estanciaId: "estancia-1",
+        pagoId: null,
         estado: true,
         observacion: "Folio de prueba",
-        cerrado_en: null,
+        cerradoEn: null,
         promociones: ["PROMO-VERANO"],
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       };
 
       mockContext.req.param = vi.fn().mockReturnValue({ id: "folio-123" });
@@ -184,14 +193,15 @@ describe("FolioController", () => {
 
       const mockOutput = {
         id: "folio-1",
-        nro_folio: 1,
-        reserva_id: "reserva-1",
+        codigo: "FOL-260416-1",
+        estanciaId: "estancia-1",
+        pagoId: null,
         estado: false,
         observacion: "Observación actualizada",
-        cerrado_en: new Date().toISOString(),
+        cerradoEn: new Date().toISOString(),
         promociones: [],
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       };
 
       mockContext.get = vi.fn().mockReturnValue(input);
@@ -218,14 +228,15 @@ describe("FolioController", () => {
 
       const mockOutput = {
         id: "folio-1",
-        nro_folio: 1,
-        reserva_id: "reserva-1",
+        codigo: "FOL-260416-1",
+        estanciaId: "estancia-1",
+        pagoId: null,
         estado: true,
         observacion: null,
-        cerrado_en: null,
+        cerradoEn: null,
         promociones: ["PROMO-NUEVA-1", "PROMO-NUEVA-2"],
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       };
 
       mockContext.get = vi.fn().mockReturnValue(input);
@@ -265,68 +276,136 @@ describe("FolioController", () => {
     });
   });
 
-  describe("close", () => {
-    it("should close folio and return 200", async () => {
+  describe("addProducto", () => {
+    it("should add producto to folio and return 201", async () => {
       const mockContext = createMockContext();
       const input = {
-        observacion: "Cierre de folio por checkout",
+        productoId: "producto-1",
+        cantidad: 2,
+        precioUnit: 10,
       };
 
       const mockOutput = {
-        id: "folio-1",
-        nro_folio: 1,
-        reserva_id: "reserva-1",
-        estado: false,
-        observacion: "Cierre de folio por checkout",
-        cerrado_en: new Date().toISOString(),
-        promociones: [],
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+        id: "folio-producto-1",
+        folioId: "folio-1",
+        productoId: "producto-1",
+        cantidad: 2,
+        precioUnit: 10,
+        total: 20,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       };
 
       mockContext.get = vi.fn().mockReturnValue(input);
       mockContext.req.param = vi.fn().mockReturnValue({ id: "folio-1" });
-      mockCloseUseCase.execute.mockResolvedValue(mockOutput);
+      mockAddProductoUseCase.execute.mockResolvedValue(mockOutput);
 
-      await controller.close(mockContext);
+      await controller.addProducto(mockContext);
 
-      expect(mockCloseUseCase.execute).toHaveBeenCalledWith("folio-1", input.observacion);
+      expect(mockAddProductoUseCase.execute).toHaveBeenCalledWith("folio-1", input);
       expect(mockContext.json).toHaveBeenCalledWith(
         expect.objectContaining({
           success: true,
-          message: "Folio cerrado exitosamente",
+          message: "Producto agregado al folio",
+          data: mockOutput,
         }),
-        200,
+        201,
       );
     });
+  });
 
-    it("should close folio without observacion", async () => {
+  describe("addServicio", () => {
+    it("should add servicio to folio and return 201", async () => {
       const mockContext = createMockContext();
-      const input = {};
+      const input = {
+        concepto: "Masaje",
+        cantidad: 1,
+        precioUnit: 50,
+      };
 
       const mockOutput = {
-        id: "folio-1",
-        nro_folio: 1,
-        reserva_id: "reserva-1",
-        estado: false,
-        observacion: null,
-        cerrado_en: new Date().toISOString(),
-        promociones: [],
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+        id: "folio-servicio-1",
+        folioId: "folio-1",
+        concepto: "Masaje",
+        cantidad: 1,
+        precioUnit: 50,
+        total: 50,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       };
 
       mockContext.get = vi.fn().mockReturnValue(input);
       mockContext.req.param = vi.fn().mockReturnValue({ id: "folio-1" });
-      mockCloseUseCase.execute.mockResolvedValue(mockOutput);
+      mockAddServicioUseCase.execute.mockResolvedValue(mockOutput);
 
-      await controller.close(mockContext);
+      await controller.addServicio(mockContext);
 
-      expect(mockCloseUseCase.execute).toHaveBeenCalledWith("folio-1", undefined);
+      expect(mockAddServicioUseCase.execute).toHaveBeenCalledWith("folio-1", input);
       expect(mockContext.json).toHaveBeenCalledWith(
         expect.objectContaining({
           success: true,
-          message: "Folio cerrado exitosamente",
+          message: "Servicio agregado al folio",
+          data: mockOutput,
+        }),
+        201,
+      );
+    });
+  });
+
+  describe("getConsumos", () => {
+    it("should get consumos and return 200", async () => {
+      const mockContext = createMockContext();
+      const mockOutput = {
+        folio: {
+          id: "folio-1",
+          codigo: "FOL-260416-1",
+          estanciaId: "estancia-1",
+          pagoId: null,
+          estado: true,
+          observacion: null,
+          cerradoEn: null,
+          promociones: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        productos: [
+          {
+            id: "fp-1",
+            folioId: "folio-1",
+            productoId: "producto-1",
+            cantidad: 2,
+            precioUnit: 10,
+            total: 20,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+        ],
+        servicios: [
+          {
+            id: "fs-1",
+            folioId: "folio-1",
+            concepto: "Masaje",
+            cantidad: 1,
+            precioUnit: 50,
+            total: 50,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+        ],
+        total: 70,
+      };
+
+      mockContext.req.param = vi.fn().mockReturnValue({ id: "folio-1" });
+      mockGetConsumosUseCase.execute.mockResolvedValue(mockOutput);
+
+      await controller.getConsumos(mockContext);
+
+      expect(mockGetConsumosUseCase.execute).toHaveBeenCalledWith("folio-1");
+      expect(mockContext.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: true,
+          message: "Consumos obtenidos",
+          data: mockOutput,
         }),
         200,
       );

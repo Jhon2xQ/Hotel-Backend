@@ -37,12 +37,10 @@ export const AddProductoSchema = z
   .object({
     producto_id: z.uuid("El ID del producto es requerido y debe ser un UUID válido"),
     cantidad: z.number().int().positive("La cantidad debe ser un número entero positivo"),
-    precio_unit: z.number().positive("El precio unitario debe ser positivo"),
   })
   .transform((data) => ({
     productoId: data.producto_id,
     cantidad: data.cantidad,
-    precioUnit: data.precio_unit,
   }));
 
 export const AddServicioSchema = z

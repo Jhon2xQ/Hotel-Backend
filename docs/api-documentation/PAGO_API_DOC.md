@@ -39,7 +39,18 @@ Crea un nuevo registro de pago.
   "moneda": "SOL",
   "metodo": "EFECTIVO",
   "recibido_por_id": "id-del-usuario",
-  "observacion": "Pago por reserva de habitación"
+  "observacion": "Pago por reserva de habitación",
+  "reserva_id": "uuid-reserva-1"
+}
+```
+
+O para pagos de consumo (folio):
+
+```json
+{
+  "concepto": "CONSUMO",
+  "metodo": "EFECTIVO",
+  "folio_id": "uuid-folio-1"
 }
 ```
 
@@ -53,6 +64,10 @@ Crea un nuevo registro de pago.
 - `metodo` (requerido): Método de pago. Valores: `EFECTIVO`, `VISA`, `MASTERCARD`, `AMEX`, `TRANSFERENCIA`
 - `recibido_por_id` (opcional): ID del usuario de Better Auth que recibió el pago
 - `observacion` (opcional): Observaciones adicionales
+- `reserva_id` (opcional): UUID de la reserva (para pagos de reserva)
+- `folio_id` (opcional): UUID del folio (para pagos de consumo)
+
+**Nota:** Debe especificar `reserva_id` O `folio_id`, no ambos.
 
 **Response:** `201 Created`
 
@@ -309,3 +324,5 @@ Elimina un pago del sistema.
 6. Los pagos pueden estar asociados a reservas o folios (relaciones opcionales)
 7. El campo `recibido_por` muestra información del usuario que registró el pago (id, name, email)
 8. El campo `fecha_pago` acepta formatos: ISO 8601 completo o solo fecha (YYYY-MM-DD)
+9. Al pagar un folio (`folio_id`), el monto se calcula automáticamente desde los consumos del folio
+10. Al pagar un folio, este se cierra automáticamente y se associa el pago al folio

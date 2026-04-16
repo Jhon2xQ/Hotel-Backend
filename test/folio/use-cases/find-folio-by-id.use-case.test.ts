@@ -14,23 +14,29 @@ describe("FindFolioByIdUseCase", () => {
       findAll: async () => [],
       findAllPaginated: async () => ({ list: [], pagination: { page: 1, limit: 10, total: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false } }),
       findById: async () => null,
-      findByReservaId: async () => [],
+      findByEstanciaId: async () => [],
+      findByCodigo: async () => null,
+      findOpenByEstanciaId: async () => null,
       update: async () => createMockFolio(),
       delete: async () => {},
-      close: async () => createMockFolio(),
+      addProducto: async () => ({ id: "fp-1" } as any),
+      addServicio: async () => ({ id: "fs-1" } as any),
+      getConsumos: async () => ({ productos: [], servicios: [] }),
+      getTotal: async () => 0,
+      closeWithPago: async () => createMockFolio(),
     };
 
     useCase = new FindFolioByIdUseCase(mockRepository);
   });
 
   it("should find folio by id", async () => {
-    const mockFolio = createMockFolio({ id: "folio-123", nroFolio: 5 });
+    const mockFolio = createMockFolio({ id: "folio-123", codigo: "FOL-260416-5" });
     mockRepository.findById = async () => mockFolio;
 
     const result = await useCase.execute("folio-123");
 
     expect(result.id).toBe("folio-123");
-    expect(result.nro_folio).toBe(5);
+    expect(result.codigo).toBe("FOL-260416-5");
   });
 
   it("should throw error when folio not found", async () => {
@@ -42,8 +48,8 @@ describe("FindFolioByIdUseCase", () => {
   it("should map folio entity to dto correctly", async () => {
     const mockFolio = createMockFolio({
       id: "folio-1",
-      nroFolio: 1,
-      reservaId: "reserva-1",
+      codigo: "FOL-260416-1",
+      estanciaId: "estancia-1",
       estado: true,
       observacion: "Test",
       promociones: ["PROMO-1", "PROMO-2"],
@@ -54,6 +60,7 @@ describe("FindFolioByIdUseCase", () => {
     const result = await useCase.execute("folio-1");
 
     expect(result.id).toBe("folio-1");
+    expect(result.codigo).toBe("FOL-260416-1");
     expect(result.promociones).toEqual(["PROMO-1", "PROMO-2"]);
   });
 });

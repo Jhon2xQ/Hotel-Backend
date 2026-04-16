@@ -16,10 +16,16 @@ describe("UpdateFolioUseCase", () => {
       findAll: async () => [],
       findAllPaginated: async () => ({ list: [], pagination: { page: 1, limit: 10, total: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false } }),
       findById: async () => null,
-      findByReservaId: async () => [],
+      findByEstanciaId: async () => [],
+      findByCodigo: async () => null,
+      findOpenByEstanciaId: async () => null,
       update: async () => createMockFolio(),
       delete: async () => {},
-      close: async () => createMockFolio(),
+      addProducto: async () => ({ id: "fp-1" } as any),
+      addServicio: async () => ({ id: "fs-1" } as any),
+      getConsumos: async () => ({ productos: [], servicios: [] }),
+      getTotal: async () => 0,
+      closeWithPago: async () => createMockFolio(),
     };
 
     mockPromocionRepository = {

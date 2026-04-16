@@ -13,6 +13,8 @@ describe("FindPagoByIdUseCase", () => {
       create: async () => createMockPago(),
       findAll: async () => [],
       findById: async () => null,
+      findByReservaId: async () => null,
+      findByFolioId: async () => null,
       update: async () => createMockPago(),
       delete: async () => {},
     };

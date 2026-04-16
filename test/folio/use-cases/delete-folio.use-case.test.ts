@@ -14,17 +14,23 @@ describe("DeleteFolioUseCase", () => {
       findAll: async () => [],
       findAllPaginated: async () => ({ list: [], pagination: { page: 1, limit: 10, total: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false } }),
       findById: async () => null,
-      findByReservaId: async () => [],
+      findByEstanciaId: async () => [],
+      findByCodigo: async () => null,
+      findOpenByEstanciaId: async () => null,
       update: async () => createMockFolio(),
       delete: async () => {},
-      close: async () => createMockFolio(),
+      addProducto: async () => ({ id: "fp-1" } as any),
+      addServicio: async () => ({ id: "fs-1" } as any),
+      getConsumos: async () => ({ productos: [], servicios: [] }),
+      getTotal: async () => 0,
+      closeWithPago: async () => createMockFolio(),
     };
 
     useCase = new DeleteFolioUseCase(mockRepository);
   });
 
   it("should delete folio successfully", async () => {
-    const openFolio = createMockFolio({ id: "folio-1", estado: true });
+    const openFolio = createMockFolio({ id: "folio-1", estado: true, pagoId: null });
     mockRepository.findById = async () => openFolio;
     mockRepository.delete = async () => {};
 
@@ -40,6 +46,13 @@ describe("DeleteFolioUseCase", () => {
   it("should throw error when trying to delete a closed folio", async () => {
     const closedFolio = createMockFolio({ id: "folio-1", estado: false });
     mockRepository.findById = async () => closedFolio;
+
+    await expect(useCase.execute("folio-1")).rejects.toThrow(FolioException);
+  });
+
+  it("should throw error when trying to delete a folio with pago", async () => {
+    const folioWithPago = createMockFolio({ id: "folio-1", estado: true, pagoId: "pago-1" });
+    mockRepository.findById = async () => folioWithPago;
 
     await expect(useCase.execute("folio-1")).rejects.toThrow(FolioException);
   });
