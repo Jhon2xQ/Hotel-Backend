@@ -3,6 +3,7 @@ node_modules/
 
 /generated
 /generated/prisma
+/dist
 
 .env
 

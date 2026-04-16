@@ -458,6 +458,7 @@ model Reserva {
   tarifa     Tarifa     @relation(fields: [tarifaId], references: [id])
   pago       Pago?      @relation("PagoReserva", fields: [pagoId], references: [id])
   estancias  Estancia[]
+  folios     Folio[]
 
   @@index([huespedId])
   @@index([habitacionId])
@@ -486,7 +487,6 @@ model Pago {
   updatedAt     DateTime     @updatedAt @db.Timestamptz
 
   reserva     Reserva? @relation("PagoReserva")
-  folio       Folio?   @relation("PagoFolio")
 
   @@map("pagos")
 }
@@ -513,8 +513,6 @@ model Estancia {
   habitacion Habitacion @relation(fields: [habitacionId], references: [id])
   huesped    Huesped    @relation(fields: [huespedId], references: [id])
 
-  folio Folio?
-
   @@map("estancias")
 }
 
@@ -524,24 +522,37 @@ model Estancia {
 
 model Folio {
   id          String      @id @default(uuid()) @db.Uuid
-  estanciaId  String      @unique @db.Uuid
-  nroFolio    String      @unique @db.VarChar(20)
-  estado      EstadoFolio @default(ABIERTO)
-  moneda      String      @default("USD") @db.Char(3)
-  totalCargos Decimal     @default(0) @db.Decimal(12, 2)
-  totalPagos  Decimal     @default(0) @db.Decimal(12, 2)
+  nroFolio    Int         @unique @default(autoincrement())
+  reservaId   String      @db.Uuid
+  estado      Boolean     @default(true) // true = abierto, false = cerrado
+  observacion String?     @db.Text
   cerradoEn   DateTime?   @db.Timestamptz
-  notas       String?     @db.Text
-  pagoId      String?     @unique @db.Uuid
   createdAt   DateTime    @default(now()) @db.Timestamptz
   updatedAt   DateTime    @updatedAt @db.Timestamptz
 
+  reserva      Reserva       @relation(fields: [reservaId], references: [id])
+  promocion    PromocionFolio[]
   cargos       CargoFolio[]
   comprobantes Comprobante[]
-  estancia     Estancia      @relation(fields: [estanciaId], references: [id])
-  pago         Pago?         @relation("PagoFolio", fields: [pagoId], references: [id])
 
+  @@index([reservaId])
+  @@index([estado])
   @@map("folios")
+}
+
+// ------------------------------------------------------------
+// 17.1 FOLIO - PROMOCION (many-to-many)
+// ------------------------------------------------------------
+
+model PromocionFolio {
+  folioId     String @db.Uuid
+  promocionId String @db.Uuid
+
+  folio     Folio     @relation(fields: [folioId], references: [id], onDelete: Cascade)
+  promocion Promocion @relation(fields: [promocionId], references: [id], onDelete: Cascade)
+
+  @@id([folioId, promocionId])
+  @@map("promocion_folio")
 }
 
 // ------------------------------------------------------------
@@ -634,6 +645,7 @@ model Promocion {
   updatedAt        DateTime       @updatedAt @db.Timestamptz
 
   habitaciones Habitacion[]
+  folios       PromocionFolio[]
 
   @@map("promociones")
 }
