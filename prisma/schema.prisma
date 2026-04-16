@@ -637,3 +637,20 @@ model Promocion {
 
   @@map("promociones")
 }
+
+// ------------------------------------------------------------
+// 21. PRODUCTOS
+// ------------------------------------------------------------
+
+model Producto {
+  id            String    @id @default(uuid()) @db.Uuid
+  codigo        String    @unique @db.VarChar(30)
+  nombre        String    @db.VarChar(150)
+  descripcion   String?   @db.Text
+  precioUnitario Decimal  @db.Decimal(6, 2)
+  stock         Int       @default(0) @db.Integer
+  createdAt     DateTime  @default(now()) @db.Timestamptz
+  updatedAt     DateTime  @updatedAt @db.Timestamptz
+
+  @@map("productos")
+}

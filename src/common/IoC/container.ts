@@ -14,6 +14,7 @@ import { EstanciaRepository } from "../../infrastructure/repositories/estancia.r
 import { CanalRepository } from "../../infrastructure/repositories/canal.repository";
 import { CategoriaMuebleRepository } from "../../infrastructure/repositories/categoria-mueble.repository";
 import { PromocionRepository } from "../../infrastructure/repositories/promocion.repository";
+import { ProductoRepository } from "../../infrastructure/repositories/producto.repository";
 
 import { CreateMuebleUseCase } from "../../application/use-cases/mueble/create-mueble.use-case";
 import { ListMueblesUseCase } from "../../application/use-cases/mueble/list-mueble.use-case";
@@ -90,6 +91,12 @@ import { FindPromocionByIdUseCase } from "../../application/use-cases/promocion/
 import { UpdatePromocionUseCase } from "../../application/use-cases/promocion/update-promocion.use-case";
 import { DeletePromocionUseCase } from "../../application/use-cases/promocion/delete-promocion.use-case";
 
+import { CreateProductoUseCase } from "../../application/use-cases/producto/create-producto.use-case";
+import { ListProductoPaginatedUseCase } from "../../application/use-cases/producto/list-producto-paginated.use-case";
+import { FindProductoByIdUseCase } from "../../application/use-cases/producto/find-producto-by-id.use-case";
+import { UpdateProductoUseCase } from "../../application/use-cases/producto/update-producto.use-case";
+import { DeleteProductoUseCase } from "../../application/use-cases/producto/delete-producto.use-case";
+
 import { MuebleController } from "../../presentation/controllers/mueble.controller";
 import { HabitacionController } from "../../presentation/controllers/habitacion.controller";
 import { TipoHabitacionController } from "../../presentation/controllers/tipo-habitacion.controller";
@@ -101,6 +108,7 @@ import { TarifaController } from "../../presentation/controllers/tarifa.controll
 import { EstanciaController } from "../../presentation/controllers/estancia.controller";
 import { CategoriaMuebleController } from "../../presentation/controllers/categoria-mueble.controller";
 import { PromocionController } from "../../presentation/controllers/promocion.controller";
+import { ProductoController } from "../../presentation/controllers/producto.controller";
 
 const repositoryBindings: Array<[symbol, new (...args: never[]) => unknown]> = [
   [DI_TOKENS.IMuebleRepository, MuebleRepository],
@@ -115,6 +123,7 @@ const repositoryBindings: Array<[symbol, new (...args: never[]) => unknown]> = [
   [DI_TOKENS.ICanalRepository, CanalRepository],
   [DI_TOKENS.ICategoriaMuebleRepository, CategoriaMuebleRepository],
   [DI_TOKENS.IPromocionRepository, PromocionRepository],
+  [DI_TOKENS.IProductoRepository, ProductoRepository],
 ];
 
 const useCaseAndControllerClasses: Array<new (...args: never[]) => unknown> = [
@@ -182,6 +191,11 @@ const useCaseAndControllerClasses: Array<new (...args: never[]) => unknown> = [
   FindPromocionByIdUseCase,
   UpdatePromocionUseCase,
   DeletePromocionUseCase,
+  CreateProductoUseCase,
+  ListProductoPaginatedUseCase,
+  FindProductoByIdUseCase,
+  UpdateProductoUseCase,
+  DeleteProductoUseCase,
   MuebleController,
   HabitacionController,
   TipoHabitacionController,
@@ -193,6 +207,7 @@ const useCaseAndControllerClasses: Array<new (...args: never[]) => unknown> = [
   EstanciaController,
   CategoriaMuebleController,
   PromocionController,
+  ProductoController,
 ];
 
 /**
