@@ -2,7 +2,8 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { FindFolioByIdUseCase } from "../../../src/application/use-cases/folio/find-folio-by-id.use-case";
 import { IFolioRepository } from "../../../src/domain/interfaces/folio.repository.interface";
 import { FolioException } from "../../../src/domain/exceptions/folio.exception";
-import { createMockFolio } from "../../helpers/folio-fixtures";
+import { createMockFolio, createMockFolioWithPromociones } from "../../helpers/folio-fixtures";
+import { Promocion } from "../../../src/domain/entities/promocion.entity";
 
 describe("FindFolioByIdUseCase", () => {
   let useCase: FindFolioByIdUseCase;
@@ -46,13 +47,12 @@ describe("FindFolioByIdUseCase", () => {
   });
 
   it("should map folio entity to dto correctly", async () => {
-    const mockFolio = createMockFolio({
+    const mockFolio = createMockFolioWithPromociones({
       id: "folio-1",
       codigo: "FOL-260416-1",
       estanciaId: "estancia-1",
       estado: true,
       observacion: "Test",
-      promociones: ["PROMO-1", "PROMO-2"],
     });
 
     mockRepository.findById = async () => mockFolio;
@@ -61,6 +61,7 @@ describe("FindFolioByIdUseCase", () => {
 
     expect(result.id).toBe("folio-1");
     expect(result.codigo).toBe("FOL-260416-1");
-    expect(result.promociones).toEqual(["PROMO-1", "PROMO-2"]);
+    expect(result.promociones).toHaveLength(2);
+    expect(result.promociones[0].codigo).toBe("PROMO-VERANO");
   });
 });

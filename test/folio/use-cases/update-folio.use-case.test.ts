@@ -3,7 +3,8 @@ import { UpdateFolioUseCase } from "../../../src/application/use-cases/folio/upd
 import { IFolioRepository } from "../../../src/domain/interfaces/folio.repository.interface";
 import { IPromocionRepository } from "../../../src/domain/interfaces/promocion.repository.interface";
 import { FolioException } from "../../../src/domain/exceptions/folio.exception";
-import { createMockFolio } from "../../helpers/folio-fixtures";
+import { createMockFolio, createMockFolioWithPromociones } from "../../helpers/folio-fixtures";
+import { Promocion } from "../../../src/domain/entities/promocion.entity";
 
 describe("UpdateFolioUseCase", () => {
   let useCase: UpdateFolioUseCase;
@@ -81,10 +82,9 @@ describe("UpdateFolioUseCase", () => {
   });
 
   it("should update promociones successfully", async () => {
-    const mockPromo = { id: "promo-1", codigo: "PROMO-VERANO" };
-    const updatedFolio = createMockFolio({
+    const mockPromo = new Promocion("promo-1", "PROMO-VERANO", "PORCENTAJE", 15, new Date(), new Date(), true, new Date(), new Date());
+    const updatedFolio = createMockFolioWithPromociones({
       id: "folio-1",
-      promociones: ["PROMO-VERANO"],
     });
 
     mockFolioRepository.findById = async () => createMockFolio({ id: "folio-1", estado: true });

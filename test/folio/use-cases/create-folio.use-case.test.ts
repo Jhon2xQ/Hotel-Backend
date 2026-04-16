@@ -4,8 +4,9 @@ import { IFolioRepository } from "../../../src/domain/interfaces/folio.repositor
 import { IEstanciaRepository } from "../../../src/domain/interfaces/estancia.repository.interface";
 import { IPromocionRepository } from "../../../src/domain/interfaces/promocion.repository.interface";
 import { FolioException } from "../../../src/domain/exceptions/folio.exception";
-import { createMockFolio } from "../../helpers/folio-fixtures";
+import { createMockFolio, createMockFolioWithPromociones } from "../../helpers/folio-fixtures";
 import { Estancia } from "../../../src/domain/entities/estancia.entity";
+import { Promocion } from "../../../src/domain/entities/promocion.entity";
 
 describe("CreateFolioUseCase", () => {
   let useCase: CreateFolioUseCase;
@@ -73,11 +74,10 @@ describe("CreateFolioUseCase", () => {
 
   it("should create folio with promociones", async () => {
     const mockEstancia = { id: "estancia-1" };
-    const mockPromo1 = { id: "promo-1", codigo: "PROMO-VERANO" };
-    const mockPromo2 = { id: "promo-2", codigo: "PROMO-INVIERNO" };
-    const mockFolio = createMockFolio({
+    const mockPromo1 = new Promocion("promo-1", "PROMO-VERANO", "PORCENTAJE", 15, new Date(), new Date(), true, new Date(), new Date());
+    const mockPromo2 = new Promocion("promo-2", "PROMO-INVIERNO", "MONTO_FIJO", 500, new Date(), new Date(), true, new Date(), new Date());
+    const mockFolio = createMockFolioWithPromociones({
       estanciaId: "estancia-1",
-      promociones: ["PROMO-VERANO", "PROMO-INVIERNO"],
     });
 
     mockEstanciaRepository.findById = async () => mockEstancia as unknown as Estancia;
@@ -94,7 +94,9 @@ describe("CreateFolioUseCase", () => {
       promocionIds: ["promo-1", "promo-2"],
     });
 
-    expect(result.promociones).toEqual(["PROMO-VERANO", "PROMO-INVIERNO"]);
+    expect(result.promociones).toHaveLength(2);
+    expect(result.promociones[0].codigo).toBe("PROMO-VERANO");
+    expect(result.promociones[1].codigo).toBe("PROMO-INVIERNO");
   });
 
   it("should throw error when estancia not found", async () => {

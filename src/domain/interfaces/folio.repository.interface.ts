@@ -1,6 +1,7 @@
 import type { Folio } from "../entities/folio.entity";
 import type { FolioProducto } from "../entities/folio-producto.entity";
 import type { FolioServicio } from "../entities/folio-servicio.entity";
+import type { Promocion } from "../entities/promocion.entity";
 import type { PaginatedResult, PaginationParams } from "../../application/paginations/api.pagination";
 
 export interface FolioPaginationParams extends PaginationParams {
@@ -31,7 +32,7 @@ export interface FolioWithRelations {
   cerradoEn: Date | null;
   createdAt: Date;
   updatedAt: Date;
-  promociones: string[];
+  promociones: Promocion[];
 }
 
 export interface FolioWithConsumos extends FolioWithRelations {
