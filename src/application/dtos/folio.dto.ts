@@ -185,5 +185,7 @@ export interface CobrarResponseDto {
   folio: FolioDto;
   productos: FolioProductoDto[];
   servicios: FolioServicioDto[];
+  subtotal: number;
+  descuento: number;
   total: number;
 }

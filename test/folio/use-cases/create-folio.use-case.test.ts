@@ -74,8 +74,8 @@ describe("CreateFolioUseCase", () => {
 
   it("should create folio with promociones", async () => {
     const mockEstancia = { id: "estancia-1" };
-    const mockPromo1 = new Promocion("promo-1", "PROMO-VERANO", "PORCENTAJE", 15, new Date(), new Date(), true, new Date(), new Date());
-    const mockPromo2 = new Promocion("promo-2", "PROMO-INVIERNO", "MONTO_FIJO", 500, new Date(), new Date(), true, new Date(), new Date());
+    const mockPromo1 = new Promocion("promo-1", "PROMO-VERANO", "PORCENTAJE", 15, new Date("2025-01-01T00:00:00Z"), new Date("2027-12-31T23:59:59Z"), true, new Date(), new Date());
+    const mockPromo2 = new Promocion("promo-2", "PROMO-INVIERNO", "MONTO_FIJO", 500, new Date("2025-01-01T00:00:00Z"), new Date("2027-12-31T23:59:59Z"), true, new Date(), new Date());
     const mockFolio = createMockFolioWithPromociones({
       estanciaId: "estancia-1",
     });

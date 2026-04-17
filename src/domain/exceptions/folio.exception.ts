@@ -42,6 +42,18 @@ export class FolioException extends DomainException {
     return new FolioException("Una o más promociones especificadas no existen", 404);
   }
 
+  static promocionInactive(): FolioException {
+    return new FolioException("Una o más promociones especificadas están inactivas", 400);
+  }
+
+  static promocionExpired(): FolioException {
+    return new FolioException("Una o más promociones especificadas han Caducado", 400);
+  }
+
+  static promocionNotYetAvailable(): FolioException {
+    return new FolioException("Una o más promociones especificadas aún no están habilitadas", 400);
+  }
+
   static folioGenerationFailed(): FolioException {
     return new FolioException("No se pudo generar el código de folio. Intente nuevamente.", 500);
   }

@@ -82,7 +82,17 @@ describe("UpdateFolioUseCase", () => {
   });
 
   it("should update promociones successfully", async () => {
-    const mockPromo = new Promocion("promo-1", "PROMO-VERANO", "PORCENTAJE", 15, new Date(), new Date(), true, new Date(), new Date());
+    const mockPromo = new Promocion(
+      "promo-1",
+      "PROMO-VERANO",
+      "PORCENTAJE",
+      15,
+      new Date("2025-01-01T00:00:00Z"),
+      new Date("2027-12-31T23:59:59Z"),
+      true,
+      new Date(),
+      new Date(),
+    );
     const updatedFolio = createMockFolioWithPromociones({
       id: "folio-1",
     });
