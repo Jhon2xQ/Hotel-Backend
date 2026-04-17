@@ -44,14 +44,26 @@ Obtiene la lista paginada de folios con filtros opcionales.
       {
         "id": "uuid",
         "codigo": "FOL-260416-1",
-        "estancia_id": "uuid-estancia-1",
-        "pago_id": null,
+        "estanciaId": "uuid-estancia-1",
+        "pagoId": null,
         "estado": true,
         "observacion": null,
-        "cerrado_en": null,
-        "promociones": ["PROMO-VERANO"],
-        "created_at": "2026-04-16T10:00:00.000Z",
-        "updated_at": "2026-04-16T10:00:00.000Z"
+        "cerradoEn": null,
+        "promociones": [
+          {
+            "id": "uuid-promo-1",
+            "codigo": "PROMO-VERANO",
+            "tipoDescuento": "PORCENTAJE",
+            "valorDescuento": 15,
+            "vigDesde": "2026-01-01T00:00:00.000Z",
+            "vigHasta": "2026-12-31T23:59:59.000Z",
+            "estado": true,
+            "createdAt": "2026-01-01T00:00:00.000Z",
+            "updatedAt": "2026-01-01T00:00:00.000Z"
+          }
+        ],
+        "createdAt": "2026-04-16T10:00:00.000Z",
+        "updatedAt": "2026-04-16T10:00:00.000Z"
       }
     ],
     "pagination": {
@@ -90,14 +102,26 @@ Obtiene los detalles de un folio específico.
   "data": {
     "id": "uuid",
     "codigo": "FOL-260416-1",
-    "estancia_id": "uuid-estancia-1",
-    "pago_id": null,
+    "estanciaId": "uuid-estancia-1",
+    "pagoId": null,
     "estado": true,
     "observacion": "Folio de ejemplo",
-    "cerrado_en": null,
-    "promociones": ["PROMO-VERANO"],
-    "created_at": "2026-04-16T10:00:00.000Z",
-    "updated_at": "2026-04-16T10:00:00.000Z"
+    "cerradoEn": null,
+    "promociones": [
+      {
+        "id": "uuid-promo-1",
+        "codigo": "PROMO-VERANO",
+        "tipoDescuento": "PORCENTAJE",
+        "valorDescuento": 15,
+        "vigDesde": "2026-01-01T00:00:00.000Z",
+        "vigHasta": "2026-12-31T23:59:59.000Z",
+        "estado": true,
+        "createdAt": "2026-01-01T00:00:00.000Z",
+        "updatedAt": "2026-01-01T00:00:00.000Z"
+      }
+    ],
+    "createdAt": "2026-04-16T10:00:00.000Z",
+    "updatedAt": "2026-04-16T10:00:00.000Z"
   },
   "timestamp": 1234567890
 }
@@ -108,7 +132,7 @@ Obtiene los detalles de un folio específico.
 ```json
 {
   "success": false,
-  "message": "Folio no encontrado",
+  "message": "Folio con id \"uuid\" no encontrado",
   "data": null,
   "timestamp": 1234567890
 }
@@ -140,6 +164,15 @@ Crea un nuevo folio asociado a una estancia. Solo se puede crear un folio abiert
 - `observacion` (string, opcional): Observación o nota del folio
 - `promocion_ids` (array de UUID, opcional): IDs de promociones a asociar al folio
 
+**Validaciones de promociones:**
+
+Al asignar promociones, se validan los siguientes requisitos:
+
+1. La promoción debe existir
+2. La promoción debe estar activa (`estado: true`)
+3. La promoción no debe estar caducada (fecha fin mayor a la actual)
+4. La promoción debe estar habilitada (fecha inicio menor o igual a la actual)
+
 **Respuesta Exitosa (201):**
 
 ```json
@@ -149,14 +182,26 @@ Crea un nuevo folio asociado a una estancia. Solo se puede crear un folio abiert
   "data": {
     "id": "uuid",
     "codigo": "FOL-260416-1",
-    "estancia_id": "uuid-estancia-1",
-    "pago_id": null,
+    "estanciaId": "uuid-estancia-1",
+    "pagoId": null,
     "estado": true,
     "observacion": "Folio de consumos",
-    "cerrado_en": null,
-    "promociones": ["PROMO-VERANO"],
-    "created_at": "2026-04-16T10:00:00.000Z",
-    "updated_at": "2026-04-16T10:00:00.000Z"
+    "cerradoEn": null,
+    "promociones": [
+      {
+        "id": "uuid-promo-1",
+        "codigo": "PROMO-VERANO",
+        "tipoDescuento": "PORCENTAJE",
+        "valorDescuento": 15,
+        "vigDesde": "2026-01-01T00:00:00.000Z",
+        "vigHasta": "2026-12-31T23:59:59.000Z",
+        "estado": true,
+        "createdAt": "2026-01-01T00:00:00.000Z",
+        "updatedAt": "2026-01-01T00:00:00.000Z"
+      }
+    ],
+    "createdAt": "2026-04-16T10:00:00.000Z",
+    "updatedAt": "2026-04-16T10:00:00.000Z"
   },
   "timestamp": 1234567890
 }
@@ -179,6 +224,44 @@ Crea un nuevo folio asociado a una estancia. Solo se puede crear un folio abiert
 {
   "success": false,
   "message": "La estancia ya tiene un folio abierto",
+  "data": null,
+  "timestamp": 1234567890
+}
+```
+
+**Respuestas de Error - Validaciones de promociones:**
+
+```json
+{
+  "success": false,
+  "message": "Una o más promociones especificadas no existen",
+  "data": null,
+  "timestamp": 1234567890
+}
+```
+
+```json
+{
+  "success": false,
+  "message": "Una o más promociones especificadas están inactivas",
+  "data": null,
+  "timestamp": 1234567890
+}
+```
+
+```json
+{
+  "success": false,
+  "message": "Una o más promociones especificadas han Caducado",
+  "data": null,
+  "timestamp": 1234567890
+}
+```
+
+```json
+{
+  "success": false,
+  "message": "Una o más promociones especificadas aún no están habilitadas",
   "data": null,
   "timestamp": 1234567890
 }
@@ -209,8 +292,18 @@ Actualiza los datos de un folio existente.
 
 **Campos (todos opcionales):**
 
+- `estado` (boolean): Cambiar estado del folio (solo de cerrado a abierto no es posible)
 - `observacion` (string): Observación o nota del folio
-- `promocion_ids` (array de UUID):IDs de promociones. Al enviar, se **reemplazan** las existentes.
+- `promocion_ids` (array de UUID): IDs de promociones. Al enviar, se **reemplazan** las existentes.
+
+**Validaciones de promociones:**
+
+Al actualizar con promociones, se aplican las mismas validaciones que en la creación:
+
+1. La promoción debe existir
+2. La promoción debe estar activa (`estado: true`)
+3. La promoción no debe estar caducada (fecha fin mayor a la actual)
+4. La promoción debe estar habilitada (fecha inicio menor o igual a la actual)
 
 **Respuesta Exitosa (200):**
 
@@ -229,6 +322,17 @@ Actualiza los datos de un folio existente.
 {
   "success": false,
   "message": "No se puede modificar un folio cerrado",
+  "data": null,
+  "timestamp": 1234567890
+}
+```
+
+**Respuesta de Error (400):**
+
+```json
+{
+  "success": false,
+  "message": "El folio ya está cerrado",
   "data": null,
   "timestamp": 1234567890
 }
@@ -317,13 +421,13 @@ Agrega un producto al folio y descuenta del stock del producto.
   "message": "Producto agregado al folio",
   "data": {
     "id": "uuid-folio-producto",
-    "folio_id": "uuid-folio-1",
-    "producto_id": "uuid-producto-1",
+    "folioId": "uuid-folio-1",
+    "productoId": "uuid-producto-1",
     "cantidad": 2,
-    "precio_unit": 10,
+    "precioUnit": 10,
     "total": 20,
-    "created_at": "2026-04-16T11:00:00.000Z",
-    "updated_at": "2026-04-16T11:00:00.000Z"
+    "createdAt": "2026-04-16T11:00:00.000Z",
+    "updatedAt": "2026-04-16T11:00:00.000Z"
   },
   "timestamp": 1234567890
 }
@@ -378,13 +482,13 @@ Agrega un servicio (concepto libre) al folio.
   "message": "Servicio agregado al folio",
   "data": {
     "id": "uuid-folio-servicio",
-    "folio_id": "uuid-folio-1",
+    "folioId": "uuid-folio-1",
     "concepto": "Masaje spa",
     "cantidad": 1,
-    "precio_unit": 50,
+    "precioUnit": 50,
     "total": 50,
-    "created_at": "2026-04-16T11:30:00.000Z",
-    "updated_at": "2026-04-16T11:30:00.000Z"
+    "createdAt": "2026-04-16T11:30:00.000Z",
+    "updatedAt": "2026-04-16T11:30:00.000Z"
   },
   "timestamp": 1234567890
 }
@@ -394,7 +498,7 @@ Agrega un servicio (concepto libre) al folio.
 
 ### 8. Obtener Consumos del Folio
 
-Obtiene todos los productos y servicios consumidos en un folio, además del total.
+Obtiene todos los productos y servicios consumidos en un folio, además del cálculo de subtotal, descuento y total con promociones aplicadas.
 
 **Endpoint:** `GET /api/private/folios/:id/consumos`
 
@@ -414,41 +518,84 @@ Obtiene todos los productos y servicios consumidos en un folio, además del tota
     "folio": {
       "id": "uuid-folio-1",
       "codigo": "FOL-260416-1",
-      "estancia_id": "uuid-estancia-1",
-      "pago_id": null,
+      "estanciaId": "uuid-estancia-1",
+      "pagoId": null,
       "estado": true,
       "observacion": null,
-      "cerrado_en": null,
-      "promociones": [],
-      "created_at": "2026-04-16T10:00:00.000Z",
-      "updated_at": "2026-04-16T10:00:00.000Z"
+      "cerradoEn": null,
+      "promociones": [
+        {
+          "id": "uuid-promo-1",
+          "codigo": "PROMO-OCTUBRE",
+          "tipoDescuento": "MONTO_FIJO",
+          "valorDescuento": 50,
+          "vigDesde": "2026-01-01T00:00:00.000Z",
+          "vigHasta": "2026-12-31T23:59:59.000Z",
+          "estado": true,
+          "createdAt": "2026-01-01T00:00:00.000Z",
+          "updatedAt": "2026-01-01T00:00:00.000Z"
+        }
+      ],
+      "createdAt": "2026-04-16T10:00:00.000Z",
+      "updatedAt": "2026-04-16T10:00:00.000Z"
     },
     "productos": [
       {
         "id": "uuid-fp-1",
-        "folio_id": "uuid-folio-1",
-        "producto_id": "uuid-producto-1",
+        "folioId": "uuid-folio-1",
+        "productoId": "uuid-producto-1",
         "cantidad": 2,
-        "precio_unit": 10,
+        "precioUnit": 10,
         "total": 20,
-        "created_at": "2026-04-16T11:00:00.000Z",
-        "updated_at": "2026-04-16T11:00:00.000Z"
+        "createdAt": "2026-04-16T11:00:00.000Z",
+        "updatedAt": "2026-04-16T11:00:00.000Z"
       }
     ],
     "servicios": [
       {
         "id": "uuid-fs-1",
-        "folio_id": "uuid-folio-1",
+        "folioId": "uuid-folio-1",
         "concepto": "Masaje spa",
         "cantidad": 1,
-        "precio_unit": 50,
+        "precioUnit": 50,
         "total": 50,
-        "created_at": "2026-04-16T11:30:00.000Z",
-        "updated_at": "2026-04-16T11:30:00.000Z"
+        "createdAt": "2026-04-16T11:30:00.000Z",
+        "updatedAt": "2026-04-16T11:30:00.000Z"
       }
     ],
-    "total": 70
+    "subtotal": 70,
+    "descuento": 50,
+    "total": 20
   },
+  "timestamp": 1234567890
+}
+```
+
+**Campos de respuesta:**
+
+- `subtotal`: Sumatoria de todos los productos y servicios sin descuentos
+- `descuento`: Total de descuentos aplicados (suma de promociones vigentes)
+- `total`: Resultado de `subtotal - descuento` (mínimo 0)
+
+**Cálculo de descuentos:**
+
+Las promociones se aplican solo si:
+- La promoción está activa (`estado: true`)
+- La fecha actual está dentro del rango de vigencia (`vigDesde` <= ahora <= `vigHasta`)
+
+Tipos de descuento:
+- `PORCENTAJE`: `subtotal * (valorDescuento / 100)`
+- `MONTO_FIJO`: `valorDescuento` (monto fijo)
+
+Los descuentos se suman si hay múltiples promociones vigentes.
+
+**Respuesta de Error (404):**
+
+```json
+{
+  "success": false,
+  "message": "Folio con id \"uuid\" no encontrado",
+  "data": null,
   "timestamp": 1234567890
 }
 ```
@@ -490,6 +637,16 @@ Un folio pertenece a una estancia (relación uno a muchos):
 
 ---
 
+## Relación con Promociones
+
+Un folio puede tener múltiples promociones asociadas:
+
+- Las promociones se validan al crear o actualizar el folio
+- Solo se aceptan promociones vigentes y activas
+- Los descuentos se calculan automáticamente al obtener consumos
+
+---
+
 ## Integración con Pagos
 
 Para cobrar un folio, usar el endpoint `POST /api/private/pagos` con el campo `folio_id`:
@@ -503,7 +660,7 @@ Para cobrar un folio, usar el endpoint `POST /api/private/pagos` con el campo `f
 ```
 
 Al crear un pago con `folio_id`:
-1. Se obtiene el total de consumos del folio
+1. Se obtiene el total de consumos del folio (incluyendo descuentos)
 2. Se crea el pago con monto = total de consumos
 3. Se asocia el pago al folio (`pago_id`)
 4. Se cierra el folio automáticamente (`estado = false`)
@@ -514,7 +671,7 @@ Al crear un pago con `folio_id`:
 
 - `200 OK`: Operación exitosa
 - `201 Created`: Recurso creado exitosamente
-- `400 Bad Request`: Datos de entrada inválidos o folio ya cerrado
+- `400 Bad Request`: Datos de entrada inválidos, folio cerrado o promoción inválida
 - `401 Unauthorized`: No autenticado
 - `403 Forbidden`: Sin permisos suficientes o folio cerrado
 - `404 Not Found`: Folio, estancia o promoción no encontrada
