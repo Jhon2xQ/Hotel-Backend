@@ -30,7 +30,9 @@ export const UpdateFolioSchema = z
     promocion_ids: z.array(z.uuid("ID de promoción inválido")).optional(),
   })
   .transform((data) => ({
-    ...data,
+    estado: data.estado,
+    observacion: data.observacion,
+    promocionIds: data.promocion_ids,
   }));
 
 export const AddProductoSchema = z

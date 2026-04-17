@@ -12,10 +12,25 @@ import type {
 import { DI_TOKENS } from "../../common/IoC/tokens";
 import { FolioProducto } from "../../domain/entities/folio-producto.entity";
 import { FolioServicio } from "../../domain/entities/folio-servicio.entity";
+import { Promocion } from "../../domain/entities/promocion.entity";
+
+function mapFolioPromocion(data: Record<string, unknown>): Promocion {
+  return new Promocion(
+    data.id as string,
+    data.codigo as string,
+    data.tipoDescuento as string,
+    Number(data.valorDescuento),
+    data.vigDesde as Date,
+    data.vigHasta as Date,
+    data.estado as boolean,
+    data.createdAt as Date,
+    data.updatedAt as Date,
+  );
+}
 
 function mapFolio(data: Record<string, unknown>): FolioWithRelations {
   const promocionesRaw = data.promociones as Array<Record<string, unknown>> | undefined;
-  const promociones = (promocionesRaw ?? []).map((p) => p.codigo as string);
+  const promociones = (promocionesRaw ?? []).map(mapFolioPromocion);
 
   return {
     id: data.id as string,
@@ -100,14 +115,14 @@ export class FolioRepository implements IFolioRepository {
           ? { connect: data.promocionIds.map((id) => ({ id })) }
           : undefined,
       },
-      include: { promociones: { select: { codigo: true } } },
+      include: { promociones: true },
     });
     return mapFolio(result as unknown as Record<string, unknown>);
   }
 
   async findAll(): Promise<FolioWithRelations[]> {
     const results = await this.prisma.folio.findMany({
-      include: { promociones: { select: { codigo: true } } },
+      include: { promociones: true },
       orderBy: { createdAt: "desc" },
     });
     return results.map((r) => mapFolio(r as unknown as Record<string, unknown>));
@@ -136,7 +151,7 @@ export class FolioRepository implements IFolioRepository {
     const [results, total] = await Promise.all([
       this.prisma.folio.findMany({
         where,
-        include: { promociones: { select: { codigo: true } } },
+        include: { promociones: true },
         orderBy: { createdAt: "desc" },
         skip,
         take: limit,
@@ -163,7 +178,7 @@ export class FolioRepository implements IFolioRepository {
   async findById(id: string): Promise<FolioWithRelations | null> {
     const result = await this.prisma.folio.findUnique({
       where: { id },
-      include: { promociones: { select: { codigo: true } } },
+      include: { promociones: true },
     });
     return result ? mapFolio(result as unknown as Record<string, unknown>) : null;
   }
@@ -171,7 +186,7 @@ export class FolioRepository implements IFolioRepository {
   async findByEstanciaId(estanciaId: string): Promise<FolioWithRelations[]> {
     const results = await this.prisma.folio.findMany({
       where: { estanciaId },
-      include: { promociones: { select: { codigo: true } } },
+      include: { promociones: true },
       orderBy: { createdAt: "asc" },
     });
     return results.map((r) => mapFolio(r as unknown as Record<string, unknown>));
@@ -180,7 +195,7 @@ export class FolioRepository implements IFolioRepository {
   async findByCodigo(codigo: string): Promise<FolioWithRelations | null> {
     const result = await this.prisma.folio.findUnique({
       where: { codigo },
-      include: { promociones: { select: { codigo: true } } },
+      include: { promociones: true },
     });
     return result ? mapFolio(result as unknown as Record<string, unknown>) : null;
   }
@@ -191,7 +206,7 @@ export class FolioRepository implements IFolioRepository {
         estanciaId,
         estado: true,
       },
-      include: { promociones: { select: { codigo: true } } },
+      include: { promociones: true },
       orderBy: { createdAt: "desc" },
     });
     return result ? mapFolio(result as unknown as Record<string, unknown>) : null;
@@ -211,7 +226,7 @@ export class FolioRepository implements IFolioRepository {
     const result = await this.prisma.folio.update({
       where: { id },
       data: updateData,
-      include: { promociones: { select: { codigo: true } } },
+      include: { promociones: true },
     });
     return mapFolio(result as unknown as Record<string, unknown>);
   }
@@ -304,7 +319,7 @@ export class FolioRepository implements IFolioRepository {
         cerradoEn: new Date(),
         pagoId,
       },
-      include: { promociones: { select: { codigo: true } } },
+      include: { promociones: true },
     });
     return mapFolio(result as unknown as Record<string, unknown>);
   }

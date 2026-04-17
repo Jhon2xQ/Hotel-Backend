@@ -3,7 +3,8 @@ import { UpdateFolioUseCase } from "../../../src/application/use-cases/folio/upd
 import { IFolioRepository } from "../../../src/domain/interfaces/folio.repository.interface";
 import { IPromocionRepository } from "../../../src/domain/interfaces/promocion.repository.interface";
 import { FolioException } from "../../../src/domain/exceptions/folio.exception";
-import { createMockFolio } from "../../helpers/folio-fixtures";
+import { createMockFolio, createMockFolioWithPromociones } from "../../helpers/folio-fixtures";
+import { Promocion } from "../../../src/domain/entities/promocion.entity";
 
 describe("UpdateFolioUseCase", () => {
   let useCase: UpdateFolioUseCase;
@@ -81,10 +82,19 @@ describe("UpdateFolioUseCase", () => {
   });
 
   it("should update promociones successfully", async () => {
-    const mockPromo = { id: "promo-1", codigo: "PROMO-VERANO" };
-    const updatedFolio = createMockFolio({
+    const mockPromo = new Promocion(
+      "promo-1",
+      "PROMO-VERANO",
+      "PORCENTAJE",
+      15,
+      new Date("2025-01-01T00:00:00Z"),
+      new Date("2027-12-31T23:59:59Z"),
+      true,
+      new Date(),
+      new Date(),
+    );
+    const updatedFolio = createMockFolioWithPromociones({
       id: "folio-1",
-      promociones: ["PROMO-VERANO"],
     });
 
     mockFolioRepository.findById = async () => createMockFolio({ id: "folio-1", estado: true });
@@ -96,5 +106,68 @@ describe("UpdateFolioUseCase", () => {
     });
 
     expect(result).toBeDefined();
+  });
+
+  it("should throw error when promocion is inactive on update", async () => {
+    const inactivePromo = new Promocion(
+      "promo-1",
+      "PROMO-INACTIVE",
+      "PORCENTAJE",
+      15,
+      new Date("2025-01-01T00:00:00Z"),
+      new Date("2027-12-31T23:59:59Z"),
+      false,
+      new Date(),
+      new Date(),
+    );
+
+    mockFolioRepository.findById = async () => createMockFolio({ id: "folio-1", estado: true });
+    mockPromocionRepository.findById = async () => inactivePromo as any;
+
+    await expect(
+      useCase.execute("folio-1", { promocionIds: ["promo-1"] }),
+    ).rejects.toThrow(FolioException.promocionInactive());
+  });
+
+  it("should throw error when promocion is expired on update", async () => {
+    const expiredPromo = new Promocion(
+      "promo-1",
+      "PROMO-EXPIRED",
+      "PORCENTAJE",
+      15,
+      new Date("2024-01-01T00:00:00Z"),
+      new Date("2024-12-31T23:59:59Z"),
+      true,
+      new Date(),
+      new Date(),
+    );
+
+    mockFolioRepository.findById = async () => createMockFolio({ id: "folio-1", estado: true });
+    mockPromocionRepository.findById = async () => expiredPromo as any;
+
+    await expect(
+      useCase.execute("folio-1", { promocionIds: ["promo-1"] }),
+    ).rejects.toThrow(FolioException.promocionExpired());
+  });
+
+  it("should throw error when promocion is not yet available on update", async () => {
+    const futurePromo = new Promocion(
+      "promo-1",
+      "PROMO-FUTURE",
+      "PORCENTAJE",
+      15,
+      new Date("2030-01-01T00:00:00Z"),
+      new Date("2030-12-31T23:59:59Z"),
+      true,
+      new Date(),
+      new Date(),
+    );
+
+    mockFolioRepository.findById = async () => createMockFolio({ id: "folio-1", estado: true });
+    mockPromocionRepository.findById = async () => futurePromo as any;
+
+    await expect(
+      useCase.execute("folio-1", { promocionIds: ["promo-1"] }),
+    ).rejects.toThrow(FolioException.promocionNotYetAvailable());
   });
 });

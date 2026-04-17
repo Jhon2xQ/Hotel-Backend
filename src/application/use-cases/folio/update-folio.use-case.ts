@@ -5,6 +5,24 @@ import type { IPromocionRepository } from "../../../domain/interfaces/promocion.
 import { UpdateFolioDto, FolioDto, toFolioDto } from "../../dtos/folio.dto";
 import { DI_TOKENS } from "../../../common/IoC/tokens";
 
+function validarPromocion(promocion: { estado: boolean; vigDesde: Date; vigHasta: Date }): void {
+  if (!promocion.estado) {
+    throw FolioException.promocionInactive();
+  }
+
+  const ahora = new Date();
+  const vigDesde = new Date(promocion.vigDesde);
+  const vigHasta = new Date(promocion.vigHasta);
+
+  if (ahora > vigHasta) {
+    throw FolioException.promocionExpired();
+  }
+
+  if (ahora < vigDesde) {
+    throw FolioException.promocionNotYetAvailable();
+  }
+}
+
 @injectable()
 export class UpdateFolioUseCase {
   constructor(
@@ -28,6 +46,7 @@ export class UpdateFolioUseCase {
         if (!promocion) {
           throw FolioException.promocionNotFound();
         }
+        validarPromocion(promocion);
       }
     }
 

@@ -1,4 +1,5 @@
 import type { FolioWithRelations } from "../../domain/interfaces/folio.repository.interface";
+import type { Promocion } from "../../domain/entities/promocion.entity";
 
 export interface CreateFolioDto {
   estanciaId: string;
@@ -19,6 +20,18 @@ export interface ListFolioDto {
   estado?: boolean;
 }
 
+export interface FolioPromocionDto {
+  id: string;
+  codigo: string;
+  tipoDescuento: string;
+  valorDescuento: number;
+  vigDesde: string;
+  vigHasta: string;
+  estado: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface FolioDto {
   id: string;
   codigo: string;
@@ -27,7 +40,7 @@ export interface FolioDto {
   estado: boolean;
   observacion: string | null;
   cerradoEn: string | null;
-  promociones: string[];
+  promociones: FolioPromocionDto[];
   createdAt: string;
   updatedAt: string;
 }
@@ -50,6 +63,20 @@ export interface FolioPaginatedDto {
   };
 }
 
+export function toFolioPromocionDto(p: Promocion): FolioPromocionDto {
+  return {
+    id: p.id,
+    codigo: p.codigo,
+    tipoDescuento: p.tipoDescuento,
+    valorDescuento: p.valorDescuento,
+    vigDesde: p.vigDesde.toISOString(),
+    vigHasta: p.vigHasta.toISOString(),
+    estado: p.estado,
+    createdAt: p.createdAt.toISOString(),
+    updatedAt: p.updatedAt.toISOString(),
+  };
+}
+
 export function toFolioDto(f: FolioWithRelations): FolioDto {
   return {
     id: f.id,
@@ -59,7 +86,7 @@ export function toFolioDto(f: FolioWithRelations): FolioDto {
     estado: f.estado,
     observacion: f.observacion,
     cerradoEn: f.cerradoEn ? f.cerradoEn.toISOString() : null,
-    promociones: f.promociones,
+    promociones: f.promociones.map(toFolioPromocionDto),
     createdAt: f.createdAt.toISOString(),
     updatedAt: f.updatedAt.toISOString(),
   };
@@ -158,5 +185,7 @@ export interface CobrarResponseDto {
   folio: FolioDto;
   productos: FolioProductoDto[];
   servicios: FolioServicioDto[];
+  subtotal: number;
+  descuento: number;
   total: number;
 }

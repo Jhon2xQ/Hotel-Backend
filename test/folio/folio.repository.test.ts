@@ -68,7 +68,7 @@ describe("FolioRepository", () => {
           estado: true,
           observacion: null,
         }),
-        include: { promociones: { select: { codigo: true } } },
+        include: { promociones: true },
       });
     });
 
@@ -83,7 +83,10 @@ describe("FolioRepository", () => {
         cerradoEn: null,
         createdAt: new Date(),
         updatedAt: new Date(),
-        promociones: [{ codigo: "PROMO-VERANO" }, { codigo: "PROMO-DESCUENTO" }],
+        promociones: [
+          { id: "promo-1", codigo: "PROMO-VERANO", tipoDescuento: "PORCENTAJE", valorDescuento: 15, vigDesde: new Date(), vigHasta: new Date(), estado: true, createdAt: new Date(), updatedAt: new Date() },
+          { id: "promo-2", codigo: "PROMO-DESCUENTO", tipoDescuento: "MONTO_FIJO", valorDescuento: 500, vigDesde: new Date(), vigHasta: new Date(), estado: true, createdAt: new Date(), updatedAt: new Date() },
+        ],
       };
 
       mockPrisma.folio.create.mockResolvedValue(mockResult);
@@ -95,7 +98,9 @@ describe("FolioRepository", () => {
       });
 
       expect(result.estanciaId).toBe("estancia-2");
-      expect(result.promociones).toEqual(["PROMO-VERANO", "PROMO-DESCUENTO"]);
+      expect(result.promociones).toHaveLength(2);
+      expect(result.promociones[0].codigo).toBe("PROMO-VERANO");
+      expect(result.promociones[1].codigo).toBe("PROMO-DESCUENTO");
       expect(mockPrisma.folio.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
           estanciaId: "estancia-2",
@@ -103,7 +108,7 @@ describe("FolioRepository", () => {
             connect: [{ id: "promo-1" }, { id: "promo-2" }],
           },
         }),
-        include: { promociones: { select: { codigo: true } } },
+        include: { promociones: true },
       });
     });
   });
@@ -151,10 +156,11 @@ describe("FolioRepository", () => {
 
       expect(result.length).toBe(2);
       expect(result[0].codigo).toBe("FOL-260416-1");
-      expect(result[0].promociones).toEqual(["PROMO-1"]);
+      expect(result[0].promociones).toHaveLength(1);
+      expect(result[0].promociones[0].codigo).toBe("PROMO-1");
       expect(result[1].estado).toBe(false);
       expect(mockPrisma.folio.findMany).toHaveBeenCalledWith({
-        include: { promociones: { select: { codigo: true } } },
+        include: { promociones: true },
         orderBy: { createdAt: "desc" },
       });
     });
@@ -182,10 +188,11 @@ describe("FolioRepository", () => {
       expect(result).toBeDefined();
       expect(result?.id).toBe("folio-123");
       expect(result?.codigo).toBe("FOL-260416-5");
-      expect(result?.promociones).toEqual(["PROMO-VERANO"]);
+      expect(result?.promociones).toHaveLength(1);
+      expect(result?.promociones[0].codigo).toBe("PROMO-VERANO");
       expect(mockPrisma.folio.findUnique).toHaveBeenCalledWith({
         where: { id: "folio-123" },
-        include: { promociones: { select: { codigo: true } } },
+        include: { promociones: true },
       });
     });
 
@@ -236,7 +243,7 @@ describe("FolioRepository", () => {
       expect(result[1].codigo).toBe("FOL-260416-2");
       expect(mockPrisma.folio.findMany).toHaveBeenCalledWith({
         where: { estanciaId: "estancia-1" },
-        include: { promociones: { select: { codigo: true } } },
+        include: { promociones: true },
         orderBy: { createdAt: "asc" },
       });
     });
@@ -269,7 +276,7 @@ describe("FolioRepository", () => {
           estanciaId: "estancia-1",
           estado: true,
         },
-        include: { promociones: { select: { codigo: true } } },
+        include: { promociones: true },
         orderBy: { createdAt: "desc" },
       });
     });
@@ -310,7 +317,7 @@ describe("FolioRepository", () => {
         data: expect.objectContaining({
           observacion: "Observación actualizada",
         }),
-        include: { promociones: { select: { codigo: true } } },
+        include: { promociones: true },
       });
     });
 
@@ -341,7 +348,7 @@ describe("FolioRepository", () => {
             set: [{ id: "promo-nueva-id" }],
           },
         }),
-        include: { promociones: { select: { codigo: true } } },
+        include: { promociones: true },
       });
     });
   });
@@ -514,7 +521,7 @@ describe("FolioRepository", () => {
           cerradoEn: closedAt,
           pagoId: "pago-1",
         },
-        include: { promociones: { select: { codigo: true } } },
+        include: { promociones: true },
       });
 
       vi.useRealTimers();
