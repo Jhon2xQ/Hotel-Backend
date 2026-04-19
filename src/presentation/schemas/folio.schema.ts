@@ -7,7 +7,9 @@ export const UUIDParamSchema = z.object({
 
 export const ListFolioQuerySchema = PaginationQuerySchema.extend({
   estancia_id: z.uuid("El ID de la estancia debe ser un UUID válido").optional(),
-  estado: z.boolean().optional(),
+  estado: z
+    .preprocess((val) => (val === "true" ? true : val === "false" ? false : undefined), z.boolean().optional())
+    .optional(),
 });
 export type ListFolioQuery = z.infer<typeof ListFolioQuerySchema>;
 
