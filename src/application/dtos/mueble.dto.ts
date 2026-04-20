@@ -11,7 +11,7 @@ export interface CreateMuebleDto {
   condicion?: MuebleCondition;
   fecha_adquisicion?: string;
   ultima_revision?: string;
-  habitacion_id?: string;
+  habitacion_id?: string | null;
 }
 
 export interface UpdateMuebleDto {
@@ -23,7 +23,7 @@ export interface UpdateMuebleDto {
   condicion?: MuebleCondition;
   fecha_adquisicion?: string;
   ultima_revision?: string;
-  habitacion_id?: string;
+  habitacion_id?: string | null;
 }
 
 export interface MuebleDto {

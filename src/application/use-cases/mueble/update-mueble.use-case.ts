@@ -27,10 +27,13 @@ export class UpdateMuebleUseCase {
       }
     }
 
-    if (input.habitacion_id !== undefined && input.habitacion_id !== null) {
-      const habitacion = await this.habitacionRepository.findById(input.habitacion_id);
-      if (!habitacion) {
-        throw MuebleException.habitacionNotFound();
+    if (input.habitacion_id !== undefined) {
+      const isEmpty = typeof input.habitacion_id === "string" && input.habitacion_id === "";
+      if (!isEmpty && input.habitacion_id) {
+        const habitacion = await this.habitacionRepository.findById(input.habitacion_id);
+        if (!habitacion) {
+          throw MuebleException.habitacionNotFound();
+        }
       }
     }
 
@@ -63,7 +66,10 @@ export class UpdateMuebleUseCase {
       updateData.ultimaRevision = input.ultima_revision ? new Date(input.ultima_revision) : null;
     }
     if (input.descripcion !== undefined) updateData.descripcion = input.descripcion ?? null;
-    if (input.habitacion_id !== undefined) updateData.habitacionId = input.habitacion_id ?? null;
+    if (input.habitacion_id !== undefined) {
+      const isEmpty = typeof input.habitacion_id === "string" && input.habitacion_id === "";
+      updateData.habitacionId = isEmpty ? null : (input.habitacion_id as string);
+    }
 
     const updated = await this.repository.update(id, updateData);
     return toMuebleDto(updated);
