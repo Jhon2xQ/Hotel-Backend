@@ -18,7 +18,7 @@ export const UpdateMuebleSchema = z.object({
   codigo: z.string().min(1, "El código es requerido").max(30, "El código no puede exceder 30 caracteres").optional(),
   nombre: z.string().min(1, "El nombre es requerido").max(100, "El nombre no puede exceder 100 caracteres").optional(),
   categoria_id: z.uuid("La categoria debe ser un UUID valido").optional(),
-  imagen: z.array(z.instanceof(File)).optional(),
+  imagen: z.union([z.array(z.instanceof(File)), z.string().max(0)]).optional().default([]),
   condicion: MuebleConditionSchema.optional(),
   fecha_adquisicion: z.string().date("Debe ser una fecha válida (YYYY-MM-DD)").optional(),
   ultima_revision: z.string().date("Debe ser una fecha válida (YYYY-MM-DD)").optional(),

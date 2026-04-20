@@ -40,9 +40,17 @@ export class UpdateMuebleUseCase {
     if (input.categoria_id !== undefined) updateData.categoriaId = input.categoria_id;
 
     if (input.imagen !== undefined) {
-      if (input.imagen && input.imagen.length > 0) {
-        updateData.urlImagen = await S3UploadService.uploadImage(input.imagen[0]);
-      } else {
+      const isStringEmpty = typeof input.imagen === "string";
+      const isArrayWithFile = Array.isArray(input.imagen) && input.imagen.length > 0;
+
+      if (existing.urlImagen && !isStringEmpty) {
+        await S3UploadService.deleteImage(existing.urlImagen);
+      }
+
+      if (isArrayWithFile) {
+        const files = input.imagen as File[];
+        updateData.urlImagen = await S3UploadService.uploadImage(files[0]);
+      } else if (isStringEmpty) {
         updateData.urlImagen = null;
       }
     }

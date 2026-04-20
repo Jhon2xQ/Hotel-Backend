@@ -19,7 +19,7 @@ export interface UpdateMuebleDto {
   nombre?: string;
   descripcion?: string;
   categoria_id?: string;
-  imagen?: File[];
+  imagen?: File[] | string;
   condicion?: MuebleCondition;
   fecha_adquisicion?: string;
   ultima_revision?: string;

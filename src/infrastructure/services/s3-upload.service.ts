@@ -39,4 +39,13 @@ export class S3UploadService {
     });
     await Promise.all(deletePromises);
   }
+
+  static async deleteImage(url: string): Promise<void> {
+    const key = url.split("/").pop()!;
+    const command = new DeleteObjectCommand({
+      Bucket: S3_BUCKET_NAME,
+      Key: key,
+    });
+    await s3Client.send(command);
+  }
 }
