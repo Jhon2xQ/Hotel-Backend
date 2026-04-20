@@ -234,11 +234,16 @@ Todos los campos son opcionales. Solo se actualizarán los campos proporcionados
 | `nombre` | string | Nombre del mueble (máx. 100 caracteres) |
 | `categoria_id` | uuid | ID de la categoría del mueble |
 | `descripcion` | string | Descripción detallada |
-| `imagen` | File | Archivo de imagen a subir a S3 (reemplaza la existente) |
+| `imagen` | File | Archivo de imagen (vacío para eliminar, no enviar para mantener) |
 | `condicion` | enum | BUENO, REGULAR, DANADO, FALTANTE |
 | `fecha_adquisicion` | date | Fecha en formato YYYY-MM-DD |
 | `ultima_revision` | date | Fecha en formato YYYY-MM-DD |
 | `habitacion_id` | uuid | ID de la habitación (null para desasignar) |
+
+**Notas sobre imágenes:**
+- No enviar campo `imagen`: Mantiene la imagen actual.
+- Enviar nueva imagen: Elimina la anterior y sube la nueva.
+- Enviar `imagen` vacío: Elimina la imagen del S3.
 
 **Response (200 OK):**
 
@@ -363,7 +368,11 @@ enum MuebleCondition {
    - La habitación debe existir si se proporciona `habitacion_id`
 7. **Actualización parcial**: Al actualizar, solo se modifican los campos proporcionados en el request
 8. **Muebles sin asignar**: Un mueble puede existir sin estar asignado a ninguna habitación (`habitacion_id: null`)
-9. **Imágenes**: La imagen se sube a S3 y la URL se almacena en `url_imagen`. Al actualizar con una nueva imagen, se reemplaza la URL existente.
+9. **Imágenes**:
+   - La imagen se sube a S3 y la URL se almacena en `url_imagen`.
+   - No enviar campo `imagen`: Mantiene la imagen actual.
+   - Enviar nueva imagen: Elimina la anterior y sube la nueva.
+   - Enviar campo `imagen` vacío: Elimina la imagen del S3.
 10. **Condición por defecto**: Si no se especifica, la condición del mueble será `BUENO`
 
 ---
@@ -405,4 +414,28 @@ curl -X PUT https://api.hotel.com/api/private/muebles/:id \
 curl -X PUT https://api.hotel.com/api/private/muebles/:id \
   -H "Authorization: Bearer <token>" \
   -F "condicion=DANADO"
+```
+
+### Actualizar imagen de mueble
+
+```bash
+curl -X PUT https://api.hotel.com/api/private/muebles/:id \
+  -H "Authorization: Bearer <token>" \
+  -F "imagen=@/path/to/nueva-imagen.jpg"
+```
+
+### Eliminar imagen de mueble
+
+```bash
+curl -X PUT https://api.hotel.com/api/private/muebles/:id \
+  -H "Authorization: Bearer <token>" \
+  -F "imagen="
+```
+
+### Mantener imagen actual
+
+```bash
+curl -X PUT https://api.hotel.com/api/private/muebles/:id \
+  -H "Authorization: Bearer <token>" \
+  -F "nombre=NuevoNombre"
 ```

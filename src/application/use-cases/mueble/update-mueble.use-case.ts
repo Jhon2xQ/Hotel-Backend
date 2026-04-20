@@ -27,10 +27,13 @@ export class UpdateMuebleUseCase {
       }
     }
 
-    if (input.habitacion_id !== undefined && input.habitacion_id !== null) {
-      const habitacion = await this.habitacionRepository.findById(input.habitacion_id);
-      if (!habitacion) {
-        throw MuebleException.habitacionNotFound();
+    if (input.habitacion_id !== undefined) {
+      const isEmpty = typeof input.habitacion_id === "string" && input.habitacion_id === "";
+      if (!isEmpty && input.habitacion_id) {
+        const habitacion = await this.habitacionRepository.findById(input.habitacion_id);
+        if (!habitacion) {
+          throw MuebleException.habitacionNotFound();
+        }
       }
     }
 
@@ -40,9 +43,17 @@ export class UpdateMuebleUseCase {
     if (input.categoria_id !== undefined) updateData.categoriaId = input.categoria_id;
 
     if (input.imagen !== undefined) {
-      if (input.imagen && input.imagen.length > 0) {
-        updateData.urlImagen = await S3UploadService.uploadImage(input.imagen[0]);
-      } else {
+      const isStringEmpty = typeof input.imagen === "string";
+      const isArrayWithFile = Array.isArray(input.imagen) && input.imagen.length > 0;
+
+      if (existing.urlImagen && !isStringEmpty) {
+        await S3UploadService.deleteImage(existing.urlImagen);
+      }
+
+      if (isArrayWithFile) {
+        const files = input.imagen as File[];
+        updateData.urlImagen = await S3UploadService.uploadImage(files[0]);
+      } else if (isStringEmpty) {
         updateData.urlImagen = null;
       }
     }
@@ -55,7 +66,10 @@ export class UpdateMuebleUseCase {
       updateData.ultimaRevision = input.ultima_revision ? new Date(input.ultima_revision) : null;
     }
     if (input.descripcion !== undefined) updateData.descripcion = input.descripcion ?? null;
-    if (input.habitacion_id !== undefined) updateData.habitacionId = input.habitacion_id ?? null;
+    if (input.habitacion_id !== undefined) {
+      const isEmpty = typeof input.habitacion_id === "string" && input.habitacion_id === "";
+      updateData.habitacionId = isEmpty ? null : (input.habitacion_id as string);
+    }
 
     const updated = await this.repository.update(id, updateData);
     return toMuebleDto(updated);
