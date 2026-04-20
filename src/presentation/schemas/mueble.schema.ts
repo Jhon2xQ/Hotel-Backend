@@ -3,7 +3,10 @@ import { z } from "zod";
 export const MuebleConditionSchema = z.enum(["BUENO", "REGULAR", "DANADO", "FALTANTE"]);
 
 export const CreateMuebleSchema = z.object({
-  codigo: z.string().min(1, "El código es requerido").max(30, "El código no puede exceder 30 caracteres"),
+  codigo: z
+    .union([z.string(), z.number()])
+    .transform((val) => String(val))
+    .pipe(z.string().min(1, "El código es requerido").max(30, "El código no puede exceder 30 caracteres")),
   nombre: z.string().min(1, "El nombre es requerido").max(100, "El nombre no puede exceder 100 caracteres"),
   categoria_id: z.string().uuid("La categoria debe ser un UUID valido"),
   imagen: z.array(z.instanceof(File)).optional(),
@@ -18,7 +21,11 @@ export const CreateMuebleSchema = z.object({
 });
 
 export const UpdateMuebleSchema = z.object({
-  codigo: z.string().min(1, "El código es requerido").max(30, "El código no puede exceder 30 caracteres").optional(),
+  codigo: z
+    .union([z.string(), z.number()])
+    .transform((val) => String(val))
+    .pipe(z.string().min(1, "El código es requerido").max(30, "El código no puede exceder 30 caracteres"))
+    .optional(),
   nombre: z.string().min(1, "El nombre es requerido").max(100, "El nombre no puede exceder 100 caracteres").optional(),
   categoria_id: z.uuid("La categoria debe ser un UUID valido").optional(),
   imagen: z.union([z.array(z.instanceof(File)), z.string().max(0)]).optional().default([]),

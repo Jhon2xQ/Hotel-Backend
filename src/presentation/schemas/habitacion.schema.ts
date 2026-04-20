@@ -26,9 +26,9 @@ export const EstadoLimpiezaSchema = z.enum(["LIMPIA", "SUCIA", "EN_LIMPIEZA", "I
 
 export const CreateHabitacionSchema = z.object({
   nro_habitacion: z
-    .string()
-    .min(1, "El número de habitación es requerido")
-    .max(10, "El número de habitación no puede exceder 10 caracteres"),
+    .union([z.string(), z.number()])
+    .transform((val) => String(val))
+    .pipe(z.string().min(1, "El número de habitación es requerido").max(10, "El número de habitación no puede exceder 10 caracteres")),
   tipo_habitacion_id: z.uuid("El tipo de habitación debe ser un UUID válido"),
   piso: z.number().int().positive("El piso debe ser un número positivo"),
   tiene_ducha: z.boolean().optional(),
@@ -40,9 +40,9 @@ export const CreateHabitacionSchema = z.object({
 
 export const UpdateHabitacionSchema = z.object({
   nro_habitacion: z
-    .string()
-    .min(1, "El número de habitación es requerido")
-    .max(10, "El número de habitación no puede exceder 10 caracteres")
+    .union([z.string(), z.number()])
+    .transform((val) => String(val))
+    .pipe(z.string().min(1, "El número de habitación es requerido").max(10, "El número de habitación no puede exceder 10 caracteres"))
     .optional(),
   tipo_habitacion_id: z.uuid("El tipo de habitación debe ser un UUID válido").optional(),
   piso: z.number().int().positive("El piso debe ser un número positivo").optional(),
