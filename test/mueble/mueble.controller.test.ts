@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MuebleController } from "../../src/presentation/controllers/mueble.controller";
 import { CreateMuebleUseCase } from "../../src/application/use-cases/mueble/create-mueble.use-case";
 import { ListMueblesUseCase } from "../../src/application/use-cases/mueble/list-mueble.use-case";
+import { ListMueblePaginatedUseCase } from "../../src/application/use-cases/mueble/list-mueble-paginated.use-case";
 import { FindMuebleByIdUseCase } from "../../src/application/use-cases/mueble/find-mueble-by-id.use-case";
 import { UpdateMuebleUseCase } from "../../src/application/use-cases/mueble/update-mueble.use-case";
 import { DeleteMuebleUseCase } from "../../src/application/use-cases/mueble/delete-mueble.use-case";
@@ -12,6 +13,7 @@ describe("MuebleController", () => {
   let controller: MuebleController;
   let mockCreateUseCase: any;
   let mockListUseCase: any;
+  let mockListPaginatedUseCase: any;
   let mockFindByIdUseCase: any;
   let mockUpdateUseCase: any;
   let mockDeleteUseCase: any;
@@ -19,6 +21,7 @@ describe("MuebleController", () => {
   beforeEach(() => {
     mockCreateUseCase = { execute: vi.fn() };
     mockListUseCase = { execute: vi.fn() };
+    mockListPaginatedUseCase = { execute: vi.fn() };
     mockFindByIdUseCase = { execute: vi.fn() };
     mockUpdateUseCase = { execute: vi.fn() };
     mockDeleteUseCase = { execute: vi.fn() };
@@ -26,6 +29,7 @@ describe("MuebleController", () => {
     controller = new MuebleController(
       mockCreateUseCase,
       mockListUseCase,
+      mockListPaginatedUseCase,
       mockFindByIdUseCase,
       mockUpdateUseCase,
       mockDeleteUseCase,

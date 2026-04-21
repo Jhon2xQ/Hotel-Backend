@@ -21,6 +21,7 @@ import { InsumoCocinaRepository } from "../../infrastructure/repositories/insumo
 
 import { CreateMuebleUseCase } from "../../application/use-cases/mueble/create-mueble.use-case";
 import { ListMueblesUseCase } from "../../application/use-cases/mueble/list-mueble.use-case";
+import { ListMueblePaginatedUseCase } from "../../application/use-cases/mueble/list-mueble-paginated.use-case";
 import { FindMuebleByIdUseCase } from "../../application/use-cases/mueble/find-mueble-by-id.use-case";
 import { UpdateMuebleUseCase } from "../../application/use-cases/mueble/update-mueble.use-case";
 import { DeleteMuebleUseCase } from "../../application/use-cases/mueble/delete-mueble.use-case";
@@ -163,6 +164,7 @@ const repositoryBindings: Array<[symbol, new (...args: never[]) => unknown]> = [
 const useCaseAndControllerClasses: Array<new (...args: never[]) => unknown> = [
   CreateMuebleUseCase,
   ListMueblesUseCase,
+  ListMueblePaginatedUseCase,
   FindMuebleByIdUseCase,
   UpdateMuebleUseCase,
   DeleteMuebleUseCase,

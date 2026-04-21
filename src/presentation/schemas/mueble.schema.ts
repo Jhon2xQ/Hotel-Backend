@@ -1,6 +1,15 @@
 import { z } from "zod";
+import { PaginationQuerySchema } from "./pagination.schema";
 
 export const MuebleConditionSchema = z.enum(["BUENO", "REGULAR", "DANADO", "FALTANTE"]);
+
+export const ListMuebleQuerySchema = PaginationQuerySchema.extend({
+  nombre: z.string().optional(),
+  categoria: z.string().optional(),
+  condicion: MuebleConditionSchema.optional(),
+});
+
+export type ListMuebleQuery = z.infer<typeof ListMuebleQuerySchema>;
 
 export const CreateMuebleSchema = z.object({
   codigo: z

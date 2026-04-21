@@ -14,11 +14,12 @@ Documentación del módulo `muebles.routes.ts`: gestión de muebles del hotel.
 
 ## Orden de endpoints
 
-1. `GET /` — listar
-2. `GET /:id` — por id
-3. `POST /` — crear (`multipart/form-data` si hay imágenes)
-4. `PUT /:id` — actualizar (`multipart/form-data` si hay imágenes)
-5. `DELETE /:id` — eliminar
+1. `GET /` — listar (paginado con filtros)
+2. `GET /all` — listar todos (sin paginado ni filtros)
+3. `GET /:id` — por id
+4. `POST /` — crear (`multipart/form-data` si hay imágenes)
+5. `PUT /:id` — actualizar (`multipart/form-data` si hay imágenes)
+6. `DELETE /:id` — eliminar
 
 ## Imágenes (S3 / multipart)
 
@@ -28,11 +29,80 @@ En las respuestas, el objeto anidado `categoria` sigue el mismo contrato que **C
 
 ## Endpoints
 
-### 1. Listar Muebles
+### 1. Listar Muebles (Paginado)
 
-Obtiene la lista de todos los muebles registrados.
+Obtiene la lista de muebles con soporte para paginación y filtros.
 
 **Endpoint:** `GET /api/private/muebles`
+
+**Autenticación:** Requerida (Admin)
+
+**Query Parameters:**
+
+| Campo | Tipo | Requerido | Descripción |
+|-------|------|-----------|-------------|
+| `page` | number | No | Número de página (default: 1) |
+| `limit` | number | No | Registros por página (default: 10, máx: 100) |
+| `nombre` | string | No | Filtrar por nombre (búsqueda case-insensitive) |
+| `categoria` | string | No | Filtrar por nombre de categoría (búsqueda case-insensitive) |
+| `condicion` | enum | No | Filtrar por condición: BUENO, REGULAR, DANADO, FALTANTE |
+
+**Response (200 OK):**
+
+```json
+{
+  "success": true,
+  "message": "Muebles obtenidos exitosamente",
+  "data": {
+    "list": [
+      {
+        "id": "uuid-mueble-1",
+        "codigo": "CAMA-001",
+        "nombre": "Cama King Size",
+        "descripcion": "Cama de lujo",
+        "categoria": {
+          "id": "uuid-categoria",
+          "nombre": "Cama",
+          "descripcion": "Muebles para dormir",
+          "activo": true,
+          "created_at": "2026-03-24T08:00:00.000Z",
+          "updated_at": "2026-03-24T08:00:00.000Z"
+        },
+        "url_imagen": "https://example.com/cama.jpg",
+        "condicion": "BUENO",
+        "fecha_adquisicion": "2025-01-15",
+        "ultima_revision": "2026-03-01",
+        "habitacion_id": "uuid-habitacion",
+        "created_at": "2026-03-24T08:00:00.000Z",
+        "updated_at": "2026-03-24T08:00:00.000Z"
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 10,
+      "total": 25,
+      "totalPages": 3,
+      "hasNextPage": true,
+      "hasPreviousPage": false
+    }
+  },
+  "timestamp": 1711267200000
+}
+```
+
+**Errores:**
+
+- `400 Bad Request`: Parámetros de paginación inválidos
+- `401 Unauthorized`: No autenticado
+- `403 Forbidden`: No tiene permisos de administrador
+
+---
+
+### 2. Listar Todos los Muebles (Sin paginado)
+
+Obtiene la lista de todos los muebles sin paginación ni filtros.
+
+**Endpoint:** `GET /api/private/muebles/all`
 
 **Autenticación:** Requerida (Admin)
 
@@ -63,27 +133,6 @@ Obtiene la lista de todos los muebles registrados.
       "habitacion_id": "uuid-habitacion",
       "created_at": "2026-03-24T08:00:00.000Z",
       "updated_at": "2026-03-24T08:00:00.000Z"
-    },
-    {
-      "id": "uuid-mueble-2",
-      "codigo": "SILLA-001",
-      "nombre": "Silla de Escritorio",
-      "descripcion": "Silla ergonómica",
-      "categoria": {
-        "id": "uuid-categoria-2",
-        "nombre": "Silla",
-        "descripcion": "Muebles para sentarse",
-        "activo": true,
-        "created_at": "2026-03-24T08:00:00.000Z",
-        "updated_at": "2026-03-24T08:00:00.000Z"
-      },
-      "url_imagen": null,
-      "condicion": "BUENO",
-      "fecha_adquisicion": "2025-02-10",
-      "ultima_revision": null,
-      "habitacion_id": null,
-      "created_at": "2026-03-24T09:00:00.000Z",
-      "updated_at": "2026-03-24T09:00:00.000Z"
     }
   ],
   "timestamp": 1711267200000
@@ -97,7 +146,7 @@ Obtiene la lista de todos los muebles registrados.
 
 ---
 
-### 2. Obtener Mueble por ID
+### 3. Obtener Mueble por ID
 
 Obtiene los detalles de un mueble específico.
 
@@ -149,7 +198,7 @@ Obtiene los detalles de un mueble específico.
 
 ---
 
-### 3. Crear Mueble
+### 4. Crear Mueble
 
 Crea un nuevo mueble en el sistema. Acepta `multipart/form-data` si se incluyen imágenes.
 
@@ -212,7 +261,7 @@ Crea un nuevo mueble en el sistema. Acepta `multipart/form-data` si se incluyen 
 
 ---
 
-### 4. Actualizar Mueble
+### 5. Actualizar Mueble
 
 Actualiza la información de un mueble existente. Acepta `multipart/form-data` si se incluyen imágenes.
 
@@ -286,7 +335,7 @@ Todos los campos son opcionales. Solo se actualizarán los campos proporcionados
 
 ---
 
-### 5. Eliminar Mueble
+### 6. Eliminar Mueble
 
 Elimina un mueble del sistema.
 

@@ -1,4 +1,12 @@
+import type { PaginationParams } from "../../application/paginations/api.pagination";
+import type { PaginatedResult } from "../../application/paginations/api.pagination";
 import { Mueble, MuebleCondition } from "../entities/mueble.entity";
+
+export interface MueblePaginationParams extends PaginationParams {
+  nombre?: string;
+  categoria?: string;
+  condicion?: MuebleCondition;
+}
 
 export interface CreateMuebleParams {
   codigo: string;
@@ -27,6 +35,7 @@ export interface UpdateMuebleParams {
 export interface IMuebleRepository {
   create(data: CreateMuebleParams): Promise<Mueble>;
   findAll(): Promise<Mueble[]>;
+  findAllPaginated(params: MueblePaginationParams): Promise<PaginatedResult<Mueble>>;
   findById(id: string): Promise<Mueble | null>;
   findByCodigo(codigo: string): Promise<Mueble | null>;
   update(id: string, data: UpdateMuebleParams): Promise<Mueble>;
