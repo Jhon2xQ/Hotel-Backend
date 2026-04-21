@@ -5,12 +5,12 @@ import type { Promocion } from "../entities/promocion.entity";
 import type { PaginatedResult, PaginationParams } from "../../application/paginations/api.pagination";
 
 export interface FolioPaginationParams extends PaginationParams {
-  estanciaId?: string;
+  reservaId?: string;
   estado?: boolean;
 }
 
 export interface CreateFolioParams {
-  estanciaId: string;
+  reservaId: string;
   estado?: boolean;
   observacion?: string;
   promocionIds?: string[];
@@ -25,7 +25,7 @@ export interface UpdateFolioParams {
 export interface FolioWithRelations {
   id: string;
   codigo: string;
-  estanciaId: string;
+  reservaId: string;
   pagoId: string | null;
   estado: boolean;
   observacion: string | null;
@@ -60,9 +60,8 @@ export interface IFolioRepository {
   findAll(): Promise<FolioWithRelations[]>;
   findAllPaginated(params: FolioPaginationParams): Promise<PaginatedResult<FolioWithRelations>>;
   findById(id: string): Promise<FolioWithRelations | null>;
-  findByEstanciaId(estanciaId: string): Promise<FolioWithRelations[]>;
+  findByReservaId(reservaId: string): Promise<FolioWithRelations[]>;
   findByCodigo(codigo: string): Promise<FolioWithRelations | null>;
-  findOpenByEstanciaId(estanciaId: string): Promise<FolioWithRelations | null>;
   update(id: string, data: UpdateFolioParams): Promise<FolioWithRelations>;
   delete(id: string): Promise<void>;
   addProducto(data: CreateFolioProductoParams): Promise<FolioProducto>;

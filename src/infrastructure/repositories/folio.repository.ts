@@ -35,7 +35,7 @@ function mapFolio(data: Record<string, unknown>): FolioWithRelations {
   return {
     id: data.id as string,
     codigo: data.codigo as string,
-    estanciaId: data.estanciaId as string,
+    reservaId: data.reservaId as string,
     pagoId: data.pagoId as string | null,
     estado: data.estado as boolean,
     observacion: data.observacion as string | null,
@@ -108,7 +108,7 @@ export class FolioRepository implements IFolioRepository {
     const result = await this.prisma.folio.create({
       data: {
         codigo,
-        estanciaId: data.estanciaId,
+        reservaId: data.reservaId,
         estado: data.estado ?? true,
         observacion: data.observacion ?? null,
         promociones: data.promocionIds
@@ -141,11 +141,11 @@ export class FolioRepository implements IFolioRepository {
       hasPreviousPage: boolean;
     };
   }> {
-    const { page = 1, limit = 10, estanciaId, estado } = params;
+    const { page = 1, limit = 10, reservaId, estado } = params;
     const skip = (page - 1) * limit;
 
     const where: Record<string, unknown> = {};
-    if (estanciaId) where.estanciaId = estanciaId;
+    if (reservaId) where.reservaId = reservaId;
     if (estado !== undefined) where.estado = estado;
 
     const [results, total] = await Promise.all([
@@ -183,9 +183,9 @@ export class FolioRepository implements IFolioRepository {
     return result ? mapFolio(result as unknown as Record<string, unknown>) : null;
   }
 
-  async findByEstanciaId(estanciaId: string): Promise<FolioWithRelations[]> {
+  async findByReservaId(reservaId: string): Promise<FolioWithRelations[]> {
     const results = await this.prisma.folio.findMany({
-      where: { estanciaId },
+      where: { reservaId },
       include: { promociones: true },
       orderBy: { createdAt: "asc" },
     });
@@ -196,18 +196,6 @@ export class FolioRepository implements IFolioRepository {
     const result = await this.prisma.folio.findUnique({
       where: { codigo },
       include: { promociones: true },
-    });
-    return result ? mapFolio(result as unknown as Record<string, unknown>) : null;
-  }
-
-  async findOpenByEstanciaId(estanciaId: string): Promise<FolioWithRelations | null> {
-    const result = await this.prisma.folio.findFirst({
-      where: {
-        estanciaId,
-        estado: true,
-      },
-      include: { promociones: true },
-      orderBy: { createdAt: "desc" },
     });
     return result ? mapFolio(result as unknown as Record<string, unknown>) : null;
   }

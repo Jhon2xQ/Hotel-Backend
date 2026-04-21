@@ -2,7 +2,7 @@ export class Folio {
   constructor(
     public readonly id: string,
     public readonly codigo: string,
-    public readonly estanciaId: string,
+    public readonly reservaId: string,
     public readonly pagoId: string | null,
     public readonly estado: boolean,
     public readonly observacion: string | null,

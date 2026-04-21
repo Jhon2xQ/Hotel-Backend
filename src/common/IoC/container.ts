@@ -10,7 +10,6 @@ import { HuespedRepository } from "../../infrastructure/repositories/huesped.rep
 import { TarifaRepository } from "../../infrastructure/repositories/tarifa.repository";
 import { PagoRepository } from "../../infrastructure/repositories/pago.repository";
 import { UserRepository } from "../../infrastructure/repositories/user.repository";
-import { EstanciaRepository } from "../../infrastructure/repositories/estancia.repository";
 import { CanalRepository } from "../../infrastructure/repositories/canal.repository";
 import { CategoriaMuebleRepository } from "../../infrastructure/repositories/categoria-mueble.repository";
 import { PromocionRepository } from "../../infrastructure/repositories/promocion.repository";
@@ -75,13 +74,6 @@ import { FindTarifaByIdUseCase } from "../../application/use-cases/tarifa/find-t
 import { UpdateTarifaUseCase } from "../../application/use-cases/tarifa/update-tarifa.use-case";
 import { DeleteTarifaUseCase } from "../../application/use-cases/tarifa/delete-tarifa.use-case";
 
-import { CreateEstanciaUseCase } from "../../application/use-cases/estancia/create-estancia.use-case";
-import { ListEstanciaUseCase } from "../../application/use-cases/estancia/list-estancia.use-case";
-import { FindEstanciaByIdUseCase } from "../../application/use-cases/estancia/find-estancia-by-id.use-case";
-import { UpdateEstanciaUseCase } from "../../application/use-cases/estancia/update-estancia.use-case";
-import { DeleteEstanciaUseCase } from "../../application/use-cases/estancia/delete-estancia.use-case";
-import { CheckoutEstanciaUseCase } from "../../application/use-cases/estancia/checkout-estancia.use-case";
-
 import { CreateCategoriaMuebleUseCase } from "../../application/use-cases/categoria-mueble/create-categoria-mueble.use-case";
 import { ListCategoriaMuebleUseCase } from "../../application/use-cases/categoria-mueble/list-categoria-mueble.use-case";
 import { FindCategoriaMuebleUseCase } from "../../application/use-cases/categoria-mueble/find-categoria-mueble-by-id.use-case";
@@ -133,7 +125,6 @@ import { PagoController } from "../../presentation/controllers/pago.controller";
 import { HuespedController } from "../../presentation/controllers/huesped.controller";
 import { CanalController } from "../../presentation/controllers/canal.controller";
 import { TarifaController } from "../../presentation/controllers/tarifa.controller";
-import { EstanciaController } from "../../presentation/controllers/estancia.controller";
 import { CategoriaMuebleController } from "../../presentation/controllers/categoria-mueble.controller";
 import { PromocionController } from "../../presentation/controllers/promocion.controller";
 import { ProductoController } from "../../presentation/controllers/producto.controller";
@@ -150,7 +141,6 @@ const repositoryBindings: Array<[symbol, new (...args: never[]) => unknown]> = [
   [DI_TOKENS.ITarifaRepository, TarifaRepository],
   [DI_TOKENS.IPagoRepository, PagoRepository],
   [DI_TOKENS.IUserRepository, UserRepository],
-  [DI_TOKENS.IEstanciaRepository, EstanciaRepository],
   [DI_TOKENS.ICanalRepository, CanalRepository],
   [DI_TOKENS.ICategoriaMuebleRepository, CategoriaMuebleRepository],
   [DI_TOKENS.IPromocionRepository, PromocionRepository],
@@ -209,12 +199,6 @@ const useCaseAndControllerClasses: Array<new (...args: never[]) => unknown> = [
   FindTarifaByIdUseCase,
   UpdateTarifaUseCase,
   DeleteTarifaUseCase,
-  CreateEstanciaUseCase,
-  ListEstanciaUseCase,
-  FindEstanciaByIdUseCase,
-  UpdateEstanciaUseCase,
-  DeleteEstanciaUseCase,
-  CheckoutEstanciaUseCase,
   CreateCategoriaMuebleUseCase,
   ListCategoriaMuebleUseCase,
   FindCategoriaMuebleUseCase,
@@ -238,7 +222,6 @@ const useCaseAndControllerClasses: Array<new (...args: never[]) => unknown> = [
   HuespedController,
   CanalController,
   TarifaController,
-  EstanciaController,
   CategoriaMuebleController,
   PromocionController,
   ProductoController,

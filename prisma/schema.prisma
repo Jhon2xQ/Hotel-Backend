@@ -245,14 +245,6 @@ enum MetodoPago {
   @@map("metodo_pago")
 }
 
-enum EstadoEstadia {
-  EN_CASA
-  COMPLETADA
-  SALIDA_ANTICIPADA
-
-  @@map("estado_estadia")
-}
-
 enum TipoDescuento {
   PORCENTAJE
   MONTO_FIJO
@@ -301,7 +293,6 @@ model Huesped {
   updatedAt    DateTime          @updatedAt @db.Timestamptz
 
   reservas  Reserva[]
-  estancias Estancia[]
 
   @@map("huespedes")
 }
@@ -367,7 +358,6 @@ model Habitacion {
   muebles     Mueble[]
   tipo        TipoHabitacion @relation(fields: [tipoHabitacionId], references: [id])
   reservas    Reserva[]
-  estancias   Estancia[]
   promociones Promocion[]
 
   @@map("habitaciones")
@@ -448,7 +438,7 @@ model Reserva {
   habitacion Habitacion @relation(fields: [habitacionId], references: [id])
   tarifa     Tarifa     @relation(fields: [tarifaId], references: [id])
   pago       Pago?      @relation("PagoReserva", fields: [pagoId], references: [id])
-  estancias  Estancia[]
+  folios     Folio[]
 
   @@index([huespedId])
   @@index([habitacionId])
@@ -483,39 +473,13 @@ model Pago {
 }
 
 // ------------------------------------------------------------
-// 16. ESTANCIAS
-// ------------------------------------------------------------
-
-model Estancia {
-  id           String @id @default(uuid()) @db.Uuid
-  reservaId    String @db.Uuid
-  habitacionId String @db.Uuid
-  huespedId    String @db.Uuid
-
-  fechaEntrada DateTime  @default(now()) @db.Timestamptz
-  fechaSalida  DateTime? @db.Timestamptz
-
-  estado    EstadoEstadia @default(EN_CASA)
-  notas     String?       @db.Text
-  createdAt DateTime      @default(now()) @db.Timestamptz
-  updatedAt DateTime      @updatedAt @db.Timestamptz
-
-  reserva    Reserva    @relation(fields: [reservaId], references: [id])
-  habitacion Habitacion @relation(fields: [habitacionId], references: [id])
-  huesped    Huesped    @relation(fields: [huespedId], references: [id])
-  folios     Folio[]
-
-  @@map("estancias")
-}
-
-// ------------------------------------------------------------
-// 17. FOLIOS
+// 16. FOLIOS
 // ------------------------------------------------------------
 
 model Folio {
   id           String          @id @default(uuid()) @db.Uuid
   codigo       String          @unique @db.VarChar(20)
-  estanciaId  String           @db.Uuid
+  reservaId   String           @db.Uuid
   pagoId       String?         @unique @db.Uuid
   estado       Boolean         @default(true)
   observacion String?          @db.Text
@@ -523,13 +487,13 @@ model Folio {
   createdAt    DateTime        @default(now()) @db.Timestamptz
   updatedAt    DateTime        @updatedAt @db.Timestamptz
 
-  estancia       Estancia       @relation(fields: [estanciaId], references: [id])
+  reserva        Reserva        @relation(fields: [reservaId], references: [id])
   pago           Pago?          @relation("PagoFolio", fields: [pagoId], references: [id])
   folioProductos FolioProducto[]
   folioServicios FolioServicio[]
   promociones    Promocion[]
 
-  @@index([estanciaId])
+  @@index([reservaId])
   @@index([estado])
   @@map("folios")
 }

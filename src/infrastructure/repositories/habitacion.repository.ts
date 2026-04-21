@@ -219,8 +219,8 @@ export class HabitacionRepository implements IHabitacionRepository {
   }
 
   async hasRelatedRecords(id: string): Promise<boolean> {
-    const estanciaCount = await this.prisma.estancia.count({ where: { habitacionId: id } });
-    return estanciaCount > 0;
+    const reservaCount = await this.prisma.reserva.count({ where: { habitacionId: id } });
+    return reservaCount > 0;
   }
 
   async findAllWithDirectPrice(): Promise<Array<{ habitacion: Habitacion; precioNoche: number | null }>> {

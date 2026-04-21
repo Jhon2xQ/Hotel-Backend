@@ -15,9 +15,8 @@ describe("FindFolioByIdUseCase", () => {
       findAll: async () => [],
       findAllPaginated: async () => ({ list: [], pagination: { page: 1, limit: 10, total: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false } }),
       findById: async () => null,
-      findByEstanciaId: async () => [],
+      findByReservaId: async () => [],
       findByCodigo: async () => null,
-      findOpenByEstanciaId: async () => null,
       update: async () => createMockFolio(),
       delete: async () => {},
       addProducto: async () => ({ id: "fp-1" } as any),
@@ -50,7 +49,7 @@ describe("FindFolioByIdUseCase", () => {
     const mockFolio = createMockFolioWithPromociones({
       id: "folio-1",
       codigo: "FOL-260416-1",
-      estanciaId: "estancia-1",
+      reservaId: "reserva-1",
       estado: true,
       observacion: "Test",
     });

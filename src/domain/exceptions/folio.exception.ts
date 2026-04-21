@@ -26,12 +26,8 @@ export class FolioException extends DomainException {
     return new FolioException("El folio ya tiene un pago asociado", 400);
   }
 
-  static estanciaNotFound(): FolioException {
-    return new FolioException("La estancia especificada no existe", 404);
-  }
-
-  static estanciaHasOpenFolio(): FolioException {
-    return new FolioException("La estancia ya tiene un folio abierto", 400);
+  static reservaNotFound(): FolioException {
+    return new FolioException("La reserva especificada no existe", 404);
   }
 
   static productoNotFound(): FolioException {
