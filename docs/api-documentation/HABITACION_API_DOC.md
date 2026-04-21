@@ -579,7 +579,8 @@ Actualiza los datos completos de una habitación existente. Soporta gestión de 
 - Las URLs que estaban en la DB pero **no** aparecen en `imagenes_existentes[]` se eliminan de S3.
 - Los archivos enviados en `imagenes[]` se suben a S3 y se agregan al resultado.
 - `url_imagen` final = `[...imagenes_existentes[], ...urls_nuevas]`.
-- Si no se envía `imagenes_existentes[]`, se asume array vacío (se borran todas las imágenes anteriores de S3).
+- Si **no se envía** `imagenes_existentes[]`, las imágenes actuales **se mantienen sin cambios**.
+- Si se envía `imagenes_existentes[]` (aunque sea array vacío), se aplica la lógica de sincronización.
 - Si no se envía `imagenes[]`, no se sube nada nuevo.
 
 **Ejemplo (curl):**

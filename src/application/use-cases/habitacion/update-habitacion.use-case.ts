@@ -37,22 +37,28 @@ export class UpdateHabitacionUseCase {
     }
 
     let imageUrls: string[] | undefined = undefined;
-    const imagenesExistentes = input.imagenes_existentes ?? [];
 
-    if (input.imagenes !== undefined || input.imagenes_existentes !== undefined) {
+    if (input.imagenes !== undefined && input.imagenes.length > 0) {
+      const newUrls = await S3UploadService.uploadImages(input.imagenes);
+
+      if (input.imagenes_existentes !== undefined) {
+        const currentUrls = existing.urlImagen ?? [];
+        const urlsToDelete = currentUrls.filter((url) => !input.imagenes_existentes!.includes(url));
+        if (urlsToDelete.length > 0) {
+          await S3UploadService.deleteImages(urlsToDelete);
+        }
+        imageUrls = [...input.imagenes_existentes!, ...newUrls];
+      } else {
+        imageUrls = [...(existing.urlImagen ?? []), ...newUrls];
+      }
+    } else if (input.imagenes_existentes !== undefined) {
+      const existingImgs = input.imagenes_existentes;
       const currentUrls = existing.urlImagen ?? [];
-
-      const urlsToDelete = currentUrls.filter((url) => !imagenesExistentes.includes(url));
+      const urlsToDelete = currentUrls.filter((url) => !existingImgs.includes(url));
       if (urlsToDelete.length > 0) {
         await S3UploadService.deleteImages(urlsToDelete);
       }
-
-      let newUrls: string[] = [];
-      if (input.imagenes && input.imagenes.length > 0) {
-        newUrls = await S3UploadService.uploadImages(input.imagenes);
-      }
-
-      imageUrls = [...imagenesExistentes, ...newUrls];
+      imageUrls = existingImgs;
     }
 
     const updated = await this.repository.update(id, {
