@@ -1,17 +1,17 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { CreateFolioUseCase } from "../../../src/application/use-cases/folio/create-folio.use-case";
 import { IFolioRepository } from "../../../src/domain/interfaces/folio.repository.interface";
-import { IEstanciaRepository } from "../../../src/domain/interfaces/estancia.repository.interface";
+import { IReservaRepository } from "../../../src/domain/interfaces/reserva.repository.interface";
 import { IPromocionRepository } from "../../../src/domain/interfaces/promocion.repository.interface";
 import { FolioException } from "../../../src/domain/exceptions/folio.exception";
 import { createMockFolio, createMockFolioWithPromociones } from "../../helpers/folio-fixtures";
-import { Estancia } from "../../../src/domain/entities/estancia.entity";
+import { Reserva } from "../../../src/domain/entities/reserva.entity";
 import { Promocion } from "../../../src/domain/entities/promocion.entity";
 
 describe("CreateFolioUseCase", () => {
   let useCase: CreateFolioUseCase;
   let mockFolioRepository: IFolioRepository;
-  let mockEstanciaRepository: IEstanciaRepository;
+  let mockReservaRepository: IReservaRepository;
   let mockPromocionRepository: IPromocionRepository;
 
   beforeEach(() => {
@@ -20,9 +20,8 @@ describe("CreateFolioUseCase", () => {
       findAll: async () => [],
       findAllPaginated: async () => ({ list: [], pagination: { page: 1, limit: 10, total: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false } }),
       findById: async () => null,
-      findByEstanciaId: async () => [],
+      findByReservaId: async () => [],
       findByCodigo: async () => null,
-      findOpenByEstanciaId: async () => null,
       update: async () => createMockFolio(),
       delete: async () => {},
       addProducto: async () => ({ id: "fp-1" } as any),
@@ -32,14 +31,16 @@ describe("CreateFolioUseCase", () => {
       closeWithPago: async () => createMockFolio(),
     };
 
-    mockEstanciaRepository = {
-      create: async () => ({ id: "estancia-1" } as unknown as Estancia),
+    mockReservaRepository = {
+      create: async () => ({ id: "reserva-1" } as unknown as Reserva),
       findAll: async () => [],
+      findAllPaginated: async () => ({ list: [], pagination: { page: 1, limit: 10, total: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false } }),
       findById: async () => null,
-      findByReservaId: async () => [],
-      update: async () => ({ id: "estancia-1" } as unknown as Estancia),
+      findByCodigo: async () => null,
+      findConflictingReservations: async () => [],
+      update: async () => ({ id: "reserva-1" } as unknown as Reserva),
       delete: async () => {},
-      checkout: async () => ({ id: "estancia-1" } as unknown as Estancia),
+      cancel: async () => ({ id: "reserva-1" } as unknown as Reserva),
     };
 
     mockPromocionRepository = {
@@ -53,35 +54,33 @@ describe("CreateFolioUseCase", () => {
       delete: async () => {},
     };
 
-    useCase = new CreateFolioUseCase(mockFolioRepository, mockEstanciaRepository, mockPromocionRepository);
+    useCase = new CreateFolioUseCase(mockFolioRepository, mockReservaRepository, mockPromocionRepository);
   });
 
   it("should create folio successfully", async () => {
-    const mockEstancia = { id: "estancia-1" };
-    const mockFolio = createMockFolio({ estanciaId: "estancia-1" });
+    const mockReserva = { id: "reserva-1" };
+    const mockFolio = createMockFolio({ reservaId: "reserva-1" });
 
-    mockEstanciaRepository.findById = async () => mockEstancia as unknown as Estancia;
+    mockReservaRepository.findById = async () => mockReserva as unknown as Reserva;
     mockFolioRepository.create = async () => mockFolio;
-    mockFolioRepository.findOpenByEstanciaId = async () => null;
 
     const result = await useCase.execute({
-      estanciaId: "estancia-1",
+      reservaId: "reserva-1",
     });
 
     expect(result).toBeDefined();
-    expect(result.estanciaId).toBe("estancia-1");
+    expect(result.reservaId).toBe("reserva-1");
   });
 
   it("should create folio with promociones", async () => {
-    const mockEstancia = { id: "estancia-1" };
+    const mockReserva = { id: "reserva-1" };
     const mockPromo1 = new Promocion("promo-1", "PROMO-VERANO", "PORCENTAJE", 15, new Date("2025-01-01T00:00:00Z"), new Date("2027-12-31T23:59:59Z"), true, new Date(), new Date());
     const mockPromo2 = new Promocion("promo-2", "PROMO-INVIERNO", "MONTO_FIJO", 500, new Date("2025-01-01T00:00:00Z"), new Date("2027-12-31T23:59:59Z"), true, new Date(), new Date());
     const mockFolio = createMockFolioWithPromociones({
-      estanciaId: "estancia-1",
+      reservaId: "reserva-1",
     });
 
-    mockEstanciaRepository.findById = async () => mockEstancia as unknown as Estancia;
-    mockFolioRepository.findOpenByEstanciaId = async () => null;
+    mockReservaRepository.findById = async () => mockReserva as unknown as Reserva;
     mockPromocionRepository.findById = async (id: string) => {
       if (id === "promo-1") return mockPromo1 as any;
       if (id === "promo-2") return mockPromo2 as any;
@@ -90,7 +89,7 @@ describe("CreateFolioUseCase", () => {
     mockFolioRepository.create = async () => mockFolio;
 
     const result = await useCase.execute({
-      estanciaId: "estancia-1",
+      reservaId: "reserva-1",
       promocionIds: ["promo-1", "promo-2"],
     });
 
@@ -99,46 +98,31 @@ describe("CreateFolioUseCase", () => {
     expect(result.promociones[1].codigo).toBe("PROMO-INVIERNO");
   });
 
-  it("should throw error when estancia not found", async () => {
-    mockEstanciaRepository.findById = async () => null;
+  it("should throw error when reserva not found", async () => {
+    mockReservaRepository.findById = async () => null;
 
     await expect(
       useCase.execute({
-        estanciaId: "non-existent-estancia",
-      }),
-    ).rejects.toThrow(FolioException);
-  });
-
-  it("should throw error when estancia already has open folio", async () => {
-    const mockEstancia = { id: "estancia-1" };
-    const existingOpenFolio = createMockFolio({ estado: true });
-
-    mockEstanciaRepository.findById = async () => mockEstancia as unknown as Estancia;
-    mockFolioRepository.findOpenByEstanciaId = async () => existingOpenFolio;
-
-    await expect(
-      useCase.execute({
-        estanciaId: "estancia-1",
+        reservaId: "non-existent-reserva",
       }),
     ).rejects.toThrow(FolioException);
   });
 
   it("should throw error when promocion not found", async () => {
-    const mockEstancia = { id: "estancia-1" };
-    mockEstanciaRepository.findById = async () => mockEstancia as unknown as Estancia;
-    mockFolioRepository.findOpenByEstanciaId = async () => null;
+    const mockReserva = { id: "reserva-1" };
+    mockReservaRepository.findById = async () => mockReserva as unknown as Reserva;
     mockPromocionRepository.findById = async () => null;
 
     await expect(
       useCase.execute({
-        estanciaId: "estancia-1",
+        reservaId: "reserva-1",
         promocionIds: ["non-existent-promo"],
       }),
     ).rejects.toThrow(FolioException);
   });
 
   it("should throw error when promocion is inactive", async () => {
-    const mockEstancia = { id: "estancia-1" };
+    const mockReserva = { id: "reserva-1" };
     const inactivePromo = new Promocion(
       "promo-1",
       "PROMO-INACTIVE",
@@ -151,20 +135,19 @@ describe("CreateFolioUseCase", () => {
       new Date(),
     );
 
-    mockEstanciaRepository.findById = async () => mockEstancia as unknown as Estancia;
-    mockFolioRepository.findOpenByEstanciaId = async () => null;
+    mockReservaRepository.findById = async () => mockReserva as unknown as Reserva;
     mockPromocionRepository.findById = async () => inactivePromo as any;
 
     await expect(
       useCase.execute({
-        estanciaId: "estancia-1",
+        reservaId: "reserva-1",
         promocionIds: ["promo-1"],
       }),
     ).rejects.toThrow(FolioException.promocionInactive());
   });
 
   it("should throw error when promocion is expired", async () => {
-    const mockEstancia = { id: "estancia-1" };
+    const mockReserva = { id: "reserva-1" };
     const expiredPromo = new Promocion(
       "promo-1",
       "PROMO-EXPIRED",
@@ -177,20 +160,19 @@ describe("CreateFolioUseCase", () => {
       new Date(),
     );
 
-    mockEstanciaRepository.findById = async () => mockEstancia as unknown as Estancia;
-    mockFolioRepository.findOpenByEstanciaId = async () => null;
+    mockReservaRepository.findById = async () => mockReserva as unknown as Reserva;
     mockPromocionRepository.findById = async () => expiredPromo as any;
 
     await expect(
       useCase.execute({
-        estanciaId: "estancia-1",
+        reservaId: "reserva-1",
         promocionIds: ["promo-1"],
       }),
     ).rejects.toThrow(FolioException.promocionExpired());
   });
 
   it("should throw error when promocion is not yet available", async () => {
-    const mockEstancia = { id: "estancia-1" };
+    const mockReserva = { id: "reserva-1" };
     const futurePromo = new Promocion(
       "promo-1",
       "PROMO-FUTURE",
@@ -203,13 +185,12 @@ describe("CreateFolioUseCase", () => {
       new Date(),
     );
 
-    mockEstanciaRepository.findById = async () => mockEstancia as unknown as Estancia;
-    mockFolioRepository.findOpenByEstanciaId = async () => null;
+    mockReservaRepository.findById = async () => mockReserva as unknown as Reserva;
     mockPromocionRepository.findById = async () => futurePromo as any;
 
     await expect(
       useCase.execute({
-        estanciaId: "estancia-1",
+        reservaId: "reserva-1",
         promocionIds: ["promo-1"],
       }),
     ).rejects.toThrow(FolioException.promocionNotYetAvailable());

@@ -16,7 +16,7 @@ describe("HabitacionRepository", () => {
       update: vi.fn(),
       delete: vi.fn(),
     };
-    mockPrisma.estancia = { count: vi.fn() };
+    mockPrisma.reserva = { count: vi.fn() };
     repository = new HabitacionRepository(mockPrisma);
   });
 
@@ -337,8 +337,8 @@ const mockResult = {
   });
 
   describe("hasRelatedRecords", () => {
-    it("should return true when has related estancias", async () => {
-      mockPrisma.estancia.count.mockResolvedValue(1);
+    it("should return true when has related reservas", async () => {
+      mockPrisma.reserva.count.mockResolvedValue(1);
 
       const result = await repository.hasRelatedRecords("test-id");
 
@@ -346,7 +346,7 @@ const mockResult = {
     });
 
     it("should return false when has no related records", async () => {
-      mockPrisma.estancia.count.mockResolvedValue(0);
+      mockPrisma.reserva.count.mockResolvedValue(0);
 
       const result = await repository.hasRelatedRecords("test-id");
 

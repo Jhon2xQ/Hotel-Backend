@@ -39,7 +39,7 @@ describe("FolioController", () => {
     it("should create folio and return 201", async () => {
       const mockContext = createMockContext();
       const input = {
-        estanciaId: "estancia-123",
+        reservaId: "estancia-123",
         observacion: "Folio de prueba",
         promocionIds: ["promo-1", "promo-2"],
       };
@@ -47,7 +47,7 @@ describe("FolioController", () => {
       const mockOutput = {
         id: "folio-1",
         codigo: "FOL-260416-1",
-        estanciaId: "estancia-123",
+        reservaId: "estancia-123",
         pagoId: null,
         estado: true,
         observacion: "Folio de prueba",
@@ -76,13 +76,13 @@ describe("FolioController", () => {
     it("should create folio without promociones", async () => {
       const mockContext = createMockContext();
       const input = {
-        estanciaId: "estancia-123",
+        reservaId: "estancia-123",
       };
 
       const mockOutput = {
         id: "folio-1",
         codigo: "FOL-260416-1",
-        estanciaId: "estancia-123",
+        reservaId: "estancia-123",
         pagoId: null,
         estado: true,
         observacion: null,
@@ -113,8 +113,8 @@ describe("FolioController", () => {
       const mockContext = createMockContext();
       const mockResult = {
         list: [
-          { id: "folio-1", codigo: "FOL-260416-1", estado: true, promociones: ["PROMO-1"], estanciaId: "estancia-1", pagoId: null, observacion: null, cerradoEn: null, createdAt: "", updatedAt: "" },
-          { id: "folio-2", codigo: "FOL-260416-2", estado: false, promociones: [], estanciaId: "estancia-1", pagoId: null, observacion: null, cerradoEn: null, createdAt: "", updatedAt: "" },
+          { id: "folio-1", codigo: "FOL-260416-1", estado: true, promociones: ["PROMO-1"], reservaId: "estancia-1", pagoId: null, observacion: null, cerradoEn: null, createdAt: "", updatedAt: "" },
+          { id: "folio-2", codigo: "FOL-260416-2", estado: false, promociones: [], reservaId: "estancia-1", pagoId: null, observacion: null, cerradoEn: null, createdAt: "", updatedAt: "" },
         ],
         pagination: { page: 1, limit: 10, total: 2, totalPages: 1, hasNextPage: false, hasPreviousPage: false },
       };
@@ -136,7 +136,7 @@ describe("FolioController", () => {
 
     it("should list folios with pagination and filters", async () => {
       const mockContext = createMockContext();
-      const queryData = { page: 2, limit: 5, estanciaId: "estancia-1", estado: true };
+      const queryData = { page: 2, limit: 5, reservaId: "estancia-1", estado: true };
       const mockResult = {
         list: [],
         pagination: { page: 2, limit: 5, total: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: true },
@@ -157,7 +157,7 @@ describe("FolioController", () => {
       const mockOutput = {
         id: "folio-123",
         codigo: "FOL-260416-5",
-        estanciaId: "estancia-1",
+        reservaId: "estancia-1",
         pagoId: null,
         estado: true,
         observacion: "Folio de prueba",
@@ -194,7 +194,7 @@ describe("FolioController", () => {
       const mockOutput = {
         id: "folio-1",
         codigo: "FOL-260416-1",
-        estanciaId: "estancia-1",
+        reservaId: "estancia-1",
         pagoId: null,
         estado: false,
         observacion: "Observación actualizada",
@@ -229,7 +229,7 @@ describe("FolioController", () => {
       const mockOutput = {
         id: "folio-1",
         codigo: "FOL-260416-1",
-        estanciaId: "estancia-1",
+        reservaId: "estancia-1",
         pagoId: null,
         estado: true,
         observacion: null,
@@ -359,7 +359,7 @@ describe("FolioController", () => {
         folio: {
           id: "folio-1",
           codigo: "FOL-260416-1",
-          estanciaId: "estancia-1",
+          reservaId: "estancia-1",
           pagoId: null,
           estado: true,
           observacion: null,

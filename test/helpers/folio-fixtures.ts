@@ -5,7 +5,7 @@ export function createMockFolio(overrides?: Partial<FolioWithRelations>): FolioW
   return {
     id: overrides?.id ?? "folio-test-id",
     codigo: overrides?.codigo ?? "FOL-260416-1",
-    estanciaId: overrides?.estanciaId ?? "estancia-test-id",
+    reservaId: overrides?.reservaId ?? "reserva-test-id",
     pagoId: overrides?.pagoId ?? null,
     estado: overrides?.estado ?? true,
     observacion: overrides?.observacion ?? null,
@@ -45,7 +45,7 @@ export function createMockFolioWithPromociones(overrides?: Partial<FolioWithRela
   return {
     id: overrides?.id ?? "folio-test-id",
     codigo: overrides?.codigo ?? "FOL-260416-1",
-    estanciaId: overrides?.estanciaId ?? "estancia-test-id",
+    reservaId: overrides?.reservaId ?? "reserva-test-id",
     pagoId: overrides?.pagoId ?? null,
     estado: overrides?.estado ?? true,
     observacion: overrides?.observacion ?? "Folio de ejemplo",

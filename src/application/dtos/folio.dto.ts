@@ -2,7 +2,7 @@ import type { FolioWithRelations } from "../../domain/interfaces/folio.repositor
 import type { Promocion } from "../../domain/entities/promocion.entity";
 
 export interface CreateFolioDto {
-  estanciaId: string;
+  reservaId: string;
   observacion?: string;
   promocionIds?: string[];
 }
@@ -16,7 +16,7 @@ export interface UpdateFolioDto {
 export interface ListFolioDto {
   page?: number;
   limit?: number;
-  estanciaId?: string;
+  reservaId?: string;
   estado?: boolean;
 }
 
@@ -35,7 +35,7 @@ export interface FolioPromocionDto {
 export interface FolioDto {
   id: string;
   codigo: string;
-  estanciaId: string;
+  reservaId: string;
   pagoId: string | null;
   estado: boolean;
   observacion: string | null;
@@ -81,7 +81,7 @@ export function toFolioDto(f: FolioWithRelations): FolioDto {
   return {
     id: f.id,
     codigo: f.codigo,
-    estanciaId: f.estanciaId,
+    reservaId: f.reservaId,
     pagoId: f.pagoId,
     estado: f.estado,
     observacion: f.observacion,

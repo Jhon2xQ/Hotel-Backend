@@ -2,7 +2,7 @@
 
 > **Autorización:** Las rutas que restrigen por rol usan `requireRoles(...)` (`src/presentation/middlewares/roles.middleware.ts`) con valores en `src/common/constants/roles.ts` (p. ej. `admin`, `recepcionista`). Cualquier mención a "ADMIN" u otros roles aquí es orientativa; la fuente de verdad es el `*.routes.ts` correspondiente.
 
-Documentación de los endpoints para la gestión de folios de consumos en estancias.
+Documentación de los endpoints para la gestión de folios de consumos asociados a reservas.
 
 ## Base URL
 
@@ -30,7 +30,7 @@ Obtiene la lista paginada de folios con filtros opcionales.
 
 - `page` (número, opcional): Número de página (default: 1)
 - `limit` (número, opcional): Elementos por página (default: 10)
-- `estancia_id` (UUID, opcional): Filtrar por ID de estancia
+- `reserva_id` (UUID, opcional): Filtrar por ID de estancia
 - `estado` (boolean, opcional): Filtrar por estado (true = abierto, false = cerrado)
 
 **Respuesta Exitosa (200):**
@@ -44,7 +44,7 @@ Obtiene la lista paginada de folios con filtros opcionales.
       {
         "id": "uuid",
         "codigo": "FOL-260416-1",
-        "estanciaId": "uuid-estancia-1",
+        "reservaId": "uuid-estancia-1",
         "pagoId": null,
         "estado": true,
         "observacion": null,
@@ -102,7 +102,7 @@ Obtiene los detalles de un folio específico.
   "data": {
     "id": "uuid",
     "codigo": "FOL-260416-1",
-    "estanciaId": "uuid-estancia-1",
+    "reservaId": "uuid-estancia-1",
     "pagoId": null,
     "estado": true,
     "observacion": "Folio de ejemplo",
@@ -142,7 +142,7 @@ Obtiene los detalles de un folio específico.
 
 ### 3. Crear Folio
 
-Crea un nuevo folio asociado a una estancia. Solo se puede crear un folio abierto por estancia.
+Crea un nuevo folio asociado a una reserva.
 
 **Endpoint:** `POST /api/private/folios`
 
@@ -152,7 +152,7 @@ Crea un nuevo folio asociado a una estancia. Solo se puede crear un folio abiert
 
 ```json
 {
-  "estancia_id": "uuid-estancia-1",
+  "reserva_id": "uuid-estancia-1",
   "observacion": "Folio de consumos",
   "promocion_ids": ["uuid-promo-1"]
 }
@@ -160,7 +160,7 @@ Crea un nuevo folio asociado a una estancia. Solo se puede crear un folio abiert
 
 **Campos:**
 
-- `estancia_id` (UUID, requerido): ID de la estancia a la que pertenece el folio
+- `reserva_id` (UUID, requerido): ID de la estancia a la que pertenece el folio
 - `observacion` (string, opcional): Observación o nota del folio
 - `promocion_ids` (array de UUID, opcional): IDs de promociones a asociar al folio
 
@@ -182,7 +182,7 @@ Al asignar promociones, se validan los siguientes requisitos:
   "data": {
     "id": "uuid",
     "codigo": "FOL-260416-1",
-    "estanciaId": "uuid-estancia-1",
+    "reservaId": "uuid-estancia-1",
     "pagoId": null,
     "estado": true,
     "observacion": "Folio de consumos",
@@ -212,7 +212,7 @@ Al asignar promociones, se validan los siguientes requisitos:
 ```json
 {
   "success": false,
-  "message": "La estancia especificada no existe",
+  "message": "La reserva especificada no existe",
   "data": null,
   "timestamp": 1234567890
 }
@@ -518,7 +518,7 @@ Obtiene todos los productos y servicios consumidos en un folio, además del cál
     "folio": {
       "id": "uuid-folio-1",
       "codigo": "FOL-260416-1",
-      "estanciaId": "uuid-estancia-1",
+      "reservaId": "uuid-estancia-1",
       "pagoId": null,
       "estado": true,
       "observacion": null,
@@ -630,10 +630,10 @@ FOL-YYMMDD-N
 
 ## Relación con Estancia
 
-Un folio pertenece a una estancia (relación uno a muchos):
+Un folio pertenece a una reserva (relación uno a muchos):
 
-- Una **estancia** puede tener **múltiples folios** (pero solo uno abierto a la vez)
-- Un **folio** solo puede tener **una estancia**
+- Una **reserva** puede tener **múltiples folios abiertos**
+- Un **folio** solo puede tener **una reserva**
 
 ---
 
@@ -674,5 +674,5 @@ Al crear un pago con `folio_id`:
 - `400 Bad Request`: Datos de entrada inválidos, folio cerrado o promoción inválida
 - `401 Unauthorized`: No autenticado
 - `403 Forbidden`: Sin permisos suficientes o folio cerrado
-- `404 Not Found`: Folio, estancia o promoción no encontrada
+- `404 Not Found`: Folio, reserva o promoción no encontrada
 - `500 Internal Server Error`: Error del servidor

@@ -42,7 +42,7 @@ describe("FolioRepository", () => {
       const mockResult = {
         id: "folio-1",
         codigo: "FOL-260416-1",
-        estanciaId: "estancia-1",
+        reservaId: "reserva-1",
         pagoId: null,
         estado: true,
         observacion: null,
@@ -55,16 +55,16 @@ describe("FolioRepository", () => {
       mockPrisma.folio.create.mockResolvedValue(mockResult);
 
       const result = await repository.create({
-        estanciaId: "estancia-1",
+        reservaId: "reserva-1",
       });
 
-      expect(result.estanciaId).toBe("estancia-1");
+      expect(result.reservaId).toBe("reserva-1");
       expect(result.codigo).toBe("FOL-260416-1");
       expect(result.estado).toBe(true);
       expect(result.promociones).toEqual([]);
       expect(mockPrisma.folio.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
-          estanciaId: "estancia-1",
+          reservaId: "reserva-1",
           estado: true,
           observacion: null,
         }),
@@ -76,7 +76,7 @@ describe("FolioRepository", () => {
       const mockResult = {
         id: "folio-2",
         codigo: "FOL-260416-2",
-        estanciaId: "estancia-2",
+        reservaId: "reserva-2",
         pagoId: null,
         estado: true,
         observacion: "Folio con promociones",
@@ -92,18 +92,18 @@ describe("FolioRepository", () => {
       mockPrisma.folio.create.mockResolvedValue(mockResult);
 
       const result = await repository.create({
-        estanciaId: "estancia-2",
+        reservaId: "reserva-2",
         observacion: "Folio con promociones",
         promocionIds: ["promo-1", "promo-2"],
       });
 
-      expect(result.estanciaId).toBe("estancia-2");
+      expect(result.reservaId).toBe("reserva-2");
       expect(result.promociones).toHaveLength(2);
       expect(result.promociones[0].codigo).toBe("PROMO-VERANO");
       expect(result.promociones[1].codigo).toBe("PROMO-DESCUENTO");
       expect(mockPrisma.folio.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
-          estanciaId: "estancia-2",
+          reservaId: "reserva-2",
           promociones: {
             connect: [{ id: "promo-1" }, { id: "promo-2" }],
           },
@@ -127,7 +127,7 @@ describe("FolioRepository", () => {
         {
           id: "folio-1",
           codigo: "FOL-260416-1",
-          estanciaId: "estancia-1",
+          reservaId: "reserva-1",
           pagoId: null,
           estado: true,
           observacion: null,
@@ -139,7 +139,7 @@ describe("FolioRepository", () => {
         {
           id: "folio-2",
           codigo: "FOL-260416-2",
-          estanciaId: "estancia-1",
+          reservaId: "reserva-1",
           pagoId: "pago-1",
           estado: false,
           observacion: "Folio cerrado",
@@ -171,7 +171,7 @@ describe("FolioRepository", () => {
       const mockResult = {
         id: "folio-123",
         codigo: "FOL-260416-5",
-        estanciaId: "estancia-1",
+        reservaId: "reserva-1",
         pagoId: null,
         estado: true,
         observacion: "Folio de prueba",
@@ -205,13 +205,13 @@ describe("FolioRepository", () => {
     });
   });
 
-  describe("findByEstanciaId", () => {
-    it("should return folios for a specific estancia", async () => {
+describe("findByReservaId", () => {
+    it("should return folios for a specific reserva", async () => {
       const mockResults = [
         {
           id: "folio-1",
           codigo: "FOL-260416-1",
-          estanciaId: "estancia-1",
+          reservaId: "reserva-1",
           pagoId: null,
           estado: true,
           observacion: null,
@@ -223,7 +223,7 @@ describe("FolioRepository", () => {
         {
           id: "folio-2",
           codigo: "FOL-260416-2",
-          estanciaId: "estancia-1",
+          reservaId: "reserva-1",
           pagoId: "pago-1",
           estado: false,
           observacion: "Cerrado",
@@ -236,57 +236,16 @@ describe("FolioRepository", () => {
 
       mockPrisma.folio.findMany.mockResolvedValue(mockResults);
 
-      const result = await repository.findByEstanciaId("estancia-1");
+      const result = await repository.findByReservaId("reserva-1");
 
       expect(result.length).toBe(2);
       expect(result[0].codigo).toBe("FOL-260416-1");
       expect(result[1].codigo).toBe("FOL-260416-2");
       expect(mockPrisma.folio.findMany).toHaveBeenCalledWith({
-        where: { estanciaId: "estancia-1" },
+        where: { reservaId: "reserva-1" },
         include: { promociones: true },
         orderBy: { createdAt: "asc" },
       });
-    });
-  });
-
-  describe("findOpenByEstanciaId", () => {
-    it("should return open folio for a specific estancia", async () => {
-      const mockResult = {
-        id: "folio-1",
-        codigo: "FOL-260416-1",
-        estanciaId: "estancia-1",
-        pagoId: null,
-        estado: true,
-        observacion: null,
-        cerradoEn: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        promociones: [],
-      };
-
-      mockPrisma.folio.findFirst.mockResolvedValue(mockResult);
-
-      const result = await repository.findOpenByEstanciaId("estancia-1");
-
-      expect(result).toBeDefined();
-      expect(result?.id).toBe("folio-1");
-      expect(result?.estado).toBe(true);
-      expect(mockPrisma.folio.findFirst).toHaveBeenCalledWith({
-        where: {
-          estanciaId: "estancia-1",
-          estado: true,
-        },
-        include: { promociones: true },
-        orderBy: { createdAt: "desc" },
-      });
-    });
-
-    it("should return null when no open folio exists", async () => {
-      mockPrisma.folio.findFirst.mockResolvedValue(null);
-
-      const result = await repository.findOpenByEstanciaId("estancia-1");
-
-      expect(result).toBeNull();
     });
   });
 
@@ -295,7 +254,7 @@ describe("FolioRepository", () => {
       const mockResult = {
         id: "folio-1",
         codigo: "FOL-260416-1",
-        estanciaId: "estancia-1",
+        reservaId: "reserva-1",
         pagoId: null,
         estado: true,
         observacion: "Observación actualizada",
@@ -325,7 +284,7 @@ describe("FolioRepository", () => {
       const mockResult = {
         id: "folio-1",
         codigo: "FOL-260416-1",
-        estanciaId: "estancia-1",
+        reservaId: "reserva-1",
         pagoId: null,
         estado: true,
         observacion: null,
@@ -497,7 +456,7 @@ describe("FolioRepository", () => {
       const mockResult = {
         id: "folio-1",
         codigo: "FOL-260416-1",
-        estanciaId: "estancia-1",
+        reservaId: "reserva-1",
         pagoId: "pago-1",
         estado: false,
         observacion: null,
