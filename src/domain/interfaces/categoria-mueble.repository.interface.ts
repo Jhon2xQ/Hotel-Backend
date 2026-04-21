@@ -2,14 +2,10 @@ import { CategoriaMueble } from "../entities/categoria-mueble.entity";
 
 export interface CreateCategoriaMuebleParams {
   nombre: string;
-  descripcion?: string | null;
-  activo?: boolean;
 }
 
 export interface UpdateCategoriaMuebleParams {
   nombre?: string;
-  descripcion?: string | null;
-  activo?: boolean;
 }
 
 export interface ICategoriaMuebleRepository {

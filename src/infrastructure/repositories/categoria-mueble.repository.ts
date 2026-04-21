@@ -19,8 +19,6 @@ export class CategoriaMuebleRepository implements ICategoriaMuebleRepository {
     const result = await this.prisma.categoriaMueble.create({
       data: {
         nombre: data.nombre,
-        descripcion: data.descripcion ?? null,
-        activo: data.activo ?? true,
       },
     });
     return mapCategoriaMuebleFromPrisma(result);
@@ -45,8 +43,6 @@ export class CategoriaMuebleRepository implements ICategoriaMuebleRepository {
       where: { id },
       data: {
         nombre: data.nombre,
-        descripcion: data.descripcion,
-        activo: data.activo,
       },
     });
     return mapCategoriaMuebleFromPrisma(result);

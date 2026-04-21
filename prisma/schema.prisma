@@ -581,12 +581,10 @@ model FolioServicio {
 // ------------------------------------------------------------
 
 model CategoriaMueble {
-  id          String   @id @default(uuid()) @db.Uuid
-  nombre      String   @unique @db.VarChar(50)
-  descripcion String?  @db.Text
-  activo      Boolean  @default(true)
-  createdAt   DateTime @default(now()) @db.Timestamptz
-  updatedAt   DateTime @updatedAt @db.Timestamptz
+  id        String   @id @default(uuid()) @db.Uuid
+  nombre    String   @unique @db.VarChar(50)
+  createdAt DateTime @default(now()) @db.Timestamptz
+  updatedAt DateTime @updatedAt @db.Timestamptz
 
   muebles Mueble[]
 
