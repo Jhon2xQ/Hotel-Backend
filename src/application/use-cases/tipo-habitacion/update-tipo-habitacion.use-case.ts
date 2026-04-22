@@ -25,7 +25,6 @@ export class UpdateTipoHabitacionUseCase {
 
     const updated = await this.repository.update(id, {
       nombre: input.nombre,
-      descripcion: input.descripcion,
     });
 
     return toTipoHabitacionDto(updated);

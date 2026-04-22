@@ -326,11 +326,10 @@ model Mueble {
 // ------------------------------------------------------------
 
 model TipoHabitacion {
-  id          String   @id @default(uuid()) @db.Uuid
-  nombre      String   @db.VarChar(100) @unique
-  descripcion String?  @db.Text
-  createdAt   DateTime @default(now()) @db.Timestamptz
-  updatedAt   DateTime @updatedAt @db.Timestamptz
+  id        String   @id @default(uuid()) @db.Uuid
+  nombre    String   @db.VarChar(100) @unique
+  createdAt DateTime @default(now()) @db.Timestamptz
+  updatedAt DateTime @updatedAt @db.Timestamptz
 
   habitaciones Habitacion[]
   tarifas      Tarifa[]

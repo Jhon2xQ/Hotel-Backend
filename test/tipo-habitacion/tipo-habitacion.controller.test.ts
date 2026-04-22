@@ -40,18 +40,11 @@ describe("TipoHabitacionController", () => {
       const mockContext = createMockContext();
       const input = {
         nombre: "Suite Deluxe",
-        descripcion: "Suite de lujo",
-        tiene_ducha: true,
-        tiene_banio: true,
       };
 
       const mockOutput = {
         id: "test-id",
         nombre: "Suite Deluxe",
-        descripcion: "Suite de lujo",
-        tiene_ducha: true,
-        tiene_banio: true,
-        muebles: [],
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
@@ -79,10 +72,6 @@ describe("TipoHabitacionController", () => {
         {
           id: "id-1",
           nombre: "Suite Deluxe",
-          descripcion: "Suite de lujo",
-          tiene_ducha: true,
-          tiene_banio: true,
-          muebles: [],
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         },
@@ -111,10 +100,6 @@ describe("TipoHabitacionController", () => {
       const mockOutput = {
         id: "test-id",
         nombre: "Suite Deluxe",
-        descripcion: "Suite de lujo",
-        tiene_ducha: true,
-        tiene_banio: true,
-        muebles: [],
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
@@ -146,10 +131,6 @@ describe("TipoHabitacionController", () => {
       const mockOutput = {
         id: "test-id",
         nombre: "Suite Premium",
-        descripcion: "Suite de lujo",
-        tiene_ducha: true,
-        tiene_banio: true,
-        muebles: [],
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };

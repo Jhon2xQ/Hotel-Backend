@@ -24,26 +24,11 @@ describe("TipoHabitacionRepository", () => {
     it("should create a tipo habitacion", async () => {
       const input = {
         nombre: "Suite Deluxe",
-        descripcion: "Suite de lujo",
-        tieneDucha: true,
-        tieneBanio: true,
-        muebles: [{ id: "mueble-1", codigo: "CAMA-01", nombre: "Cama", categoria: "CAMA" }],
       };
 
       const mockResult = {
         id: "test-id",
         nombre: "Suite Deluxe",
-        descripcion: "Suite de lujo",
-        tieneDucha: true,
-        tieneBanio: true,
-        muebles: [
-          {
-            id: "mueble-1",
-            codigo: "CAMA-01",
-            nombre: "Cama",
-            categoria: "CAMA",
-          },
-        ],
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -63,20 +48,12 @@ describe("TipoHabitacionRepository", () => {
         {
           id: "id-1",
           nombre: "Suite Deluxe",
-          descripcion: "Suite de lujo",
-          tieneDucha: true,
-          tieneBanio: true,
-          muebles: [],
           createdAt: new Date("2026-03-17T10:00:00.000Z"),
           updatedAt: new Date("2026-03-17T10:00:00.000Z"),
         },
         {
           id: "id-2",
           nombre: "Standard",
-          descripcion: null,
-          tieneDucha: false,
-          tieneBanio: true,
-          muebles: [],
           createdAt: new Date("2026-03-16T10:00:00.000Z"),
           updatedAt: new Date("2026-03-16T10:00:00.000Z"),
         },
@@ -99,10 +76,6 @@ describe("TipoHabitacionRepository", () => {
       const mockResult = {
         id: "test-id",
         nombre: "Suite Deluxe",
-        descripcion: "Suite de lujo",
-        tieneDucha: true,
-        tieneBanio: true,
-        muebles: [],
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -131,13 +104,11 @@ describe("TipoHabitacionRepository", () => {
     it("should update tipo habitacion", async () => {
       const updateData = {
         nombre: "Suite Deluxe Premium",
-        descripcion: "Descripción actualizada",
       };
 
       const mockResult = {
         id: "test-id",
         nombre: "Suite Deluxe Premium",
-        descripcion: "Descripción actualizada",
         createdAt: new Date(),
         updatedAt: new Date(),
       };

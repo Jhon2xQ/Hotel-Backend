@@ -4,7 +4,6 @@ export function createMockTipoHabitacion(overrides?: Partial<TipoHabitacion>): T
   return new TipoHabitacion(
     overrides?.id ?? "tipo-test-id",
     overrides?.nombre ?? "Suite Deluxe",
-    overrides?.descripcion !== undefined ? overrides.descripcion : "Suite de lujo con vista panorámica",
     overrides?.createdAt ?? new Date(),
     overrides?.updatedAt ?? new Date(),
   );

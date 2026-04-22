@@ -25,35 +25,25 @@ describe("CreateTipoHabitacionUseCase", () => {
   it("should create tipo habitacion successfully", async () => {
     const mockTipo = createMockTipoHabitacion({
       nombre: "Suite Deluxe",
-      descripcion: "Suite de lujo con vista panorámica",
     });
 
     mockRepository.create = async () => mockTipo;
 
     const result = await useCase.execute({
       nombre: "Suite Deluxe",
-      descripcion: "Suite de lujo con vista panorámica",
     });
 
     expect(result).toBeDefined();
     expect(result.nombre).toBe("Suite Deluxe");
-    expect(result.descripcion).toBe("Suite de lujo con vista panorámica");
   });
 
-  it("should create tipo habitacion without descripcion", async () => {
-    mockRepository.create = async (data) => {
-      return createMockTipoHabitacion({
-        nombre: data.nombre,
-        descripcion: data.descripcion ?? null,
-      });
-    };
+  it("should throw error when nombre is duplicate", async () => {
+    mockRepository.findByName = async () => createMockTipoHabitacion({ nombre: "Suite Deluxe" });
 
-    const result = await useCase.execute({
-      nombre: "Habitación Estándar",
-    });
-
-    expect(result).toBeDefined();
-    expect(result.nombre).toBe("Habitación Estándar");
-    expect(result.descripcion).toBeNull();
+    await expect(
+      useCase.execute({
+        nombre: "Suite Deluxe",
+      }),
+    ).rejects.toThrow();
   });
 });

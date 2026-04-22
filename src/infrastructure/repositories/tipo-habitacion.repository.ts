@@ -19,7 +19,6 @@ export class TipoHabitacionRepository implements ITipoHabitacionRepository {
     const result = await this.prisma.tipoHabitacion.create({
       data: {
         nombre: data.nombre,
-        descripcion: data.descripcion ?? null,
       },
     });
     return mapTipoHabitacionFromPrisma(result);
@@ -57,7 +56,6 @@ export class TipoHabitacionRepository implements ITipoHabitacionRepository {
   async update(id: string, data: UpdateTipoHabitacionParams): Promise<TipoHabitacion> {
     const updateData: Record<string, unknown> = {};
     if (data.nombre !== undefined) updateData.nombre = data.nombre;
-    if (data.descripcion !== undefined) updateData.descripcion = data.descripcion ?? null;
 
     const result = await this.prisma.tipoHabitacion.update({
       where: { id },
