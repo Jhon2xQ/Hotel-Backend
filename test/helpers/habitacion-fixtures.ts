@@ -4,7 +4,6 @@ import { TipoHabitacion } from "../../src/domain/entities/tipo-habitacion.entity
 const defaultTipo = new TipoHabitacion(
   "tipo-test-id",
   "Suite Deluxe",
-  "Suite de lujo",
   new Date("2025-01-01"),
   new Date("2025-01-01"),
 );

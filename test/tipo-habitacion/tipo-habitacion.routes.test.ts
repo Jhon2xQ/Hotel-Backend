@@ -38,9 +38,6 @@ describe("TipoHabitacion Routes Integration", () => {
     const mockResult = {
       id: "test-id",
       nombre: "Suite Deluxe",
-      descripcion: "Suite de lujo",
-      tieneDucha: true,
-      tieneBanio: true,
       createdAt: new Date(),
       updatedAt: new Date(),
     };

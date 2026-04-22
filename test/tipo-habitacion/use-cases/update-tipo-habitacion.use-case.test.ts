@@ -51,17 +51,17 @@ describe("UpdateTipoHabitacionUseCase", () => {
     ).rejects.toThrow(TipoHabitacionException);
   });
 
-  it("should update only descripcion", async () => {
-    const existingTipo = createMockTipoHabitacion({ id: "test-id", descripcion: "Old description" });
-    const updatedTipo = createMockTipoHabitacion({ id: "test-id", descripcion: "New description" });
+  it("should throw error when nombre is duplicate", async () => {
+    const existingTipo = createMockTipoHabitacion({ id: "test-id", nombre: "Suite Deluxe" });
+    const duplicateTipo = createMockTipoHabitacion({ id: "other-id", nombre: "Suite Deluxe Premium" });
 
     mockRepository.findById = async () => existingTipo;
-    mockRepository.update = async () => updatedTipo;
+    mockRepository.findByName = async () => duplicateTipo;
 
-    const result = await useCase.execute("test-id", {
-      descripcion: "New description",
-    });
-
-    expect(result.descripcion).toBe("New description");
+    await expect(
+      useCase.execute("test-id", {
+        nombre: "Suite Deluxe Premium",
+      }),
+    ).rejects.toThrow(TipoHabitacionException);
   });
 });

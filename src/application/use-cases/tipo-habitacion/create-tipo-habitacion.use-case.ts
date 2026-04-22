@@ -18,7 +18,6 @@ export class CreateTipoHabitacionUseCase {
 
     const tipoHabitacion = await this.repository.create({
       nombre: input.nombre,
-      descripcion: input.descripcion ?? null,
     });
 
     return toTipoHabitacionDto(tipoHabitacion);

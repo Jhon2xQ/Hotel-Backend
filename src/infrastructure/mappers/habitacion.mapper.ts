@@ -19,7 +19,6 @@ export function mapHabitacionFromPrisma(data: HabitacionPrismaRow): Habitacion {
   const tipoHabitacion = mapTipoHabitacionFromPrisma({
     id: data.tipo.id,
     nombre: data.tipo.nombre,
-    descripcion: data.tipo.descripcion,
     createdAt: data.tipo.createdAt,
     updatedAt: data.tipo.updatedAt,
   });

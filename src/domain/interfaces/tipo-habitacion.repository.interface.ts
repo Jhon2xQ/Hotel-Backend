@@ -3,12 +3,10 @@ import type { Habitacion } from "../entities/habitacion.entity";
 
 export interface CreateTipoHabitacionParams {
   nombre: string;
-  descripcion?: string | null;
 }
 
 export interface UpdateTipoHabitacionParams {
   nombre?: string;
-  descripcion?: string | null;
 }
 
 export interface ITipoHabitacionRepository {

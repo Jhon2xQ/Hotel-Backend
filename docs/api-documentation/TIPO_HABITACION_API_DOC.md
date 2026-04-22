@@ -50,13 +50,11 @@ Obtiene la lista completa de tipos de habitación. No incluye timestamps.
   "data": [
     {
       "id": "123e4567-e89b-12d3-a456-426614174000",
-      "nombre": "Suite Deluxe",
-      "descripcion": "Suite de lujo con vista panorámica al mar"
+      "nombre": "Suite Deluxe"
     },
     {
       "id": "123e4567-e89b-12d3-a456-426614174001",
-      "nombre": "Habitación Estándar",
-      "descripcion": "Habitación cómoda con todas las comodidades básicas"
+      "nombre": "Habitación Estándar"
     }
   ],
   "timestamp": 1710669600000
@@ -75,7 +73,6 @@ Cada tipo de habitación incluye una habitación de ejemplo (solo una por tipo).
     {
       "id": "123e4567-e89b-12d3-a456-426614174000",
       "nombre": "Suite Deluxe",
-      "descripcion": "Suite de lujo con vista panorámica al mar",
       "habitacion": {
         "id": "456e7890-e89b-12d3-a456-426614174000",
         "nro_habitacion": "101",
@@ -91,7 +88,6 @@ Cada tipo de habitación incluye una habitación de ejemplo (solo una por tipo).
     {
       "id": "123e4567-e89b-12d3-a456-426614174001",
       "nombre": "Habitación Estándar",
-      "descripcion": "Habitación cómoda con todas las comodidades básicas",
       "habitacion": null
     }
   ],
@@ -119,14 +115,12 @@ Obtiene la lista completa de tipos de habitación con timestamps.
     {
       "id": "123e4567-e89b-12d3-a456-426614174000",
       "nombre": "Suite Deluxe",
-      "descripcion": "Suite de lujo con vista panorámica al mar",
       "created_at": "2026-03-17T10:00:00.000Z",
       "updated_at": "2026-03-17T10:00:00.000Z"
     },
     {
       "id": "123e4567-e89b-12d3-a456-426614174001",
       "nombre": "Habitación Estándar",
-      "descripcion": "Habitación cómoda con todas las comodidades básicas",
       "created_at": "2026-03-17T09:00:00.000Z",
       "updated_at": "2026-03-17T09:00:00.000Z"
     }
@@ -160,7 +154,6 @@ Obtiene los detalles de un tipo de habitación específico.
   "data": {
     "id": "123e4567-e89b-12d3-a456-426614174000",
     "nombre": "Suite Deluxe",
-    "descripcion": "Suite de lujo con vista panorámica al mar",
     "created_at": "2026-03-17T10:00:00.000Z",
     "updated_at": "2026-03-17T10:00:00.000Z"
   },
@@ -169,7 +162,7 @@ Obtiene los detalles de un tipo de habitación específico.
 ```
 
 **Errores:**
-
+ 
 - `404`: Tipo de habitación no encontrado
 
 ---
@@ -186,15 +179,13 @@ Crea un nuevo tipo de habitación en el sistema.
 
 ```json
 {
-  "nombre": "Suite Deluxe",
-  "descripcion": "Suite de lujo con vista panorámica al mar"
+  "nombre": "Suite Deluxe"
 }
 ```
 
 **Campos:**
 
 - `nombre` (string, requerido): Nombre del tipo de habitación (máx. 100 caracteres, único)
-- `descripcion` (string, opcional): Descripción detallada del tipo de habitación
 
 **Respuesta exitosa (201):**
 
@@ -205,7 +196,6 @@ Crea un nuevo tipo de habitación en el sistema.
   "data": {
     "id": "123e4567-e89b-12d3-a456-426614174000",
     "nombre": "Suite Deluxe",
-    "descripcion": "Suite de lujo con vista panorámica al mar",
     "created_at": "2026-03-17T10:00:00.000Z",
     "updated_at": "2026-03-17T10:00:00.000Z"
   },
@@ -237,8 +227,7 @@ Actualiza los datos de un tipo de habitación existente.
 
 ```json
 {
-  "nombre": "Suite Deluxe Premium",
-  "descripcion": "Suite de lujo premium con vista panorámica al mar y jacuzzi"
+  "nombre": "Suite Deluxe Premium"
 }
 ```
 
@@ -253,7 +242,6 @@ Actualiza los datos de un tipo de habitación existente.
   "data": {
     "id": "123e4567-e89b-12d3-a456-426614174000",
     "nombre": "Suite Deluxe Premium",
-    "descripcion": "Suite de lujo premium con vista panorámica al mar y jacuzzi",
     "created_at": "2026-03-17T10:00:00.000Z",
     "updated_at": "2026-03-17T12:00:00.000Z"
   },
@@ -269,7 +257,7 @@ Actualiza los datos de un tipo de habitación existente.
 - `409`: Nombre duplicado
 
 **Notas:**
-
+ 
 - Solo se actualizan los campos proporcionados en el body
 - El campo `updated_at` se actualiza automáticamente
 - Si se intenta cambiar el nombre a uno que ya existe, se retorna error 409
@@ -329,11 +317,6 @@ Elimina un tipo de habitación del sistema.
 - **Longitud máxima**: 100 caracteres
 - **Único**: Sí
 
-### Campo `descripcion`
-
-- **Requerido**: No
-- **Tipo**: String
-
 ---
 
 ## Estructura de Datos
@@ -345,14 +328,12 @@ Elimina un tipo de habitación del sistema.
 {
   id: string;              // UUID
   nombre: string;          // máx. 100 caracteres, único
-  descripcion: string | null;
 }
 
 // PublicTipoHabitacionWithHabitacionDto (?habitacion=true)
 {
   id: string;
   nombre: string;
-  descripcion: string | null;
   habitacion: PublicHabitacionDto | null;
 }
 
@@ -376,7 +357,6 @@ Elimina un tipo de habitación del sistema.
 {
   id: string;              // UUID
   nombre: string;          // máx. 100 caracteres, único
-  descripcion: string | null;
   created_at: string;      // ISO 8601
   updated_at: string;      // ISO 8601
 }
@@ -411,7 +391,7 @@ curl -X GET https://api.hotel.com/api/private/tipos-habitacion \
 curl -X POST https://api.hotel.com/api/private/tipos-habitacion \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <token>" \
-  -d '{"nombre": "Suite Deluxe", "descripcion": "Suite de lujo"}'
+  -d '{"nombre": "Suite Deluxe"}'
 ```
 
 ### Actualizar tipo de habitación

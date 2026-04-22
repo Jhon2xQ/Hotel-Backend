@@ -53,7 +53,7 @@ describe("CreateTarifaUseCase", () => {
     mockRepository.create = async (data) => {
       const now = new Date();
       return createMockTarifa({
-        tipoHabitacion: new TipoHabitacion(data.tipoHabitacionId, "Suite", "desc", now, now),
+        tipoHabitacion: new TipoHabitacion(data.tipoHabitacionId, "Suite", now, now),
         canal: new Canal(data.canalId, "Booking", "OTA", true, null, now, now),
         precio: data.precio,
         IVA: data.IVA ?? null,

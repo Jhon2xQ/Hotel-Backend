@@ -5,7 +5,7 @@ import { Canal } from "../../src/domain/entities/canal.entity";
 export function createMockTarifa(overrides?: Partial<Tarifa>): Tarifa {
   const tipoHabitacion =
     overrides?.tipoHabitacion ??
-    new TipoHabitacion("tipo-habitacion-test-id", "Suite Deluxe", "Suite de lujo", new Date(), new Date());
+    new TipoHabitacion("tipo-habitacion-test-id", "Suite Deluxe", new Date(), new Date());
 
   const canal =
     overrides?.canal ??
