@@ -42,13 +42,13 @@ export class MuebleRepository implements IMuebleRepository {
   }
 
   async findAllPaginated(params: MueblePaginationParams): Promise<PaginatedResult<Mueble>> {
-    const { page, limit, nombre, categoria, condicion } = params;
+    const { page, limit, codigo, categoria, condicion } = params;
     const skip = (page - 1) * limit;
 
     const where: Record<string, unknown> = {};
 
-    if (nombre) {
-      where.nombre = { contains: nombre, mode: "insensitive" };
+    if (codigo) {
+      where.codigo = { contains: codigo, mode: "insensitive" };
     }
 
     if (categoria) {

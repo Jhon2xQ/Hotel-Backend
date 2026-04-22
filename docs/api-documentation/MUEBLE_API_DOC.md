@@ -25,7 +25,7 @@ Documentación del módulo `muebles.routes.ts`: gestión de muebles del hotel.
 
 Creación y actualización aceptan `multipart/form-data` con campos de mueble y archivos de imagen; las URLs resultantes se guardan en `url_imagen`. Variables de entorno S3: `S3_REGION`, `S3_ENDPOINT`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_BUCKET_NAME`, `S3_FORCE_PATH_STYLE`.
 
-En las respuestas, el objeto anidado `categoria` sigue el mismo contrato que **Categoría de mueble** (`CategoriaMuebleDto`: incluye `id`, `nombre`, `descripcion`, `activo`, `created_at`, `updated_at`).
+En las respuestas, el objeto anidado `categoria` sigue el mismo contrato que **Categoría de mueble** (`CategoriaMuebleDto`: incluye `id`, `nombre`, `created_at`, `updated_at`).
 
 ## Endpoints
 
@@ -43,7 +43,7 @@ Obtiene la lista de muebles con soporte para paginación y filtros.
 |-------|------|-----------|-------------|
 | `page` | number | No | Número de página (default: 1) |
 | `limit` | number | No | Registros por página (default: 10, máx: 100) |
-| `nombre` | string | No | Filtrar por nombre (búsqueda case-insensitive) |
+| `codigo` | string | No | Filtrar por código (búsqueda case-insensitive) |
 | `categoria` | string | No | Filtrar por nombre de categoría (búsqueda case-insensitive) |
 | `condicion` | enum | No | Filtrar por condición: BUENO, REGULAR, DANADO, FALTANTE |
 

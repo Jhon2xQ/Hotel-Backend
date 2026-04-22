@@ -3,7 +3,7 @@ import type { PaginatedResult } from "../../application/paginations/api.paginati
 import { Mueble, MuebleCondition } from "../entities/mueble.entity";
 
 export interface MueblePaginationParams extends PaginationParams {
-  nombre?: string;
+  codigo?: string;
   categoria?: string;
   condicion?: MuebleCondition;
 }

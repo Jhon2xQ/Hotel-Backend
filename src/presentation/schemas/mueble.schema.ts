@@ -4,7 +4,7 @@ import { PaginationQuerySchema } from "./pagination.schema";
 export const MuebleConditionSchema = z.enum(["BUENO", "REGULAR", "DANADO", "FALTANTE"]);
 
 export const ListMuebleQuerySchema = PaginationQuerySchema.extend({
-  nombre: z.string().optional(),
+  codigo: z.string().optional(),
   categoria: z.string().optional(),
   condicion: MuebleConditionSchema.optional(),
 });

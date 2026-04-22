@@ -38,7 +38,7 @@ export class MuebleController {
     const result = await this.listPaginatedUseCase.execute({
       page: validData.page,
       limit: validData.limit,
-      nombre: validData.nombre,
+      codigo: validData.codigo,
       categoria: validData.categoria,
       condicion: validData.condicion as MuebleCondition | undefined,
     });
