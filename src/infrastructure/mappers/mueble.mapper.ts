@@ -20,8 +20,6 @@ export function mapMuebleFromPrisma(data: MueblePrismaRow): Mueble {
   const categoria = mapCategoriaMuebleFromPrisma({
     id: data.categoria.id,
     nombre: data.categoria.nombre,
-    descripcion: data.categoria.descripcion,
-    activo: data.categoria.activo,
     createdAt: data.categoria.createdAt,
     updatedAt: data.categoria.updatedAt,
   });

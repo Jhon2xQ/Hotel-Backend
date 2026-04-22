@@ -22,8 +22,6 @@ export class CreateCategoriaMuebleUseCase {
     }
     const created = await this.categoriaMuebleRepository.create({
       nombre: data.nombre,
-      descripcion: data.descripcion ?? null,
-      activo: data.activo,
     });
     return toCategoriaMuebleDto(created);
   }

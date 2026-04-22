@@ -11,6 +11,7 @@ describe("ListMueblesUseCase", () => {
     mockMuebleRepo = {
       create: async () => createMockMueble(),
       findAll: async () => [],
+      findAllPaginated: async () => ({ list: [], pagination: { page: 1, limit: 10, total: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false } }),
       findById: async () => null,
       findByCodigo: async () => null,
       update: async () => createMockMueble(),

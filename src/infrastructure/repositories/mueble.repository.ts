@@ -5,7 +5,9 @@ import type {
   IMuebleRepository,
   CreateMuebleParams,
   UpdateMuebleParams,
+  MueblePaginationParams,
 } from "../../domain/interfaces/mueble.repository.interface";
+import type { PaginatedResult } from "../../application/paginations/api.pagination";
 import { mapMuebleFromPrisma } from "../mappers/mueble.mapper";
 import { DI_TOKENS } from "../../common/IoC/tokens";
 
@@ -37,6 +39,49 @@ export class MuebleRepository implements IMuebleRepository {
       orderBy: { nombre: "asc" },
     });
     return results.map((r) => mapMuebleFromPrisma(r));
+  }
+
+  async findAllPaginated(params: MueblePaginationParams): Promise<PaginatedResult<Mueble>> {
+    const { page, limit, codigo, categoria, condicion } = params;
+    const skip = (page - 1) * limit;
+
+    const where: Record<string, unknown> = {};
+
+    if (codigo) {
+      where.codigo = { contains: codigo, mode: "insensitive" };
+    }
+
+    if (categoria) {
+      where.categoria = { nombre: { contains: categoria, mode: "insensitive" } };
+    }
+
+    if (condicion) {
+      where.condicion = condicion;
+    }
+
+    const [muebles, total] = await Promise.all([
+      this.prisma.mueble.findMany({
+        where,
+        include: { categoria: true },
+        take: limit,
+        skip,
+        orderBy: { nombre: "asc" },
+      }),
+      this.prisma.mueble.count({ where }),
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
+    return {
+      list: muebles.map((m) => mapMuebleFromPrisma(m)),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
+      },
+    };
   }
 
   async findById(id: string): Promise<Mueble | null> {

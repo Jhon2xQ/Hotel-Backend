@@ -30,8 +30,6 @@ export class UpdateCategoriaMuebleUseCase {
 
     const updated = await this.repository.update(id, {
       nombre: data.nombre,
-      descripcion: data.descripcion,
-      activo: data.activo,
     });
     return toCategoriaMuebleDto(updated);
   }

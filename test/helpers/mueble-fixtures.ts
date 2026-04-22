@@ -4,8 +4,6 @@ import { CategoriaMueble } from "../../src/domain/entities/categoria-mueble.enti
 const defaultCategoria = new CategoriaMueble(
   "categoria-id",
   "Cama",
-  "Muebles para dormir",
-  true,
   new Date(),
   new Date(),
 );

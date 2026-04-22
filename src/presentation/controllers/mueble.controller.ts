@@ -3,16 +3,20 @@ import { AppContext } from "../../common/types/app.types";
 import { ApiResponse } from "../api.response";
 import { CreateMuebleUseCase } from "../../application/use-cases/mueble/create-mueble.use-case";
 import { ListMueblesUseCase } from "../../application/use-cases/mueble/list-mueble.use-case";
+import { ListMueblePaginatedUseCase } from "../../application/use-cases/mueble/list-mueble-paginated.use-case";
 import { FindMuebleByIdUseCase } from "../../application/use-cases/mueble/find-mueble-by-id.use-case";
 import { UpdateMuebleUseCase } from "../../application/use-cases/mueble/update-mueble.use-case";
 import { DeleteMuebleUseCase } from "../../application/use-cases/mueble/delete-mueble.use-case";
 import { CreateMuebleDto, UpdateMuebleDto } from "../../application/dtos/mueble.dto";
+import type { ListMuebleQuery } from "../schemas/mueble.schema";
+import { MuebleCondition } from "../../domain/entities/mueble.entity";
 
 @injectable()
 export class MuebleController {
   constructor(
     private createUseCase: CreateMuebleUseCase,
     private listUseCase: ListMueblesUseCase,
+    private listPaginatedUseCase: ListMueblePaginatedUseCase,
     private findByIdUseCase: FindMuebleByIdUseCase,
     private updateUseCase: UpdateMuebleUseCase,
     private deleteUseCase: DeleteMuebleUseCase,
@@ -27,6 +31,18 @@ export class MuebleController {
   async list(c: AppContext) {
     const results = await this.listUseCase.execute();
     return c.json(ApiResponse.success("Muebles obtenidos exitosamente", results), 200);
+  }
+
+  async listPaginated(c: AppContext) {
+    const validData = c.get("validData") as ListMuebleQuery;
+    const result = await this.listPaginatedUseCase.execute({
+      page: validData.page,
+      limit: validData.limit,
+      codigo: validData.codigo,
+      categoria: validData.categoria,
+      condicion: validData.condicion as MuebleCondition | undefined,
+    });
+    return c.json(ApiResponse.success("Muebles obtenidos exitosamente", result), 200);
   }
 
   async findById(c: AppContext) {
