@@ -4,7 +4,10 @@ import { PaginationQuerySchema } from "./pagination.schema";
 export const ListHabitacionQuerySchema = PaginationQuerySchema.extend({
   numero: z.string().optional(),
   tipo: z.string().optional(),
-  estado: z.boolean().optional(),
+  estado: z
+    .string()
+    .optional()
+    .transform((val) => (val ? val === "true" : undefined)),
 });
 export type ListHabitacionQuery = z.infer<typeof ListHabitacionQuerySchema>;
 
