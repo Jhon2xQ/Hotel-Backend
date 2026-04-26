@@ -43,13 +43,15 @@ Obtiene la lista paginada de habitaciones del hotel, con opción de filtrar por 
 
 **Query (opcional):**
 
-| Parámetro | Tipo   | Default | Descripción                                      |
-| --------- | ------ | ------- | ------------------------------------------------ |
-| `page`    | number | 1       | Número de página (debe ser mayor a 0)            |
-| `limit`   | number | 10      | Resultados por página (entre 1 y 100)            |
+| Parámetro | Tipo   | Default | Descripción                                                                      |
+| --------- | ------ | ------- | -------------------------------------------------------------------------------- |
+| `page`    | number | 1       | Número de página (debe ser mayor a 0)                                            |
+| `limit`   | number | 10      | Resultados por página (entre 1 y 100)                                            |
+| `numero`  | string | —       | Filtra por número de habitación (coincidencia parcial, sin distinción de mayúsculas) |
 | `tipo`    | string | —       | Filtra por nombre de tipo de habitación (coincidencia parcial, sin distinción de mayúsculas) |
+| `estado`  | bool   | —       | Filtra por estado de la habitación (`true` = activa, `false` = inactiva)         |
 
-**Ejemplo:** `GET /api/private/habitaciones?page=1&limit=10&tipo=suite`
+**Ejemplo:** `GET /api/private/habitaciones?page=1&limit=10&numero=10&tipo=suite&estado=true`
 
 **Respuesta exitosa (200):**
 
@@ -114,7 +116,10 @@ Obtiene la lista paginada de habitaciones del hotel, con opción de filtrar por 
 - Las habitaciones se devuelven ordenadas por número de habitación (ascendente)
 - Cada habitación incluye el tipo de habitación asociado
 - El campo `url_imagen` es un array de strings que puede contener múltiples URLs de imágenes
+- El filtro `numero` busca por número de habitación de forma parcial y sin distinción de mayúsculas
 - El filtro `tipo` busca por nombre del tipo de habitación de forma parcial y sin distinción de mayúsculas
+- El filtro `estado` filtra por el estado booleano de la habitación (`true` = activa, `false` = inactiva)
+- Los filtros pueden combinarse (ej. `?numero=10&tipo=suite&estado=true`)
 
 ---
 

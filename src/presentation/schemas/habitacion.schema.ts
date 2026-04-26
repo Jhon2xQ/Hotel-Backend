@@ -2,7 +2,9 @@ import { z } from "zod";
 import { PaginationQuerySchema } from "./pagination.schema";
 
 export const ListHabitacionQuerySchema = PaginationQuerySchema.extend({
+  numero: z.string().optional(),
   tipo: z.string().optional(),
+  estado: z.boolean().optional(),
 });
 export type ListHabitacionQuery = z.infer<typeof ListHabitacionQuerySchema>;
 

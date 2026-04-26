@@ -8,7 +8,9 @@ export interface HabitacionConPromociones extends Habitacion {
 }
 
 export interface HabitacionPaginationParams extends PaginationParams {
+  numero?: string;
   tipo?: string;
+  estado?: boolean;
 }
 
 export interface CreateHabitacionParams {
