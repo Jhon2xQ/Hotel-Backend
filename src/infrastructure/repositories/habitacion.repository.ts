@@ -46,12 +46,18 @@ export class HabitacionRepository implements IHabitacionRepository {
   }
 
   async findAllPaginated(params: HabitacionPaginationParams): Promise<PaginatedResult<HabitacionConPromociones>> {
-    const { page, limit, tipo } = params;
+    const { page, limit, numero, tipo, estado } = params;
     const skip = (page - 1) * limit;
 
     const where: Record<string, unknown> = {};
+    if (numero) {
+      where.nroHabitacion = { contains: numero, mode: "insensitive" };
+    }
     if (tipo) {
       where.tipo = { nombre: { contains: tipo, mode: "insensitive" } };
+    }
+    if (estado !== undefined) {
+      where.estado = estado;
     }
 
     const [habitaciones, total] = await Promise.all([

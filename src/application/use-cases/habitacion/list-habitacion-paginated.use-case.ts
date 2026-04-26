@@ -8,7 +8,7 @@ import { DI_TOKENS } from "../../../common/IoC/tokens";
 export class ListHabitacionPaginatedUseCase {
   constructor(@inject(DI_TOKENS.IHabitacionRepository) private repository: IHabitacionRepository) {}
 
-  async execute(params: { page: number; limit: number; tipo?: string }): Promise<PaginatedResult<HabitacionDto>> {
+  async execute(params: { page: number; limit: number; numero?: string; tipo?: string; estado?: boolean }): Promise<PaginatedResult<HabitacionDto>> {
     const result = await this.repository.findAllPaginated(params);
     return {
       list: result.list.map((h) => toHabitacionDto(h, [], h.promociones)),
