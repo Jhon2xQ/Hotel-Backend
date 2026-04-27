@@ -5,8 +5,8 @@ export type HabitacionPrismaRow = {
   id: string;
   nroHabitacion: string;
   piso: number;
-  tieneDucha: boolean;
-  tieneBanio: boolean;
+  feature: string | null;
+  amenities: string | null;
   urlImagen: string[] | null;
   estado: boolean;
   descripcion: string | null;
@@ -28,8 +28,8 @@ export function mapHabitacionFromPrisma(data: HabitacionPrismaRow): Habitacion {
     data.nroHabitacion,
     tipoHabitacion,
     data.piso,
-    data.tieneDucha,
-    data.tieneBanio,
+    data.feature,
+    data.amenities,
     data.urlImagen,
     data.estado,
     data.descripcion,

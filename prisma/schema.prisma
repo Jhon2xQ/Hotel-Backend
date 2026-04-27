@@ -346,8 +346,8 @@ model Habitacion {
   nroHabitacion    String           @unique @db.VarChar(10)
   tipoHabitacionId String           @db.Uuid
   piso             Int
-  tieneDucha       Boolean          @default(false)
-  tieneBanio       Boolean          @default(false)
+  feature          String?          @db.Text
+  amenities        String?          @db.Text
   urlImagen        String[]         @db.VarChar(255)
   estado           Boolean          @default(false)
   descripcion      String?          @db.Text

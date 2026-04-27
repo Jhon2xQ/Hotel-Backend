@@ -9,8 +9,8 @@ export interface CreateHabitacionDto {
   nro_habitacion: string;
   tipo_habitacion_id: string;
   piso: number;
-  tiene_ducha?: boolean;
-  tiene_banio?: boolean;
+  feature?: string;
+  amenities?: string;
   imagenes?: File[];
   estado?: boolean;
   descripcion?: string;
@@ -20,8 +20,8 @@ export interface UpdateHabitacionDto {
   nro_habitacion?: string;
   tipo_habitacion_id?: string;
   piso?: number;
-  tiene_ducha?: boolean;
-  tiene_banio?: boolean;
+  feature?: string;
+  amenities?: string;
   imagenes_existentes?: string[];
   imagenes?: File[];
   estado?: boolean;
@@ -44,8 +44,8 @@ export interface HabitacionDto {
   nro_habitacion: string;
   tipo_habitacion: TipoHabitacionDto;
   piso: number;
-  tiene_ducha: boolean;
-  tiene_banio: boolean;
+  feature: string | null;
+  amenities: string | null;
   url_imagen: string[] | null;
   estado: boolean;
   descripcion: string | null;
@@ -84,8 +84,8 @@ export interface PublicHabitacionDto {
   nro_habitacion: string;
   tipo_habitacion_id: string;
   piso: number;
-  tiene_ducha: boolean;
-  tiene_banio: boolean;
+  feature: string | null;
+  amenities: string | null;
   url_imagen: string[] | null;
   estado: boolean;
   descripcion: string | null;
@@ -101,8 +101,8 @@ export function toHabitacionDto(h: Habitacion, muebles: Mueble[] = [], promocion
     nro_habitacion: h.nroHabitacion,
     tipo_habitacion: toTipoHabitacionDto(h.tipoHabitacion),
     piso: h.piso,
-    tiene_ducha: h.tieneDucha,
-    tiene_banio: h.tieneBanio,
+    feature: h.feature,
+    amenities: h.amenities,
     url_imagen: h.urlImagen,
     estado: h.estado,
     descripcion: h.descripcion,
@@ -125,8 +125,8 @@ export function toPublicHabitacionDto(h: Habitacion): PublicHabitacionDto {
     nro_habitacion: h.nroHabitacion,
     tipo_habitacion_id: h.tipoHabitacion.id,
     piso: h.piso,
-    tiene_ducha: h.tieneDucha,
-    tiene_banio: h.tieneBanio,
+    feature: h.feature,
+    amenities: h.amenities,
     url_imagen: h.urlImagen,
     estado: h.estado,
     descripcion: h.descripcion,

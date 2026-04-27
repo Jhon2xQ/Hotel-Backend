@@ -51,8 +51,8 @@ describe("CreateHabitacionUseCase", () => {
     const mockHabitacion = createMockHabitacion({
       nroHabitacion: "101",
       piso: 1,
-      tieneDucha: true,
-      tieneBanio: true,
+      feature: "WiFi",
+      amenities: "TV",
     });
 
     mockTipoRepo.findById = async () => mockTipo;
@@ -63,15 +63,15 @@ describe("CreateHabitacionUseCase", () => {
       nro_habitacion: "101",
       tipo_habitacion_id: "tipo-test-id",
       piso: 1,
-      tiene_ducha: true,
-      tiene_banio: true,
+      feature: "WiFi",
+      amenities: "TV",
     });
 
     expect(result).toBeDefined();
     expect(result.nro_habitacion).toBe("101");
     expect(result.piso).toBe(1);
-    expect(result.tiene_ducha).toBe(true);
-    expect(result.tiene_banio).toBe(true);
+    expect(result.feature).toBe("WiFi");
+    expect(result.amenities).toBe("TV");
   });
 
   it("should throw error if tipo habitacion not found", async () => {

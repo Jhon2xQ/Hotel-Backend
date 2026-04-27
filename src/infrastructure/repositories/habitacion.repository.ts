@@ -26,8 +26,8 @@ export class HabitacionRepository implements IHabitacionRepository {
         nroHabitacion: data.nroHabitacion,
         tipoHabitacionId: data.tipoHabitacionId,
         piso: data.piso,
-        tieneDucha: data.tieneDucha ?? false,
-        tieneBanio: data.tieneBanio ?? false,
+        feature: data.feature ?? null,
+        amenities: data.amenities ?? null,
         urlImagen: data.urlImagen ?? undefined,
         estado: data.estado ?? false,
         descripcion: data.descripcion,
@@ -191,8 +191,8 @@ export class HabitacionRepository implements IHabitacionRepository {
     if (data.nroHabitacion !== undefined) updateData.nroHabitacion = data.nroHabitacion;
     if (data.tipoHabitacionId !== undefined) updateData.tipoHabitacionId = data.tipoHabitacionId;
     if (data.piso !== undefined) updateData.piso = data.piso;
-    if (data.tieneDucha !== undefined) updateData.tieneDucha = data.tieneDucha;
-    if (data.tieneBanio !== undefined) updateData.tieneBanio = data.tieneBanio;
+    if (data.feature !== undefined) updateData.feature = data.feature;
+    if (data.amenities !== undefined) updateData.amenities = data.amenities;
     if (data.urlImagen !== undefined) updateData.urlImagen = data.urlImagen;
     if (data.estado !== undefined) updateData.estado = data.estado;
     if (data.descripcion !== undefined) updateData.descripcion = data.descripcion;
