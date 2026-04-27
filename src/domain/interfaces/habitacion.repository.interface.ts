@@ -17,8 +17,8 @@ export interface CreateHabitacionParams {
   nroHabitacion: string;
   tipoHabitacionId: string;
   piso: number;
-  tieneDucha?: boolean;
-  tieneBanio?: boolean;
+  feature?: string | null;
+  amenities?: string | null;
   urlImagen?: string[] | null;
   estado?: boolean;
   descripcion?: string | null;
@@ -28,8 +28,8 @@ export interface UpdateHabitacionParams {
   nroHabitacion?: string;
   tipoHabitacionId?: string;
   piso?: number;
-  tieneDucha?: boolean;
-  tieneBanio?: boolean;
+  feature?: string | null;
+  amenities?: string | null;
   urlImagen?: string[] | null;
   estado?: boolean;
   descripcion?: string | null;

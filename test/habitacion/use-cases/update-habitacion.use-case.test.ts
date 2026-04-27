@@ -121,20 +121,20 @@ describe("UpdateHabitacionUseCase", () => {
     ).rejects.toThrow(HabitacionException);
   });
 
-  it("should update tiene_ducha and tiene_banio", async () => {
-    const existingHabitacion = createMockHabitacion({ id: "test-id", tieneDucha: false, tieneBanio: false });
-    const updatedHabitacion = createMockHabitacion({ id: "test-id", tieneDucha: true, tieneBanio: true });
+  it("should update feature and amenities", async () => {
+    const existingHabitacion = createMockHabitacion({ id: "test-id", feature: null, amenities: null });
+    const updatedHabitacion = createMockHabitacion({ id: "test-id", feature: "WiFi", amenities: "TV" });
 
     mockHabitacionRepo.findById = async () => existingHabitacion;
     mockHabitacionRepo.findByNumero = async () => null;
     mockHabitacionRepo.update = async () => updatedHabitacion;
 
     const result = await useCase.execute("test-id", {
-      tiene_ducha: true,
-      tiene_banio: true,
+      feature: "WiFi",
+      amenities: "TV",
     });
 
-    expect(result.tiene_ducha).toBe(true);
-    expect(result.tiene_banio).toBe(true);
+    expect(result.feature).toBe("WiFi");
+    expect(result.amenities).toBe("TV");
   });
 });

@@ -36,8 +36,8 @@ export const CreateHabitacionSchema = z.object({
     .pipe(z.string().min(1, "El número de habitación es requerido").max(10, "El número de habitación no puede exceder 10 caracteres")),
   tipo_habitacion_id: z.uuid("El tipo de habitación debe ser un UUID válido"),
   piso: z.number().int().positive("El piso debe ser un número positivo"),
-  tiene_ducha: z.boolean().optional(),
-  tiene_banio: z.boolean().optional(),
+  feature: z.string().optional(),
+  amenities: z.string().optional(),
   imagenes: z.array(z.instanceof(File)).optional().default([]),
   estado: z.boolean().optional(),
   descripcion: z.string().optional(),
@@ -51,8 +51,8 @@ export const UpdateHabitacionSchema = z.object({
     .optional(),
   tipo_habitacion_id: z.uuid("El tipo de habitación debe ser un UUID válido").optional(),
   piso: z.number().int().positive("El piso debe ser un número positivo").optional(),
-  tiene_ducha: z.boolean().optional(),
-  tiene_banio: z.boolean().optional(),
+  feature: z.string().optional(),
+  amenities: z.string().optional(),
   imagenes_existentes: z.array(z.string().url()).optional(),
   imagenes: z.array(z.instanceof(File)).optional().default([]),
   estado: z.boolean().optional(),
@@ -69,6 +69,7 @@ export const SearchAvailableHabitacionesSchema = z
     fecha_inicio: z.string().datetime({ message: "fecha_inicio debe ser una fecha ISO válida" }).optional(),
     fecha_fin: z.string().datetime({ message: "fecha_fin debe ser una fecha ISO válida" }).optional(),
     orden_precio: z.enum(["asc", "desc"]).optional(),
+    locale: z.enum(["es", "en", "fr"]).optional().default("es"),
   })
   .refine(
     (data) => {
@@ -86,3 +87,11 @@ export const SearchAvailableHabitacionesSchema = z
     fecha_inicio: data.fecha_inicio ? new Date(data.fecha_inicio) : undefined,
     fecha_fin: data.fecha_fin ? new Date(data.fecha_fin) : undefined,
   }));
+
+export type SearchAvailableHabitacionesQuery = z.infer<typeof SearchAvailableHabitacionesSchema>;
+
+export const HabitacionPublicDetailQuerySchema = z.object({
+  locale: z.enum(["es", "en", "fr"]).optional().default("es"),
+});
+
+export type HabitacionPublicDetailQuery = z.infer<typeof HabitacionPublicDetailQuerySchema>;

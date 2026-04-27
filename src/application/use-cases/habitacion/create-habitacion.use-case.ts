@@ -1,6 +1,7 @@
 import { inject, injectable } from "tsyringe";
 import type { IHabitacionRepository } from "../../../domain/interfaces/habitacion.repository.interface";
 import type { ITipoHabitacionRepository } from "../../../domain/interfaces/tipo-habitacion.repository.interface";
+import type { IInternacionalizacionRepository } from "../../../domain/interfaces/internacionalizacion.repository.interface";
 import { HabitacionException } from "../../../domain/exceptions/habitacion.exception";
 import { CreateHabitacionDto, HabitacionDto, toHabitacionDto } from "../../dtos/habitacion.dto";
 import { S3UploadService } from "../../../infrastructure/services/s3-upload.service";
@@ -12,6 +13,8 @@ export class CreateHabitacionUseCase {
     @inject(DI_TOKENS.IHabitacionRepository) private repository: IHabitacionRepository,
     @inject(DI_TOKENS.ITipoHabitacionRepository)
     private tipoHabitacionRepository: ITipoHabitacionRepository,
+    @inject(DI_TOKENS.IInternacionalizacionRepository)
+    private internacionalizacionRepository: IInternacionalizacionRepository,
   ) {}
 
   async execute(input: CreateHabitacionDto): Promise<HabitacionDto> {
@@ -34,11 +37,15 @@ export class CreateHabitacionUseCase {
       nroHabitacion: input.nro_habitacion,
       tipoHabitacionId: input.tipo_habitacion_id,
       piso: input.piso,
-      tieneDucha: input.tiene_ducha ?? false,
-      tieneBanio: input.tiene_banio ?? false,
+      feature: input.feature ?? null,
+      amenities: input.amenities ?? null,
       urlImagen: imageUrls,
       estado: input.estado ?? false,
       descripcion: input.descripcion ?? null,
+    });
+
+    await this.internacionalizacionRepository.create({
+      habitacionId: habitacion.id,
     });
 
     return toHabitacionDto(habitacion);

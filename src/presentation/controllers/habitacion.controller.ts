@@ -19,6 +19,7 @@ import {
 } from "../../application/dtos/habitacion.dto";
 import type { ListHabitacionQuery } from "../schemas/habitacion.schema";
 import type { HabitacionDetailQuery } from "../schemas/habitacion.schema";
+import type { HabitacionPublicDetailQuery } from "../schemas/habitacion.schema";
 import type { EstadoReserva } from "../../domain/entities/reserva.entity";
 
 @injectable()
@@ -88,7 +89,8 @@ export class HabitacionController {
 
   async findByIdWithPrice(c: AppContext) {
     const { id } = c.req.param();
-    const result = await this.findByIdWithPriceUseCase.execute(id);
+    const validData = c.get("validData") as HabitacionPublicDetailQuery;
+    const result = await this.findByIdWithPriceUseCase.execute(id, validData.locale as "es" | "en" | "fr");
     return c.json(ApiResponse.success("Habitación con precio obtenida exitosamente", result), 200);
   }
 }

@@ -70,8 +70,8 @@ Obtiene la lista paginada de habitaciones del hotel, con opción de filtrar por 
           "descripcion": "Suite de lujo con vista panorámica al mar"
         },
         "piso": 1,
-        "tiene_ducha": true,
-        "tiene_banio": true,
+        "feature": "WiFi, aire acondicionado",
+        "amenities": "TV, minibar",
         "url_imagen": ["https://example.com/rooms/101-1.jpg", "https://example.com/rooms/101-2.jpg"],
         "estado": true,
         "descripcion": "Suite con balcón privado",
@@ -88,8 +88,8 @@ Obtiene la lista paginada de habitaciones del hotel, con opción de filtrar por 
           "descripcion": "Habitación cómoda con todas las comodidades básicas"
         },
         "piso": 1,
-        "tiene_ducha": true,
-        "tiene_banio": false,
+        "feature": null,
+        "amenities": null,
         "url_imagen": null,
         "estado": false,
         "descripcion": null,
@@ -165,8 +165,8 @@ Valores válidos para `tipo_reserva`: `TENTATIVA`, `CONFIRMADA`, `EN_CASA`, `COM
         "descripcion": "Suite de lujo con vista panorámica al mar"
       },
       "piso": 1,
-      "tiene_ducha": true,
-      "tiene_banio": true,
+      "feature": "WiFi, aire acondicionado",
+      "amenities": "TV, minibar, cafetera",
       "url_imagen": ["https://example.com/rooms/101-1.jpg", "https://example.com/rooms/101-2.jpg"],
       "estado": true,
       "descripcion": "Suite con balcón privado",
@@ -310,8 +310,8 @@ Obtiene las habitaciones disponibles con precio de tarifa del canal **DIRECTO**,
           "descripcion": "Suite de lujo con vista panorámica al mar"
         },
         "piso": 1,
-        "tiene_ducha": true,
-        "tiene_banio": true,
+        "feature": "WiFi, aire acondicionado",
+        "amenities": "TV, minibar",
         "url_imagen": ["https://example.com/rooms/101-1.jpg"],
         "estado": true,
         "descripcion": "Suite con balcón privado",
@@ -330,8 +330,8 @@ Obtiene las habitaciones disponibles con precio de tarifa del canal **DIRECTO**,
           "descripcion": "Habitación cómoda con todas las comodidades básicas"
         },
         "piso": 1,
-        "tiene_ducha": true,
-        "tiene_banio": false,
+        "feature": null,
+        "amenities": null,
         "url_imagen": null,
         "estado": true,
         "descripcion": null,
@@ -391,8 +391,8 @@ Obtiene los detalles de una habitación junto con el precio de la tarifa del can
     "nro_habitacion": "101",
     "tipo_habitacion_id": "123e4567-e89b-12d3-a456-426614174000",
     "piso": 1,
-    "tiene_ducha": true,
-    "tiene_banio": true,
+    "feature": "WiFi, aire acondicionado",
+    "amenities": "TV, minibar, cafetera",
     "url_imagen": ["https://example.com/rooms/101-1.jpg", "https://example.com/rooms/101-2.jpg"],
     "estado": true,
     "descripcion": "Suite con balcón privado",
@@ -456,8 +456,8 @@ Crea una nueva habitación física en el sistema. Acepta `multipart/form-data` p
 | `nro_habitacion`     | string           | Sí        | Número único de habitación (máx. 10 caracteres)               |
 | `tipo_habitacion_id` | UUID             | Sí        | ID del tipo de habitación                                      |
 | `piso`               | number           | Sí        | Número de piso (entero positivo)                               |
-| `tiene_ducha`        | boolean          | No        | Si la habitación tiene ducha (default: `false`)                |
-| `tiene_banio`        | boolean          | No        | Si la habitación tiene baño completo (default: `false`)        |
+| `feature`            | string           | No        | Características principales de la habitación                  |
+| `amenities`          | string           | No        | Comodidades adicionales (separadas por coma)                  |
 | `estado`             | boolean          | No        | Estado de la habitación (`true` = activa, `false` = inactiva; default: `false`) |
 | `descripcion`        | string           | No        | Descripción o notas adicionales                                |
 | `imagenes[]`         | archivos         | No        | Archivos de imagen a subir a S3                                |
@@ -470,8 +470,8 @@ curl -X POST https://api.hotel.com/api/private/habitaciones \
   -F "nro_habitacion=301" \
   -F "tipo_habitacion_id=123e4567-e89b-12d3-a456-426614174000" \
   -F "piso=3" \
-  -F "tiene_ducha=true" \
-  -F "tiene_banio=true" \
+  -F "feature=WiFi, aire acondicionado" \
+  -F "amenities=TV, minibar, cafetera" \
   -F "estado=true" \
   -F "descripcion=Habitación con vista al mar" \
   -F "imagenes[]=@/path/to/room-photo.jpg"
@@ -492,8 +492,8 @@ curl -X POST https://api.hotel.com/api/private/habitaciones \
       "descripcion": "Suite de lujo con vista panorámica al mar"
     },
     "piso": 3,
-    "tiene_ducha": true,
-    "tiene_banio": true,
+    "feature": "WiFi, aire acondicionado",
+    "amenities": "TV, minibar, cafetera",
     "url_imagen": ["https://example.com/rooms/301-1.jpg", "https://example.com/rooms/301-2.jpg"],
     "estado": true,
     "descripcion": "Habitación con vista al mar",
@@ -571,8 +571,8 @@ Actualiza los datos completos de una habitación existente. Soporta gestión de 
 | `nro_habitacion`       | string           | No        | Número de habitación (máx. 10 caracteres)                                     |
 | `tipo_habitacion_id`   | UUID             | No        | ID del tipo de habitación                                                     |
 | `piso`                 | number           | No        | Número de piso (entero positivo)                                              |
-| `tiene_ducha`          | boolean          | No        | Si la habitación tiene ducha                                                  |
-| `tiene_banio`          | boolean          | No        | Si la habitación tiene baño                                                   |
+| `feature`              | string           | No        | Características principales de la habitación                                  |
+| `amenities`            | string           | No        | Comodidades adicionales (separadas por coma)                                  |
 | `estado`               | boolean          | No        | Estado de la habitación (`true` = activa, `false` = inactiva)                 |
 | `descripcion`          | string           | No        | Descripción o notas adicionales                                               |
 | `imagenes_existentes[]` | array de strings | No        | URLs de imágenes actuales que se desean **conservar**                         |
@@ -595,8 +595,8 @@ curl -X PUT https://api.hotel.com/api/private/habitaciones/789e4567-e89b-12d3-a4
   -H "Authorization: Bearer <token>" \
   -F "nro_habitacion=301-A" \
   -F "piso=3" \
-  -F "tiene_ducha=true" \
-  -F "tiene_banio=false" \
+  -F "feature=WiFi, aire acondicionado" \
+  -F "amenities=TV, minibar, cafetera" \
   -F "estado=false" \
   -F "descripcion=Reparación de aire acondicionado" \
   -F "imagenes_existentes[]=https://example.com/rooms/301-1.jpg" \
@@ -618,8 +618,8 @@ curl -X PUT https://api.hotel.com/api/private/habitaciones/789e4567-e89b-12d3-a4
       "descripcion": "Suite de lujo con vista panorámica al mar"
     },
     "piso": 3,
-    "tiene_ducha": true,
-    "tiene_banio": false,
+    "feature": "WiFi, aire acondicionado",
+    "amenities": "TV, minibar, cafetera",
     "url_imagen": [
       "https://example.com/rooms/301-1.jpg",
       "https://example.com/rooms/a1b2c3d4-e5f6-7890-abcd-ef1234567890.jpg"
@@ -706,8 +706,8 @@ Actualiza únicamente el estado booleano de una habitación.
       "descripcion": "Suite de lujo con vista panorámica al mar"
     },
     "piso": 3,
-    "tiene_ducha": true,
-    "tiene_banio": true,
+    "feature": "WiFi, aire acondicionado",
+    "amenities": "TV, minibar, cafetera",
     "url_imagen": ["https://example.com/rooms/301.jpg"],
     "estado": true,
     "descripcion": "Habitación con vista al mar",
@@ -852,19 +852,17 @@ Elimina una habitación del sistema.
 - **Validación**: Debe ser un número positivo
 - **Ejemplo**: 1, 2, 3, 10
 
-### Campo `tiene_ducha`
+### Campo `feature`
 
-- **Requerido**: No (default: `false`)
-- **Tipo**: Boolean
-- **Valores**: `true` o `false`
-- **Descripción**: Indica si la habitación tiene ducha
+- **Requerido**: No
+- **Tipo**: String
+- **Descripción**: Características principales de la habitación (ej. "WiFi, aire acondicionado")
 
-### Campo `tiene_banio`
+### Campo `amenities`
 
-- **Requerido**: No (default: `false`)
-- **Tipo**: Boolean
-- **Valores**: `true` o `false`
-- **Descripción**: Indica si la habitación tiene baño completo
+- **Requerido**: No
+- **Tipo**: String
+- **Descripción**: Comodidades adicionales separadas por coma (ej. "TV, minibar, cafetera")
 
 ### Campo `url_imagen`
 
@@ -891,7 +889,7 @@ Elimina una habitación del sistema.
 
 - Las habitaciones representan las unidades físicas del hotel con número y ubicación específicos
 - Cada habitación está asociada a un tipo de habitación que define sus características
-- Los campos `tiene_ducha` y `tiene_banio` permiten especificar las instalaciones sanitarias de cada habitación individual
+- Los campos `feature` y `amenities` permiten especificar características y comodidades de cada habitación individual
 - El campo `estado` es booleano: `true` indica habitación activa/disponible, `false` indica inactiva
 - El campo `descripcion` permite almacenar información adicional o notas del personal
 - El campo `url_imagen` es un array que permite almacenar múltiples imágenes de la habitación
@@ -913,8 +911,8 @@ curl -X POST https://api.hotel.com/api/private/habitaciones \
   -F "nro_habitacion=301" \
   -F "tipo_habitacion_id=123e4567-e89b-12d3-a456-426614174000" \
   -F "piso=3" \
-  -F "tiene_ducha=true" \
-  -F "tiene_banio=true" \
+  -F "feature=WiFi, aire acondicionado" \
+  -F "amenities=TV, minibar, cafetera" \
   -F "estado=true" \
   -F "descripcion=Habitación con vista al mar" \
   -F "imagenes[]=@/path/to/room1.jpg" \
@@ -929,8 +927,8 @@ curl -X POST https://api.hotel.com/api/private/habitaciones \
   -F "nro_habitacion=101" \
   -F "tipo_habitacion_id=123e4567-e89b-12d3-a456-426614174000" \
   -F "piso=1" \
-  -F "tiene_ducha=true" \
-  -F "tiene_banio=false"
+  -F "feature=WiFi" \
+  -F "amenities=TV"
 ```
 
 ### Listar todas las habitaciones (paginado)
@@ -979,8 +977,8 @@ curl -X PUT https://api.hotel.com/api/private/habitaciones/789e4567-e89b-12d3-a4
   -H "Authorization: Bearer <token>" \
   -F "nro_habitacion=301-A" \
   -F "piso=3" \
-  -F "tiene_ducha=true" \
-  -F "tiene_banio=false" \
+  -F "feature=WiFi, aire acondicionado" \
+  -F "amenities=TV, minibar, cafetera" \
   -F "estado=false" \
   -F "descripcion=Reparación de aire acondicionado" \
   -F "imagenes_existentes[]=https://example.com/rooms/301-1.jpg" \

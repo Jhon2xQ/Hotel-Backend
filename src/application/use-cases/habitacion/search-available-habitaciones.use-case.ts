@@ -1,18 +1,24 @@
 import { inject, injectable } from "tsyringe";
 import type { IHabitacionRepository } from "../../../domain/interfaces/habitacion.repository.interface";
+import type { IInternacionalizacionRepository } from "../../../domain/interfaces/internacionalizacion.repository.interface";
 import type { Habitacion } from "../../../domain/entities/habitacion.entity";
 import {
-  HabitacionWithPriceDto,
+  PublicHabitacionWithPriceDto,
   SearchAvailableHabitacionesDto,
-  toHabitacionDto,
+  toPublicHabitacionDto,
 } from "../../dtos/habitacion.dto";
 import { DI_TOKENS } from "../../../common/IoC/tokens";
 
 @injectable()
 export class SearchAvailableHabitacionesUseCase {
-  constructor(@inject(DI_TOKENS.IHabitacionRepository) private repository: IHabitacionRepository) {}
+  constructor(
+    @inject(DI_TOKENS.IHabitacionRepository) private repository: IHabitacionRepository,
+    @inject(DI_TOKENS.IInternacionalizacionRepository)
+    private internacionalizacionRepository: IInternacionalizacionRepository,
+  ) {}
 
-  async execute(input: SearchAvailableHabitacionesDto): Promise<HabitacionWithPriceDto[]> {
+  async execute(input: SearchAvailableHabitacionesDto): Promise<PublicHabitacionWithPriceDto[]> {
+    const locale = input.locale ?? "es";
     let results: Array<{ habitacion: Habitacion; precioNoche: number | null }>;
 
     if (input.fecha_inicio && input.fecha_fin) {
@@ -23,12 +29,16 @@ export class SearchAvailableHabitacionesUseCase {
       results = await this.repository.findAllWithDirectPrice();
     }
 
-    let output = results.map((r) => ({
-      habitacion: toHabitacionDto(r.habitacion),
-      precio_noche: r.precioNoche,
-    }));
+    let output = await Promise.all(
+      results.map(async (r) => {
+        const internacionalizacion = await this.internacionalizacionRepository.findByHabitacionId(r.habitacion.id);
+        return {
+          habitacion: toPublicHabitacionDto(r.habitacion, internacionalizacion, locale),
+          precio_noche: r.precioNoche,
+        };
+      }),
+    );
 
-    // Ordenar por precio si se especificó
     if (input.orden_precio) {
       output.sort((a, b) => {
         const precioA = a.precio_noche ?? Number.MAX_VALUE;

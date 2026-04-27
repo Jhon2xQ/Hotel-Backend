@@ -346,20 +346,42 @@ model Habitacion {
   nroHabitacion    String           @unique @db.VarChar(10)
   tipoHabitacionId String           @db.Uuid
   piso             Int
-  tieneDucha       Boolean          @default(false)
-  tieneBanio       Boolean          @default(false)
+  feature          String?          @db.Text
+  amenities        String?          @db.Text
   urlImagen        String[]         @db.VarChar(255)
   estado           Boolean          @default(false)
   descripcion      String?          @db.Text
   createdAt        DateTime         @default(now()) @db.Timestamptz
   updatedAt        DateTime         @updatedAt @db.Timestamptz
 
-  muebles     Mueble[]
-  tipo        TipoHabitacion @relation(fields: [tipoHabitacionId], references: [id])
-  reservas    Reserva[]
-  promociones Promocion[]
+  muebles             Mueble[]
+  tipo                TipoHabitacion       @relation(fields: [tipoHabitacionId], references: [id])
+  reservas            Reserva[]
+  promociones        Promocion[]
+  internacionalizacion Internacionalizacion?
 
   @@map("habitaciones")
+}
+
+// ------------------------------------------------------------
+// 6.1 INTERNACIONALIZACIONES
+// ------------------------------------------------------------
+
+model Internacionalizacion {
+  id              String    @id @default(uuid()) @db.Uuid
+  habitacionId    String    @unique @db.Uuid
+  descripcionEn   String?   @db.Text
+  descripcionFr   String?   @db.Text
+  featureEn       String?   @db.Text
+  featureFr       String?   @db.Text
+  amenitiesEn     String?   @db.Text
+  amenitiesFr     String?   @db.Text
+  createdAt       DateTime  @default(now()) @db.Timestamptz
+  updatedAt       DateTime  @updatedAt @db.Timestamptz
+
+  habitacion Habitacion @relation(fields: [habitacionId], references: [id], onDelete: Cascade)
+
+  @@map("internacionalizaciones")
 }
 
 // ------------------------------------------------------------
