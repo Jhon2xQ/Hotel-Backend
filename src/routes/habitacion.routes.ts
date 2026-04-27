@@ -12,6 +12,7 @@ import {
   SearchAvailableHabitacionesSchema,
   ListHabitacionQuerySchema,
   HabitacionDetailQuerySchema,
+  HabitacionPublicDetailQuerySchema,
 } from "../presentation/schemas/habitacion.schema";
 
 export function createHabitacionRoutes(): AppHono {
@@ -33,7 +34,7 @@ export function createHabitacionPublicRoutes(): AppHono {
   const router = new Hono<{ Variables: AppVariables }>();
 
   router.get("/", validQuery(SearchAvailableHabitacionesSchema), (c) => ctrl.searchAvailable(c));
-  router.get("/:id", validParams(UUIDParamSchema), (c) => ctrl.findByIdWithPrice(c));
+  router.get("/:id", validParams(UUIDParamSchema), validQuery(HabitacionPublicDetailQuerySchema), (c) => ctrl.findByIdWithPrice(c));
 
   return router;
 }

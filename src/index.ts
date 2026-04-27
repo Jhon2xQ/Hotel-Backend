@@ -18,6 +18,7 @@ import { createProductoRoutes } from "./routes/producto.routes";
 import { createFolioRoutes } from "./routes/folio.routes";
 import { createInsumoBarRoutes, createMovimientoBarRoutes } from "./routes/insumo-bar.routes";
 import { createInsumoCocinaRoutes, createMovimientoCocinaRoutes } from "./routes/insumo-cocina.routes";
+import { createInternacionalizacionRoutes } from "./routes/internacionalizacion.routes";
 import { errorHandler } from "./presentation/middlewares/exception.middleware";
 import { authMiddleware } from "./presentation/middlewares/auth.middleware";
 
@@ -57,6 +58,7 @@ privateApi.route("/bar/insumos", createInsumoBarRoutes());
 privateApi.route("/bar/movimientos", createMovimientoBarRoutes());
 privateApi.route("/cocina/insumos", createInsumoCocinaRoutes());
 privateApi.route("/cocina/movimientos", createMovimientoCocinaRoutes());
+privateApi.route("/internacionalizaciones", createInternacionalizacionRoutes());
 
 app.route("/api/public", publicApi);
 app.route("/api/private", privateApi);

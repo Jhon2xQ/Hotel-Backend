@@ -18,4 +18,9 @@ export const DI_TOKENS = {
   IFolioRepository: Symbol.for("IFolioRepository"),
   IInsumoBarRepository: Symbol.for("IInsumoBarRepository"),
   IInsumoCocinaRepository: Symbol.for("IInsumoCocinaRepository"),
+  IInternacionalizacionRepository: Symbol.for("IInternacionalizacionRepository"),
+  CreateInternacionalizacionUseCase: Symbol.for("CreateInternacionalizacionUseCase"),
+  FindInternacionalizacionByHabitacionUseCase: Symbol.for("FindInternacionalizacionByHabitacionUseCase"),
+  UpdateInternacionalizacionUseCase: Symbol.for("UpdateInternacionalizacionUseCase"),
+  DeleteInternacionalizacionUseCase: Symbol.for("DeleteInternacionalizacionUseCase"),
 } as const;

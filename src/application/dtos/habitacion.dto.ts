@@ -4,6 +4,7 @@ import { toTipoHabitacionDto } from "./tipo-habitacion.dto";
 import type { MuebleDto, PublicMuebleDto } from "./mueble.dto";
 import { toMuebleDto, toPublicMuebleDto } from "./mueble.dto";
 import type { Mueble } from "../../domain/entities/mueble.entity";
+import type { Internacionalizacion } from "../../domain/entities/internacionalizacion.entity";
 
 export interface CreateHabitacionDto {
   nro_habitacion: string;
@@ -37,6 +38,7 @@ export interface SearchAvailableHabitacionesDto {
   fecha_inicio?: Date;
   fecha_fin?: Date;
   orden_precio?: "asc" | "desc";
+  locale?: "es" | "en" | "fr";
 }
 
 export interface HabitacionDto {
@@ -95,6 +97,11 @@ export interface PublicHabitacionWithMueblesDto extends PublicHabitacionDto {
   muebles: PublicMuebleDto[];
 }
 
+export interface PublicHabitacionWithPriceDto {
+  habitacion: PublicHabitacionDto;
+  precio_noche: number | null;
+}
+
 export function toHabitacionDto(h: Habitacion, muebles: Mueble[] = [], promociones: string[] = []): HabitacionDto {
   return {
     id: h.id,
@@ -119,23 +126,48 @@ export function toHabitacionWithMueblesDto(h: Habitacion, muebles: Mueble[], pro
   };
 }
 
-export function toPublicHabitacionDto(h: Habitacion): PublicHabitacionDto {
+export function toPublicHabitacionDto(
+  h: Habitacion,
+  internacionalizacion?: Internacionalizacion | null,
+  locale: "es" | "en" | "fr" = "es",
+): PublicHabitacionDto {
+  let feature = h.feature;
+  let amenities = h.amenities;
+  let descripcion = h.descripcion;
+
+  if (internacionalizacion && locale !== "es") {
+    if (locale === "en") {
+      if (internacionalizacion.featureEn) feature = internacionalizacion.featureEn;
+      if (internacionalizacion.amenitiesEn) amenities = internacionalizacion.amenitiesEn;
+      if (internacionalizacion.descripcionEn) descripcion = internacionalizacion.descripcionEn;
+    } else if (locale === "fr") {
+      if (internacionalizacion.featureFr) feature = internacionalizacion.featureFr;
+      if (internacionalizacion.amenitiesFr) amenities = internacionalizacion.amenitiesFr;
+      if (internacionalizacion.descripcionFr) descripcion = internacionalizacion.descripcionFr;
+    }
+  }
+
   return {
     id: h.id,
     nro_habitacion: h.nroHabitacion,
     tipo_habitacion_id: h.tipoHabitacion.id,
     piso: h.piso,
-    feature: h.feature,
-    amenities: h.amenities,
+    feature,
+    amenities,
     url_imagen: h.urlImagen,
     estado: h.estado,
-    descripcion: h.descripcion,
+    descripcion,
   };
 }
 
-export function toPublicHabitacionWithMueblesDto(h: Habitacion, muebles: Mueble[]): PublicHabitacionWithMueblesDto {
+export function toPublicHabitacionWithMueblesDto(
+  h: Habitacion,
+  muebles: Mueble[],
+  internacionalizacion?: Internacionalizacion | null,
+  locale: "es" | "en" | "fr" = "es",
+): PublicHabitacionWithMueblesDto {
   return {
-    ...toPublicHabitacionDto(h),
+    ...toPublicHabitacionDto(h, internacionalizacion, locale),
     muebles: muebles.map(toPublicMuebleDto),
   };
 }

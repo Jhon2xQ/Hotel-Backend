@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { CreateHabitacionUseCase } from "../../../src/application/use-cases/habitacion/create-habitacion.use-case";
 import { IHabitacionRepository } from "../../../src/domain/interfaces/habitacion.repository.interface";
 import { ITipoHabitacionRepository } from "../../../src/domain/interfaces/tipo-habitacion.repository.interface";
+import { IInternacionalizacionRepository } from "../../../src/domain/interfaces/internacionalizacion.repository.interface";
 import { HabitacionException } from "../../../src/domain/exceptions/habitacion.exception";
 import { createMockHabitacion } from "../../helpers/habitacion-fixtures";
 import { createMockTipoHabitacion } from "../../helpers/tipo-habitacion-fixtures";
@@ -10,6 +11,7 @@ describe("CreateHabitacionUseCase", () => {
   let useCase: CreateHabitacionUseCase;
   let mockHabitacionRepo: IHabitacionRepository;
   let mockTipoRepo: ITipoHabitacionRepository;
+  let mockInternacionalizacionRepo: IInternacionalizacionRepository;
 
   beforeEach(() => {
     mockHabitacionRepo = {
@@ -43,7 +45,32 @@ describe("CreateHabitacionUseCase", () => {
       findAllWithSampleHabitacion: async () => [],
     };
 
-    useCase = new CreateHabitacionUseCase(mockHabitacionRepo, mockTipoRepo);
+    mockInternacionalizacionRepo = {
+      create: async () => {
+        const { Internacionalizacion } = await import("../../../src/domain/entities/internacionalizacion.entity");
+        return new Internacionalizacion(
+          "int-test-id",
+          "habitacion-test-id",
+          null, null, null, null, null, null,
+          new Date(),
+          new Date(),
+        );
+      },
+      findByHabitacionId: async () => null,
+      update: async () => {
+        const { Internacionalizacion } = await import("../../../src/domain/entities/internacionalizacion.entity");
+        return new Internacionalizacion(
+          "int-test-id",
+          "habitacion-test-id",
+          null, null, null, null, null, null,
+          new Date(),
+          new Date(),
+        );
+      },
+      delete: async () => {},
+    };
+
+    useCase = new CreateHabitacionUseCase(mockHabitacionRepo, mockTipoRepo, mockInternacionalizacionRepo);
   });
 
   it("should create habitacion successfully", async () => {

@@ -17,6 +17,7 @@ import { ProductoRepository } from "../../infrastructure/repositories/producto.r
 import { FolioRepository } from "../../infrastructure/repositories/folio.repository";
 import { InsumoBarRepository } from "../../infrastructure/repositories/insumo-bar.repository";
 import { InsumoCocinaRepository } from "../../infrastructure/repositories/insumo-cocina.repository";
+import { InternacionalizacionRepository } from "../../infrastructure/repositories/internacionalizacion.repository";
 
 import { CreateMuebleUseCase } from "../../application/use-cases/mueble/create-mueble.use-case";
 import { ListMueblesUseCase } from "../../application/use-cases/mueble/list-mueble.use-case";
@@ -132,6 +133,11 @@ import { ProductoController } from "../../presentation/controllers/producto.cont
 import { FolioController } from "../../presentation/controllers/folio.controller";
 import { InsumoBarController } from "../../presentation/controllers/insumo-bar.controller";
 import { InsumoCocinaController } from "../../presentation/controllers/insumo-cocina.controller";
+import { InternacionalizacionController } from "../../presentation/controllers/internacionalizacion.controller";
+import { CreateInternacionalizacionUseCase } from "../../application/use-cases/internacionalizacion/create-internacionalizacion.use-case";
+import { FindInternacionalizacionByHabitacionUseCase } from "../../application/use-cases/internacionalizacion/find-internacionalizacion-by-habitacion.use-case";
+import { UpdateInternacionalizacionUseCase } from "../../application/use-cases/internacionalizacion/update-internacionalizacion.use-case";
+import { DeleteInternacionalizacionUseCase } from "../../application/use-cases/internacionalizacion/delete-internacionalizacion.use-case";
 
 const repositoryBindings: Array<[symbol, new (...args: never[]) => unknown]> = [
   [DI_TOKENS.IMuebleRepository, MuebleRepository],
@@ -149,6 +155,7 @@ const repositoryBindings: Array<[symbol, new (...args: never[]) => unknown]> = [
   [DI_TOKENS.IFolioRepository, FolioRepository],
   [DI_TOKENS.IInsumoBarRepository, InsumoBarRepository],
   [DI_TOKENS.IInsumoCocinaRepository, InsumoCocinaRepository],
+  [DI_TOKENS.IInternacionalizacionRepository, InternacionalizacionRepository],
 ];
 
 const useCaseAndControllerClasses: Array<new (...args: never[]) => unknown> = [
@@ -238,6 +245,11 @@ FolioController,
   GetConsumosFolioUseCase,
   InsumoBarController,
   InsumoCocinaController,
+  InternacionalizacionController,
+  CreateInternacionalizacionUseCase,
+  FindInternacionalizacionByHabitacionUseCase,
+  UpdateInternacionalizacionUseCase,
+  DeleteInternacionalizacionUseCase,
 ];
 
 /**

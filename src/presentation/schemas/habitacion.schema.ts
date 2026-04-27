@@ -69,6 +69,7 @@ export const SearchAvailableHabitacionesSchema = z
     fecha_inicio: z.string().datetime({ message: "fecha_inicio debe ser una fecha ISO válida" }).optional(),
     fecha_fin: z.string().datetime({ message: "fecha_fin debe ser una fecha ISO válida" }).optional(),
     orden_precio: z.enum(["asc", "desc"]).optional(),
+    locale: z.enum(["es", "en", "fr"]).optional().default("es"),
   })
   .refine(
     (data) => {
@@ -86,3 +87,11 @@ export const SearchAvailableHabitacionesSchema = z
     fecha_inicio: data.fecha_inicio ? new Date(data.fecha_inicio) : undefined,
     fecha_fin: data.fecha_fin ? new Date(data.fecha_fin) : undefined,
   }));
+
+export type SearchAvailableHabitacionesQuery = z.infer<typeof SearchAvailableHabitacionesSchema>;
+
+export const HabitacionPublicDetailQuerySchema = z.object({
+  locale: z.enum(["es", "en", "fr"]).optional().default("es"),
+});
+
+export type HabitacionPublicDetailQuery = z.infer<typeof HabitacionPublicDetailQuerySchema>;
